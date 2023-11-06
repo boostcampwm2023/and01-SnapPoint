@@ -1,6 +1,4 @@
 # TripTrack
-And01
-Good
 
 ## 팀원
 
