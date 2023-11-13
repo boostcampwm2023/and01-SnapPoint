@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+    implementation(libs.androidx.rules)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -68,6 +69,8 @@ dependencies {
     //coil
     implementation(libs.coil)
 
+    //exif
+    implementation(libs.androidx.exifinterface)
 
     //retrofit
     implementation(libs.retrofit)
