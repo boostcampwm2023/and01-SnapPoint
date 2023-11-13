@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  seq        Int      @id @default(autoincrement())
+  id         String   @unique @default(uuid())
+  email      String   @unique
+  password   String
+  nickname   String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
+}
+
+model Post {
+  seq        Int      @id @default(autoincrement())
+  id         String   @unique @default(uuid())
+  userId     String
+  title      String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
+}
+
+model Like {
+  seq    Int    @id @default(autoincrement())
+  userId String
+  postId String
+}
+
+model Block {
+  seq         Int      @id @default(autoincrement())
+  id          String   @unique @default(uuid())
+  postId      String
+  typeSeq     Int
+  content     String
+  order       Decimal
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @default(now())
+  fileName    String?
+  coordinates String?
+}
+
+model BlockType {
+  seq  Int    @id @default(autoincrement())
+  type String
+}
