@@ -1,5 +1,8 @@
 package com.boostcampwm2023.snappoint.di
 
+import com.boostcampwm2023.snappoint.data.repository.MediaRepository
+import com.boostcampwm2023.snappoint.data.repository.MediaRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -7,7 +10,14 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-class RepositoryModule {
+object RepositoryModule {
 
-    
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryImplModule{
+
+    @Binds
+    abstract fun bindMediaRepository(impl: MediaRepositoryImpl): MediaRepository
 }
