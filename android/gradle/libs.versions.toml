@@ -16,6 +16,9 @@ kotlinx-serialization-json = "1.5.1"
 datastore-preferences = "1.0.0"
 coil = "2.4.0"
 room_version = "2.6.0"
+mockk_version = "1.13.8"
+exifinterface = "1.3.6"
+rules = "1.5.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -41,6 +44,9 @@ coil = {group = "io.coil-kt", name = "coil", version.ref = "coil"}
 room-runtime = {group = "androidx.room", name = "room-runtime", version.ref = "room_version" }
 room-compiler = {group = "androidx.room", name = "room-compiler", version.ref = "room_version" }
 room-ktx = {group = "androidx.room", name = "room-ktx", version.ref = "room_version" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk_version"}
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
+androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
 
 
 

@@ -1,0 +1,39 @@
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  setup-node:
+    if: contains(github.event.pull_request.labels.*.name, 'BE')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: 'backend/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: '**/yarn.lock'
+
+  test:
+    if: contains(github.event.pull_request.labels.*.name, 'BE')
+    needs: setup-node
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: cd backend && yarn install --frozen-lockfile
+      - name: Run test
+        run: cd backend && yarn test
+
+  build:
+    if: contains(github.event.pull_request.labels.*.name, 'BE')
+    needs: setup-node
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: cd backend && yarn install --frozen-lockfile
+      - name: Build
+        run: cd backend && yarn build
