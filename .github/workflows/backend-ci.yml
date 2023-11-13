@@ -6,6 +6,7 @@ on:
 
 jobs:
   setup-node:
+    if: contains(github.event.pull_request.labels.*.name, 'BE')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,6 +17,7 @@ jobs:
           cache-dependency-path: '**/yarn.lock'
 
   test:
+    if: contains(github.event.pull_request.labels.*.name, 'BE')
     needs: setup-node
     runs-on: ubuntu-latest
     steps:
@@ -26,6 +28,7 @@ jobs:
         run: cd backend && yarn test
 
   build:
+    if: contains(github.event.pull_request.labels.*.name, 'BE')
     needs: setup-node
     runs-on: ubuntu-latest
     steps:
