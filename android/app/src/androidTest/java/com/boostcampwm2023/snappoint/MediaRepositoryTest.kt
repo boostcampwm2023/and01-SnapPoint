@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint
 
 import androidx.test.rule.GrantPermissionRule
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
@@ -19,12 +20,7 @@ class MediaRepositoryTest {
     private val imageFileWithGPS = "/storage/emulated/0/Pictures/IMG_20231113_022342.jpg"
     private val imageFileWithoutGPS = "/storage/emulated/0/Pictures/IMG_20231113_130850.jpg"
 
-    @Test
-    fun 미디어_파일을_성공적으로_가져온_경우(){
-
-    }
-
-    @Test
+    @Before
     fun 파일이_존재하는지_확인() {
         assert(File(imageFileWithGPS).exists())
         assert(File(imageFileWithoutGPS).exists())
