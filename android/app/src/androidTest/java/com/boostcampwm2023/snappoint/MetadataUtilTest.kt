@@ -7,7 +7,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.File
 
-class MediaRepositoryTest {
+class MetadataUtilTest {
 
     @JvmField
     @Rule
