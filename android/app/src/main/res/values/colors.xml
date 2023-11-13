@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primaryColor">#3E6A00</color>
+    <color name="secondaryColor">#576249</color>
+    <color name="surfaceColor">#FAFAF2</color>
+    <color name="onSurfaceColor">#1B1C18</color>
+    <color name="surfaceContainerHighest">#E3E3DB</color>
+    <color name="surfaceContainerLow">#F5F4EC</color>
 </resources>
