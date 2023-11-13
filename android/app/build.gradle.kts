@@ -84,4 +84,7 @@ dependencies {
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
 
+    //mockk
+    testImplementation(libs.mockk)
+
 }
