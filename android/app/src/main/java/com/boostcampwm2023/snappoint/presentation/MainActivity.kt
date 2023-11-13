@@ -1,7 +1,8 @@
-package com.boostcampwm2023.snappoint
+package com.boostcampwm2023.snappoint.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.boostcampwm2023.snappoint.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
