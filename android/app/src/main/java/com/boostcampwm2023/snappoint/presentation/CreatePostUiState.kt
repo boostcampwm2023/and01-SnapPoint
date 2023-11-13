@@ -11,6 +11,6 @@ sealed class PostBlock(open val content: String) {
 }
 
 data class Position(
-    val latitude: Long,
-    val longitude: Long
+    val latitude: Double,
+    val longitude: Double
 )
