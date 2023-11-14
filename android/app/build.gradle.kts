@@ -6,6 +6,7 @@ plugins {
     kotlin("kapt")
     alias(libs.plugins.hiltAndroid)
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 
     kotlin("plugin.serialization") version "1.9.0"
 }
@@ -90,4 +91,13 @@ dependencies {
     //mockk
     testImplementation(libs.mockk)
 
+    //maps
+    implementation (libs.play.services.maps)
+
+    //mockwebserver
+    testImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.mockwebserver)
+
+    //kotlinx-coroutines-test
+    testImplementation(libs.kotlinx.coroutines.test)
 }
