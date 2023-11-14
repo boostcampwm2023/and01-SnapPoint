@@ -1,12 +1,14 @@
 package com.boostcampwm2023.snappoint.presentation
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
+import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+@AndroidEntryPoint
+class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
+
+    override fun initView() {
+
     }
 }

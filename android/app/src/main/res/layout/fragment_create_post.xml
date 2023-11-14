@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,7 +49,8 @@
             android:src="@drawable/icon_check"
             app:layout_constraintBottom_toBottomOf="@id/tb"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{() -> vm.printBlockList()}"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_title"
@@ -86,7 +89,8 @@
             android:padding="16dp"
             android:src="@drawable/icon_text_block"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/til_title" />
+            app:layout_constraintTop_toBottomOf="@id/til_title"
+            android:onClick="@{() -> vm.addTextBlock()}"/>
 
         <ImageButton
             android:id="@+id/btn_insert_image_block"
@@ -113,13 +117,14 @@
             app:layout_constraintTop_toBottomOf="@id/til_title" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcv_input_block"
+            android:id="@+id/rcv_post_block"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:layout_constraintTop_toBottomOf="@id/btn_insert_text_block"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:padding="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_text_block" />
+            tools:listitem="@layout/item_text_block"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
