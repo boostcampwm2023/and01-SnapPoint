@@ -4,6 +4,10 @@
 
     <data>
 
+        <variable
+            name="listener"
+            type="android.text.TextWatcher" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,7 +62,8 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                textWatcher="@{listener}"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
