@@ -93,4 +93,11 @@ dependencies {
 
     //maps
     implementation (libs.play.services.maps)
+
+    //mockwebserver
+    testImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.mockwebserver)
+
+    //kotlinx-coroutines-test
+    testImplementation(libs.kotlinx.coroutines.test)
 }
