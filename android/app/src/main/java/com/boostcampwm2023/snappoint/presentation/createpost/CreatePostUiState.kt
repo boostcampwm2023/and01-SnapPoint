@@ -2,9 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 
 data class CreatePostUiState(
     val postBlocks: MutableList<PostBlock> = mutableListOf(),
-    val onTextChanged: (position: Int, text: String) -> Unit = { _: Int, _: String ->
-
-    }
+    val onTextChanged: ((position: Int, text: String) -> Unit)? = null
 )
 
 sealed class PostBlock(open val content: String) {

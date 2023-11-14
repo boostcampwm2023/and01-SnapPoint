@@ -45,7 +45,7 @@ class EditTextChangeListener(private val uiState: CreatePostUiState) : TextWatch
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        uiState.onTextChanged(position, s.toString())
+        uiState.onTextChanged?.let { it(position, s.toString()) }
     }
 
     override fun afterTextChanged(s: Editable?) {
