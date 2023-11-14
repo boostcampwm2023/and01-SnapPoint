@@ -18,7 +18,7 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_google_map) as SupportMapFragment
         map.getMapAsync(this)
     }
 
