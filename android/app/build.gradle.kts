@@ -90,4 +90,11 @@ dependencies {
     //mockk
     testImplementation(libs.mockk)
 
+    //mockwebserver
+    testImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.mockwebserver)
+
+    //kotlinx-coroutines-test
+    testImplementation(libs.kotlinx.coroutines.test)
+
 }
