@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.BindingAdapter
@@ -33,18 +32,17 @@ class CreatePostListAdapter(
     }
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
-        Log.d("TAG", "onBindViewHolder: $position")
         holder.bind(blocks[position].content, position)
     }
 
     override fun onViewAttachedToWindow(holder: BlockItemViewHolder) {
         super.onViewAttachedToWindow(holder)
-        Log.d("TAG", "onViewAttachedToWindow: ")
+        holder.attachTextWatcherToEditText()
     }
 
     override fun onViewDetachedFromWindow(holder: BlockItemViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        Log.d("TAG", "onViewDetachedFromWindow: ")
+        holder.detachTextWatcherFromEditText()
     }
 }
 
@@ -53,18 +51,19 @@ fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlock>, listener: (Int
     if (adapter == null) adapter = CreatePostListAdapter(listener)
 
     when {
+        // 아이템 추가
         (adapter as CreatePostListAdapter).getCurrentBlocks().size < blocks.size -> {
             with(adapter as CreatePostListAdapter) {
                 updateBlocks(blocks)
                 notifyItemInserted(blocks.size - 1)
             }
         }
-//
-//        (adapter as CreatePostListAdapter).getCurrentBlocks().size == blocks.size -> {
-//            with(adapter as CreatePostListAdapter) {
-//                updateBlocks(blocks)
-//                notifyItemRangeChanged(0, blocks.size)
-//            }
-//        }
+
+        // content 변경
+        (adapter as CreatePostListAdapter).getCurrentBlocks().size == blocks.size -> {
+            with(adapter as CreatePostListAdapter) {
+                updateBlocks(blocks)
+            }
+        }
     }
 }
