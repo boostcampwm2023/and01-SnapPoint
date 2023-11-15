@@ -31,7 +31,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".presentation.map.MapsMarkerActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +41,7 @@
         </activity>
 
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.map.MapsMarkerActivity"
             android:exported="true">
         </activity>
     </application>

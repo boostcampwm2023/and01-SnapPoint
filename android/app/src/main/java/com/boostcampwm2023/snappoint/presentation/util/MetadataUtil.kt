@@ -1,7 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.util
 
 import androidx.exifinterface.media.ExifInterface
-import com.boostcampwm2023.snappoint.presentation.Position
+import com.boostcampwm2023.snappoint.presentation.createpost.Position
 
 object MetadataUtil {
 
