@@ -2,13 +2,16 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.serialization.descriptors.PrimitiveKind
 
 @AndroidEntryPoint
 class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.fragment_create_post) {
@@ -34,13 +37,16 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
     private fun collectViewModelData() {
         lifecycleScope.launch {
-            viewModel.uiState.collect {
-//                if (it.postBlocks.size > listAdapter.blocks.size) {
-//                    listAdapter.blocks = it.postBlocks.toMutableList()
-//                    listAdapter.notifyItemInserted(it.postBlocks.size)
-//                    binding.rcvPostBlock.scrollToPosition(it.postBlocks.size - 1)
-//                }
+            viewModel.event.collect{event ->
+                when(event){
+                    is CreatePostEvent.ShowMessage -> {showToastMessage(event.resId)}
+                }
             }
+
         }
+    }
+
+    private fun showToastMessage(resId: Int) {
+        Toast.makeText(requireContext(), getString(resId), Toast.LENGTH_LONG).show()
     }
 }

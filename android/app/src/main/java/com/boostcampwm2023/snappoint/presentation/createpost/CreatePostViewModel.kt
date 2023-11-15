@@ -2,9 +2,14 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.boostcampwm2023.snappoint.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -18,6 +23,13 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
         }
     ))
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
+
+    private val _event: MutableSharedFlow<CreatePostEvent> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val event: SharedFlow<CreatePostEvent> = _event.asSharedFlow()
+
 
     fun addTextBlock() {
         _uiState.update {
@@ -73,6 +85,8 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onCheckButtonClicked() {
-        
+        if(isValidContents().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
+        }
     }
 }
