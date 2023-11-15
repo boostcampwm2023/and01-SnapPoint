@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
         <variable
-            name="listener"
-            type="android.text.TextWatcher" />
+            name="stringBlock"
+            type="com.boostcampwm2023.snappoint.presentation.createpost.PostBlock.STRING" />
 
     </data>
 
@@ -61,9 +60,10 @@
             android:hint="@string/item_text_block_til_hint">
 
             <com.google.android.material.textfield.TextInputEditText
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                textWatcher="@{listener}"/>
+                />
 
         </com.google.android.material.textfield.TextInputLayout>
 

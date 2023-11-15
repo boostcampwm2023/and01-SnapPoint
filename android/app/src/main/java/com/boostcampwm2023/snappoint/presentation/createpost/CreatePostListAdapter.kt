@@ -1,25 +1,30 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.text.Editable
-import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
-class CreatePostListAdapter(private val uiState: CreatePostUiState) :
-    RecyclerView.Adapter<BlockItemViewHolder>() {
+class CreatePostListAdapter(
+    private val listener: (Int, String) -> Unit
+) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
-    var blocks: MutableList<PostBlock> = uiState.postBlocks
+    private var blocks: MutableList<PostBlock> = mutableListOf()
+
+    fun getCurrentBlocks() = blocks.toList()
+
+    fun updateBlocks(newBlocks: List<PostBlock>) {
+        blocks = newBlocks.toMutableList()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         return BlockItemViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
-            EditTextChangeListener(uiState = uiState)
+            listener
         )
     }
 
@@ -28,32 +33,38 @@ class CreatePostListAdapter(private val uiState: CreatePostUiState) :
     }
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
-        holder.listener.updatePosition(position)
+        Log.d("TAG", "onBindViewHolder: $position")
+        holder.bind(blocks[position].content, position)
+    }
+
+    override fun onViewAttachedToWindow(holder: BlockItemViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        Log.d("TAG", "onViewAttachedToWindow: ")
+    }
+
+    override fun onViewDetachedFromWindow(holder: BlockItemViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        Log.d("TAG", "onViewDetachedFromWindow: ")
     }
 }
 
-class EditTextChangeListener(private val uiState: CreatePostUiState) : TextWatcher {
+@BindingAdapter("blocks", "listener")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlock>, listener: (Int, String) -> Unit) {
+    if (adapter == null) adapter = CreatePostListAdapter(listener)
 
-    private var position: Int = 0
-
-    fun updatePosition(new: Int) {
-        position = new
+    when {
+        (adapter as CreatePostListAdapter).getCurrentBlocks().size < blocks.size -> {
+            with(adapter as CreatePostListAdapter) {
+                updateBlocks(blocks)
+                notifyItemInserted(blocks.size - 1)
+            }
+        }
+//
+//        (adapter as CreatePostListAdapter).getCurrentBlocks().size == blocks.size -> {
+//            with(adapter as CreatePostListAdapter) {
+//                updateBlocks(blocks)
+//                notifyItemRangeChanged(0, blocks.size)
+//            }
+//        }
     }
-
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-    }
-
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        uiState.onTextChanged?.let { it(position, s.toString()) }
-    }
-
-    override fun afterTextChanged(s: Editable?) {
-
-    }
-}
-
-@BindingAdapter("textWatcher")
-fun EditText.addTextChangeListener(listener: TextWatcher) {
-    addTextChangedListener(listener)
 }

@@ -3,7 +3,6 @@ package com.boostcampwm2023.snappoint.presentation.map
 import android.os.Bundle
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMapsMarkerBinding
-import com.boostcampwm2023.snappoint.presentation.Position
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
