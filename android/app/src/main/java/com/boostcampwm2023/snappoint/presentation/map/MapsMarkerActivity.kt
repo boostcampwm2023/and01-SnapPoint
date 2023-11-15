@@ -48,6 +48,10 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         _marker?.tag = post
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.5f))
+
+        googleMap.setOnMarkerClickListener(this)
+        googleMap.setOnMarkerDragListener(this)
+        googleMap.setOnMapLongClickListener(this)
     }
 
     override fun onStop() {
