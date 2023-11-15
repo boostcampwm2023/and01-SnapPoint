@@ -12,8 +12,8 @@ class BlockItemViewHolder(
 
     private val textWatcher = EditTextWatcher(listener)
 
-    fun bind(s: String, position: Int) {
-        binding.tilText.editText?.setText(s)
+    fun bind(text: String, position: Int) {
+        binding.tilText.editText?.setText(text)
         textWatcher.updatePosition(position)
     }
 
@@ -42,7 +42,7 @@ class EditTextWatcher(private val listener: (Int, String) -> Unit) : TextWatcher
 
     }
 
-    override fun afterTextChanged(s: Editable?) {
-        listener(position, s.toString())
+    override fun afterTextChanged(changedText: Editable?) {
+        listener(position, changedText.toString())
     }
 }
