@@ -61,7 +61,18 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
         Log.d("TAG", "updatePostBlocks: ${_uiState.value.postBlocks[position].content}")
     }
 
-    fun printBlockList() {
-        println(uiState.value.postBlocks)
+    private fun isValidContents(): Boolean {
+        _uiState.value.postBlocks.forEach {
+            when(it){
+                is PostBlock.STRING -> {if(it.content.isEmpty()) return false}
+                is PostBlock.IMAGE -> {if(it.content.isEmpty()) return false}
+                is PostBlock.VIDEO -> {if(it.content.isEmpty()) return false}
+            }
+        }
+        return true
+    }
+
+    fun onCheckButtonClicked() {
+        
     }
 }
