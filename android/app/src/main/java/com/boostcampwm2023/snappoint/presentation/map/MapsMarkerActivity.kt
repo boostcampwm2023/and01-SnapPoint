@@ -16,7 +16,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
-    OnMapReadyCallback {
+    OnMapReadyCallback,
+    GoogleMap.OnMarkerClickListener {
 
     private var _post: PostBlock = PostBlock.IMAGE("Content", Position(37.3586926, 127.1051209))
     private var _marker: Marker? = null
@@ -67,5 +68,11 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         super.onDestroy()
 
         _marker = null
+    }
+
+    override fun onMarkerClick(p0: Marker): Boolean {
+        Log.d("LOG", "${p0.id} here")
+
+        return false
     }
 }
