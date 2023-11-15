@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'be') }}
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'be') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,13 +34,13 @@ jobs:
             echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
 
       - name: Build Docker image
-        run: docker build -t snap-point:latest ./backend
+        run: docker build -t ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest ./backend
 
       - name: Login to NCP container registory
         run: docker login ${{ secrets.NCP_DOCKER_REGISTORY }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
 
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.NCP_DOCKER_REGISTORY }}/<snap-point:latest>
+        run: docker push ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
 
       - name: SSH into Ubuntu server and pull the latest image
         uses: appleboy/ssh-action@master
@@ -52,7 +52,7 @@ jobs:
             port: ${{ secrets.SSH_PORT }}
             script: |
                 docker login ${{ secrets.NCP_DOCKER_REGISTORY }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
-                docker pull ${{ secrets.NCP_DOCKER_REGISTORY }}/<snap-point:latest>
+                docker pull ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
                 docker stop snap-point-container ner || true
-                docker rm snap-point || true
-                docker run -d -p 3000:3000 --name snap-point-container snap-point
+                docker rm snap-point-container || true
+                docker run -d -p 3000:3000 --name snap-point-container ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
