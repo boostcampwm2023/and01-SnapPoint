@@ -1,0 +1,58 @@
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'be') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'backend/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: '**/yarn.lock'
+
+      - name: Install dependencies
+        run: |
+            cd backend
+            yarn install --frozen-lockfile
+
+      - name: env file create
+        env:
+            DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
+        run: |
+            cd backend
+            touch .env
+            echo "DATABASE_URL=$DATABASE_URL" >> .env
+            echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
+
+      - name: Build Docker image
+        run: docker build -t snap-point:latest ./backend
+
+      - name: Login to NCP container registory
+        run: docker login ${{ secrets.NCP_DOCKER_REGISTORY }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.NCP_DOCKER_REGISTORY }}/<snap-point:latest>
+
+      - name: SSH into Ubuntu server and pull the latest image
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USER }}
+            password: ${{ secrets.SSH_PASSWORD }}
+            key: ${{ secrets.SSH_PEM_KEY }}
+            port: ${{ secrets.SSH_PORT }}
+            script: |
+                docker login ${{ secrets.NCP_DOCKER_REGISTORY }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
+                docker pull ${{ secrets.NCP_DOCKER_REGISTORY }}/<snap-point:latest>
+                docker stop snap-point-container ner || true
+                docker rm snap-point || true
+                docker run -d -p 3000:3000 --name snap-point-container snap-point
