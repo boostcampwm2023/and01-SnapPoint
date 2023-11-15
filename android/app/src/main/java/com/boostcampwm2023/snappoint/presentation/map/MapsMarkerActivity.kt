@@ -18,7 +18,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
     OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener,
-    GoogleMap.OnMarkerDragListener {
+    GoogleMap.OnMarkerDragListener,
+    GoogleMap.OnMapLongClickListener {
 
     private var _post: PostBlock = PostBlock.IMAGE("Content", Position(37.3586926, 127.1051209))
     private var _marker: Marker? = null
@@ -98,5 +99,22 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
             is PostBlock.VIDEO -> PostBlock.IMAGE(tag.content, newPosition)
             else -> return
         }
+    }
+
+    override fun onMapLongClick(p0: LatLng) {
+        Log.d("LOG","LONG CLICK AT: $p0")
+
+        val marker: Marker = _marker!!
+        val tag: PostBlock = marker.tag as? PostBlock ?: return
+        val newPosition: Position = Position(p0.latitude, p0.longitude)
+
+        marker.position = p0
+        marker.tag = when (tag) {
+            is PostBlock.IMAGE -> PostBlock.IMAGE(tag.content, newPosition)
+            is PostBlock.VIDEO -> PostBlock.VIDEO(tag.content, newPosition)
+            else -> return
+        }
+
+        marker.showInfoWindow()
     }
 }
