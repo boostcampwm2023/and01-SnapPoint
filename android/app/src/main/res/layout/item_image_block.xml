@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cv_image"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/til_description"
+            app:cardBackgroundColor="@color/surfaceColor">
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <ImageButton
+            android:id="@+id/btn_delete_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_edit_block"
+            app:layout_constraintTop_toTopOf="@id/cv_image"
+            app:layout_constraintBottom_toTopOf="@id/iv_image"
+            android:src="@drawable/icon_delete"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            app:tint="@color/errorContainer" />
+
+        <ImageButton
+            android:id="@+id/btn_edit_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/cv_image"
+            app:layout_constraintTop_toTopOf="@id/cv_image"
+            app:layout_constraintBottom_toTopOf="@id/iv_image"
+            android:src="@drawable/icon_edit"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginVertical="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_down"
+            app:layout_constraintTop_toTopOf="@id/cv_image"
+            app:layout_constraintBottom_toTopOf="@id/iv_image"
+            android:src="@drawable/icon_arrow_up"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="invisible"/>
+
+        <ImageButton
+            android:id="@+id/btn_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_edit_cancel"
+            app:layout_constraintTop_toTopOf="@id/cv_image"
+            app:layout_constraintBottom_toTopOf="@id/iv_image"
+            android:src="@drawable/icon_arrow_down"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="invisible"/>
+
+        <ImageButton
+            android:id="@+id/btn_edit_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_edit_block"
+            app:layout_constraintTop_toTopOf="@id/cv_image"
+            app:layout_constraintBottom_toTopOf="@id/iv_image"
+            android:src="@drawable/icon_cancel"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="invisible"/>
+
+        <ImageButton
+            android:id="@+id/btn_edit_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/cv_image"
+            app:layout_constraintTop_toTopOf="@id/cv_image"
+            app:layout_constraintBottom_toTopOf="@id/iv_image"
+            android:src="@drawable/icon_check"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="invisible"/>
+
+<!--    TODO : 테스트 완료 시 layout_height 수정-->
+        <ImageView
+            android:id="@+id/iv_image"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_delete_block"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/iv_image"
+            android:hint="@string/item_image_block_til_address_hint"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/icon_location_pin">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/til_address"
+            android:hint="@string/item_image_block_til_description_hint"
+            app:endIconMode="clear_text"
+            app:endIconDrawable="@drawable/icon_erase_all">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

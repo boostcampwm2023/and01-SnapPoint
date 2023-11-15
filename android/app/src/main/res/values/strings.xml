@@ -5,4 +5,6 @@
     <string name="create_post_fragment_appbar_title">게시글 작성하기</string>
     <string name="create_post_fragment_til_title_hint">제목</string>
     <string name="item_text_block_til_hint">본문 내용</string>
+    <string name="item_image_block_til_address_hint">이미지 주소</string>
+    <string name="item_image_block_til_description_hint">이미지 설명</string>
 </resources>
