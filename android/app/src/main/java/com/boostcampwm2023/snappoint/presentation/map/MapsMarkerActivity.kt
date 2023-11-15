@@ -58,8 +58,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         val newPosition: Position = Position(marker.position.latitude, marker.position.longitude)
 
         _post = when(post) {
-            is PostBlock.IMAGE -> PostBlock.IMAGE(post.content, newPosition)
-            is PostBlock.VIDEO -> PostBlock.IMAGE(post.content, newPosition)
+            is PostBlock.IMAGE -> post.copy(post.content, newPosition)
+            is PostBlock.VIDEO -> post.copy(post.content, newPosition)
             else -> return
         }
 
@@ -95,8 +95,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         val newPosition: Position = Position(p0.position.latitude, p0.position.longitude)
 
         p0.tag = when (tag) {
-            is PostBlock.IMAGE -> PostBlock.IMAGE(tag.content, newPosition)
-            is PostBlock.VIDEO -> PostBlock.IMAGE(tag.content, newPosition)
+            is PostBlock.IMAGE -> tag.copy(tag.content, newPosition)
+            is PostBlock.VIDEO -> tag.copy(tag.content, newPosition)
             else -> return
         }
     }
@@ -110,8 +110,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
 
         marker.position = p0
         marker.tag = when (tag) {
-            is PostBlock.IMAGE -> PostBlock.IMAGE(tag.content, newPosition)
-            is PostBlock.VIDEO -> PostBlock.VIDEO(tag.content, newPosition)
+            is PostBlock.IMAGE -> tag.copy(tag.content, newPosition)
+            is PostBlock.VIDEO -> tag.copy(tag.content, newPosition)
             else -> return
         }
 
