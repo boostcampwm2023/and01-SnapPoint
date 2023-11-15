@@ -17,7 +17,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
     OnMapReadyCallback,
-    GoogleMap.OnMarkerClickListener {
+    GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMarkerDragListener {
 
     private var _post: PostBlock = PostBlock.IMAGE("Content", Position(37.3586926, 127.1051209))
     private var _marker: Marker? = null
@@ -74,5 +75,28 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         Log.d("LOG", "${p0.id} here")
 
         return false
+    }
+
+    override fun onMarkerDrag(p0: Marker) {
+        //Log.d("LOG", "DRAG")
+    }
+
+    override fun onMarkerDragStart(p0: Marker) {
+        Log.d("LOG", "START: ${p0.position}")
+        p0.showInfoWindow()
+    }
+
+    override fun onMarkerDragEnd(p0: Marker) {
+        Log.d("LOG", "END: ${p0.position}")
+        p0.hideInfoWindow()
+
+        val tag: PostBlock = (p0.tag as? PostBlock) ?: return
+        val newPosition: Position = Position(p0.position.latitude, p0.position.longitude)
+
+        p0.tag = when (tag) {
+            is PostBlock.IMAGE -> PostBlock.IMAGE(tag.content, newPosition)
+            is PostBlock.VIDEO -> PostBlock.IMAGE(tag.content, newPosition)
+            else -> return
+        }
     }
 }
