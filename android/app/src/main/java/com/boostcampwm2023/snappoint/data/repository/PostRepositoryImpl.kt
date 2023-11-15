@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class MediaRepositoryImpl @Inject constructor(
+class PostRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi,
-): MediaRepository {
+): PostRepository {
     override fun getImage(uri: String): Flow<ByteArray> {
         return flowOf(true)
             .map{

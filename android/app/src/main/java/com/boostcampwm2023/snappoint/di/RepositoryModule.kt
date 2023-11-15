@@ -1,7 +1,7 @@
 package com.boostcampwm2023.snappoint.di
 
-import com.boostcampwm2023.snappoint.data.repository.MediaRepository
-import com.boostcampwm2023.snappoint.data.repository.MediaRepositoryImpl
+import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.data.repository.PostRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -19,5 +19,5 @@ object RepositoryModule {
 abstract class RepositoryImplModule{
 
     @Binds
-    abstract fun bindMediaRepository(impl: MediaRepositoryImpl): MediaRepository
+    abstract fun bindPostRepository(impl: PostRepositoryImpl): PostRepository
 }
