@@ -1,11 +1,13 @@
 on:
   pull_request:
     branches:
-      - develop
+      - main
+    types:
+      - closed
 
 jobs:
   deploy:
-    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'be') }}
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'be') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
