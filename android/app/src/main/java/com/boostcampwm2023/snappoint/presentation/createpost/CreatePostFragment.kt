@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
@@ -17,9 +16,6 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.fragment_create_post) {
 
     private val viewModel: CreatePostViewModel by viewModels()
-//    private val listAdapter: CreatePostListAdapter by lazy{
-//        CreatePostListAdapter(viewModel.uiState.value)
-//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,7 +27,6 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     fun initBinding() {
         with(binding) {
             vm = viewModel
-//            listAdapter.blocks = viewModel.uiState.value.postBlocks.toMutableList()
         }
     }
 
