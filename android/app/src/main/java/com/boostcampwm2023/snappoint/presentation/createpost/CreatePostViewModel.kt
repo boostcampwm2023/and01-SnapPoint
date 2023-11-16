@@ -158,4 +158,24 @@ class CreatePostViewModel @Inject constructor(
             }
         }
     }
+
+    fun setAddressAndPosition(index: Int, address: String, position: PositionState) {
+
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
+                    if(idx == index){
+                        when(postBlock){
+                            is PostBlockState.IMAGE -> { PostBlockState.IMAGE(postBlock.content, postBlock.uri, position, address)}
+                            is PostBlockState.VIDEO -> {PostBlockState.VIDEO(postBlock.content, postBlock.uri, position, address)}
+                            is PostBlockState.STRING -> {postBlock}
+                        }
+                    }else{
+                        postBlock
+                    }
+                }
+            )
+        }
+        Log.d("TAG", "setAddressAndPosition: ${_uiState.value.postBlocks[index]}")
+    }
 }

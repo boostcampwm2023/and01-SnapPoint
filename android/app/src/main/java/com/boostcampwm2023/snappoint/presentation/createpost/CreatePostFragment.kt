@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.Manifest
+import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -20,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
+import com.boostcampwm2023.snappoint.presentation.map.MapsMarkerActivity
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -53,6 +55,27 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                 viewModel.addImageBlock(imageUri, position)
             }
         }
+
+    private val addressSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
+            if(result.resultCode == RESULT_OK){
+                result.data?.let{
+                    viewModel.setAddressAndPosition(
+                        index = it.getIntExtra("index", 0),
+                        address = it.getStringExtra("address") ?: "",
+                        position = PositionState(
+                            it.getDoubleExtra("longitude", 0.0),
+                            it.getDoubleExtra("latitude", 0.0)
+                        )
+                    )
+                }
+                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getStringExtra("address")}")
+                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getStringExtra("asdasdasd")}")
+                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getDoubleExtra("longitude", 123.123)}")
+                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getDoubleExtra("latitude", 123.123)}")
+            }
+        }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -146,6 +169,9 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
 
     private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
-        Log.d("TAG", "startMapActivityAndFindAddress: $index, $position")
+        val intent = Intent(requireContext(), MapsMarkerActivity::class.java)
+        intent.putExtra("index", index)
+        intent.putExtra("position", position.asDoubleArray())
+        addressSelectionLauncher.launch(intent)
     }
 }

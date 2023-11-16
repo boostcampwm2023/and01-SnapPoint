@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ViewDataBinding
@@ -49,8 +50,9 @@ sealed class BlockItemViewHolder(
         private val onDeleteButtonClicked: (Int) -> Unit
     ) : BlockItemViewHolder(binding, listener) {
 
-        fun bind(content: String, uri: Uri, index: Int) {
+        fun bind(content: String, uri: Uri, index: Int, address: String) {
             binding.tilDescription.editText?.setText(content)
+            binding.tilAddress.editText?.setText(address)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(index) }
             binding.uri = uri
             binding.tilAddress.setEndIconOnClickListener { onAddressIconClicked.invoke(index) }

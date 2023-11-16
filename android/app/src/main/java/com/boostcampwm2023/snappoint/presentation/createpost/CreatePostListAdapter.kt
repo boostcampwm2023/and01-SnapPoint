@@ -19,6 +19,7 @@ class CreatePostListAdapter(
 
     fun updateBlocks(newBlocks: List<PostBlockState>) {
         blocks = newBlocks.toMutableList()
+        notifyDataSetChanged()
     }
 
     private fun deleteBlocks(position: Int) {
@@ -74,7 +75,7 @@ class CreatePostListAdapter(
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
             is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position].content, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlockState.IMAGE).uri, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlockState.IMAGE).uri, position, (blocks[position] as PostBlockState.IMAGE).address)
         }
     }
 
