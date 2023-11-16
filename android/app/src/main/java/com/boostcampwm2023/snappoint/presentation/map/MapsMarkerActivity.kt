@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.map
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import com.boostcampwm2023.snappoint.R
@@ -20,7 +21,7 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     GoogleMap.OnCameraMoveListener,
     GoogleMap.OnCameraIdleListener {
 
-    private var _post: PostBlock = PostBlock.IMAGE("Content", Position(37.3586926, 127.1051209))
+    private var _post: PostBlock = PostBlock.IMAGE("Content", Uri.EMPTY, Position(37.3586926, 127.1051209))
     private var _marker: Marker? = null
     private var _map: GoogleMap? = null
 
@@ -83,7 +84,7 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         val newPosition: Position = Position(latLng.latitude, latLng.longitude)
 
         marker.tag = when (tag) {
-            is PostBlock.IMAGE -> tag.copy(tag.content, newPosition)
+            is PostBlock.IMAGE -> tag.copy(tag.content, tag.uri, newPosition)
             is PostBlock.VIDEO -> tag.copy(tag.content, newPosition)
             else -> return
         }

@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
+import android.util.Log
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
