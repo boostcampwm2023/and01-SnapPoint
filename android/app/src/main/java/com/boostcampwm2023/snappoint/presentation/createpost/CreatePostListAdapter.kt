@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class CreatePostListAdapter(
@@ -18,10 +19,30 @@ class CreatePostListAdapter(
         blocks = newBlocks.toMutableList()
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return when(blocks[position]) {
+            is PostBlock.STRING -> ViewType.STRING.ordinal
+            is PostBlock.IMAGE -> ViewType.IMAGE.ordinal
+            is PostBlock.VIDEO -> ViewType.VIDEO.ordinal
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
-        return BlockItemViewHolder(
+        when (viewType) {
+            ViewType.IMAGE.ordinal -> {
+                return BlockItemViewHolder.ImageBlockViewHolder(
+                    ItemImageBlockBinding.inflate(inflater, parent, false),
+                    listener
+                )
+            }
+
+            ViewType.VIDEO.ordinal -> {
+                TODO()
+            }
+        }
+        return BlockItemViewHolder.TextBlockViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
             listener
         )
@@ -32,7 +53,10 @@ class CreatePostListAdapter(
     }
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
-        holder.bind(blocks[position].content, position)
+        when (holder) {
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position].content, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlock.IMAGE).uri, position)
+        }
     }
 
     override fun onViewAttachedToWindow(holder: BlockItemViewHolder) {
