@@ -102,7 +102,8 @@
             android:padding="16dp"
             android:src="@drawable/icon_photo_block"
             app:layout_constraintStart_toEndOf="@id/btn_insert_text_block"
-            app:layout_constraintTop_toBottomOf="@id/til_title" />
+            app:layout_constraintTop_toBottomOf="@id/til_title"
+            android:onClick="@{() -> vm.onImageBlockButtonClicked()}"/>
 
         <ImageButton
             android:id="@+id/btn_insert_video_block"

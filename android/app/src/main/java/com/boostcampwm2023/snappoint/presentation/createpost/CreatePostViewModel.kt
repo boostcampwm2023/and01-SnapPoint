@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.util.Log
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
@@ -48,8 +49,14 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addImageBlock() {
-        TODO()
+    fun addImageBlock(uri: Uri?, position: PositionState) {
+        if (uri == null) return
+
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlockState.IMAGE(uri = uri, position = position)
+            )
+        }
     }
 
     fun addVideoBlock() {
@@ -59,13 +66,6 @@ class CreatePostViewModel @Inject constructor(
     private fun updatePostBlocks(position: Int, content: String) {
         _uiState.update {
             it.copy(
-//                postBlocks = it.postBlocks.toMutableList().apply {
-//                    when (val postBlock = this[position]) {
-//                        is PostBlock.STRING -> set(position, postBlock.copy(content = content))
-//                        is PostBlock.IMAGE -> TODO()
-//                        is PostBlock.VIDEO -> TODO()
-//                    }
-//                }
                 postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
                     if(position == index) {
                         when(postBlock){
@@ -79,7 +79,6 @@ class CreatePostViewModel @Inject constructor(
                 }
             )
         }
-        Log.d("TAG", "updatePostBlocks: ${_uiState.value.postBlocks[position].content}")
     }
 
     private fun isValidContents(): Boolean {
@@ -94,6 +93,7 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun onCheckButtonClicked() {
+        println(uiState.value.postBlocks)
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
         }
@@ -108,5 +108,9 @@ class CreatePostViewModel @Inject constructor(
                 Log.d("TAG", "onCheckButtonClicked: api request success")
             }
             .launchIn(viewModelScope)
+    }
+
+    fun onImageBlockButtonClicked() {
+        _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
     }
 }

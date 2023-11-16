@@ -1,30 +1,66 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
+import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.ImageView
+import androidx.databinding.BindingAdapter
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
-class BlockItemViewHolder(
-    private val binding: ItemTextBlockBinding,
+sealed class BlockItemViewHolder(
+    binding: ViewDataBinding,
     listener: (Int, String) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val textWatcher = EditTextWatcher(listener)
+    val textWatcher = EditTextWatcher(listener)
 
-    fun bind(text: String, position: Int) {
-        binding.tilText.editText?.setText(text)
-        textWatcher.updatePosition(position)
+    abstract fun attachTextWatcherToEditText()
+    abstract fun detachTextWatcherFromEditText()
+
+    class TextBlockViewHolder(
+        private val binding: ItemTextBlockBinding,
+        listener: (Int, String) -> Unit
+    ) : BlockItemViewHolder(binding, listener) {
+
+        fun bind(content: String, position: Int) {
+            binding.tilText.editText?.setText(content)
+            textWatcher.updatePosition(position)
+        }
+
+        override fun attachTextWatcherToEditText() {
+            binding.tilText.editText?.addTextChangedListener(textWatcher)
+        }
+
+        override fun detachTextWatcherFromEditText() {
+            binding.tilText.editText?.removeTextChangedListener(textWatcher)
+        }
     }
 
-    fun attachTextWatcherToEditText() {
-        binding.tilText.editText?.addTextChangedListener(textWatcher)
-    }
+    class ImageBlockViewHolder(
+        private val binding: ItemImageBlockBinding,
+        listener: (Int, String) -> Unit
+    ) : BlockItemViewHolder(binding, listener) {
 
-    fun detachTextWatcherFromEditText() {
-        binding.tilText.editText?.removeTextChangedListener(textWatcher)
+        fun bind(content: String, uri: Uri, position: Int) {
+            binding.tilDescription.editText?.setText(content)
+            binding.uri = uri
+            textWatcher.updatePosition(position)
+        }
+
+        override fun attachTextWatcherToEditText() {
+            binding.tilDescription.editText?.addTextChangedListener(textWatcher)
+        }
+
+        override fun detachTextWatcherFromEditText() {
+            binding.tilDescription.editText?.removeTextChangedListener(textWatcher)
+        }
     }
 }
+
 
 class EditTextWatcher(private val listener: (Int, String) -> Unit) : TextWatcher {
 
@@ -45,4 +81,10 @@ class EditTextWatcher(private val listener: (Int, String) -> Unit) : TextWatcher
     override fun afterTextChanged(changedText: Editable?) {
         listener(position, changedText.toString())
     }
+}
+
+
+@BindingAdapter("uri")
+fun ImageView.bindUri(uri: Uri) {
+    load(uri)
 }
