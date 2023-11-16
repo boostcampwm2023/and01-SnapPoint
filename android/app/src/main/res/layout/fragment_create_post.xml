@@ -132,6 +132,7 @@
             blocks="@{vm.uiState.postBlocks}"
             listener="@{vm.uiState.onTextChanged}"
             onDeleteButtonClick="@{vm.uiState.onDeleteButtonClicked}"
+            onEditButtonClick="@{vm.uiState.onEditButtonClicked}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_text_block"/>
 

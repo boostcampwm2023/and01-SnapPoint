@@ -9,7 +9,8 @@ import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class CreatePostListAdapter(
     private val listener: (Int, String) -> Unit,
-    private val onDeleteButtonClicked: (Int) -> Unit
+    private val onDeleteButtonClicked: (Int) -> Unit,
+    private val onEditButtonClicked: (Int) -> Unit,
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -41,7 +42,8 @@ class CreatePostListAdapter(
             ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     ItemImageBlockBinding.inflate(inflater, parent, false),
-                    listener
+                    listener,
+                    onEditButtonClicked
                 ) { index ->
                     onDeleteButtonClicked(index)
                     deleteBlocks(index)
@@ -54,7 +56,8 @@ class CreatePostListAdapter(
         }
         return BlockItemViewHolder.TextBlockViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
-            listener
+            listener,
+            onEditButtonClicked
         ) { index ->
             onDeleteButtonClicked(index)
             deleteBlocks(index)
@@ -67,8 +70,8 @@ class CreatePostListAdapter(
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position].content, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlockState.IMAGE).uri, position)
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.STRING, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.IMAGE, position)
         }
     }
 
@@ -91,9 +94,9 @@ class CreatePostListAdapter(
     }
 }
 
-@BindingAdapter("blocks", "listener", "onDeleteButtonClick")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit) {
-    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked)
+@BindingAdapter("blocks", "listener", "onDeleteButtonClick", "onEditButtonClick")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit, onEditButtonClicked: (Int) -> Unit) {
+    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked, onEditButtonClicked)
 
     when {
         // 아이템 추가
@@ -104,10 +107,20 @@ fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener:
             }
         }
 
-        // content 변경
+        // content 또는 editMode 변경
         (adapter as CreatePostListAdapter).getCurrentBlocks().size == blocks.size -> {
             with(adapter as CreatePostListAdapter) {
+                val current = (adapter as CreatePostListAdapter).getCurrentBlocks()
                 updateBlocks(blocks)
+                current.forEachIndexed { index, postBlock ->
+                    if (postBlock.isEditMode != blocks[index].isEditMode) {
+                        val on = blocks.indexOfFirst { it.isEditMode }
+                        val off = current.indexOfFirst { it.isEditMode }
+                        notifyItemChanged(on)
+                        notifyItemChanged(off)
+                        return@forEachIndexed
+                    }
+                }
             }
         }
     }
