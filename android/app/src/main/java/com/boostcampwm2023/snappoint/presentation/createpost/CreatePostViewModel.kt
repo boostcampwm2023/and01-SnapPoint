@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,12 +39,12 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun addImageBlock(uri: Uri?) {
+    fun addImageBlock(uri: Uri?, position: Position) {
         if (uri == null) return
 
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlock.IMAGE(uri = uri, position = Position(0.0, 0.0))
+                postBlocks = it.postBlocks + PostBlock.IMAGE(uri = uri, position = position)
             )
         }
     }
@@ -57,18 +56,11 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
     private fun updatePostBlocks(position: Int, content: String) {
         _uiState.update {
             it.copy(
-//                postBlocks = it.postBlocks.toMutableList().apply {
-//                    when (val postBlock = this[position]) {
-//                        is PostBlock.STRING -> set(position, postBlock.copy(content = content))
-//                        is PostBlock.IMAGE -> TODO()
-//                        is PostBlock.VIDEO -> TODO()
-//                    }
-//                }
                 postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
                     if(position == index) {
                         when(postBlock){
                             is PostBlock.STRING -> postBlock.copy(content = content)
-                            is PostBlock.IMAGE -> TODO()
+                            is PostBlock.IMAGE -> postBlock.copy(content = content)
                             is PostBlock.VIDEO -> TODO()
                         }
                     }else{
@@ -77,7 +69,6 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
                 }
             )
         }
-        Log.d("TAG", "updatePostBlocks: ${_uiState.value.postBlocks[position].content}")
     }
 
     private fun isValidContents(): Boolean {
@@ -92,6 +83,7 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onCheckButtonClicked() {
+        println(uiState.value.postBlocks)
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
         }

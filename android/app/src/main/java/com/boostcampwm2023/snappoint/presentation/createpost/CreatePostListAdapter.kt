@@ -55,24 +55,18 @@ class CreatePostListAdapter(
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
             is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position].content, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind((blocks[position] as PostBlock.IMAGE).uri, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlock.IMAGE).uri, position)
         }
     }
 
     override fun onViewAttachedToWindow(holder: BlockItemViewHolder) {
         super.onViewAttachedToWindow(holder)
-        when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.attachTextWatcherToEditText()
-            is BlockItemViewHolder.ImageBlockViewHolder -> {}
-        }
+        holder.attachTextWatcherToEditText()
     }
 
     override fun onViewDetachedFromWindow(holder: BlockItemViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.detachTextWatcherFromEditText()
-            is BlockItemViewHolder.ImageBlockViewHolder -> {}
-        }
+        holder.detachTextWatcherFromEditText()
     }
 }
 
