@@ -21,9 +21,9 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when(blocks[position]) {
-            is PostBlock.STRING -> ViewType.STRING.code
-            is PostBlock.IMAGE -> ViewType.IMAGE.code
-            is PostBlock.VIDEO -> ViewType.VIDEO.code
+            is PostBlock.STRING -> ViewType.STRING.ordinal
+            is PostBlock.IMAGE -> ViewType.IMAGE.ordinal
+            is PostBlock.VIDEO -> ViewType.VIDEO.ordinal
         }
     }
 
@@ -31,14 +31,14 @@ class CreatePostListAdapter(
         val inflater = LayoutInflater.from(parent.context)
 
         when (viewType) {
-            ViewType.IMAGE.code -> {
+            ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     ItemImageBlockBinding.inflate(inflater, parent, false),
                     listener
                 )
             }
 
-            ViewType.VIDEO.code -> {
+            ViewType.VIDEO.ordinal -> {
                 TODO()
             }
         }

@@ -9,4 +9,6 @@
     <string name="item_image_block_til_description_hint">이미지 설명</string>
     <string name="create_post_fragment_empty_block">비어있는 블록이 존재합니다.</string>
     <string name="create_post_fragment_post_api_success">요청 성공 !</string>
+    <string name="message_permission_denied">이미지를 추가하려면 저장소에 접근할 수 있는 권한이 필요합니다.</string>
+    <string name="message_permission_required">이미지를 추가하려면 권한을 허용해야 합니다.</string>
 </resources>

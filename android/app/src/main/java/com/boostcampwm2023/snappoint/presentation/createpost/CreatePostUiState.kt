@@ -13,10 +13,10 @@ sealed class PostBlock(open val content: String) {
     data class VIDEO(override val content: String = "", val position: Position) : PostBlock(content)
 }
 
-enum class ViewType(val code: Int) {
-    STRING(1),
-    IMAGE(2),
-    VIDEO(3),
+enum class ViewType {
+    STRING,
+    IMAGE,
+    VIDEO,
 }
 
 data class Position(

@@ -3,13 +3,14 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +27,31 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
     private val viewModel: CreatePostViewModel by viewModels()
 
+    private val imagePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
+            if (map.containsValue(false).not()) {
+                launchImageSelectionLauncher()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.message_permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+    private val imageSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val imageUri = result.data?.data ?: return@registerForActivityResult
+                val inputStream = requireContext().contentResolver.openInputStream(imageUri)
+                    ?: return@registerForActivityResult
+                val position = MetadataUtil.extractLocationFromInputStream(inputStream)
+                    .getOrDefault(Position(0.0, 0.0))
+                viewModel.addImageBlock(imageUri, position)
+            }
+        }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initBinding()
@@ -40,12 +66,16 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
     private fun collectViewModelData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED){
-                viewModel.event.collect{event ->
-                    when(event){
-                        is CreatePostEvent.ShowMessage -> {showToastMessage(event.resId)}
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is CreatePostEvent.ShowMessage -> {
+                            showToastMessage(event.resId)
+                        }
 
-                        is CreatePostEvent.SelectImageFromLocal -> { selectImage() }
+                        is CreatePostEvent.SelectImageFromLocal -> {
+                            selectImage()
+                        }
                     }
                 }
             }
@@ -58,54 +88,49 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     }
 
     private fun selectImage() {
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                imagePermissionLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.READ_MEDIA_IMAGES,
-                        Manifest.permission.ACCESS_MEDIA_LOCATION
-                    )
-                )
-            }
+        val permissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.ACCESS_MEDIA_LOCATION
+            )
 
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                imagePermissionLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.ACCESS_MEDIA_LOCATION
-                    )
-                )
-            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_MEDIA_LOCATION
+            )
 
-            else -> {
-                imagePermissionLauncher.launch(
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-                )
-            }
+            else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
+
+        getImageWithPermissionCheck(permissions)
     }
 
-    private val imagePermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-            if (map.containsValue(false).not()) {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.setDataAndType(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    "image/*"
-                )
-                imageSelectionLauncher.launch(intent)
-            } else {
-                Log.d("galleryPermissionLauncher", "permission denied.")
-            }
+    private fun launchImageSelectionLauncher() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.setDataAndType(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            "image/*"
+        )
+        imageSelectionLauncher.launch(intent)
+    }
+
+    private fun getImageWithPermissionCheck(permissions: Array<String>) {
+        val permissionCheck = permissions.filter {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                it
+            ) == PackageManager.PERMISSION_DENIED
         }
 
-    private val imageSelectionLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val imageUri = result.data?.data ?: return@registerForActivityResult
-                val inputStream = requireContext().contentResolver.openInputStream(imageUri) ?: return@registerForActivityResult
-                val position = MetadataUtil.extractLocationFromInputStream(inputStream).getOrDefault(Position(0.0, 0.0))
-                viewModel.addImageBlock(imageUri, position)
+        if (permissionCheck.isNotEmpty()) {
+            if (permissionCheck.any { shouldShowRequestPermissionRationale(it) }) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.message_permission_required),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
+        imagePermissionLauncher.launch(permissions)
+    }
 }

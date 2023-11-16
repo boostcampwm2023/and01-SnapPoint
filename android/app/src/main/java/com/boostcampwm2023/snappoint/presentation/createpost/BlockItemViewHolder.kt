@@ -12,8 +12,11 @@ import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 sealed class BlockItemViewHolder(
-    binding: ViewDataBinding
+    binding: ViewDataBinding,
+    listener: (Int, String) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    val textWatcher = EditTextWatcher(listener)
 
     abstract fun attachTextWatcherToEditText()
     abstract fun detachTextWatcherFromEditText()
@@ -21,9 +24,7 @@ sealed class BlockItemViewHolder(
     class TextBlockViewHolder(
         private val binding: ItemTextBlockBinding,
         listener: (Int, String) -> Unit
-    ) : BlockItemViewHolder(binding) {
-
-        private val textWatcher = EditTextWatcher(listener)
+    ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(content: String, position: Int) {
             binding.tilText.editText?.setText(content)
@@ -42,9 +43,7 @@ sealed class BlockItemViewHolder(
     class ImageBlockViewHolder(
         private val binding: ItemImageBlockBinding,
         listener: (Int, String) -> Unit
-    ) : BlockItemViewHolder(binding) {
-
-        private val textWatcher = EditTextWatcher(listener)
+    ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(content: String, uri: Uri, position: Int) {
             binding.tilDescription.editText?.setText(content)
