@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.map
 
 import android.location.Geocoder
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMapsMarkerBinding
@@ -22,19 +23,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     GoogleMap.OnCameraMoveListener,
     GoogleMap.OnCameraIdleListener
 {
-    var startLatLng = LatLng(37.3586926, 127.1051209)
+    private var startLatLng = LatLng(37.3586926, 127.1051209)
     private var index: Int = 0
-
-    private val addressSelectionLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if(result.resultCode == RESULT_OK){
-                result.data?.getDoubleArrayExtra("position")?.let{
-                    startLatLng = LatLng(it[0], it[1])
-                }
-                index = result.data?.getIntExtra("index",0) ?: 0
-
-            }
-        }
 
     private var _marker: Marker? = null
     private var _map: GoogleMap? = null
@@ -42,17 +32,30 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        getIntentExtra()
+
         val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_google_map) as SupportMapFragment
         map.getMapAsync(this)
 
         binding.btnConfirmPosition.setOnClickListener {
-            intent.putExtra("address", getAddressLine())
-            intent.putExtra("index", index)
-            intent.putExtra("latitude", _marker?.position?.latitude)
-            intent.putExtra("longitude", _marker?.position?.longitude)
+            setIntentExtra()
             setResult(RESULT_OK, intent)
             finish()
         }
+    }
+
+    private fun setIntentExtra() {
+        intent.putExtra("address", getAddressLine())
+        intent.putExtra("index", index)
+        intent.putExtra("latitude", _marker?.position?.latitude)
+        intent.putExtra("longitude", _marker?.position?.longitude)
+    }
+
+    private fun getIntentExtra() {
+        intent.getDoubleArrayExtra("position")?.let{
+            startLatLng = LatLng(it[0], it[1])
+        }
+        index = intent.getIntExtra("index",0) ?: 0
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

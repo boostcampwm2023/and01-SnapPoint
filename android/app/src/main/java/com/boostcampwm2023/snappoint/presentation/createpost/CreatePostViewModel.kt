@@ -36,6 +36,18 @@ class CreatePostViewModel @Inject constructor(
         },
         onAddressIconClicked = { index ->
             findAddress(index)
+        },
+        onEditButtonClicked = { position ->
+            changeToEditMode(position)
+        },
+        onCheckButtonClicked = { position ->
+            clearEditMode(position)
+        },
+        onUpButtonClicked = { position ->
+            moveUp(position)
+        },
+        onDownButtonClicked = { position ->
+            moveDown(position)
         }
     ))
 
@@ -95,6 +107,68 @@ class CreatePostViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    private fun changeToEditMode(position: Int) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
+                    if (position == index) {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = true)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = true)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = true)
+                        }
+                    } else {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    private fun clearEditMode(position: Int) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
+                    if (position == index) {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
+                        }
+                    } else {
+                        postBlock
+                    }
+                }
+            )
+        }
+    }
+
+    private fun moveUp(position: Int) {
+        if (position == 0) return
+        _uiState.update {
+            val list = it.postBlocks.toMutableList()
+            val tmp = list[position]
+            list[position] = list[position - 1]
+            list[position - 1] = tmp
+            it.copy(postBlocks = list)
+        }
+    }
+
+    private fun moveDown(position: Int) {
+        if (position == uiState.value.postBlocks.lastIndex) return
+        _uiState.update {
+            val list = it.postBlocks.toMutableList()
+            val tmp = list[position]
+            list[position] = list[position + 1]
+            list[position + 1] = tmp
+            it.copy(postBlocks = list)
         }
     }
 
@@ -166,9 +240,9 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
                     if(idx == index){
                         when(postBlock){
-                            is PostBlockState.IMAGE -> { PostBlockState.IMAGE(postBlock.content, postBlock.uri, position, address)}
-                            is PostBlockState.VIDEO -> {PostBlockState.VIDEO(postBlock.content, postBlock.uri, position, address)}
-                            is PostBlockState.STRING -> {postBlock}
+                            is PostBlockState.IMAGE ->  PostBlockState.IMAGE(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
+                            is PostBlockState.VIDEO -> PostBlockState.VIDEO(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
+                            is PostBlockState.STRING -> postBlock
                         }
                     }else{
                         postBlock

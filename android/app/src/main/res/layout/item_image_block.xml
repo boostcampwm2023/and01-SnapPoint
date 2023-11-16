@@ -4,6 +4,7 @@
 
     <data>
 
+        <import type="android.view.View"/>
         <import type="kotlin.jvm.functions.Function0"/>
         <import type="kotlin.Unit"/>
         <variable
@@ -12,6 +13,9 @@
         <variable
             name="uri"
             type="android.net.Uri" />
+        <variable
+            name="editMode"
+            type="Boolean" />
 
     </data>
 
@@ -26,7 +30,8 @@
             android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/til_description"
-            app:cardBackgroundColor="@color/surfaceColor">
+            app:cardBackgroundColor="@color/surfaceColor"
+            editMode="@{editMode}">
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -42,7 +47,8 @@
             android:padding="16dp"
             android:layout_marginVertical="8dp"
             app:tint="@color/errorContainer"
-            android:onClick="@{() -> onDeleteButtonClick.invoke()}"/>
+            android:onClick="@{() -> onDeleteButtonClick.invoke()}"
+            android:visibility="@{editMode ? View.INVISIBLE : View.VISIBLE}"/>
 
         <ImageButton
             android:id="@+id/btn_edit_block"
@@ -55,7 +61,8 @@
             android:background="?attr/actionBarItemBackground"
             android:padding="16dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginVertical="8dp"/>
+            android:layout_marginVertical="8dp"
+            android:visibility="@{editMode ? View.INVISIBLE : View.VISIBLE}"/>
 
         <ImageButton
             android:id="@+id/btn_up"
@@ -68,7 +75,7 @@
             android:background="?attr/actionBarItemBackground"
             android:padding="16dp"
             android:layout_marginVertical="8dp"
-            android:visibility="invisible"/>
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
 
         <ImageButton
             android:id="@+id/btn_down"
@@ -81,7 +88,7 @@
             android:background="?attr/actionBarItemBackground"
             android:padding="16dp"
             android:layout_marginVertical="8dp"
-            android:visibility="invisible"/>
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
 
         <ImageButton
             android:id="@+id/btn_edit_cancel"
@@ -94,7 +101,7 @@
             android:background="?attr/actionBarItemBackground"
             android:padding="16dp"
             android:layout_marginVertical="8dp"
-            android:visibility="invisible"/>
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
 
         <ImageButton
             android:id="@+id/btn_edit_complete"
@@ -108,13 +115,14 @@
             android:padding="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginVertical="8dp"
-            android:visibility="invisible"/>
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
 
         <ImageView
             android:id="@+id/iv_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="1dp"
             app:layout_constraintTop_toBottomOf="@id/btn_delete_block"
             uri="@{uri}"/>
 
