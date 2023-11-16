@@ -1,12 +1,14 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.Manifest
+import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
+import com.boostcampwm2023.snappoint.presentation.map.MapsMarkerActivity
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -50,8 +53,27 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
                 viewModel.addImageBlock(imageUri, position)
+
+                startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
             }
         }
+
+    private val addressSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
+            if(result.resultCode == RESULT_OK){
+                result.data?.let{
+                    viewModel.setAddressAndPosition(
+                        index = it.getIntExtra("index", 0),
+                        address = it.getStringExtra("address") ?: "",
+                        position = PositionState(
+                            it.getDoubleExtra("longitude", 0.0),
+                            it.getDoubleExtra("latitude", 0.0)
+                        )
+                    )
+                }
+            }
+        }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,8 +100,12 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                             selectImage()
                         }
 
-                        CreatePostEvent.NavigatePrev -> {
+                        is CreatePostEvent.NavigatePrev -> {
                             findNavController().popBackStack()
+                        }
+
+                        is CreatePostEvent.FindAddress -> {
+                            startMapActivityAndFindAddress(event.index, event.position)
                         }
                     }
                 }
@@ -137,5 +163,13 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
             }
         }
         imagePermissionLauncher.launch(permissions)
+    }
+
+
+    private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
+        val intent = Intent(requireContext(), MapsMarkerActivity::class.java)
+        intent.putExtra("index", index)
+        intent.putExtra("position", position.asDoubleArray())
+        addressSelectionLauncher.launch(intent)
     }
 }

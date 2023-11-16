@@ -15,23 +15,23 @@ import com.google.android.material.card.MaterialCardView
 
 sealed class BlockItemViewHolder(
     binding: ViewDataBinding,
-    listener: (Int, String) -> Unit
+    onContentChanged: (Int, String) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    val textWatcher = EditTextWatcher(listener)
+    val textWatcher = EditTextWatcher(onContentChanged)
 
     abstract fun attachTextWatcherToEditText()
     abstract fun detachTextWatcherFromEditText()
 
     class TextBlockViewHolder(
         private val binding: ItemTextBlockBinding,
-        listener: (Int, String) -> Unit,
+        private val onContentChanged: (Int, String) -> Unit,
         private val onEditButtonClicked: (Int) -> Unit,
         private val onCheckButtonClicked: (Int) -> Unit,
-        private val onUpButtonClicked: (position: Int) -> Unit,
-        private val onDownButtonClicked: (position: Int) -> Unit,
+        private val onUpButtonClicked: (Int) -> Unit,
+        private val onDownButtonClicked: (Int) -> Unit,
         private val onDeleteButtonClicked: (Int) -> Unit,
-    ) : BlockItemViewHolder(binding, listener) {
+    ) : BlockItemViewHolder(binding, onContentChanged) {
 
         fun bind(block: PostBlockState.STRING, position: Int) {
             binding.tilText.editText?.setText(block.content)
@@ -64,33 +64,39 @@ sealed class BlockItemViewHolder(
 
     class ImageBlockViewHolder(
         private val binding: ItemImageBlockBinding,
-        listener: (Int, String) -> Unit,
+        private val onContentChanged: (Int, String) -> Unit,
+        private val onAddressIconClicked: (Int) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit,
         private val onEditButtonClicked: (Int) -> Unit,
         private val onCheckButtonClicked: (Int) -> Unit,
         private val onUpButtonClicked: (position: Int) -> Unit,
         private val onDownButtonClicked: (position: Int) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit,
-    ) : BlockItemViewHolder(binding, listener) {
+    ) : BlockItemViewHolder(binding, onContentChanged) {
 
-        fun bind(block: PostBlockState.IMAGE, position: Int) {
-            binding.tilDescription.editText?.setText(block.content)
-            binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
-            binding.btnEditBlock.setOnClickListener {
-                itemView.rootView.clearFocus()
-                onEditButtonClicked(position)
+        fun bind(block: PostBlockState.IMAGE, index: Int) {
+            with(binding){
+                tilDescription.editText?.setText(block.content)
+                tilAddress.editText?.setText(block.address)
+                onDeleteButtonClick = { onDeleteButtonClicked(index) }
+                btnEditBlock.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    onEditButtonClicked(index)
+                }
+                tilAddress.setEndIconOnClickListener { onAddressIconClicked.invoke(index) }
+                btnEditComplete.setOnClickListener { onCheckButtonClicked(index) }
+                btnUp.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    onUpButtonClicked(index)
+                }
+                btnDown.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    onDownButtonClicked(index)
+                }
+                uri = block.uri
+                editMode = block.isEditMode
+
             }
-            binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
-            binding.btnUp.setOnClickListener {
-                itemView.rootView.clearFocus()
-                onUpButtonClicked(position)
-            }
-            binding.btnDown.setOnClickListener {
-                itemView.rootView.clearFocus()
-                onDownButtonClicked(position)
-            }
-            binding.uri = block.uri
-            binding.editMode = block.isEditMode
-            textWatcher.updatePosition(position)
+            textWatcher.updatePosition(index)
         }
 
         override fun attachTextWatcherToEditText() {
@@ -134,17 +140,12 @@ fun ImageView.bindUri(uri: Uri) {
 @BindingAdapter("editMode")
 fun MaterialCardView.isEditMode(editMode: Boolean) {
     val value = TypedValue()
-    val width = if (editMode) {
-        context.theme.resolveAttribute(
-            com.google.android.material.R.attr.colorSecondary,
-            value,
-            true
-        )
-        4
+    if (editMode) {
+        context.theme.resolveAttribute(com.google.android.material.R.attr.colorSecondary, value, true)
+        strokeWidth =4
     } else {
         context.theme.resolveAttribute(com.google.android.material.R.attr.colorOutline, value, true)
-        1
+        strokeWidth = 1
     }
-    strokeWidth = width
     strokeColor = value.data
 }

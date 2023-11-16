@@ -8,7 +8,8 @@ import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class CreatePostListAdapter(
-    private val listener: (Int, String) -> Unit,
+    private val onAddressIconClicked: (Int) -> Unit,
+    private val onContentChanged: (Int, String) -> Unit,
     private val onDeleteButtonClicked: (Int) -> Unit,
     private val onEditButtonClicked: (Int) -> Unit,
     private val onCheckButtonClicked: (Int) -> Unit,
@@ -22,6 +23,7 @@ class CreatePostListAdapter(
 
     fun updateBlocks(newBlocks: List<PostBlockState>) {
         blocks = newBlocks.toMutableList()
+        notifyDataSetChanged()
     }
 
     private fun deleteBlocks(position: Int) {
@@ -56,29 +58,29 @@ class CreatePostListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val onDeleteButtonClicked: (Int) -> Unit = { index ->
-            onDeleteButtonClicked(index)
-            deleteBlocks(index)
-        }
-        val onUpButtonClicked: (Int) -> Unit = { index ->
-            onUpButtonClicked(index)
-            moveUpBlock(index)
-        }
-        val onDownButtonClicked: (Int) -> Unit = { index ->
-            onDownButtonClicked(index)
-            moveDownBlock(index)
-        }
 
         when (viewType) {
             ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
-                    ItemImageBlockBinding.inflate(inflater, parent, false),
-                    listener,
-                    onEditButtonClicked,
-                    onCheckButtonClicked,
-                    onUpButtonClicked,
-                    onDownButtonClicked,
-                    onDeleteButtonClicked
+                    binding = ItemImageBlockBinding.inflate(inflater, parent, false),
+                    onContentChanged = onContentChanged,
+                    onAddressIconClicked = { index ->
+                        onAddressIconClicked(index)
+                    },
+                    onDeleteButtonClicked = { index ->
+                        onDeleteButtonClicked(index)
+                        deleteBlocks(index)
+                    },
+                    onEditButtonClicked = onEditButtonClicked,
+                    onCheckButtonClicked = onCheckButtonClicked,
+                    onUpButtonClicked = { index ->
+                        onUpButtonClicked(index)
+                        moveUpBlock(index)
+                    },
+                    onDownButtonClicked = { index ->
+                        onDownButtonClicked(index)
+                        moveDownBlock(index)
+                    },
                 )
             }
 
@@ -87,13 +89,16 @@ class CreatePostListAdapter(
             }
         }
         return BlockItemViewHolder.TextBlockViewHolder(
-            ItemTextBlockBinding.inflate(inflater, parent, false),
-            listener,
-            onEditButtonClicked,
-            onCheckButtonClicked,
-            onUpButtonClicked,
-            onDownButtonClicked,
-            onDeleteButtonClicked
+            binding = ItemTextBlockBinding.inflate(inflater, parent, false),
+            onContentChanged = onContentChanged,
+            onDeleteButtonClicked = { index ->
+                onDeleteButtonClicked(index)
+                deleteBlocks(index)
+            },
+            onEditButtonClicked = onEditButtonClicked,
+            onCheckButtonClicked = onCheckButtonClicked,
+            onUpButtonClicked = onUpButtonClicked,
+            onDownButtonClicked = onDownButtonClicked,
         )
     }
 
@@ -103,15 +108,8 @@ class CreatePostListAdapter(
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(
-                blocks[position] as PostBlockState.STRING,
-                position
-            )
-
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(
-                blocks[position] as PostBlockState.IMAGE,
-                position
-            )
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.STRING, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.IMAGE, position)
         }
     }
 
@@ -136,29 +134,32 @@ class CreatePostListAdapter(
 
 @BindingAdapter(
     "blocks",
-    "listener",
+    "onContentChange",
     "onDeleteButtonClick",
     "onEditButtonClick",
     "onCheckButtonClick",
     "onUpButtonClick",
-    "onDownButtonClick"
+    "onDownButtonClick",
+    "onAddressIconClick"
 )
 fun RecyclerView.bindRecyclerViewAdapter(
     blocks: List<PostBlockState>,
-    listener: (Int, String) -> Unit,
+    onContentChanged: (Int, String) -> Unit,
     onDeleteButtonClicked: (Int) -> Unit,
     onEditButtonClicked: (Int) -> Unit,
     onCheckButtonClicked: (Int) -> Unit,
     onUpButtonClicked: (Int) -> Unit,
-    onDownButtonClicked: (Int) -> Unit
+    onDownButtonClicked: (Int) -> Unit,
+    onAddressIconClicked: (Int) -> Unit
 ) {
     if (adapter == null) adapter = CreatePostListAdapter(
-        listener,
-        onDeleteButtonClicked,
-        onEditButtonClicked,
-        onCheckButtonClicked,
-        onUpButtonClicked,
-        onDownButtonClicked
+        onDeleteButtonClicked = onDeleteButtonClicked,
+        onContentChanged = onContentChanged,
+        onEditButtonClicked = onEditButtonClicked,
+        onCheckButtonClicked = onCheckButtonClicked,
+        onUpButtonClicked = onUpButtonClicked,
+        onDownButtonClicked = onDownButtonClicked,
+        onAddressIconClicked = onAddressIconClicked
     )
 
     when {
