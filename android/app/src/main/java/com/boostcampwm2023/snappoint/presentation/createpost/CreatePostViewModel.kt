@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.R
@@ -39,8 +40,14 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun addImageBlock() {
-        TODO()
+    fun addImageBlock(uri: Uri?) {
+        if (uri == null) return
+
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlock.IMAGE(uri = uri, position = Position(0.0, 0.0))
+            )
+        }
     }
 
     fun addVideoBlock() {
@@ -88,5 +95,9 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
         }
+    }
+
+    fun onImageBlockButtonClicked() {
+        _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
     }
 }

@@ -4,6 +4,10 @@
 
     <data>
 
+        <variable
+            name="uri"
+            type="android.net.Uri" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -106,7 +110,8 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_delete_block"/>
+            app:layout_constraintTop_toBottomOf="@id/btn_delete_block"
+            uri="@{uri}"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_address"
@@ -120,7 +125,10 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusable="false"
+                android:cursorVisible="false"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
