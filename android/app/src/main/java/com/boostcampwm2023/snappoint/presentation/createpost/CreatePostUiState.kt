@@ -14,11 +14,22 @@ data class CreatePostUiState(
 
 
 sealed class PostBlockState(open val content: String, open val isEditMode: Boolean) {
-    data class STRING(override val content: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class IMAGE(override val content: String = "", override val isEditMode: Boolean = false, val uri: Uri, val position: PositionState) : PostBlockState(content, isEditMode)
-    data class VIDEO(override val content: String = "", override val isEditMode: Boolean = false, val position: PositionState) : PostBlockState(content, isEditMode)
-}
+    data class STRING(override val content: String = "", override val isEditMode: Boolean = false) :
+        PostBlockState(content, isEditMode)
 
+    data class IMAGE(
+        override val content: String = "",
+        override val isEditMode: Boolean = false,
+        val uri: Uri,
+        val position: PositionState
+    ) : PostBlockState(content, isEditMode)
+
+    data class VIDEO(
+        override val content: String = "",
+        override val isEditMode: Boolean = false,
+        val position: PositionState
+    ) : PostBlockState(content, isEditMode)
+}
 
 
 data class PositionState(

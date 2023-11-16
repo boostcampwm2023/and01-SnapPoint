@@ -109,7 +109,11 @@ fun ImageView.bindUri(uri: Uri) {
 fun MaterialCardView.isEditMode(editMode: Boolean) {
     val value = TypedValue()
     val width = if (editMode) {
-        context.theme.resolveAttribute(com.google.android.material.R.attr.colorSecondary, value, true)
+        context.theme.resolveAttribute(
+            com.google.android.material.R.attr.colorSecondary,
+            value,
+            true
+        )
         4
     } else {
         context.theme.resolveAttribute(com.google.android.material.R.attr.colorOutline, value, true)
