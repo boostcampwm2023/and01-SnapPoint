@@ -18,7 +18,5 @@ abstract class BaseActivity<B: ViewDataBinding>(
 
         binding = DataBindingUtil.setContentView(this, layoutResId)
         binding.lifecycleOwner = this@BaseActivity
-
     }
-
 }
