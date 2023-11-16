@@ -5,6 +5,7 @@ import android.net.Uri
 data class CreatePostUiState(
     val postBlocks: List<PostBlock> = mutableListOf(),
     val onTextChanged: (position: Int, content: String) -> Unit,
+    val onDeleteButtonClicked: (position: Int) -> Unit,
 )
 
 sealed class PostBlock(open val content: String) {

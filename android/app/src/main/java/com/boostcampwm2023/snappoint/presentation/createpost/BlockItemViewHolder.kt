@@ -23,11 +23,13 @@ sealed class BlockItemViewHolder(
 
     class TextBlockViewHolder(
         private val binding: ItemTextBlockBinding,
-        listener: (Int, String) -> Unit
+        listener: (Int, String) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit
     ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(content: String, position: Int) {
             binding.tilText.editText?.setText(content)
+            binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
             textWatcher.updatePosition(position)
         }
 
@@ -42,11 +44,13 @@ sealed class BlockItemViewHolder(
 
     class ImageBlockViewHolder(
         private val binding: ItemImageBlockBinding,
-        listener: (Int, String) -> Unit
+        listener: (Int, String) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit
     ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(content: String, uri: Uri, position: Int) {
             binding.tilDescription.editText?.setText(content)
+            binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
             binding.uri = uri
             textWatcher.updatePosition(position)
         }
