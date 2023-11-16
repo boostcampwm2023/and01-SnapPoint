@@ -47,7 +47,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                 val inputStream = requireContext().contentResolver.openInputStream(imageUri)
                     ?: return@registerForActivityResult
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
-                    .getOrDefault(Position(0.0, 0.0))
+                    .getOrDefault(PositionState(0.0, 0.0))
                 viewModel.addImageBlock(imageUri, position)
             }
         }
