@@ -8,7 +8,7 @@ import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class PostBlockListAdapter(
     private val listener: (Int, String) -> Unit
-) : ListAdapter<PostBlock, BlockItemViewHolder>(diffUtil) {
+) : ListAdapter<PostBlockState, BlockItemViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -26,8 +26,8 @@ class PostBlockListAdapter(
 
     companion object {
 
-        val diffUtil = object : DiffUtil.ItemCallback<PostBlock>() {
-            override fun areItemsTheSame(oldItem: PostBlock, newItem: PostBlock): Boolean {
+        val diffUtil = object : DiffUtil.ItemCallback<PostBlockState>() {
+            override fun areItemsTheSame(oldItem: PostBlockState, newItem: PostBlockState): Boolean {
 //                return when{
 //                    oldItem is PostBlock.STRING && newItem is PostBlock.STRING -> true
 //                    oldItem is PostBlock.IMAGE && newItem is PostBlock.IMAGE -> true
@@ -37,7 +37,7 @@ class PostBlockListAdapter(
                 return oldItem === newItem
             }
 
-            override fun areContentsTheSame(oldItem: PostBlock, newItem: PostBlock): Boolean {
+            override fun areContentsTheSame(oldItem: PostBlockState, newItem: PostBlockState): Boolean {
                 return oldItem.content == newItem.content
             }
         }

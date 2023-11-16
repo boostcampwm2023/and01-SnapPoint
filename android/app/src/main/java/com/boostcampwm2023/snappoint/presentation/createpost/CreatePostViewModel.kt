@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -44,7 +43,7 @@ class CreatePostViewModel @Inject constructor(
     fun addTextBlock() {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.plus(PostBlock.STRING())
+                postBlocks = it.postBlocks.plus(PostBlockState.STRING())
             )
         }
     }
@@ -70,9 +69,9 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
                     if(position == index) {
                         when(postBlock){
-                            is PostBlock.STRING -> postBlock.copy(content = content)
-                            is PostBlock.IMAGE -> TODO()
-                            is PostBlock.VIDEO -> TODO()
+                            is PostBlockState.STRING -> postBlock.copy(content = content)
+                            is PostBlockState.IMAGE -> TODO()
+                            is PostBlockState.VIDEO -> TODO()
                         }
                     }else{
                         postBlock
@@ -86,9 +85,9 @@ class CreatePostViewModel @Inject constructor(
     private fun isValidContents(): Boolean {
         _uiState.value.postBlocks.forEach {
             when(it){
-                is PostBlock.STRING -> {if(it.content.isEmpty()) return false}
-                is PostBlock.IMAGE -> {if(it.content.isEmpty()) return false}
-                is PostBlock.VIDEO -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.STRING -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.IMAGE -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.VIDEO -> {if(it.content.isEmpty()) return false}
             }
         }
         return true
@@ -98,7 +97,10 @@ class CreatePostViewModel @Inject constructor(
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
         }
-        postRepository.postPost(_uiState.value.postBlocks)
+        postRepository.postCreatePost(
+            title = _uiState.value.title,
+            postBlocks = _uiState.value.postBlocks
+        )
             .onStart { Log.d("TAG", "onCheckButtonClicked: started, loading") }
             .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
             .onCompletion { Log.d("TAG", "onCheckButtonClicked: finished, end") }

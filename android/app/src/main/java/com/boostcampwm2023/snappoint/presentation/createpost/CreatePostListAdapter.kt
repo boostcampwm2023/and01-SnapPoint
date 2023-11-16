@@ -10,11 +10,11 @@ class CreatePostListAdapter(
     private val listener: (Int, String) -> Unit
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
-    private var blocks: MutableList<PostBlock> = mutableListOf()
+    private var blocks: MutableList<PostBlockState> = mutableListOf()
 
     fun getCurrentBlocks() = blocks.toList()
 
-    fun updateBlocks(newBlocks: List<PostBlock>) {
+    fun updateBlocks(newBlocks: List<PostBlockState>) {
         blocks = newBlocks.toMutableList()
     }
 
@@ -47,7 +47,7 @@ class CreatePostListAdapter(
 }
 
 @BindingAdapter("blocks", "listener")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlock>, listener: (Int, String) -> Unit) {
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit) {
     if (adapter == null) adapter = CreatePostListAdapter(listener)
 
     when {

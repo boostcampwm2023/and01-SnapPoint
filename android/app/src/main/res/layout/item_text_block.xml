@@ -5,7 +5,7 @@
     <data>
         <variable
             name="stringBlock"
-            type="com.boostcampwm2023.snappoint.presentation.createpost.PostBlock.STRING" />
+            type="com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState.STRING" />
 
     </data>
 
