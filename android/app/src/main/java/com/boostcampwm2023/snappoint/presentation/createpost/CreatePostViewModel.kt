@@ -2,7 +2,9 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,11 +13,18 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class CreatePostViewModel @Inject constructor() : ViewModel() {
+class CreatePostViewModel @Inject constructor(
+    private val postRepository: PostRepository
+) : ViewModel() {
 
     private val _uiState: MutableStateFlow<CreatePostUiState> = MutableStateFlow(CreatePostUiState(
         onTextChanged = { position, content ->
@@ -88,5 +97,13 @@ class CreatePostViewModel @Inject constructor() : ViewModel() {
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
         }
+        postRepository.postPost(_uiState.value.postBlocks)
+            .onStart {  }
+            .catch {  }
+            .onCompletion {  }
+            .onEach {
+                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_post_api_success))
+            }
+            .launchIn(viewModelScope)
     }
 }

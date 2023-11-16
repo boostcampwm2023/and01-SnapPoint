@@ -20,7 +20,7 @@ object RemoteModule {
     @Singleton
     fun provideSnapPointApi(): SnapPointApi{
         return Retrofit.Builder()
-            .baseUrl("asd")
+            .baseUrl("https://asdf.com/")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(SnapPointApi::class.java)
