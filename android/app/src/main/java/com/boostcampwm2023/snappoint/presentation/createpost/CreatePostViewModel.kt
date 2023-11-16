@@ -70,7 +70,7 @@ class CreatePostViewModel @Inject constructor(
                     if(position == index) {
                         when(postBlock){
                             is PostBlockState.STRING -> postBlock.copy(content = content)
-                            is PostBlockState.IMAGE -> TODO()
+                            is PostBlockState.IMAGE -> postBlock.copy(content = content)
                             is PostBlockState.VIDEO -> TODO()
                         }
                     }else{
@@ -96,6 +96,7 @@ class CreatePostViewModel @Inject constructor(
         println(uiState.value.postBlocks)
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
+            return
         }
         postRepository.postCreatePost(
             title = _uiState.value.title,
@@ -114,11 +115,16 @@ class CreatePostViewModel @Inject constructor(
             }
             .onEach {
                 Log.d("TAG", "onCheckButtonClicked: api request success")
+                _event.tryEmit(CreatePostEvent.NavigatePrev)
             }
             .launchIn(viewModelScope)
     }
 
     fun onImageBlockButtonClicked() {
         _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
+    }
+
+    fun onBackButtonClicked(){
+        _event.tryEmit(CreatePostEvent.NavigatePrev)
     }
 }

@@ -38,6 +38,7 @@
             android:elevation="2dp"
             android:padding="16dp"
             android:src="@drawable/icon_arrow_back"
+            android:onClick="@{() -> vm.onBackButtonClicked()}"
             app:layout_constraintBottom_toBottomOf="@id/tb"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
