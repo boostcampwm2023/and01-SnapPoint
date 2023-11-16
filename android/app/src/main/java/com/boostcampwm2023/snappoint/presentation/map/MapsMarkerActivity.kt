@@ -17,12 +17,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
     OnMapReadyCallback,
-    GoogleMap.OnMarkerClickListener,
-    GoogleMap.OnMarkerDragListener,
-    GoogleMap.OnMapLongClickListener {
+    GoogleMap.OnCameraMoveListener,
+    GoogleMap.OnCameraIdleListener {
 
     private var _post: PostBlock = PostBlock.IMAGE("Content", Position(37.3586926, 127.1051209))
     private var _marker: Marker? = null
+    private var _map: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +32,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        _map = googleMap
+
         val post = _post
         val latLng = when (post) {
             is PostBlock.VIDEO -> LatLng(post.position.latitude, post.position.longitude)
@@ -43,82 +45,47 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
             MarkerOptions()
                 .position(latLng)
                 .title(post.content)
-                .draggable(true)
+                .draggable(false)
         )
         _marker?.tag = post
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.5f))
 
-        googleMap.setOnMarkerClickListener(this)
-        googleMap.setOnMarkerDragListener(this)
-        googleMap.setOnMapLongClickListener(this)
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        val post: PostBlock = _marker?.tag as? PostBlock ?: return
-        val marker: Marker = _marker!!
-        val newPosition: Position = Position(marker.position.latitude, marker.position.longitude)
-
-        _post = when(post) {
-            is PostBlock.IMAGE -> post.copy(post.content, newPosition)
-            is PostBlock.VIDEO -> post.copy(post.content, newPosition)
-            else -> return
-        }
-
-        Log.d("LOG", "NEW POSITION: $newPosition")
+        googleMap.setOnCameraMoveListener(this)
+        googleMap.setOnCameraIdleListener(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
         _marker = null
+        _map = null
     }
 
-    override fun onMarkerClick(p0: Marker): Boolean {
-        Log.d("LOG", "${p0.id} here")
-
-        return false
+    override fun onCameraMove() {
+        val map: GoogleMap = _map ?: return
+        moveMarker(map.cameraPosition.target)
     }
 
-    override fun onMarkerDrag(p0: Marker) {
-        //Log.d("LOG", "DRAG")
+    override fun onCameraIdle() {
+        val map: GoogleMap = _map ?: return
+        updateBlockPosition(map.cameraPosition.target)
     }
 
-    override fun onMarkerDragStart(p0: Marker) {
-        Log.d("LOG", "START: ${p0.position}")
-        p0.showInfoWindow()
+    private fun moveMarker(latLng: LatLng) {
+        val marker: Marker = _marker ?: return
+        marker.position = latLng
     }
 
-    override fun onMarkerDragEnd(p0: Marker) {
-        Log.d("LOG", "END: ${p0.position}")
-        p0.hideInfoWindow()
+    private fun updateBlockPosition(latLng: LatLng) {
+        val marker: Marker = _marker ?: return
+        val tag: PostBlock = (marker.tag as? PostBlock) ?: return
+        val newPosition: Position = Position(latLng.latitude, latLng.longitude)
 
-        val tag: PostBlock = (p0.tag as? PostBlock) ?: return
-        val newPosition: Position = Position(p0.position.latitude, p0.position.longitude)
-
-        p0.tag = when (tag) {
-            is PostBlock.IMAGE -> tag.copy(tag.content, newPosition)
-            is PostBlock.VIDEO -> tag.copy(tag.content, newPosition)
-            else -> return
-        }
-    }
-
-    override fun onMapLongClick(p0: LatLng) {
-        Log.d("LOG","LONG CLICK AT: $p0")
-
-        val marker: Marker = _marker!!
-        val tag: PostBlock = marker.tag as? PostBlock ?: return
-        val newPosition: Position = Position(p0.latitude, p0.longitude)
-
-        marker.position = p0
         marker.tag = when (tag) {
             is PostBlock.IMAGE -> tag.copy(tag.content, newPosition)
             is PostBlock.VIDEO -> tag.copy(tag.content, newPosition)
             else -> return
         }
-
-        marker.showInfoWindow()
     }
 }
