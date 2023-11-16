@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
@@ -47,7 +48,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                 val inputStream = requireContext().contentResolver.openInputStream(imageUri)
                     ?: return@registerForActivityResult
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
-                    .getOrDefault(Position(0.0, 0.0))
+                    .getOrDefault(PositionState(0.0, 0.0))
                 viewModel.addImageBlock(imageUri, position)
             }
         }
@@ -75,6 +76,10 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
                         is CreatePostEvent.SelectImageFromLocal -> {
                             selectImage()
+                        }
+
+                        CreatePostEvent.NavigatePrev -> {
+                            findNavController().popBackStack()
                         }
                     }
                 }

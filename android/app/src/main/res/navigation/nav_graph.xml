@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/createPostFragment">
+    app:startDestination="@id/featureListFragment">
 
     <fragment
         android:id="@+id/createPostFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostFragment"
         android:label="CreatePostFragment" />
+    <fragment
+        android:id="@+id/featureListFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.featurelist.FeatureListFragment"
+        android:label="fragment_feature_list"
+        tools:layout="@layout/fragment_feature_list" >
+        <action
+            android:id="@+id/action_to_createPostFragment"
+            app:destination="@id/createPostFragment" />
+    </fragment>
 </navigation>

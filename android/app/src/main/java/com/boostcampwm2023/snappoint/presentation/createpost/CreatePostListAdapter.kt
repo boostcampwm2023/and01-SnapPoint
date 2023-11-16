@@ -12,11 +12,11 @@ class CreatePostListAdapter(
     private val onDeleteButtonClicked: (Int) -> Unit
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
-    private var blocks: MutableList<PostBlock> = mutableListOf()
+    private var blocks: MutableList<PostBlockState> = mutableListOf()
 
     fun getCurrentBlocks() = blocks.toList()
 
-    fun updateBlocks(newBlocks: List<PostBlock>) {
+    fun updateBlocks(newBlocks: List<PostBlockState>) {
         blocks = newBlocks.toMutableList()
     }
 
@@ -28,9 +28,9 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when(blocks[position]) {
-            is PostBlock.STRING -> ViewType.STRING.ordinal
-            is PostBlock.IMAGE -> ViewType.IMAGE.ordinal
-            is PostBlock.VIDEO -> ViewType.VIDEO.ordinal
+            is PostBlockState.STRING -> ViewType.STRING.ordinal
+            is PostBlockState.IMAGE -> ViewType.IMAGE.ordinal
+            is PostBlockState.VIDEO -> ViewType.VIDEO.ordinal
         }
     }
 
@@ -68,7 +68,7 @@ class CreatePostListAdapter(
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
             is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position].content, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlock.IMAGE).uri, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlockState.IMAGE).uri, position)
         }
     }
 
@@ -81,10 +81,18 @@ class CreatePostListAdapter(
         super.onViewDetachedFromWindow(holder)
         holder.detachTextWatcherFromEditText()
     }
+
+    companion object{
+        enum class ViewType {
+            STRING,
+            IMAGE,
+            VIDEO,
+        }
+    }
 }
 
 @BindingAdapter("blocks", "listener", "onDeleteButtonClick")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlock>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit) {
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit) {
     if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked)
 
     when {

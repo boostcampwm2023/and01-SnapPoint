@@ -2,11 +2,10 @@ package com.boostcampwm2023.snappoint.presentation.map
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMapsMarkerBinding
-import com.boostcampwm2023.snappoint.presentation.createpost.Position
-import com.boostcampwm2023.snappoint.presentation.createpost.PostBlock
+import com.boostcampwm2023.snappoint.presentation.createpost.PositionState
+import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,7 +20,7 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     GoogleMap.OnCameraMoveListener,
     GoogleMap.OnCameraIdleListener {
 
-    private var _post: PostBlock = PostBlock.IMAGE("Content", Uri.EMPTY, Position(37.3586926, 127.1051209))
+    private var _post: PostBlockState = PostBlockState.IMAGE("Content", Uri.EMPTY, PositionState(37.3586926, 127.1051209))
     private var _marker: Marker? = null
     private var _map: GoogleMap? = null
 
@@ -37,8 +36,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
 
         val post = _post
         val latLng = when (post) {
-            is PostBlock.VIDEO -> LatLng(post.position.latitude, post.position.longitude)
-            is PostBlock.IMAGE -> LatLng(post.position.latitude, post.position.longitude)
+            is PostBlockState.VIDEO -> LatLng(post.position.latitude, post.position.longitude)
+            is PostBlockState.IMAGE -> LatLng(post.position.latitude, post.position.longitude)
             else -> return
         }
 
@@ -80,12 +79,12 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
 
     private fun updateBlockPosition(latLng: LatLng) {
         val marker: Marker = _marker ?: return
-        val tag: PostBlock = (marker.tag as? PostBlock) ?: return
-        val newPosition: Position = Position(latLng.latitude, latLng.longitude)
+        val tag: PostBlockState = (marker.tag as? PostBlockState) ?: return
+        val newPositionState: PositionState = PositionState(latLng.latitude, latLng.longitude)
 
         marker.tag = when (tag) {
-            is PostBlock.IMAGE -> tag.copy(tag.content, tag.uri, newPosition)
-            is PostBlock.VIDEO -> tag.copy(tag.content, newPosition)
+            is PostBlockState.IMAGE -> tag.copy(tag.content, tag.uri, newPositionState)
+            is PostBlockState.VIDEO -> tag.copy(tag.content, newPositionState)
             else -> return
         }
     }

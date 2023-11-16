@@ -3,24 +3,23 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.net.Uri
 
 data class CreatePostUiState(
-    val postBlocks: List<PostBlock> = mutableListOf(),
+    val title: String = "",
+    val postBlocks: List<PostBlockState> = mutableListOf(),
     val onTextChanged: (position: Int, content: String) -> Unit,
     val onDeleteButtonClicked: (position: Int) -> Unit,
+    val isLoading: Boolean = false,
 )
 
-sealed class PostBlock(open val content: String) {
-    data class STRING(override val content: String = "") : PostBlock(content)
-    data class IMAGE(override val content: String = "", val uri: Uri, val position: Position) : PostBlock(content)
-    data class VIDEO(override val content: String = "", val position: Position) : PostBlock(content)
+
+sealed class PostBlockState(open val content: String) {
+    data class STRING(override val content: String = "") : PostBlockState(content)
+    data class IMAGE(override val content: String = "", val uri: Uri, val position: PositionState) : PostBlockState(content)
+    data class VIDEO(override val content: String = "", val position: PositionState) : PostBlockState(content)
 }
 
-enum class ViewType {
-    STRING,
-    IMAGE,
-    VIDEO,
-}
 
-data class Position(
+
+data class PositionState(
     val latitude: Double,
     val longitude: Double
 )

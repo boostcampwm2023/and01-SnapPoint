@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -48,17 +47,17 @@ class CreatePostViewModel @Inject constructor(
     fun addTextBlock() {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.plus(PostBlock.STRING())
+                postBlocks = it.postBlocks.plus(PostBlockState.STRING())
             )
         }
     }
 
-    fun addImageBlock(uri: Uri?, position: Position) {
+    fun addImageBlock(uri: Uri?, position: PositionState) {
         if (uri == null) return
 
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlock.IMAGE(uri = uri, position = position)
+                postBlocks = it.postBlocks + PostBlockState.IMAGE(uri = uri, position = position)
             )
         }
     }
@@ -83,9 +82,9 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
                     if(position == index) {
                         when(postBlock){
-                            is PostBlock.STRING -> postBlock.copy(content = content)
-                            is PostBlock.IMAGE -> postBlock.copy(content = content)
-                            is PostBlock.VIDEO -> TODO()
+                            is PostBlockState.STRING -> postBlock.copy(content = content)
+                            is PostBlockState.IMAGE -> postBlock.copy(content = content)
+                            is PostBlockState.VIDEO -> TODO()
                         }
                     }else{
                         postBlock
@@ -98,9 +97,9 @@ class CreatePostViewModel @Inject constructor(
     private fun isValidContents(): Boolean {
         _uiState.value.postBlocks.forEach {
             when(it){
-                is PostBlock.STRING -> {if(it.content.isEmpty()) return false}
-                is PostBlock.IMAGE -> {if(it.content.isEmpty()) return false}
-                is PostBlock.VIDEO -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.STRING -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.IMAGE -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.VIDEO -> {if(it.content.isEmpty()) return false}
             }
         }
         return true
@@ -110,18 +109,35 @@ class CreatePostViewModel @Inject constructor(
         println(uiState.value.postBlocks)
         if(isValidContents().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
+            return
         }
-        postRepository.postPost(_uiState.value.postBlocks)
-            .onStart { Log.d("TAG", "onCheckButtonClicked: started, loading") }
+        postRepository.postCreatePost(
+            title = _uiState.value.title,
+            postBlocks = _uiState.value.postBlocks
+        )
+            .onStart {
+                _uiState.update {
+                    it.copy(isLoading = true)
+                }
+            }
             .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
-            .onCompletion { Log.d("TAG", "onCheckButtonClicked: finished, end") }
+            .onCompletion {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
             .onEach {
                 Log.d("TAG", "onCheckButtonClicked: api request success")
+                _event.tryEmit(CreatePostEvent.NavigatePrev)
             }
             .launchIn(viewModelScope)
     }
 
     fun onImageBlockButtonClicked() {
         _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
+    }
+
+    fun onBackButtonClicked(){
+        _event.tryEmit(CreatePostEvent.NavigatePrev)
     }
 }
