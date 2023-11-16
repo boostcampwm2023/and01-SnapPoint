@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
@@ -31,10 +34,12 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     }
 
     private fun collectViewModelData() {
-        lifecycleScope.launch {
-            viewModel.event.collect{event ->
-                when(event){
-                    is CreatePostEvent.ShowMessage -> {showToastMessage(event.resId)}
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED){
+                viewModel.event.collect{event ->
+                    when(event){
+                        is CreatePostEvent.ShowMessage -> {showToastMessage(event.resId)}
+                    }
                 }
             }
 

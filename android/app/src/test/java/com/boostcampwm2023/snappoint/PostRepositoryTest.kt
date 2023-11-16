@@ -18,7 +18,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 
 
-class MediaRepositoryTest {
+class PostRepositoryTest {
 
     private lateinit var server: MockWebServer
     private lateinit var snapPointApi: SnapPointApi
