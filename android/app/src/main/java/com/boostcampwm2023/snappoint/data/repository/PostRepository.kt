@@ -8,5 +8,5 @@ interface PostRepository {
     fun getImageUri(image: ByteArray): Flow<Unit>
     fun getVideo(uri: String): Flow<ByteArray>
     fun getVideoUri(video: ByteArray): Flow<Unit>
-    fun postPost(postBlocks: List<PostBlock>): Flow<Unit>
+    fun postCreatePost(postBlocks: List<PostBlock>): Flow<Unit>
 }

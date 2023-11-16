@@ -38,7 +38,7 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun postPost(postBlocks: List<PostBlock>): Flow<Unit> {
+    override fun postCreatePost(postBlocks: List<PostBlock>): Flow<Unit> {
         return flowOf(true)
             .map{
 
