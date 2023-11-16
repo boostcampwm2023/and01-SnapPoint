@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <variable
+            name="stringBlock"
+            type="com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState.STRING" />
 
     </data>
 
