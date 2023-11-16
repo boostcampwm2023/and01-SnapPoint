@@ -101,9 +101,17 @@ class CreatePostViewModel @Inject constructor(
             title = _uiState.value.title,
             postBlocks = _uiState.value.postBlocks
         )
-            .onStart { Log.d("TAG", "onCheckButtonClicked: started, loading") }
+            .onStart {
+                _uiState.update {
+                    it.copy(isLoading = true)
+                }
+            }
             .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
-            .onCompletion { Log.d("TAG", "onCheckButtonClicked: finished, end") }
+            .onCompletion {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
             .onEach {
                 Log.d("TAG", "onCheckButtonClicked: api request success")
             }

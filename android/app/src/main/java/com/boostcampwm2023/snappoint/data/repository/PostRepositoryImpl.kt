@@ -4,6 +4,7 @@ import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -52,7 +53,8 @@ class PostRepositoryImpl @Inject constructor(
 
         return flowOf(true)
             .map{
-                snapPointApi.createPost(request)
+                delay(1000)
+                //snapPointApi.createPost(request)
             }
     }
 }
