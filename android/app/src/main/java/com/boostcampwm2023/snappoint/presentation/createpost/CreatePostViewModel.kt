@@ -33,6 +33,18 @@ class CreatePostViewModel @Inject constructor(
         },
         onDeleteButtonClicked = { position ->
             deletePostBlock(position)
+        },
+        onEditButtonClicked = { position ->
+            changeToEditMode(position)
+        },
+        onCheckButtonClicked = { position ->
+            clearEditMode(position)
+        },
+        onUpButtonClicked = { position ->
+            moveUp(position)
+        },
+        onDownButtonClicked = { position ->
+            moveDown(position)
         }
     ))
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
@@ -91,6 +103,68 @@ class CreatePostViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    private fun changeToEditMode(position: Int) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
+                    if (position == index) {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = true)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = true)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = true)
+                        }
+                    } else {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    private fun clearEditMode(position: Int) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
+                    if (position == index) {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
+                        }
+                    } else {
+                        postBlock
+                    }
+                }
+            )
+        }
+    }
+
+    private fun moveUp(position: Int) {
+        if (position == 0) return
+        _uiState.update {
+            val list = it.postBlocks.toMutableList()
+            val tmp = list[position]
+            list[position] = list[position - 1]
+            list[position - 1] = tmp
+            it.copy(postBlocks = list)
+        }
+    }
+
+    private fun moveDown(position: Int) {
+        if (position == uiState.value.postBlocks.lastIndex) return
+        _uiState.update {
+            val list = it.postBlocks.toMutableList()
+            val tmp = list[position]
+            list[position] = list[position + 1]
+            list[position + 1] = tmp
+            it.copy(postBlocks = list)
         }
     }
 

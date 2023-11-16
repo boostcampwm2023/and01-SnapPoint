@@ -20,7 +20,7 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
     GoogleMap.OnCameraMoveListener,
     GoogleMap.OnCameraIdleListener {
 
-    private var _post: PostBlockState = PostBlockState.IMAGE("Content", Uri.EMPTY, PositionState(37.3586926, 127.1051209))
+    private var _post: PostBlockState = PostBlockState.IMAGE("Content", false, Uri.EMPTY, PositionState(37.3586926, 127.1051209))
     private var _marker: Marker? = null
     private var _map: GoogleMap? = null
 
@@ -83,8 +83,8 @@ class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.acti
         val newPositionState: PositionState = PositionState(latLng.latitude, latLng.longitude)
 
         marker.tag = when (tag) {
-            is PostBlockState.IMAGE -> tag.copy(tag.content, tag.uri, newPositionState)
-            is PostBlockState.VIDEO -> tag.copy(tag.content, newPositionState)
+            is PostBlockState.IMAGE -> tag.copy(tag.content, false, tag.uri, newPositionState)
+            is PostBlockState.VIDEO -> tag.copy(tag.content, false, newPositionState)
             else -> return
         }
     }

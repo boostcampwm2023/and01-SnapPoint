@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ViewDataBinding
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
+import com.google.android.material.card.MaterialCardView
 
 sealed class BlockItemViewHolder(
     binding: ViewDataBinding,
@@ -24,12 +26,30 @@ sealed class BlockItemViewHolder(
     class TextBlockViewHolder(
         private val binding: ItemTextBlockBinding,
         listener: (Int, String) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit
+        private val onEditButtonClicked: (Int) -> Unit,
+        private val onCheckButtonClicked: (Int) -> Unit,
+        private val onUpButtonClicked: (position: Int) -> Unit,
+        private val onDownButtonClicked: (position: Int) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, listener) {
 
-        fun bind(content: String, position: Int) {
-            binding.tilText.editText?.setText(content)
+        fun bind(block: PostBlockState.STRING, position: Int) {
+            binding.tilText.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
+            binding.btnEditBlock.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onEditButtonClicked(position)
+            }
+            binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
+            binding.btnUp.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onUpButtonClicked(position)
+            }
+            binding.btnDown.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onDownButtonClicked(position)
+            }
+            binding.editMode = block.isEditMode
             textWatcher.updatePosition(position)
         }
 
@@ -45,13 +65,31 @@ sealed class BlockItemViewHolder(
     class ImageBlockViewHolder(
         private val binding: ItemImageBlockBinding,
         listener: (Int, String) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit
+        private val onEditButtonClicked: (Int) -> Unit,
+        private val onCheckButtonClicked: (Int) -> Unit,
+        private val onUpButtonClicked: (position: Int) -> Unit,
+        private val onDownButtonClicked: (position: Int) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, listener) {
 
-        fun bind(content: String, uri: Uri, position: Int) {
-            binding.tilDescription.editText?.setText(content)
+        fun bind(block: PostBlockState.IMAGE, position: Int) {
+            binding.tilDescription.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
-            binding.uri = uri
+            binding.btnEditBlock.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onEditButtonClicked(position)
+            }
+            binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
+            binding.btnUp.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onUpButtonClicked(position)
+            }
+            binding.btnDown.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onDownButtonClicked(position)
+            }
+            binding.uri = block.uri
+            binding.editMode = block.isEditMode
             textWatcher.updatePosition(position)
         }
 
@@ -91,4 +129,22 @@ class EditTextWatcher(private val listener: (Int, String) -> Unit) : TextWatcher
 @BindingAdapter("uri")
 fun ImageView.bindUri(uri: Uri) {
     load(uri)
+}
+
+@BindingAdapter("editMode")
+fun MaterialCardView.isEditMode(editMode: Boolean) {
+    val value = TypedValue()
+    val width = if (editMode) {
+        context.theme.resolveAttribute(
+            com.google.android.material.R.attr.colorSecondary,
+            value,
+            true
+        )
+        4
+    } else {
+        context.theme.resolveAttribute(com.google.android.material.R.attr.colorOutline, value, true)
+        1
+    }
+    strokeWidth = width
+    strokeColor = value.data
 }

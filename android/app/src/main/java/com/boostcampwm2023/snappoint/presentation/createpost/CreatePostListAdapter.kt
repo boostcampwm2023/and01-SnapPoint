@@ -9,7 +9,11 @@ import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class CreatePostListAdapter(
     private val listener: (Int, String) -> Unit,
-    private val onDeleteButtonClicked: (Int) -> Unit
+    private val onDeleteButtonClicked: (Int) -> Unit,
+    private val onEditButtonClicked: (Int) -> Unit,
+    private val onCheckButtonClicked: (Int) -> Unit,
+    private val onUpButtonClicked: (position: Int) -> Unit,
+    private val onDownButtonClicked: (position: Int) -> Unit,
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -26,8 +30,24 @@ class CreatePostListAdapter(
         notifyItemRangeChanged(position, blocks.size - position)
     }
 
+    private fun moveUpBlock(position: Int) {
+        if (position == 0) return
+        val tmp = blocks[position]
+        blocks[position] = blocks[position - 1]
+        blocks[position - 1] = tmp
+        notifyItemRangeChanged(position - 1, 2)
+    }
+
+    private fun moveDownBlock(position: Int) {
+        if (position == blocks.lastIndex) return
+        val tmp = blocks[position]
+        blocks[position] = blocks[position + 1]
+        blocks[position + 1] = tmp
+        notifyItemRangeChanged(position, 2)
+    }
+
     override fun getItemViewType(position: Int): Int {
-        return when(blocks[position]) {
+        return when (blocks[position]) {
             is PostBlockState.STRING -> ViewType.STRING.ordinal
             is PostBlockState.IMAGE -> ViewType.IMAGE.ordinal
             is PostBlockState.VIDEO -> ViewType.VIDEO.ordinal
@@ -36,16 +56,30 @@ class CreatePostListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
+        val onDeleteButtonClicked: (Int) -> Unit = { index ->
+            onDeleteButtonClicked(index)
+            deleteBlocks(index)
+        }
+        val onUpButtonClicked: (Int) -> Unit = { index ->
+            onUpButtonClicked(index)
+            moveUpBlock(index)
+        }
+        val onDownButtonClicked: (Int) -> Unit = { index ->
+            onDownButtonClicked(index)
+            moveDownBlock(index)
+        }
 
         when (viewType) {
             ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     ItemImageBlockBinding.inflate(inflater, parent, false),
-                    listener
-                ) { index ->
-                    onDeleteButtonClicked(index)
-                    deleteBlocks(index)
-                }
+                    listener,
+                    onEditButtonClicked,
+                    onCheckButtonClicked,
+                    onUpButtonClicked,
+                    onDownButtonClicked,
+                    onDeleteButtonClicked
+                )
             }
 
             ViewType.VIDEO.ordinal -> {
@@ -54,11 +88,13 @@ class CreatePostListAdapter(
         }
         return BlockItemViewHolder.TextBlockViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
-            listener
-        ) { index ->
-            onDeleteButtonClicked(index)
-            deleteBlocks(index)
-        }
+            listener,
+            onEditButtonClicked,
+            onCheckButtonClicked,
+            onUpButtonClicked,
+            onDownButtonClicked,
+            onDeleteButtonClicked
+        )
     }
 
     override fun getItemCount(): Int {
@@ -67,8 +103,15 @@ class CreatePostListAdapter(
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position].content, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position].content, (blocks[position] as PostBlockState.IMAGE).uri, position)
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(
+                blocks[position] as PostBlockState.STRING,
+                position
+            )
+
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(
+                blocks[position] as PostBlockState.IMAGE,
+                position
+            )
         }
     }
 
@@ -82,7 +125,7 @@ class CreatePostListAdapter(
         holder.detachTextWatcherFromEditText()
     }
 
-    companion object{
+    companion object {
         enum class ViewType {
             STRING,
             IMAGE,
@@ -91,9 +134,32 @@ class CreatePostListAdapter(
     }
 }
 
-@BindingAdapter("blocks", "listener", "onDeleteButtonClick")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit) {
-    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked)
+@BindingAdapter(
+    "blocks",
+    "listener",
+    "onDeleteButtonClick",
+    "onEditButtonClick",
+    "onCheckButtonClick",
+    "onUpButtonClick",
+    "onDownButtonClick"
+)
+fun RecyclerView.bindRecyclerViewAdapter(
+    blocks: List<PostBlockState>,
+    listener: (Int, String) -> Unit,
+    onDeleteButtonClicked: (Int) -> Unit,
+    onEditButtonClicked: (Int) -> Unit,
+    onCheckButtonClicked: (Int) -> Unit,
+    onUpButtonClicked: (Int) -> Unit,
+    onDownButtonClicked: (Int) -> Unit
+) {
+    if (adapter == null) adapter = CreatePostListAdapter(
+        listener,
+        onDeleteButtonClicked,
+        onEditButtonClicked,
+        onCheckButtonClicked,
+        onUpButtonClicked,
+        onDownButtonClicked
+    )
 
     when {
         // 아이템 추가
@@ -104,10 +170,20 @@ fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener:
             }
         }
 
-        // content 변경
+        // content 또는 editMode 변경
         (adapter as CreatePostListAdapter).getCurrentBlocks().size == blocks.size -> {
             with(adapter as CreatePostListAdapter) {
+                val current = (adapter as CreatePostListAdapter).getCurrentBlocks()
                 updateBlocks(blocks)
+                current.forEachIndexed { index, postBlock ->
+                    if (postBlock.isEditMode != blocks[index].isEditMode) {
+                        val on = blocks.indexOfFirst { it.isEditMode }
+                        val off = current.indexOfFirst { it.isEditMode }
+                        notifyItemChanged(on)
+                        notifyItemChanged(off)
+                        return@forEachIndexed
+                    }
+                }
             }
         }
     }
