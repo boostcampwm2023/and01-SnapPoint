@@ -53,6 +53,8 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
                 viewModel.addImageBlock(imageUri, position)
+
+                startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
             }
         }
 
@@ -69,10 +71,6 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                         )
                     )
                 }
-                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getStringExtra("address")}")
-                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getStringExtra("asdasdasd")}")
-                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getDoubleExtra("longitude", 123.123)}")
-                Log.d("TAG", "addressSelectionLauncher result: ${result.data?.getDoubleExtra("latitude", 123.123)}")
             }
         }
 
@@ -102,7 +100,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                             selectImage()
                         }
 
-                        CreatePostEvent.NavigatePrev -> {
+                        is CreatePostEvent.NavigatePrev -> {
                             findNavController().popBackStack()
                         }
 

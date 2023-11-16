@@ -176,6 +176,5 @@ class CreatePostViewModel @Inject constructor(
                 }
             )
         }
-        Log.d("TAG", "setAddressAndPosition: ${_uiState.value.postBlocks[index]}")
     }
 }
