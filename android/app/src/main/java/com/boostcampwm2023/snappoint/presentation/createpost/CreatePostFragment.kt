@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -81,6 +82,10 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                         CreatePostEvent.NavigatePrev -> {
                             findNavController().popBackStack()
                         }
+
+                        is CreatePostEvent.FindAddress -> {
+                            startMapActivityAndFindAddress(event.index, event.position)
+                        }
                     }
                 }
             }
@@ -137,5 +142,10 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
             }
         }
         imagePermissionLauncher.launch(permissions)
+    }
+
+
+    private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
+        Log.d("TAG", "startMapActivityAndFindAddress: $index, $position")
     }
 }

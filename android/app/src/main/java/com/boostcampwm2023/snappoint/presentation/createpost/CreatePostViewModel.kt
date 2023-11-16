@@ -28,13 +28,17 @@ class CreatePostViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<CreatePostUiState> = MutableStateFlow(CreatePostUiState(
-        onTextChanged = { position, content ->
-            updatePostBlocks(position, content)
+        onTextChanged = { index, content ->
+            updatePostBlocks(index, content)
         },
-        onDeleteButtonClicked = { position ->
-            deletePostBlock(position)
+        onDeleteButtonClicked = { index ->
+            deletePostBlock(index)
+        },
+        onAddressIconClicked = { index ->
+            findAddress(index)
         }
     ))
+
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
 
     private val _event: MutableSharedFlow<CreatePostEvent> = MutableSharedFlow(
@@ -76,11 +80,11 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    private fun updatePostBlocks(position: Int, content: String) {
+    private fun updatePostBlocks(index: Int, content: String) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
-                    if(position == index) {
+                postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
+                    if(index == idx) {
                         when(postBlock){
                             is PostBlockState.STRING -> postBlock.copy(content = content)
                             is PostBlockState.IMAGE -> postBlock.copy(content = content)
@@ -139,5 +143,19 @@ class CreatePostViewModel @Inject constructor(
 
     fun onBackButtonClicked(){
         _event.tryEmit(CreatePostEvent.NavigatePrev)
+    }
+
+
+    private fun findAddress(index: Int) {
+
+        when(val target = _uiState.value.postBlocks[index]){
+            is PostBlockState.STRING -> {return}
+            is PostBlockState.IMAGE -> {
+                _event.tryEmit(CreatePostEvent.FindAddress(index, target.position))
+            }
+            is PostBlockState.VIDEO -> {
+                _event.tryEmit(CreatePostEvent.FindAddress(index, target.position))
+            }
+        }
     }
 }

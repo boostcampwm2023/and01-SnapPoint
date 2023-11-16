@@ -8,8 +8,9 @@ import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class CreatePostListAdapter(
-    private val listener: (Int, String) -> Unit,
-    private val onDeleteButtonClicked: (Int) -> Unit
+    private val onContentChanged: (Int, String) -> Unit,
+    private val onDeleteButtonClicked: (Int) -> Unit,
+    private val onAddressIconClicked: (Int) -> Unit,
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -41,11 +42,15 @@ class CreatePostListAdapter(
             ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     ItemImageBlockBinding.inflate(inflater, parent, false),
-                    listener
-                ) { index ->
-                    onDeleteButtonClicked(index)
-                    deleteBlocks(index)
-                }
+                    onContentChanged,
+                    onAddressIconClicked = { index ->
+                        onAddressIconClicked(index)
+                    },
+                    onDeleteButtonClicked = { index ->
+                        onDeleteButtonClicked(index)
+                        deleteBlocks(index)
+                    }
+                )
             }
 
             ViewType.VIDEO.ordinal -> {
@@ -54,11 +59,12 @@ class CreatePostListAdapter(
         }
         return BlockItemViewHolder.TextBlockViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
-            listener
-        ) { index ->
-            onDeleteButtonClicked(index)
-            deleteBlocks(index)
-        }
+            onContentChanged,
+            onDeleteButtonClicked = { index ->
+                onDeleteButtonClicked(index)
+                deleteBlocks(index)
+            }
+        )
     }
 
     override fun getItemCount(): Int {
@@ -91,9 +97,9 @@ class CreatePostListAdapter(
     }
 }
 
-@BindingAdapter("blocks", "listener", "onDeleteButtonClick")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit) {
-    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked)
+@BindingAdapter("blocks", "onContentChanged", "onDeleteButtonClicked", "onAddressIconClicked")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, onContentChanged: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit, onAddressIconClicked: (Int) -> Unit) {
+    if (adapter == null) adapter = CreatePostListAdapter(onContentChanged, onDeleteButtonClicked, onAddressIconClicked)
 
     when {
         // 아이템 추가

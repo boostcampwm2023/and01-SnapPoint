@@ -45,14 +45,16 @@ sealed class BlockItemViewHolder(
     class ImageBlockViewHolder(
         private val binding: ItemImageBlockBinding,
         listener: (Int, String) -> Unit,
+        private val onAddressIconClicked: (Int) -> Unit,
         private val onDeleteButtonClicked: (Int) -> Unit
     ) : BlockItemViewHolder(binding, listener) {
 
-        fun bind(content: String, uri: Uri, position: Int) {
+        fun bind(content: String, uri: Uri, index: Int) {
             binding.tilDescription.editText?.setText(content)
-            binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
+            binding.onDeleteButtonClick = { onDeleteButtonClicked(index) }
             binding.uri = uri
-            textWatcher.updatePosition(position)
+            binding.tilAddress.setEndIconOnClickListener { onAddressIconClicked.invoke(index) }
+            textWatcher.updatePosition(index)
         }
 
         override fun attachTextWatcherToEditText() {
