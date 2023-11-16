@@ -7,6 +7,8 @@
         <variable
             name="vm"
             type="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostViewModel" />
+        
+        <import type="android.view.View"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,6 +16,8 @@
         android:layout_height="match_parent"
         android:background="@color/surfaceContainerLow"
         tools:context=".presentation.createpost.CreatePostFragment">
+
+
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/tb"
@@ -34,6 +38,7 @@
             android:elevation="2dp"
             android:padding="16dp"
             android:src="@drawable/icon_arrow_back"
+            android:onClick="@{() -> vm.onBackButtonClicked()}"
             app:layout_constraintBottom_toBottomOf="@id/tb"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -128,6 +133,16 @@
             listener="@{vm.uiState.onTextChanged}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_text_block"/>
+
+        <ProgressBar
+            android:id="@+id/pb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="@{vm.uiState.loading ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

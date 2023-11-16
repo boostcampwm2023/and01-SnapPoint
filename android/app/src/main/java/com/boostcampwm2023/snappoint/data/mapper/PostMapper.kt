@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.data.mapper
 
+import android.net.Uri
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.Position
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
@@ -16,7 +17,8 @@ fun PostBlock.asPostBlockState(): PostBlockState {
         BlockType.IMAGE -> {
             PostBlockState.IMAGE(
                 content = this.content,
-                position = this.position!!.asPositionState()
+                position = this.position!!.asPositionState(),
+                uri = Uri.EMPTY
             )
         }
         BlockType.VIDEO -> TODO()
