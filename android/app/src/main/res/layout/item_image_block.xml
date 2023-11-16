@@ -4,6 +4,11 @@
 
     <data>
 
+        <import type="kotlin.jvm.functions.Function0"/>
+        <import type="kotlin.Unit"/>
+        <variable
+            name="onDeleteButtonClick"
+            type="Function0&lt;Unit>" />
         <variable
             name="uri"
             type="android.net.Uri" />
@@ -36,7 +41,8 @@
             android:background="?attr/actionBarItemBackground"
             android:padding="16dp"
             android:layout_marginVertical="8dp"
-            app:tint="@color/errorContainer" />
+            app:tint="@color/errorContainer"
+            android:onClick="@{() -> onDeleteButtonClick.invoke()}"/>
 
         <ImageButton
             android:id="@+id/btn_edit_block"

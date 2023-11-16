@@ -8,7 +8,8 @@ import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 
 class CreatePostListAdapter(
-    private val listener: (Int, String) -> Unit
+    private val listener: (Int, String) -> Unit,
+    private val onDeleteButtonClicked: (Int) -> Unit
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -17,6 +18,12 @@ class CreatePostListAdapter(
 
     fun updateBlocks(newBlocks: List<PostBlockState>) {
         blocks = newBlocks.toMutableList()
+    }
+
+    private fun deleteBlocks(position: Int) {
+        blocks.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, blocks.size - position)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -35,7 +42,10 @@ class CreatePostListAdapter(
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     ItemImageBlockBinding.inflate(inflater, parent, false),
                     listener
-                )
+                ) { index ->
+                    onDeleteButtonClicked(index)
+                    deleteBlocks(index)
+                }
             }
 
             ViewType.VIDEO.ordinal -> {
@@ -45,7 +55,10 @@ class CreatePostListAdapter(
         return BlockItemViewHolder.TextBlockViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
             listener
-        )
+        ) { index ->
+            onDeleteButtonClicked(index)
+            deleteBlocks(index)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -78,9 +91,9 @@ class CreatePostListAdapter(
     }
 }
 
-@BindingAdapter("blocks", "listener")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit) {
-    if (adapter == null) adapter = CreatePostListAdapter(listener)
+@BindingAdapter("blocks", "listener", "onDeleteButtonClick")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit) {
+    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked)
 
     when {
         // 아이템 추가

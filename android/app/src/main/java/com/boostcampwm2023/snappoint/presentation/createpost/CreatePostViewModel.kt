@@ -30,6 +30,9 @@ class CreatePostViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<CreatePostUiState> = MutableStateFlow(CreatePostUiState(
         onTextChanged = { position, content ->
             updatePostBlocks(position, content)
+        },
+        onDeleteButtonClicked = { position ->
+            deletePostBlock(position)
         }
     ))
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
@@ -61,6 +64,16 @@ class CreatePostViewModel @Inject constructor(
 
     fun addVideoBlock() {
         TODO()
+    }
+
+    private fun deletePostBlock(position: Int) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.filterIndexed { index, _ ->
+                    index != position
+                }
+            )
+        }
     }
 
     private fun updatePostBlocks(position: Int, content: String) {

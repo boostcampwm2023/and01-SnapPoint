@@ -131,6 +131,7 @@
             android:padding="20dp"
             blocks="@{vm.uiState.postBlocks}"
             listener="@{vm.uiState.onTextChanged}"
+            onDeleteButtonClick="@{vm.uiState.onDeleteButtonClicked}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_text_block"/>
 
