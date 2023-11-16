@@ -133,6 +133,7 @@
             listener="@{vm.uiState.onTextChanged}"
             onDeleteButtonClick="@{vm.uiState.onDeleteButtonClicked}"
             onEditButtonClick="@{vm.uiState.onEditButtonClicked}"
+            onCheckButtonClick="@{vm.uiState.onCheckButtonClicked}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_text_block"/>
 

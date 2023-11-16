@@ -11,6 +11,7 @@ class CreatePostListAdapter(
     private val listener: (Int, String) -> Unit,
     private val onDeleteButtonClicked: (Int) -> Unit,
     private val onEditButtonClicked: (Int) -> Unit,
+    private val onCheckButtonClicked: (Int) -> Unit,
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -43,7 +44,8 @@ class CreatePostListAdapter(
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     ItemImageBlockBinding.inflate(inflater, parent, false),
                     listener,
-                    onEditButtonClicked
+                    onEditButtonClicked,
+                    onCheckButtonClicked,
                 ) { index ->
                     onDeleteButtonClicked(index)
                     deleteBlocks(index)
@@ -57,7 +59,8 @@ class CreatePostListAdapter(
         return BlockItemViewHolder.TextBlockViewHolder(
             ItemTextBlockBinding.inflate(inflater, parent, false),
             listener,
-            onEditButtonClicked
+            onEditButtonClicked,
+            onCheckButtonClicked
         ) { index ->
             onDeleteButtonClicked(index)
             deleteBlocks(index)
@@ -94,9 +97,9 @@ class CreatePostListAdapter(
     }
 }
 
-@BindingAdapter("blocks", "listener", "onDeleteButtonClick", "onEditButtonClick")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit, onEditButtonClicked: (Int) -> Unit) {
-    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked, onEditButtonClicked)
+@BindingAdapter("blocks", "listener", "onDeleteButtonClick", "onEditButtonClick", "onCheckButtonClick")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, listener: (Int, String) -> Unit, onDeleteButtonClicked: (Int) -> Unit, onEditButtonClicked: (Int) -> Unit, onCheckButtonClicked: (Int) -> Unit) {
+    if (adapter == null) adapter = CreatePostListAdapter(listener, onDeleteButtonClicked, onEditButtonClicked, onCheckButtonClicked)
 
     when {
         // 아이템 추가

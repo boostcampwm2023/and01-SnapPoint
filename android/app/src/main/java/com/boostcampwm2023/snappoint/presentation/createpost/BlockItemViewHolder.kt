@@ -27,13 +27,15 @@ sealed class BlockItemViewHolder(
         private val binding: ItemTextBlockBinding,
         listener: (Int, String) -> Unit,
         private val onEditButtonClicked: (Int) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit
+        private val onCheckButtonClicked: (Int) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(block: PostBlockState.STRING, position: Int) {
             binding.tilText.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
             binding.btnEditBlock.setOnClickListener { onEditButtonClicked(position) }
+            binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
             binding.editMode = block.isEditMode
             textWatcher.updatePosition(position)
         }
@@ -51,13 +53,15 @@ sealed class BlockItemViewHolder(
         private val binding: ItemImageBlockBinding,
         listener: (Int, String) -> Unit,
         private val onEditButtonClicked: (Int) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit
+        private val onCheckButtonClicked: (Int) -> Unit,
+        private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(block: PostBlockState.IMAGE, position: Int) {
             binding.tilDescription.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
             binding.btnEditBlock.setOnClickListener { onEditButtonClicked(position) }
+            binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
             binding.uri = block.uri
             binding.editMode = block.isEditMode
             textWatcher.updatePosition(position)

@@ -36,6 +36,9 @@ class CreatePostViewModel @Inject constructor(
         },
         onEditButtonClicked = { position ->
             changeToEditMode(position)
+        },
+        onCheckButtonClicked = { position ->
+            clearEditMode(position)
         }
     ))
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
@@ -113,6 +116,24 @@ class CreatePostViewModel @Inject constructor(
                             is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
                             is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
                         }
+                    }
+                }
+            )
+        }
+    }
+
+    private fun clearEditMode(position: Int) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
+                    if (position == index) {
+                        when (postBlock) {
+                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
+                        }
+                    } else {
+                        postBlock
                     }
                 }
             )
