@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -98,11 +99,11 @@ class CreatePostViewModel @Inject constructor(
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
         }
         postRepository.postPost(_uiState.value.postBlocks)
-            .onStart {  }
-            .catch {  }
-            .onCompletion {  }
+            .onStart { Log.d("TAG", "onCheckButtonClicked: started, loading") }
+            .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
+            .onCompletion { Log.d("TAG", "onCheckButtonClicked: finished, end") }
             .onEach {
-                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_post_api_success))
+                Log.d("TAG", "onCheckButtonClicked: api request success")
             }
             .launchIn(viewModelScope)
     }

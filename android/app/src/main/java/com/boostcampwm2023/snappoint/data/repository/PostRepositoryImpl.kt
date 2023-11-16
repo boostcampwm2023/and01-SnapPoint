@@ -24,6 +24,20 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun getVideo(uri: String): Flow<ByteArray> {
+        return flowOf(true)
+            .map{
+                byteArrayOf()
+            }
+    }
+
+    override fun getVideoUri(video: ByteArray): Flow<Unit> {
+        return flowOf(true)
+            .map{
+
+            }
+    }
+
     override fun postPost(postBlocks: List<PostBlock>): Flow<Unit> {
         return flowOf(true)
             .map{
