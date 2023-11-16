@@ -28,14 +28,27 @@ sealed class BlockItemViewHolder(
         listener: (Int, String) -> Unit,
         private val onEditButtonClicked: (Int) -> Unit,
         private val onCheckButtonClicked: (Int) -> Unit,
+        private val onUpButtonClicked: (position: Int) -> Unit,
+        private val onDownButtonClicked: (position: Int) -> Unit,
         private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(block: PostBlockState.STRING, position: Int) {
             binding.tilText.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
-            binding.btnEditBlock.setOnClickListener { onEditButtonClicked(position) }
+            binding.btnEditBlock.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onEditButtonClicked(position)
+            }
             binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
+            binding.btnUp.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onUpButtonClicked(position)
+            }
+            binding.btnDown.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onDownButtonClicked(position)
+            }
             binding.editMode = block.isEditMode
             textWatcher.updatePosition(position)
         }
@@ -54,14 +67,27 @@ sealed class BlockItemViewHolder(
         listener: (Int, String) -> Unit,
         private val onEditButtonClicked: (Int) -> Unit,
         private val onCheckButtonClicked: (Int) -> Unit,
+        private val onUpButtonClicked: (position: Int) -> Unit,
+        private val onDownButtonClicked: (position: Int) -> Unit,
         private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, listener) {
 
         fun bind(block: PostBlockState.IMAGE, position: Int) {
             binding.tilDescription.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
-            binding.btnEditBlock.setOnClickListener { onEditButtonClicked(position) }
+            binding.btnEditBlock.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onEditButtonClicked(position)
+            }
             binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
+            binding.btnUp.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onUpButtonClicked(position)
+            }
+            binding.btnDown.setOnClickListener {
+                itemView.rootView.clearFocus()
+                onDownButtonClicked(position)
+            }
             binding.uri = block.uri
             binding.editMode = block.isEditMode
             textWatcher.updatePosition(position)

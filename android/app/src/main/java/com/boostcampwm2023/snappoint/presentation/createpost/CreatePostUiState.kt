@@ -9,6 +9,8 @@ data class CreatePostUiState(
     val onDeleteButtonClicked: (position: Int) -> Unit,
     val onEditButtonClicked: (position: Int) -> Unit,
     val onCheckButtonClicked: (position: Int) -> Unit,
+    val onUpButtonClicked: (position: Int) -> Unit,
+    val onDownButtonClicked: (position: Int) -> Unit,
     val isLoading: Boolean = false,
 )
 

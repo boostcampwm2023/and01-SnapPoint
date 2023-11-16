@@ -39,6 +39,12 @@ class CreatePostViewModel @Inject constructor(
         },
         onCheckButtonClicked = { position ->
             clearEditMode(position)
+        },
+        onUpButtonClicked = { position ->
+            moveUp(position)
+        },
+        onDownButtonClicked = { position ->
+            moveDown(position)
         }
     ))
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
@@ -137,6 +143,28 @@ class CreatePostViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    private fun moveUp(position: Int) {
+        if (position == 0) return
+        _uiState.update {
+            val list = it.postBlocks.toMutableList()
+            val tmp = list[position]
+            list[position] = list[position - 1]
+            list[position - 1] = tmp
+            it.copy(postBlocks = list)
+        }
+    }
+
+    private fun moveDown(position: Int) {
+        if (position == uiState.value.postBlocks.lastIndex) return
+        _uiState.update {
+            val list = it.postBlocks.toMutableList()
+            val tmp = list[position]
+            list[position] = list[position + 1]
+            list[position + 1] = tmp
+            it.copy(postBlocks = list)
         }
     }
 

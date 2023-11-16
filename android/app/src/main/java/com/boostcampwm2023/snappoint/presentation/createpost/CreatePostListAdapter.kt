@@ -12,6 +12,8 @@ class CreatePostListAdapter(
     private val onDeleteButtonClicked: (Int) -> Unit,
     private val onEditButtonClicked: (Int) -> Unit,
     private val onCheckButtonClicked: (Int) -> Unit,
+    private val onUpButtonClicked: (position: Int) -> Unit,
+    private val onDownButtonClicked: (position: Int) -> Unit,
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -28,6 +30,22 @@ class CreatePostListAdapter(
         notifyItemRangeChanged(position, blocks.size - position)
     }
 
+    private fun moveUpBlock(position: Int) {
+        if (position == 0) return
+        val tmp = blocks[position]
+        blocks[position] = blocks[position - 1]
+        blocks[position - 1] = tmp
+        notifyItemRangeChanged(position - 1, 2)
+    }
+
+    private fun moveDownBlock(position: Int) {
+        if (position == blocks.lastIndex) return
+        val tmp = blocks[position]
+        blocks[position] = blocks[position + 1]
+        blocks[position + 1] = tmp
+        notifyItemRangeChanged(position, 2)
+    }
+
     override fun getItemViewType(position: Int): Int {
         return when (blocks[position]) {
             is PostBlockState.STRING -> ViewType.STRING.ordinal
@@ -38,6 +56,18 @@ class CreatePostListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
+        val onDeleteButtonClicked: (Int) -> Unit = { index ->
+            onDeleteButtonClicked(index)
+            deleteBlocks(index)
+        }
+        val onUpButtonClicked: (Int) -> Unit = { index ->
+            onUpButtonClicked(index)
+            moveUpBlock(index)
+        }
+        val onDownButtonClicked: (Int) -> Unit = { index ->
+            onDownButtonClicked(index)
+            moveDownBlock(index)
+        }
 
         when (viewType) {
             ViewType.IMAGE.ordinal -> {
@@ -46,10 +76,10 @@ class CreatePostListAdapter(
                     listener,
                     onEditButtonClicked,
                     onCheckButtonClicked,
-                ) { index ->
-                    onDeleteButtonClicked(index)
-                    deleteBlocks(index)
-                }
+                    onUpButtonClicked,
+                    onDownButtonClicked,
+                    onDeleteButtonClicked
+                )
             }
 
             ViewType.VIDEO.ordinal -> {
@@ -60,11 +90,11 @@ class CreatePostListAdapter(
             ItemTextBlockBinding.inflate(inflater, parent, false),
             listener,
             onEditButtonClicked,
-            onCheckButtonClicked
-        ) { index ->
-            onDeleteButtonClicked(index)
-            deleteBlocks(index)
-        }
+            onCheckButtonClicked,
+            onUpButtonClicked,
+            onDownButtonClicked,
+            onDeleteButtonClicked
+        )
     }
 
     override fun getItemCount(): Int {
@@ -109,20 +139,26 @@ class CreatePostListAdapter(
     "listener",
     "onDeleteButtonClick",
     "onEditButtonClick",
-    "onCheckButtonClick"
+    "onCheckButtonClick",
+    "onUpButtonClick",
+    "onDownButtonClick"
 )
 fun RecyclerView.bindRecyclerViewAdapter(
     blocks: List<PostBlockState>,
     listener: (Int, String) -> Unit,
     onDeleteButtonClicked: (Int) -> Unit,
     onEditButtonClicked: (Int) -> Unit,
-    onCheckButtonClicked: (Int) -> Unit
+    onCheckButtonClicked: (Int) -> Unit,
+    onUpButtonClicked: (Int) -> Unit,
+    onDownButtonClicked: (Int) -> Unit
 ) {
     if (adapter == null) adapter = CreatePostListAdapter(
         listener,
         onDeleteButtonClicked,
         onEditButtonClicked,
-        onCheckButtonClicked
+        onCheckButtonClicked,
+        onUpButtonClicked,
+        onDownButtonClicked
     )
 
     when {
