@@ -1,10 +1,12 @@
-import { PrismaService } from '@/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Block, Post } from '@prisma/client';
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
 import { PostService } from '@/post/post.service';
 import { BlockService } from '@/block/block.service';
 import { BlockFileService } from '@/block-file/block-file.service';
+import { BlockFileDto } from '@/block-file/dtos/block-files.dto';
+import { BlockDto } from '@/block/dtos/block.dto';
+import { PostDto } from '@/post/dtos/post.dto';
+import { PrismaService } from '@/prisma.service';
 
 @Injectable()
 export class PostApiService {
@@ -12,6 +14,7 @@ export class PostApiService {
     private postService: PostService,
     private blockService: BlockService,
     private blockFileService: BlockFileService,
+    private prismaService: PrismaService,
   ) {}
 
   isMediaBlock(type: string) {
@@ -20,34 +23,35 @@ export class PostApiService {
     }
   }
 
-  async create(createPostApiDto: CreatePostApiDto): Promise<{ post: Post; blocks: Block[] }> {
-    const { userEmail, title, blocks } = createPostApiDto;
-    userEmail;
+  async create(createPostApiDto: CreatePostApiDto): Promise<PostDto> {
+    const { title, blocks } = createPostApiDto;
     const userUuid = 'test';
 
     const createdPost = await this.postService.create({ title, userUuid });
 
-    const createdBlocks = blocks.map(async (block, index) => {
-      const createdBlock = await this.blockService.create(createdPost.uuid, {
-        content: block.content,
-        order: index,
-        type: block.type,
-      });
-
-      // 별도의 타입
-      // 프론트에 안보내도 되는 값들 필터링해서 리턴해주기
-      const blockWithFile = { ...createdBlock, blockFile: [] };
-
-      if (this.isMediaBlock(block.type)) {
-        blockWithFile.blockFile = block.blockFiles.map(async (blockFile) => {
-          const createdBlockFile = await this.blockFileService.create(createdBlock.uuid, blockFile);
-          return createdBlockFile;
+    const blockDtos = await Promise.all(
+      blocks.map(async (block, index) => {
+        const createdBlock = await this.blockService.create(createdPost.uuid, {
+          content: block.content,
+          order: index,
+          type: block.type,
         });
-      }
 
-      return blockWithFile;
-    });
+        const blockFileDtos = [];
 
-    return { post: createdPost, blocks: createdBlocks };
+        if (this.isMediaBlock(block.type)) {
+          block.blockFiles.forEach(async (blockFile) => {
+            const createdBlockFile = await this.blockFileService.create(createdBlock.uuid, blockFile);
+            blockFileDtos.push(BlockFileDto.of(createdBlockFile));
+          });
+        }
+
+        const blockDto = BlockDto.of(createdBlock, blockFileDtos);
+
+        return blockDto;
+      }),
+    );
+
+    return PostDto.of(createdPost, blockDtos);
   }
 }

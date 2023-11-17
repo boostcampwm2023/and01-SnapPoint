@@ -9,7 +9,8 @@ export class BlockFileService {
 
   async create(blockUuid: string, createBlockFileDto: CreateBlockFileDto): Promise<BlockFile> {
     // TODO: NCP Object Storage에 이미지 업로드한다.
-    const blockFileName = 'test';
+    // - BlockFile의 UUID를 생성하고, 확장자 제외한 이름으로 NCP에 업로드한다.
+    const blockFileName = `test.jpeg`;
     const { latitude, longitude } = createBlockFileDto;
 
     return this.prisma.blockFile.create({

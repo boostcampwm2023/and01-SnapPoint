@@ -4,9 +4,6 @@ import { ArrayNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 export class CreatePostApiDto {
   @IsString()
-  readonly userEmail: string;
-
-  @IsString()
   readonly title: string;
 
   @ArrayNotEmpty()
