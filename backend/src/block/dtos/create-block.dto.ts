@@ -15,5 +15,5 @@ export class CreateBlockDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateBlockFileDto)
-  readonly blockFiles?: CreateBlockFileDto[];
+  readonly files?: CreateBlockFileDto[];
 }

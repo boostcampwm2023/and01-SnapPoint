@@ -1,7 +1,7 @@
 import { PrismaProvider } from '@/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { CreateBlockFileDto } from './dtos/create-block-files.dto';
-import { BlockFile } from '@prisma/client';
+import { BlockFile, Prisma } from '@prisma/client';
 
 @Injectable()
 export class BlockFileService {
