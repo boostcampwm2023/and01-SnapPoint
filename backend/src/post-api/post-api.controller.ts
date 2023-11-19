@@ -1,4 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
 import { PostApiService } from './post-api.service';
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
 
@@ -17,6 +18,7 @@ export class PostApiController {
   // }
 
   @Post('/')
+  @UsePipes(BlockTypeAndFilesValidationPipe)
   create(@Body() createPostDto: CreatePostApiDto) {
     return this.postApiService.create(createPostDto);
   }
