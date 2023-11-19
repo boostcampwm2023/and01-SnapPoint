@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
 import { PostService } from '@/post/post.service';
 import { BlockService } from '@/block/block.service';
@@ -6,7 +6,7 @@ import { BlockFileService } from '@/block-file/block-file.service';
 import { BlockFileDto } from '@/block-file/dtos/block-files.dto';
 import { BlockDto } from '@/block/dtos/block.dto';
 import { PostDto } from '@/post/dtos/post.dto';
-import { PrismaService } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma.service';
 
 @Injectable()
 export class PostApiService {
@@ -14,7 +14,7 @@ export class PostApiService {
     private postService: PostService,
     private blockService: BlockService,
     private blockFileService: BlockFileService,
-    private prismaService: PrismaService,
+    private prisma: PrismaProvider,
   ) {}
 
   isMediaBlock(type: string) {
@@ -23,35 +23,56 @@ export class PostApiService {
     }
   }
 
-  async create(createPostApiDto: CreatePostApiDto): Promise<PostDto> {
-    const { title, blocks } = createPostApiDto;
-    const userUuid = 'test';
+  async post(uuid: string): Promise<PostDto> {
+    const post = await this.postService.post({ uuid });
 
-    const createdPost = await this.postService.create({ title, userUuid });
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    const blocks = await this.blockService.blocks({ postUuid: post.uuid });
 
     const blockDtos = await Promise.all(
-      blocks.map(async (block, index) => {
-        const createdBlock = await this.blockService.create(createdPost.uuid, {
-          content: block.content,
-          order: index,
-          type: block.type,
-        });
+      blocks.map(async (block) => {
+        const files = await this.blockFileService.blockFiles({ blockUuid: block.uuid });
+        const fileDtos = files.map((file) => BlockFileDto.of(file));
 
-        const blockFileDtos = [];
-
-        if (this.isMediaBlock(block.type)) {
-          block.blockFiles.forEach(async (blockFile) => {
-            const createdBlockFile = await this.blockFileService.create(createdBlock.uuid, blockFile);
-            blockFileDtos.push(BlockFileDto.of(createdBlockFile));
-          });
-        }
-
-        const blockDto = BlockDto.of(createdBlock, blockFileDtos);
-
-        return blockDto;
+        return BlockDto.of(block, fileDtos);
       }),
     );
 
-    return PostDto.of(createdPost, blockDtos);
+    return PostDto.of(post, blockDtos);
+  }
+
+  async create(createPostApiDto: CreatePostApiDto) {
+    const { title, blocks } = createPostApiDto;
+    const userUuid = 'test';
+
+    const postDto = await this.prisma.beginTransaction(async () => {
+      const createdPost = await this.postService.create({ title, userUuid });
+
+      const blockDtos = await Promise.all(
+        blocks.map(async (block, index) => {
+          const createdBlock = await this.blockService.create(createdPost.uuid, {
+            content: block.content,
+            order: index,
+            type: block.type,
+          });
+          if (!this.isMediaBlock(block.type)) {
+            return BlockDto.of(createdBlock, []);
+          }
+
+          const blockFileDtos = await Promise.all(
+            block.files.map(async (blockFile) => {
+              const createdBlockFile = await this.blockFileService.create(createdBlock.uuid, blockFile);
+              return BlockFileDto.of(createdBlockFile);
+            }),
+          );
+          return BlockDto.of(createdBlock, blockFileDtos);
+        }),
+      );
+      return PostDto.of(createdPost, blockDtos);
+    });
+    return postDto;
   }
 }

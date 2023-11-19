@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Block } from '@prisma/client';
-import { PrismaService } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma.service';
 import { CreateBlockDto } from './dtos/create-block.dto';
 
 @Injectable()
 export class BlockService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaProvider) {}
 
   async create(postUuid: string, createBlockDto: CreateBlockDto): Promise<Block> {
     const { order, type, content } = createBlockDto;
 
-    return this.prisma.block.create({
+    return this.prisma.get().block.create({
       data: {
         postUuid: postUuid,
         order: order,
@@ -21,13 +21,13 @@ export class BlockService {
   }
 
   async block(where: Prisma.BlockWhereUniqueInput): Promise<Block | null> {
-    return this.prisma.block.findUnique({
+    return this.prisma.get().block.findUnique({
       where,
     });
   }
 
   async blocks(where?: Prisma.BlockWhereInput): Promise<Block[] | null> {
-    return this.prisma.block.findMany({
+    return this.prisma.get().block.findMany({
       where,
     });
   }
