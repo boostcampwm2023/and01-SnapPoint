@@ -7,6 +7,7 @@ import { BlockFileDto } from '@/block-file/dtos/block-files.dto';
 import { BlockDto } from '@/block/dtos/block.dto';
 import { PostDto } from '@/post/dtos/post.dto';
 import { PrismaProvider } from '@/prisma.service';
+import { Post, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostApiService {
@@ -23,13 +24,7 @@ export class PostApiService {
     }
   }
 
-  async post(uuid: string): Promise<PostDto> {
-    const post = await this.postService.post({ uuid });
-
-    if (!post) {
-      throw new NotFoundException();
-    }
-
+  private async geneatePostDto(post: Post): Promise<PostDto> {
     const blocks = await this.blockService.blocks({ postUuid: post.uuid });
 
     const blockDtos = await Promise.all(
@@ -42,6 +37,26 @@ export class PostApiService {
     );
 
     return PostDto.of(post, blockDtos);
+  }
+
+  async post(where?: Prisma.PostWhereUniqueInput): Promise<PostDto> {
+    const post = await this.postService.post(where);
+
+    if (!post) {
+      throw new NotFoundException('Cloud not found posts');
+    }
+
+    return this.geneatePostDto(post);
+  }
+
+  async posts(where?: Prisma.PostWhereInput): Promise<PostDto[] | null> {
+    const posts = await this.postService.posts(where);
+
+    if (!posts) {
+      throw new NotFoundException('Cloud not found posts.');
+    }
+
+    return Promise.all(posts.map((post) => this.geneatePostDto(post)));
   }
 
   async create(createPostApiDto: CreatePostApiDto) {
