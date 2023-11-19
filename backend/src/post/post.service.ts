@@ -11,24 +11,22 @@ export class PostService {
     const { title } = createPostDto;
     const userUuid = 'test';
 
-    const createdPost = this.prisma.post.create({
+    return this.prisma.get().post.create({
       data: {
         title,
         userUuid,
       },
     });
-
-    return createdPost;
   }
 
   async post(where: Prisma.PostWhereUniqueInput): Promise<Post | null> {
-    return this.prisma.post.findUnique({
+    return this.prisma.get().post.findUnique({
       where,
     });
   }
 
   async posts(where?: Prisma.PostWhereInput): Promise<Post[] | null> {
-    return this.prisma.post.findMany({
+    return this.prisma.get().post.findMany({
       where,
     });
   }
