@@ -1,8 +1,10 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -14,8 +16,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
@@ -37,14 +39,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         initBinding()
 
-
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED){
+                viewModel.event.collect{event ->
+                    when(event){
+                        MainActivityEvent.OpenDrawer -> openDrawer()
+                    }
+                }
+            }
+        }
 
         binding.sb.setOnClickListener {
             binding.sv.show()
         }
-  /*      binding.sb.setNavigationOnClickListener {
-            Log.d("TAG", "onCreate: navigation clicked")
-        }*/
+    }
+
+    private fun openDrawer() {
+        binding.dl.open()
     }
 
     private fun initBinding() {
@@ -52,7 +63,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
             vm = viewModel
         }
     }
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         _map = googleMap
