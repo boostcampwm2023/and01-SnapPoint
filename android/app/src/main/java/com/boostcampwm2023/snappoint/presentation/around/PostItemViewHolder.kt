@@ -9,5 +9,6 @@ class PostItemViewHolder(private val binding: ItemAroundPostBinding) :
     fun bind(item: PostState) {
         binding.tvPostTitle.text = item.title
         binding.tvPostTimestamp.text = item.timeStamp
+        binding.tvPostBody.text = item.body
     }
 }

@@ -9,7 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cv_around_post"
@@ -17,8 +18,7 @@
             android:layout_height="0dp"
             app:cardBackgroundColor="@color/surfaceColor"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/iv_profile"
-            android:layout_marginBottom="12dp" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <ImageView
             android:id="@+id/iv_profile"
@@ -27,8 +27,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginVertical="16dp"
             app:layout_constraintStart_toStartOf="@id/cv_around_post"
-            app:layout_constraintTop_toTopOf="@id/cv_around_post"
-            app:layout_constraintBottom_toBottomOf="@id/cv_around_post" />
+            app:layout_constraintTop_toTopOf="@id/btn_expand"
+            app:layout_constraintBottom_toBottomOf="@id/btn_expand" />
 
         <TextView
             android:id="@+id/tv_post_title"
@@ -40,7 +40,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginBottom="4dp"
             app:layout_constraintStart_toEndOf="@id/iv_profile"
-            app:layout_constraintTop_toTopOf="@id/cv_around_post"
+            app:layout_constraintTop_toTopOf="@id/btn_expand"
             app:layout_constraintBottom_toTopOf="@id/tv_post_timestamp"
             app:layout_constraintVertical_chainStyle="packed" />
 
@@ -52,7 +52,7 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/tv_post_title"
             app:layout_constraintTop_toBottomOf="@id/tv_post_title"
-            app:layout_constraintBottom_toBottomOf="@id/cv_around_post" />
+            app:layout_constraintBottom_toBottomOf="@id/btn_expand" />
 
         <ImageButton
             android:id="@+id/btn_expand"
@@ -65,7 +65,40 @@
             android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toEndOf="@id/cv_around_post"
             app:layout_constraintTop_toTopOf="@id/cv_around_post"
-            app:layout_constraintBottom_toBottomOf="@id/cv_around_post" />
+            app:layout_constraintBottom_toTopOf="@id/tv_post_body"/>
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_post_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:layout_constraintStart_toStartOf="@id/cv_around_post"
+            app:layout_constraintEnd_toEndOf="@id/cv_around_post"
+            app:layout_constraintTop_toBottomOf="@id/btn_expand"
+            app:layout_constraintBottom_toTopOf="@id/btn_view_post"
+            tools:text="동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"/>
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/btn_preview_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toTopOf="@id/btn_view_post"
+            app:layout_constraintBottom_toBottomOf="@id/btn_view_post"
+            app:layout_constraintEnd_toStartOf="@id/btn_view_post"/>
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/btn_view_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginVertical="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_post_body"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/cv_around_post"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
