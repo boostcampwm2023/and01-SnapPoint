@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.main.MainViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.MainActivity">
+        tools:context=".presentation.main.MainActivity">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fcv_main_map"
@@ -29,8 +32,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:hint="@string/activity_main_sb_hint"
+            side_sheet_icon_click= "@{() -> vm.sideSheetIconClicked()}"
             app:elevation="6dp"
-            app:navigationIcon="@drawable/icon_menu"
+            app:navigationIcon="@drawable/icon_side_sheet"
             app:menu="@menu/search_view_menu"
             app:layout_constraintEnd_toEndOf="parent"/>
 
