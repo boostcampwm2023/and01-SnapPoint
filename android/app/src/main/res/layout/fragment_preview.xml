@@ -21,12 +21,10 @@
             android:id="@+id/iv_preview_profile"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginVertical="16dp"
+            android:layout_marginStart="26dp"
             android:foreground="@drawable/ic_launcher_foreground"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/gl_top" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_preview_post_title"
@@ -36,28 +34,35 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginStart="16dp"
-            android:layout_marginBottom="4dp"
             app:layout_constraintStart_toEndOf="@id/iv_preview_profile"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tv_preview_post_timestamp"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             android:id="@+id/tv_preview_post_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             tools:text="1 Days Ago"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/tv_preview_post_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title"
-            app:layout_constraintBottom_toBottomOf="@id/gl_top" />
+            app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title" />
+
+        <ImageView
+            android:id="@+id/iv_preview_arrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="18dp"
+            android:foreground="@drawable/icon_arrow_down_left"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gl_top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="72dp" />
+            app:layout_constraintGuide_begin="56dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv_preview"
