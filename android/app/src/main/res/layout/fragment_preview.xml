@@ -30,23 +30,22 @@
             android:id="@+id/tv_preview_post_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="제목"
+            android:layout_marginStart="16dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginStart="16dp"
             app:layout_constraintStart_toEndOf="@id/iv_preview_profile"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="제목" />
 
         <TextView
             android:id="@+id/tv_preview_post_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            tools:text="1 Days Ago"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/tv_preview_post_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title"
+            tools:text="1 Days Ago" />
 
         <ImageView
             android:id="@+id/iv_preview_arrow"
@@ -73,8 +72,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gl_top"
-            tools:layout_editor_absoluteX="124dp"
-            tools:listitem="@layout/item_image_preview"/>
+            tools:listitem="@layout/item_image_preview" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
