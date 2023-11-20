@@ -12,6 +12,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,6 +28,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
             supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment
         val navController = navHostFragment.findNavController()
         binding.bnv.setupWithNavController(navController)
+
+        val behavior = BottomSheetBehavior.from(binding.bs)
+        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
         val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
