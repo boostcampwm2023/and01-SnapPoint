@@ -12,7 +12,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,7 +24,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         super.onCreate(savedInstanceState)
 
         val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.bs) as NavHostFragment
+            supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment
         val navController = navHostFragment.findNavController()
         binding.bnv.setupWithNavController(navController)
 
