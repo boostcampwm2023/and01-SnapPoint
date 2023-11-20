@@ -33,6 +33,7 @@
             android:layout_marginStart="16dp"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:text="@{vm.uiState.title}"
             app:layout_constraintStart_toEndOf="@id/iv_preview_profile"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="제목" />
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="14sp"
+            android:text="@{vm.uiState.timeStamp}"
             app:layout_constraintStart_toStartOf="@id/tv_preview_post_title"
             app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title"
             tools:text="1 Days Ago" />

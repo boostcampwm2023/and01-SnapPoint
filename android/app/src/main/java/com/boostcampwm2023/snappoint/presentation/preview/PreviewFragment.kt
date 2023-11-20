@@ -14,6 +14,8 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
 
     private val viewModel: PreviewViewModel by viewModels()
 
+    private val title: String = "TITLE"
+    private val timeStamp: String = "0 Days Ago"
     private val list: MutableList<PostBlockState> = mutableListOf(
         PostBlockState.IMAGE(
             "aaas dfad fa df aaasd fad fas df aaa sdfa dfasdf aaasd fadf asdf ",
@@ -34,11 +36,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        with(binding) {
-            rcvPreview.adapter = PreviewAdapter(list)
-            tvPreviewPostTitle.text = "제목"
-            tvPreviewPostTimestamp.text = "0 days ago"
-        }
+        viewModel.updatePost(title, timeStamp, list)
+        binding.rcvPreview.adapter = PreviewAdapter(list)
     }
 }
