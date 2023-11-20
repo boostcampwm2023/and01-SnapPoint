@@ -4,9 +4,11 @@
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryContainer">@color/secondaryContainer</item>
 
         <item name="colorOnSurface">@color/onSurfaceColor</item>
 
+        <item name="colorSurfaceContainer">@color/surfaceContainer</item>
         <item name="colorSurfaceContainerHighest">@color/surfaceContainerHighest</item>
         <item name="colorSurfaceContainerLow">@color/surfaceContainerLow</item>
     </style>
