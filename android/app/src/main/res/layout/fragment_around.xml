@@ -34,6 +34,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:padding="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            posts="@{vm.uiState.posts}"
             tools:listitem="@layout/item_around_post" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
