@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImagePreviewBinding
 import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
 
-class PreviewListAdapter(private val blocks: List<PostBlockState>) : RecyclerView.Adapter<PreviewViewHolder>() {
+class PreviewAdapter(private val blocks: List<PostBlockState>) : RecyclerView.Adapter<PreviewViewHolder>() {
 
     private val mediaBlocks: List<PostBlockState> = blocks.filter { (it is PostBlockState.STRING).not() }
 
