@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.preview
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPreviewBinding
@@ -35,6 +36,10 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.rcvPreview.adapter = PreviewListAdapter(list)
+        with(binding) {
+            rcvPreview.adapter = PreviewListAdapter(list)
+            tvPreviewPostTitle.text = "제목"
+            tvPreviewPostTimestamp.text = "0 days ago"
+        }
     }
 }
