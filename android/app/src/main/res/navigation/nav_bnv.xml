@@ -10,7 +10,7 @@
         android:name="com.boostcampwm2023.snappoint.presentation.around.AroundFragment"
         android:label="AroundFragment" >
         <action
-            android:id="@+id/action_aroundFragment_to_aroundPreviewFragment"
+            android:id="@+id/action_aroundFragment_to_previewFragment"
             app:destination="@id/previewFragment" />
     </fragment>
     <fragment
@@ -28,5 +28,5 @@
     <fragment
         android:id="@+id/previewFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.preview.PreviewFragment"
-        android:label="AroundPreviewFragment" />
+        android:label="PreviewFragment" />
 </navigation>
