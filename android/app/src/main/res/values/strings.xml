@@ -20,4 +20,5 @@
     <string name="menu_settings">설정</string>
     <string name="activity_main_fab_content_description">present_location_button</string>
     <string name="activity_main_sb_hint">검색할 주소를 입력하세요.</string>
+    <string name="around_title">주변 게시글</string>
 </resources>
