@@ -86,7 +86,6 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     fun initBinding() {
         with(binding) {
             vm = viewModel
-            onTextChanged = { viewModel.updateTitle(tilEtTitle.text.toString()) }
         }
     }
 

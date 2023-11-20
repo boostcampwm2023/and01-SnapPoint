@@ -9,11 +9,6 @@
             type="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostViewModel" />
         
         <import type="android.view.View"/>
-        <import type="kotlin.jvm.functions.Function0" />
-        <import type="kotlin.Unit" />
-        <variable
-            name="onTextChanged"
-            type="Function0&lt;Unit>" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -79,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:background="@color/surfaceContainerHighest"
-                android:onTextChanged="@{() -> onTextChanged.invoke()}"/>
+                android:onTextChanged="@{(text,start,before,_) -> vm.updateTitle(text.toString())}"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 

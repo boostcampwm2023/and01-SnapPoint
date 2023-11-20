@@ -86,7 +86,6 @@ class CreatePostViewModel @Inject constructor(
         _uiState.update {
             it.copy(title = title)
         }
-        uiState.value.onTextChanged(0, "")
     }
 
     private fun deletePostBlock(position: Int) {
