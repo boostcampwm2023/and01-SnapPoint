@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.around.AroundViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
