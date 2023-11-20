@@ -1,7 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.util
 
 import androidx.exifinterface.media.ExifInterface
-import com.boostcampwm2023.snappoint.presentation.createpost.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import java.io.InputStream
 
 object MetadataUtil {

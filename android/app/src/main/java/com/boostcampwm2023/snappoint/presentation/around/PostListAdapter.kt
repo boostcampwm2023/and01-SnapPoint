@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemAroundPostBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 
-class PostListAdapter() : ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
+class PostListAdapter(
+) : ListAdapter<PostSummaryState, PostItemViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -20,12 +22,12 @@ class PostListAdapter() : ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<PostState>() {
-            override fun areItemsTheSame(oldItem: PostState, newItem: PostState): Boolean {
+        val diffUtil = object : DiffUtil.ItemCallback<PostSummaryState>() {
+            override fun areItemsTheSame(oldItem: PostSummaryState, newItem: PostSummaryState): Boolean {
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(oldItem: PostState, newItem: PostState): Boolean {
+            override fun areContentsTheSame(oldItem: PostSummaryState, newItem: PostSummaryState): Boolean {
                 return oldItem == newItem
             }
 
@@ -34,7 +36,7 @@ class PostListAdapter() : ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
 }
 
 @BindingAdapter("posts")
-fun RecyclerView.bindRecyclerViewAdapter(posts: List<PostState>) {
+fun RecyclerView.bindRecyclerViewAdapter(posts: List<PostSummaryState>) {
     if (adapter == null) adapter = PostListAdapter()
     (adapter as PostListAdapter).submitList(posts)
 }
