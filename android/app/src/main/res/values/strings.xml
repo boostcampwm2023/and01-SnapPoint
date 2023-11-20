@@ -18,4 +18,5 @@
     <string name="menu_subscription">구독</string>
     <string name="menu_popular_post">인기글</string>
     <string name="menu_settings">설정</string>
+    <string name="around_title">주변 게시글</string>
 </resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_around_post"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="@color/surfaceColor"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/iv_profile"
+        android:layout_marginBottom="12dp"/>
+
+    <ImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginVertical="16dp"
+        app:layout_constraintStart_toStartOf="@id/cv_around_post"
+        app:layout_constraintTop_toTopOf="@id/cv_around_post"
+        app:layout_constraintBottom_toBottomOf="@id/cv_around_post"/>
+
+    <TextView
+        android:id="@+id/tv_post_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="제목"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintStart_toEndOf="@id/iv_profile"
+        app:layout_constraintTop_toTopOf="@id/cv_around_post"
+        app:layout_constraintBottom_toTopOf="@id/tv_post_timestamp"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/tv_post_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="1 Days Ago"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/tv_post_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_post_title"
+        app:layout_constraintBottom_toBottomOf="@id/cv_around_post"/>
+
+    <ImageButton
+        android:id="@+id/btn_expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_arrow_down"
+        android:background="?attr/actionBarItemBackground"
+        android:padding="16dp"
+        android:layout_marginVertical="12dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintEnd_toEndOf="@id/cv_around_post"
+        app:layout_constraintTop_toTopOf="@id/cv_around_post"
+        app:layout_constraintBottom_toBottomOf="@id/cv_around_post"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
