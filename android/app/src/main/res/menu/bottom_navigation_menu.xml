@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/aroundFragment"
+        android:title="@string/menu_around" />
+    <item
+        android:id="@+id/subscriptionFragment"
+        android:title="@string/menu_subscription" />
+    <item
+        android:id="@+id/popularPostFragment"
+        android:title="@string/menu_popular_post" />
+    <item
+        android:id="@+id/settingFragment"
+        android:title="@string/menu_settings" />
+</menu>
