@@ -9,6 +9,11 @@
             type="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostViewModel" />
         
         <import type="android.view.View"/>
+        <import type="kotlin.jvm.functions.Function0" />
+        <import type="kotlin.Unit" />
+        <variable
+            name="onTextChanged"
+            type="Function0&lt;Unit>" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,10 +74,12 @@
             app:layout_constraintTop_toBottomOf="@id/tb">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/til_et_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:background="@color/surfaceContainerHighest" />
+                android:background="@color/surfaceContainerHighest"
+                android:onTextChanged="@{() -> onTextChanged.invoke()}"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
