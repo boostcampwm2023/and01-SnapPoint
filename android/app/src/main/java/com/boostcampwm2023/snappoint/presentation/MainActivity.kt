@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -31,6 +32,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
+
+
+
+        binding.sb.setOnClickListener {
+            binding.sv.show()
+        }
     }
 
 

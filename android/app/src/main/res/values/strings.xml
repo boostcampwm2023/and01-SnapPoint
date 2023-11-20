@@ -18,4 +18,6 @@
     <string name="menu_subscription">구독</string>
     <string name="menu_popular_post">인기글</string>
     <string name="menu_settings">설정</string>
+    <string name="activity_main_fab_content_description">present_location_button</string>
+    <string name="activity_main_sb_hint">검색할 주소를 입력하세요.</string>
 </resources>
