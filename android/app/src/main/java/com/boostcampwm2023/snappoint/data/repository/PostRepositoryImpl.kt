@@ -3,7 +3,7 @@ package com.boostcampwm2023.snappoint.data.repository
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
-import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

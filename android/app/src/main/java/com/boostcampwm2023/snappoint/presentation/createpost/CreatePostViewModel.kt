@@ -1,11 +1,13 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.util.Log
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.presentation.model.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
