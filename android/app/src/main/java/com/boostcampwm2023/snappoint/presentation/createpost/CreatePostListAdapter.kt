@@ -23,7 +23,6 @@ class CreatePostListAdapter(
 
     fun updateBlocks(newBlocks: List<PostBlockState>) {
         blocks = newBlocks.toMutableList()
-        notifyDataSetChanged()
     }
 
     private fun deleteBlocks(position: Int) {
@@ -182,7 +181,21 @@ fun RecyclerView.bindRecyclerViewAdapter(
                         val off = current.indexOfFirst { it.isEditMode }
                         notifyItemChanged(on)
                         notifyItemChanged(off)
-                        return@forEachIndexed
+                    }
+                    when (postBlock) {
+                        is PostBlockState.IMAGE -> {
+                            if (postBlock.address != (blocks[index] as PostBlockState.IMAGE).address) {
+                                notifyItemChanged(index)
+                            }
+                        }
+
+                        is PostBlockState.VIDEO -> {
+                            if (postBlock.address != (blocks[index] as PostBlockState.VIDEO).address) {
+                                notifyItemChanged(index)
+                            }
+                        }
+
+                        else -> {}
                     }
                 }
             }
