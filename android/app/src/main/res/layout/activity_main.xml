@@ -4,65 +4,106 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.main.MainViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/dl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.MainActivity">
+        tools:context=".presentation.main.MainActivity">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fcv_main_map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bnv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/bnv">
+            android:layout_height="match_parent">
 
-            <LinearLayout
-                android:id="@+id/bs"
-                style="@style/Widget.Material3.BottomSheet"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:behavior_fitToContents="false"
-                app:behavior_peekHeight="0dp"
-                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fcv_main_map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-                <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-                    android:id="@+id/drag_handle"
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/cl"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/bnv"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.search.SearchBar
+                    android:id="@+id/sb"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/activity_main_sb_hint"
+                    drawer_icon_click= "@{() -> vm.drawerIconClicked()}"
+                    app:elevation="6dp"
+                    app:navigationIcon="@drawable/icon_drawer"
+                    app:menu="@menu/search_view_menu"/>
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/fcv"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
+                <com.google.android.material.search.SearchView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:defaultNavHost="true"
-                    app:navGraph="@navigation/nav_bnv" />
+                    android:id="@+id/sv"/>
 
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/bs"
+                    style="@style/Widget.Material3.BottomSheet"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:behavior_fitToContents="false"
+                    app:behavior_peekHeight="0dp"
+                    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+                        android:id="@+id/drag_handle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bnv"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/bottom_navigation_menu" />
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/fcv"
+                        android:name="androidx.navigation.fragment.NavHostFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:defaultNavHost="true"
+                        app:navGraph="@navigation/nav_bnv" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/icon_present_location"
+                    app:layout_anchor="@id/bs"
+                    app:useCompatPadding="true"
+                    android:layout_gravity="top"
+                    app:layout_anchorGravity="end"
+                    android:contentDescription="@string/activity_main_fab_content_description" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bnv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:menu="@menu/bottom_navigation_menu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <include
+            layout="@layout/layout_drawer"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>
