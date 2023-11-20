@@ -11,8 +11,8 @@ data class PostSummaryState(
 
 sealed class PostBlockState(open val content: String, open val isEditMode: Boolean) {
     data class STRING(override val content: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class IMAGE(override val content: String = "", val uri: Uri, val position: PositionState, val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class VIDEO(override val content: String = "", val uri: Uri, val position: PositionState, val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
+    data class IMAGE(override val content: String = "", val uri: Uri = Uri.EMPTY, val description: String = "", val position: PositionState = PositionState(0.0, 0.0), val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
+    data class VIDEO(override val content: String = "", val uri: Uri = Uri.EMPTY, val description: String = "", val position: PositionState = PositionState(0.0, 0.0), val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
 }
 
 data class PositionState(
