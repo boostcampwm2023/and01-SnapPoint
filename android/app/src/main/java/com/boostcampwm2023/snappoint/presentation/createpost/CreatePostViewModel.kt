@@ -172,6 +172,22 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    private fun isValidTitle(): Boolean {
+        return _uiState.value.title.isNotBlank()
+    }
+
+    private fun isValidBlocks(): Boolean {
+        return _uiState.value.postBlocks.isNotEmpty()
+    }
+
+    private fun isValidTextBlock(): Boolean {
+        return _uiState.value.postBlocks.find { it is PostBlockState.STRING && it.content.isEmpty() } == null
+    }
+
+    private fun isValidMediaBlock(): Boolean {
+        return _uiState.value.postBlocks.find { (it is PostBlockState.STRING).not() } != null
+    }
+
     private fun isValidContents(): Boolean {
         _uiState.value.postBlocks.forEach {
             when(it){
@@ -185,10 +201,23 @@ class CreatePostViewModel @Inject constructor(
 
     fun onCheckButtonClicked() {
         println(uiState.value.postBlocks)
-        if(isValidContents().not()){
-            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_block))
+        if(isValidTitle().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
         }
+        if(isValidBlocks().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_blocks))
+            return
+        }
+        if(isValidTextBlock().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
+            return
+        }
+        if(isValidMediaBlock().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
+            return
+        }
+
         postRepository.postCreatePost(
             title = _uiState.value.title,
             postBlocks = _uiState.value.postBlocks
