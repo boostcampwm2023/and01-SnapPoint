@@ -1,6 +1,9 @@
 package com.boostcampwm2023.snappoint.presentation
 
 import android.os.Bundle
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
@@ -20,6 +23,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.bs) as NavHostFragment
+        val navController = navHostFragment.findNavController()
+        binding.bnv.setupWithNavController(navController)
+
         val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
     }

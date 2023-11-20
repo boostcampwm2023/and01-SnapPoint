@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation" />
+            app:layout_constraintBottom_toTopOf="@+id/bnv" />
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="0dp"
@@ -28,28 +28,28 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation">
+            app:layout_constraintBottom_toTopOf="@+id/bnv">
 
-            <FrameLayout
-                android:id="@+id/standard_bottom_sheet"
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/bs"
+                android:name="androidx.navigation.fragment.NavHostFragment"
                 style="@style/Widget.Material3.BottomSheet"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/nav_bnv">
+            </androidx.fragment.app.FragmentContainerView>
 
-                <!-- Drag handle for accessibility -->
-                <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-                    android:id="@+id/drag_handle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+            <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+                android:id="@+id/drag_handle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-                <!-- Bottom sheet contents. -->
-
-            </FrameLayout>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
+            android:id="@+id/bnv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_around"
-        android:title="주변" />
+        android:id="@+id/aroundFragment"
+        android:title="@string/menu_around" />
     <item
-        android:id="@+id/menu_subscription"
-        android:title="구독" />
+        android:id="@+id/subscriptionFragment"
+        android:title="@string/menu_subscription" />
     <item
-        android:id="@+id/menu_popular_post"
-        android:title="인기글" />
+        android:id="@+id/popularPostFragment"
+        android:title="@string/menu_popular_post" />
     <item
-        android:id="@+id/menu_setting"
-        android:title="설정" />
+        android:id="@+id/settingFragment"
+        android:title="@string/menu_settings" />
 </menu>
