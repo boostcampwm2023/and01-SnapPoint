@@ -6,6 +6,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 class CreatePostListAdapter(
     private val onAddressIconClicked: (Int) -> Unit,

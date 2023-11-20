@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.data.repository
 
-import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {

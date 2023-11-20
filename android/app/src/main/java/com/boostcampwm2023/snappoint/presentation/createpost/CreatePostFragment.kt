@@ -20,6 +20,7 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
+import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

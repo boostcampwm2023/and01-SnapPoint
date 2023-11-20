@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.net.Uri
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 data class CreatePostUiState(
     val title: String = "",
@@ -16,17 +17,3 @@ data class CreatePostUiState(
 )
 
 
-sealed class PostBlockState(open val content: String, open val isEditMode: Boolean) {
-    data class STRING(override val content: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class IMAGE(override val content: String = "", val uri: Uri, val position: PositionState, val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class VIDEO(override val content: String = "", val uri: Uri, val position: PositionState, val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-}
-
-data class PositionState(
-    val latitude: Double,
-    val longitude: Double
-){
-    fun asDoubleArray(): DoubleArray{
-        return doubleArrayOf(latitude, longitude)
-    }
-}
