@@ -1,9 +1,7 @@
-package com.boostcampwm2023.snappoint.presentation.map
+package com.boostcampwm2023.snappoint.presentation.markerpointselector
 
 import android.location.Geocoder
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMapsMarkerBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
@@ -18,7 +16,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.Locale
 
-class MapsMarkerActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
+class MarkerPointSelectorActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
     OnMapReadyCallback,
     GoogleMap.OnCameraMoveListener,
     GoogleMap.OnCameraIdleListener

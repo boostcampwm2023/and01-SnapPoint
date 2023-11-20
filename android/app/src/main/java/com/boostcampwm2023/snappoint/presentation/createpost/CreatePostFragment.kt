@@ -1,20 +1,16 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.Manifest
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -23,7 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
-import com.boostcampwm2023.snappoint.presentation.map.MapsMarkerActivity
+import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -169,7 +165,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
 
     private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
-        val intent = Intent(requireContext(), MapsMarkerActivity::class.java)
+        val intent = Intent(requireContext(), MarkerPointSelectorActivity::class.java)
         intent.putExtra("index", index)
         intent.putExtra("position", position.asDoubleArray())
         addressSelectionLauncher.launch(intent)

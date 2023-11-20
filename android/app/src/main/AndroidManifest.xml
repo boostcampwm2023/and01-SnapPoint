@@ -41,7 +41,7 @@
         </activity>
 
         <activity
-            android:name=".presentation.map.MapsMarkerActivity"
+            android:name=".presentation.markerpointselector.MarkerPointSelectorActivity"
             android:exported="true">
         </activity>
     </application>
