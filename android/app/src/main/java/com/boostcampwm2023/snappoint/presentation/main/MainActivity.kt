@@ -116,6 +116,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(10.0,10.0)))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0,10.0), 10f))
     }
 }
