@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImagePreviewBinding
-import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 class PreviewAdapter(private val blocks: List<PostBlockState>) : RecyclerView.Adapter<PreviewViewHolder>() {
 
