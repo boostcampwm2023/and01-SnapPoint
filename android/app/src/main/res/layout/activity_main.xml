@@ -7,6 +7,8 @@
         <variable
             name="vm"
             type="com.boostcampwm2023.snappoint.presentation.main.MainViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -43,10 +45,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/activity_main_sb_hint"
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}"
                     drawer_icon_click= "@{() -> vm.drawerIconClicked()}"
                     app:elevation="6dp"
                     app:navigationIcon="@drawable/icon_drawer"
                     app:menu="@menu/search_view_menu"/>
+
+                <com.google.android.material.appbar.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.VISIBLE : View.GONE}">
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/topAppBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/actionBarSize"
+                        app:title="@string/app_name"
+                        app:titleCentered="true"
+                        app:menu="@menu/preview_app_bar_menu"
+                        app:navigationIcon="@drawable/icon_arrow_back"
+                        navigation_icon_click="@{vm.appbarBackIconClicked}"
+                        menu_item_click="@{vm.appbarCloseIconClicked}"/>
+
+                </com.google.android.material.appbar.AppBarLayout>
 
                 <com.google.android.material.search.SearchView
                     android:layout_width="match_parent"
@@ -62,12 +84,14 @@
                     android:orientation="vertical"
                     app:behavior_fitToContents="false"
                     app:behavior_peekHeight="0dp"
-                    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+                    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                    draggable="@{!vm.uiState.isPreviewFragmentShowing}">
 
                     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
                         android:id="@+id/drag_handle"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}" />
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/fcv"
@@ -88,7 +112,8 @@
                     app:useCompatPadding="true"
                     android:layout_gravity="top"
                     app:layout_anchorGravity="end"
-                    android:contentDescription="@string/activity_main_fab_content_description" />
+                    android:contentDescription="@string/activity_main_fab_content_description"
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}"  />
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

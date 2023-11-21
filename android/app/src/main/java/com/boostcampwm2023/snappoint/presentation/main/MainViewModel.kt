@@ -40,6 +40,15 @@ class MainViewModel @Inject constructor(
     fun drawerIconClicked() {
         _event.tryEmit(MainActivityEvent.OpenDrawer)
     }
+
+    fun appbarBackIconClicked() {
+        _event.tryEmit(MainActivityEvent.NavigatePrev)
+    }
+
+    fun appbarCloseIconClicked() {
+        _event.tryEmit(MainActivityEvent.NavigateClose)
+    }
+
     init{
         loadPosts()
     }
@@ -118,5 +127,21 @@ class MainViewModel @Inject constructor(
             )
         }
 
+    }
+
+    fun onPreviewFragmentShowing() {
+        _uiState.update {
+            it.copy(
+                isPreviewFragmentShowing = true
+            )
+        }
+    }
+
+    fun onPreviewFragmentClosing() {
+        _uiState.update {
+            it.copy(
+                isPreviewFragmentShowing = false
+            )
+        }
     }
 }

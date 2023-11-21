@@ -22,6 +22,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="26dp"
+            android:layout_marginTop="16dp"
             android:foreground="@drawable/ic_launcher_foreground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -31,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:textSize="16sp"
             android:textStyle="bold"
             android:text="@{vm.uiState.title}"
@@ -54,6 +56,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="18dp"
+            android:layout_marginTop="16dp"
             android:foreground="@drawable/icon_arrow_down_left"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -63,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="56dp" />
+            app:layout_constraintGuide_begin="72dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv_preview"

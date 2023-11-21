@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 data class MainUiState(
     val posts: List<PostSummaryState> = emptyList(),
     val snapPoints: List<SnapPointState> = emptyList(),
+    val isPreviewFragmentShowing: Boolean = false
 )
 
 data class SnapPointState(
