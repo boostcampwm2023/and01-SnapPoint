@@ -29,16 +29,16 @@ class PostItemViewHolder(
         }
     }
 
-    private fun toggleLayout(isExpanded: Boolean, view: View, textView: TextView, button1: Button, button2: Button) {
+    private fun toggleLayout(isExpanded: Boolean, view: View, tvBody: TextView, btnPreviewPost: Button, btnViewPost: Button) {
         ExpandButtonToggleAnimation.toggleArrow(view, isExpanded)
         if (isExpanded) {
-            ExpandButtonToggleAnimation.expand(textView)
-            ExpandButtonToggleAnimation.expand(button1)
-            ExpandButtonToggleAnimation.expand(button2)
+            ExpandButtonToggleAnimation.expand(tvBody)
+            ExpandButtonToggleAnimation.expand(btnPreviewPost)
+            ExpandButtonToggleAnimation.expand(btnViewPost)
         } else {
-            ExpandButtonToggleAnimation.collapse(textView)
-            ExpandButtonToggleAnimation.collapse(button1)
-            ExpandButtonToggleAnimation.collapse(button2)
+            ExpandButtonToggleAnimation.collapse(tvBody)
+            ExpandButtonToggleAnimation.collapse(btnPreviewPost)
+            ExpandButtonToggleAnimation.collapse(btnViewPost)
         }
     }
 }
