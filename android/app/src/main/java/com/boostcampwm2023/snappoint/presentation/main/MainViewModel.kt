@@ -119,4 +119,20 @@ class MainViewModel @Inject constructor(
         }
 
     }
+
+    fun openPreview() {
+        _uiState.update {
+            it.copy(
+                onPreview = true
+            )
+        }
+    }
+
+    fun closePreview() {
+        _uiState.update {
+            it.copy(
+                onPreview = false
+            )
+        }
+    }
 }
