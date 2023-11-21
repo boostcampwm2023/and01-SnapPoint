@@ -8,7 +8,7 @@
         <import type="android.view.View"/>
         <variable
             name="postItem"
-            type="com.boostcampwm2023.snappoint.presentation.around.PostState" />
+            type="com.boostcampwm2023.snappoint.presentation.model.PostSummaryState" />
         <variable
             name="isExpand"
             type="Boolean" />
@@ -82,7 +82,7 @@
             android:id="@+id/tv_post_body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{postItem.body}"
+            android:text="@{postItem.postBlocks[0].content}"
             android:padding="16dp"
             app:layout_constraintStart_toStartOf="@id/cv_around_post"
             app:layout_constraintEnd_toEndOf="@id/cv_around_post"

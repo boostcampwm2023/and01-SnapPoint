@@ -5,7 +5,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemAroundPostBinding
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.ExpandButtonToggleAnimation
 
@@ -14,12 +13,10 @@ class PostItemViewHolder(
     private val onExpandButtonClicked: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: PostState, index: Int, isExpanded: Boolean) {
+    fun bind(item: PostSummaryState, index: Int, isExpanded: Boolean) {
+
         var expandState = isExpanded
 
-    fun bind(item: PostSummaryState) {
-        binding.tvPostTitle.text = item.title
-        binding.tvPostTimestamp.text = item.timeStamp
         with(binding) {
             postItem = item
             isExpand = expandState
