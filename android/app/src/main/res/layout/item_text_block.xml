@@ -5,7 +5,7 @@
     <data>
         <variable
             name="stringBlock"
-            type="com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState.STRING" />
+            type="com.boostcampwm2023.snappoint.presentation.model.PostBlockState.STRING" />
 
         <import type="android.view.View"/>
         <import type="kotlin.jvm.functions.Function0"/>
