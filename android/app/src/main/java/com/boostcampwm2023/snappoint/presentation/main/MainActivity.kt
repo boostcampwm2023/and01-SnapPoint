@@ -35,8 +35,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         initBottomSheetWithNavigation()
 
-        initSearchBar()
-
         initMapApi()
 
         collectViewModelData()
@@ -71,12 +69,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
     private fun updateMarker(posts: List<PostSummaryState>) {
 
-    }
-
-    private fun initSearchBar() {
-        binding.sb.setOnClickListener {
-            binding.sv.show()
-        }
     }
 
     private fun initBottomSheetWithNavigation() {
