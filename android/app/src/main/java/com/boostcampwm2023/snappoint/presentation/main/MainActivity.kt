@@ -12,8 +12,6 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
-import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -63,38 +61,28 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 }
                 launch {
                     viewModel.uiState.collect{uiState ->
-                        updateMarker(uiState.posts)
-
+                        updateMarker(uiState.snapPoints)
                     }
                 }
             }
         }
     }
 
-    private fun updateMarker(posts: List<PostSummaryState>) {
+    private fun updateMarker(snapPoints: List<SnapPointState>) {
         lifecycleScope.launch {
             while(googleMap == null){
                 delay(1000)
 
             }
-            posts.forEach {
-                it.postBlocks.forEach{
-                    when(it){
-                        is PostBlockState.IMAGE -> {
-                            googleMap?.addMarker(
-                                MarkerOptions()
-                                    .position(LatLng(it.position.latitude, it.position.longitude))
-                            )
-                        }
-                        is PostBlockState.STRING -> {}
-                        is PostBlockState.VIDEO -> {
-                        }
+            googleMap?.let { map ->
+                map.clear()
+                snapPoints.forEach {
+                    it.markerOptions.forEach {
+                        map.addMarker(it)
                     }
                 }
             }
         }
-
-
     }
 
     private fun initBottomSheetWithNavigation() {

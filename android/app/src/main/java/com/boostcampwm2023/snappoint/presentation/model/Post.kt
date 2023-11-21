@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.model
 
 import android.net.Uri
+import com.google.android.gms.maps.model.LatLng
 
 data class PostSummaryState(
     val title: String,
@@ -21,5 +22,8 @@ data class PositionState(
 ){
     fun asDoubleArray(): DoubleArray{
         return doubleArrayOf(latitude, longitude)
+    }
+    fun asLatLng(): LatLng{
+        return LatLng(latitude, longitude)
     }
 }

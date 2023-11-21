@@ -5,6 +5,9 @@ import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,6 +33,9 @@ class MainViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val event: SharedFlow<MainActivityEvent> = _event.asSharedFlow()
+
+
+
 
     fun drawerIconClicked() {
         _event.tryEmit(MainActivityEvent.OpenDrawer)
@@ -92,5 +98,25 @@ class MainViewModel @Inject constructor(
                 )
             )
         }
+        createMarkers()
+    }
+
+    private fun createMarkers() {
+        _uiState.update {
+            it.copy(
+                snapPoints =
+                _uiState.value.posts.mapIndexed { index, postSummaryState ->
+                        SnapPointState(
+                            index = index,
+                            markerOptions = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
+                                    MarkerOptions().apply {
+                                        position(it.position.asLatLng())
+                                    }
+                            }
+                        )
+                }
+            )
+        }
+
     }
 }
