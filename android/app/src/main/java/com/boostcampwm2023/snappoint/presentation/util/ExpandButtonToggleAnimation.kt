@@ -33,8 +33,9 @@ class ExpandButtonToggleAnimation {
                         view.visibility = View.GONE
                     } else {
                         view.layoutParams.height = (actualHeight - (actualHeight * interpolatedTime)).toInt()
-                        view.requestLayout()
                     }
+
+                    view.requestLayout()
                 }
             }
 
@@ -51,8 +52,11 @@ class ExpandButtonToggleAnimation {
 
             val animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-                    view.layoutParams.height = if (interpolatedTime == 1f) ViewGroup.LayoutParams.WRAP_CONTENT
-                    else (actualHeight * interpolatedTime).toInt()
+                    view.layoutParams.height = if (interpolatedTime == 1f) {
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    } else {
+                        (actualHeight * interpolatedTime).toInt()
+                    }
 
                     view.requestLayout()
                 }
