@@ -9,11 +9,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.data.remote.model.BlockType
-import com.boostcampwm2023.snappoint.data.remote.model.Position
-import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
-import com.boostcampwm2023.snappoint.presentation.around.AroundFragmentDirections
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
