@@ -9,6 +9,9 @@
         <variable
             name="postItem"
             type="com.boostcampwm2023.snappoint.presentation.around.PostState" />
+        <variable
+            name="isExpand"
+            type="Boolean" />
 
     </data>
 
@@ -75,7 +78,7 @@
             app:layout_constraintBottom_toTopOf="@id/tv_post_body"/>
 
         <TextView
-            android:visibility="@{postItem.expanded ? View.VISIBLE : View.GONE}"
+            android:visibility="@{isExpand ? View.VISIBLE : View.GONE}"
             android:id="@+id/tv_post_body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -87,7 +90,7 @@
             app:layout_constraintBottom_toTopOf="@id/btn_view_post"/>
 
         <Button
-            android:visibility="@{postItem.expanded ? View.VISIBLE : View.GONE}"
+            android:visibility="@{isExpand ? View.VISIBLE : View.GONE}"
             android:id="@+id/btn_preview_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,7 +100,7 @@
             app:layout_constraintEnd_toStartOf="@id/btn_view_post"/>
 
         <Button
-            android:visibility="@{postItem.expanded ? View.VISIBLE : View.GONE}"
+            android:visibility="@{isExpand ? View.VISIBLE : View.GONE}"
             android:id="@+id/btn_view_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

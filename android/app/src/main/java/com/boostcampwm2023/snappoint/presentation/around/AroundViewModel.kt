@@ -12,9 +12,7 @@ import javax.inject.Inject
 class AroundViewModel @Inject constructor() : ViewModel() {
 
     private val _uiState: MutableStateFlow<AroundUiState> =
-        MutableStateFlow(AroundUiState(onExpandButtonClick = { index ->
-            expandItem(index)
-        }))
+        MutableStateFlow(AroundUiState())
     val uiState: StateFlow<AroundUiState> = _uiState.asStateFlow()
 
     init {
@@ -94,32 +92,6 @@ class AroundViewModel @Inject constructor() : ViewModel() {
                         body = ""
                     ),
                 )
-            )
-        }
-    }
-
-    private fun expandItem(index: Int) {
-        if (index > uiState.value.posts.lastIndex) return
-
-        _uiState.update {
-            it.copy(
-                posts = it.posts.mapIndexed { idx, postState ->
-                    if (idx == index && postState.isExpanded.not()) {
-                        postState.copy(isExpanded = true)
-                    } else {
-                        postState.copy(isExpanded = false)
-                    }
-                }
-            )
-        }
-    }
-
-    fun clearExpanded() {
-        _uiState.update {
-            it.copy(
-                posts = it.posts.map { postState ->
-                    postState.copy(isExpanded = false)
-                }
             )
         }
     }
