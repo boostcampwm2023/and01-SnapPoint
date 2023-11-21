@@ -28,9 +28,20 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
 
     private fun collectViewModelData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED){
-                mainViewModel.uiState.collect{
-                    aroundViewModel.updatePosts(it.posts)
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    mainViewModel.uiState.collect {
+                        aroundViewModel.updatePosts(it.posts)
+                    }
+                }
+                launch {
+                    aroundViewModel.event.collect { event ->
+                        when (event) {
+                            is AroundEvent.ShowSnapPointAndRoute -> {
+                                mainViewModel.updateSelected(event.index)
+                            }
+                        }
+                    }
                 }
             }
         }
