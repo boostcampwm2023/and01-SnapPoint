@@ -68,11 +68,10 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcv_preview"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="232dp"
             android:orientation="horizontal"
-            android:padding="20dp"
+            android:padding="10dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/gl_top"
             tools:listitem="@layout/item_image_preview" />
 
