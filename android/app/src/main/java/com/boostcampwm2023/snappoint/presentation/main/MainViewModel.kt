@@ -44,6 +44,12 @@ class MainViewModel @Inject constructor(
         loadPosts()
     }
 
+    fun updateSelected(index: Int) {
+        _uiState.update {
+            it.copy(selectedIndex = index)
+        }
+    }
+
     private fun loadPosts() {
         _uiState.update {
             MainUiState(
@@ -79,7 +85,8 @@ class MainViewModel @Inject constructor(
                                 content = "ㅎㅇ염"
                             ),
                         )
-                    ),PostSummaryState(
+                    ),
+                    PostSummaryState(
                         title = "여기좋아용",
                         author = "안언수",
                         timeStamp = "678",
@@ -93,6 +100,34 @@ class MainViewModel @Inject constructor(
                                 description = "이것은 악어~",
                                 address = "제일 좋아하는 동물이에용"
                             )
+                        )
+                    ),
+                    PostSummaryState(
+                        title = "마커 테스트",
+                        author = "TEST",
+                        timeStamp = "1",
+                        postBlocks = listOf(
+                            PostBlockState.STRING(
+                                content = "123"
+                            ),
+                            PostBlockState.IMAGE(
+                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
+                                position = PositionState(9.9, 10.1),
+                                description = "test",
+                                address = "address"
+                            ),
+                            PostBlockState.IMAGE(
+                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
+                                position = PositionState(9.6, 9.7),
+                                description = "test",
+                                address = "address"
+                            ),
+                            PostBlockState.IMAGE(
+                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
+                                position = PositionState(10.3, 10.5),
+                                description = "test",
+                                address = "address"
+                            ),
                         )
                     ),
                 )

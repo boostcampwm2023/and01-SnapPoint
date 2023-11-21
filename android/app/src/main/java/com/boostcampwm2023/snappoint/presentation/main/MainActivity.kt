@@ -61,7 +61,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 }
                 launch {
                     viewModel.uiState.collect{uiState ->
-                        updateMarker(uiState.snapPoints)
+                        if (uiState.selectedIndex > -1) {
+                            drawPins()
+                        } else {
+                            updateMarker(uiState.snapPoints)
+                        }
                     }
                 }
             }
@@ -81,6 +85,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                         map.addMarker(it)
                     }
                 }
+            }
+        }
+    }
+
+    private fun drawPins() {
+        googleMap?.clear()
+
+        val index = viewModel.uiState.value.selectedIndex
+        viewModel.uiState.value.posts[index].postBlocks.forEach { block ->
+            when (block) {
+                is PostBlockState.IMAGE -> {
+                    googleMap?.addMarker(MarkerOptions()
+                        .position(LatLng(block.position.latitude, block.position.longitude))
+                    )
+                }
+
+                is PostBlockState.VIDEO -> {
+                    googleMap?.addMarker(MarkerOptions()
+                        .position(LatLng(block.position.latitude, block.position.longitude))
+                    )
+                }
+
+                else -> {}
             }
         }
     }

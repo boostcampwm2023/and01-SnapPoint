@@ -10,7 +10,8 @@ import com.boostcampwm2023.snappoint.presentation.util.ExpandButtonToggleAnimati
 
 class PostItemViewHolder(
     private val binding: ItemAroundPostBinding,
-    private val onExpandButtonClicked: (Int) -> Unit
+    private val onExpandButtonClicked: (Int) -> Unit,
+    private val onPreviewButtonClicked: (Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
 
@@ -26,6 +27,10 @@ class PostItemViewHolder(
                 expandState = expandState.not()
                 toggleLayout(expandState, it, layoutExpanded)
                 onExpandButtonClicked(index)
+            }
+
+            btnPreviewPost.setOnClickListener {
+                onPreviewButtonClicked(index)
             }
         }
     }
