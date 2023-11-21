@@ -10,7 +10,9 @@ class PreviewViewHolder(private val binding: ItemImagePreviewBinding) : Recycler
 
     fun bind(uri: Uri, description: String) {
         with(binding){
-            ivImagePreview.load(uri)
+            ivImagePreview.load(uri) {
+                scale(coil.size.Scale.FILL)
+            }
             tvImageDescription.text = description
         }
     }

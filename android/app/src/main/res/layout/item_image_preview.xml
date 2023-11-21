@@ -23,29 +23,34 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/iv_image_preview"
-                android:layout_width="wrap_content"
-                android:layout_height="212dp"
-                android:maxWidth="264dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:foreground="@drawable/ic_launcher_foreground" />
-
-            <TextView
-                android:id="@+id/tv_image_description"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_gravity="bottom"
-                android:maxWidth="264dp"
-                android:padding="4dp"
-                android:textColor="#000000"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="@+id/iv_image_preview"
-                app:layout_constraintStart_toStartOf="@+id/iv_image_preview" />
+                android:layout_height="match_parent">
 
+                <ImageView
+                    android:id="@+id/iv_image_preview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="212dp"
+                    android:maxWidth="264dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:foreground="@drawable/ic_launcher_foreground" />
+
+                <TextView
+                    android:id="@+id/tv_image_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_gravity="bottom"
+                    android:padding="4dp"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:layout_alignStart="@+id/iv_image_preview"
+                    android:layout_alignTop="@+id/iv_image_preview"
+                    android:layout_alignEnd="@+id/iv_image_preview"
+                    android:layout_alignBottom="@+id/iv_image_preview" />
+            </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
