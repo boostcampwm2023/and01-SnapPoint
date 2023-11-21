@@ -1,7 +1,8 @@
 package com.boostcampwm2023.snappoint.presentation.around
 
 data class AroundUiState(
-    val posts: List<PostState> = emptyList()
+    val posts: List<PostState> = emptyList(),
+    val onExpandButtonClick: (Int) -> Unit,
 )
 
 data class PostState(

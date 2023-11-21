@@ -35,6 +35,7 @@
             android:padding="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             posts="@{vm.uiState.posts}"
+            onExpandButtonClick="@{vm.uiState.onExpandButtonClick}"
             tools:listitem="@layout/item_around_post" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

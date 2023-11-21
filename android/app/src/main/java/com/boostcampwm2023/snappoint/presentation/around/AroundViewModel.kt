@@ -11,7 +11,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AroundViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState: MutableStateFlow<AroundUiState> = MutableStateFlow(AroundUiState())
+    private val _uiState: MutableStateFlow<AroundUiState> =
+        MutableStateFlow(AroundUiState(onExpandButtonClick = { index ->
+            expandItem(index)
+        }))
     val uiState: StateFlow<AroundUiState> = _uiState.asStateFlow()
 
     init {
@@ -22,8 +25,7 @@ class AroundViewModel @Inject constructor() : ViewModel() {
                         title = "노잼도시 청주를 여행해보자",
                         author = "양희범",
                         timeStamp = "1 Days Ago",
-                        body = "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세",
-                        isExpanded = true
+                        body = "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"
                     ),
                     PostState(
                         title = "청주의 정통 맛집을 찾아서",
@@ -37,23 +39,72 @@ class AroundViewModel @Inject constructor() : ViewModel() {
                         timeStamp = "3 Months Ago",
                         body = ""
                     ),
-                    PostState(title = "안녕하세요",
+                    PostState(
+                        title = "안녕하세요",
                         author = "원승빈",
                         timeStamp = "4 Years Ago",
                         body = ""
-                    )
+                    ),
+                    PostState(
+                        title = "노잼도시 청주를 여행해보자",
+                        author = "양희범",
+                        timeStamp = "1 Days Ago",
+                        body = "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"
+                    ),
+                    PostState(
+                        title = "청주의 정통 맛집을 찾아서",
+                        author = "주재현",
+                        timeStamp = "2 Weeks Ago",
+                        body = ""
+                    ),
+                    PostState(
+                        title = "청주 야경 맛집 7선",
+                        author = "이정건",
+                        timeStamp = "3 Months Ago",
+                        body = ""
+                    ),
+                    PostState(
+                        title = "안녕하세요",
+                        author = "원승빈",
+                        timeStamp = "4 Years Ago",
+                        body = ""
+                    ),
+                    PostState(
+                        title = "노잼도시 청주를 여행해보자",
+                        author = "양희범",
+                        timeStamp = "1 Days Ago",
+                        body = "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"
+                    ),
+                    PostState(
+                        title = "청주의 정통 맛집을 찾아서",
+                        author = "주재현",
+                        timeStamp = "2 Weeks Ago",
+                        body = ""
+                    ),
+                    PostState(
+                        title = "청주 야경 맛집 7선",
+                        author = "이정건",
+                        timeStamp = "3 Months Ago",
+                        body = ""
+                    ),
+                    PostState(
+                        title = "안녕하세요",
+                        author = "원승빈",
+                        timeStamp = "4 Years Ago",
+                        body = ""
+                    ),
                 )
             )
         }
     }
 
-    fun expandItem(index: Int) {
+    private fun expandItem(index: Int) {
         if (index > uiState.value.posts.lastIndex) return
 
         _uiState.update {
             it.copy(
                 posts = it.posts.mapIndexed { idx, postState ->
-                    if (idx == index) {
+                    if (idx == index && postState.isExpanded.not()) {
                         postState.copy(isExpanded = true)
                     } else {
                         postState.copy(isExpanded = false)
