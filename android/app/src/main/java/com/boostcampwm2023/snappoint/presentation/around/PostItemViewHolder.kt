@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemAroundPostBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.ExpandButtonToggleAnimation
 
@@ -11,6 +12,7 @@ class PostItemViewHolder(
     private val binding: ItemAroundPostBinding,
     private val onExpandButtonClicked: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
+
 
     fun bind(item: PostSummaryState, index: Int, isExpanded: Boolean) {
 

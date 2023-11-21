@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <com.google.android.material.carousel.MaskableFrameLayout
+        android:id="@+id/fl_preview_carousel_item_container"
+        android:layout_width="400dp"
+        android:minWidth="200dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:foreground="?attr/selectableItemBackground"
+        app:shapeAppearance="?attr/shapeAppearanceCornerExtraLarge">
+
+        <ImageView
+            android:id="@+id/iv_preview_carousel_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/tv_preview_image_description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:textSize="18sp"
+            android:shadowColor="#FFFFFF"
+            android:textColor="#000000"
+            android:shadowRadius="80.0"
+            android:gravity="bottom"
+            android:textAlignment="gravity" />
+    </com.google.android.material.carousel.MaskableFrameLayout>
+</layout>
