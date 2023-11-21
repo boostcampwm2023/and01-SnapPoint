@@ -1,8 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.around
 
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemAroundPostBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
@@ -23,22 +22,18 @@ class PostItemViewHolder(
 
             btnExpand.setOnClickListener {
                 expandState = expandState.not()
-                toggleLayout(expandState, it, tvPostBody, btnPreviewPost, btnViewPost)
+                toggleLayout(expandState, it, layoutExpanded)
                 onExpandButtonClicked(index)
             }
         }
     }
 
-    private fun toggleLayout(isExpanded: Boolean, view: View, tvBody: TextView, btnPreviewPost: Button, btnViewPost: Button) {
+    private fun toggleLayout(isExpanded: Boolean, view: View, expandedLayout: LinearLayout) {
         ExpandButtonToggleAnimation.toggleArrow(view, isExpanded)
         if (isExpanded) {
-            ExpandButtonToggleAnimation.expand(tvBody)
-            ExpandButtonToggleAnimation.expand(btnPreviewPost)
-            ExpandButtonToggleAnimation.expand(btnViewPost)
+            ExpandButtonToggleAnimation.expand(expandedLayout)
         } else {
-            ExpandButtonToggleAnimation.collapse(tvBody)
-            ExpandButtonToggleAnimation.collapse(btnPreviewPost)
-            ExpandButtonToggleAnimation.collapse(btnViewPost)
+            ExpandButtonToggleAnimation.collapse(expandedLayout)
         }
     }
 }
