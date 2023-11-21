@@ -6,8 +6,6 @@ export class BlockDto {
 
   readonly content: string;
 
-  readonly order: number;
-
   readonly type: string;
 
   readonly files?: FileDto[];
@@ -16,7 +14,6 @@ export class BlockDto {
     return {
       uuid: block.uuid,
       content: block.content,
-      order: block.order,
       type: block.type,
       files: files,
     };

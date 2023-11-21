@@ -13,12 +13,12 @@ export class BlockFileService {
     });
   }
 
-  async attachFiles(blockUuid: string, createBlockFileDtos: CreateBlockFileDto[]) {
-    const blocks = createBlockFileDtos.map((createBlockFileDto) => ({
-      fileUuid: createBlockFileDto.uuid,
-      blockUuid: blockUuid,
-    }));
-
-    return this.prisma.get().blockFile.createMany({ data: blocks });
+  async attachFile(blockUuid: string, createBlockFileDto: CreateBlockFileDto) {
+    return this.prisma.get().blockFile.create({
+      data: {
+        fileUuid: createBlockFileDto.uuid,
+        blockUuid: blockUuid,
+      },
+    });
   }
 }

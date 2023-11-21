@@ -62,4 +62,11 @@ export class BlockService {
       where,
     });
   }
+
+  async getOrdered(postUuid: string): Promise<Block[]> {
+    return this.prisma.get().block.findMany({
+      where: { postUuid },
+      orderBy: { order: 'asc' },
+    });
+  }
 }
