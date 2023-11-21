@@ -5,6 +5,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -41,6 +42,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         collectViewModelData()
 
+        // 임시코드
+        binding.fab.setOnClickListener {
+            BottomSheetBehavior.from(binding.bs).state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment)
+                .findNavController()
+                .navigate(R.id.action_aroundFragment_to_previewFragment)
+        }
+
     }
 
     private fun initMapApi() {
@@ -55,7 +64,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 launch {
                     viewModel.event.collect{event ->
                         when(event){
-                            MainActivityEvent.OpenDrawer -> openDrawer()
+                            MainActivityEvent.OpenDrawer -> {
+                                openDrawer()
+                            }
+                            MainActivityEvent.NavigatePrev -> {
+                                (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment)
+                                    .findNavController()
+                                    .popBackStack()
+                            }
+                            MainActivityEvent.NavigateClose -> {
+                                (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment)
+                                    .findNavController()
+                                    .popBackStack()
+                                BottomSheetBehavior
+                                    .from(binding.bs)
+                                    .state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
                         }
                     }
                 }
