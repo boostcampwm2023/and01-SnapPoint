@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemAroundPostBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 
-class PostListAdapter : ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
+class PostListAdapter(
+) : ListAdapter<PostSummaryState, PostItemViewHolder>(diffUtil) {
 
     private var isExpandedList: MutableList<Boolean> = mutableListOf()
 
@@ -27,27 +29,28 @@ class PostListAdapter : ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
     }
 
     override fun onCurrentListChanged(
-        previousList: MutableList<PostState>, currentList: MutableList<PostState>
+        previousList: MutableList<PostSummaryState>, currentList: MutableList<PostSummaryState>
     ) {
         super.onCurrentListChanged(previousList, currentList)
         isExpandedList = currentList.map { false }.toMutableList()
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<PostState>() {
-            override fun areItemsTheSame(oldItem: PostState, newItem: PostState): Boolean {
+        val diffUtil = object : DiffUtil.ItemCallback<PostSummaryState>() {
+            override fun areItemsTheSame(oldItem: PostSummaryState, newItem: PostSummaryState): Boolean {
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(oldItem: PostState, newItem: PostState): Boolean {
+            override fun areContentsTheSame(oldItem: PostSummaryState, newItem: PostSummaryState): Boolean {
                 return oldItem == newItem
             }
+
         }
     }
 }
 
 @BindingAdapter("posts")
-fun RecyclerView.bindRecyclerViewAdapter(posts: List<PostState>) {
+fun RecyclerView.bindRecyclerViewAdapter(posts: List<PostSummaryState>) {
     if (adapter == null) adapter = PostListAdapter()
     (adapter as PostListAdapter).submitList(posts)
 }

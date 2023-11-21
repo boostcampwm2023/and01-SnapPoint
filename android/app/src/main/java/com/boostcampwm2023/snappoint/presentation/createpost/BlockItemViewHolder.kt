@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.google.android.material.card.MaterialCardView
 
 sealed class BlockItemViewHolder(

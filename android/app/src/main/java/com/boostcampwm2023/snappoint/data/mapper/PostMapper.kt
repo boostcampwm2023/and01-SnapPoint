@@ -4,8 +4,8 @@ import android.net.Uri
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.Position
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
-import com.boostcampwm2023.snappoint.presentation.createpost.PositionState
-import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 fun PostBlock.asPostBlockState(): PostBlockState {
     return when(type){

@@ -5,8 +5,8 @@ import android.os.Bundle
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMapsMarkerBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.createpost.PositionState
-import com.boostcampwm2023.snappoint.presentation.createpost.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -101,8 +101,8 @@ class MarkerPointSelectorActivity : BaseActivity<ActivityMapsMarkerBinding>(R.la
         val newPositionState: PositionState = PositionState(latLng.latitude, latLng.longitude)
 
         marker.tag = when (tag) {
-            is PostBlockState.IMAGE -> tag.copy(tag.content, tag.uri, newPositionState)
-            is PostBlockState.VIDEO -> tag.copy(tag.content, tag.uri, newPositionState)
+            is PostBlockState.IMAGE -> tag.copy(tag.content, tag.uri, position = newPositionState)
+            is PostBlockState.VIDEO -> tag.copy(tag.content, tag.uri, position = newPositionState)
             else -> return
         }
     }
