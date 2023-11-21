@@ -65,6 +65,7 @@
             app:layout_constraintBottom_toBottomOf="@id/btn_expand" />
 
         <ImageButton
+            android:rotation="@{isExpand ? 180f : 0f}"
             android:id="@+id/btn_expand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
