@@ -1,14 +1,17 @@
 package com.boostcampwm2023.snappoint.presentation.preview
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImagePreviewBinding
+import com.boostcampwm2023.snappoint.presentation.around.PostListAdapter
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
-class PreviewAdapter(private val blocks: List<PostBlockState>) : RecyclerView.Adapter<PreviewViewHolder>() {
+class PreviewAdapter : RecyclerView.Adapter<PreviewViewHolder>() {
 
-    private val mediaBlocks: List<PostBlockState> = blocks.filter { (it is PostBlockState.STRING).not() }
+    private var mediaBlocks: List<PostBlockState> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -20,12 +23,23 @@ class PreviewAdapter(private val blocks: List<PostBlockState>) : RecyclerView.Ad
     }
 
     override fun onBindViewHolder(holder: PreviewViewHolder, position: Int) {
-        with(mediaBlocks[position]) {
-            when (this) {
-                is PostBlockState.IMAGE -> holder.bind(this.uri, this.content)
-                is PostBlockState.VIDEO -> holder.bind(this.uri, this.content)
+        mediaBlocks[position].let { postBlock ->
+            when (postBlock) {
+                is PostBlockState.IMAGE -> holder.bind(Uri.parse(postBlock.content), postBlock.description)
+                is PostBlockState.VIDEO -> holder.bind(Uri.parse(postBlock.content), postBlock.description)
                 is PostBlockState.STRING -> {}
             }
         }
     }
+
+    fun updateList(blocks: List<PostBlockState>) {
+        mediaBlocks = blocks.filter { (it is PostBlockState.STRING).not() }
+        notifyDataSetChanged()
+    }
+}
+
+@BindingAdapter("blocks")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>){
+    if (adapter == null) adapter = PreviewAdapter()
+    (adapter as PreviewAdapter).updateList(blocks)
 }
