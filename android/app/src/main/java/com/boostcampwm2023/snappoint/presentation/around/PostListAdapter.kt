@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemAroundPostBinding
 
-class PostListAdapter :
-    ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
+class PostListAdapter : ListAdapter<PostState, PostItemViewHolder>(diffUtil) {
 
     private var isExpandedList: MutableList<Boolean> = mutableListOf()
 

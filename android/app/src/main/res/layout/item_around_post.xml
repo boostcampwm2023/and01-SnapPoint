@@ -92,9 +92,11 @@
         <Button
             android:visibility="@{isExpand ? View.VISIBLE : View.GONE}"
             android:id="@+id/btn_preview_post"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:text="@string/btn_preview_text"
             app:layout_constraintTop_toTopOf="@id/btn_view_post"
             app:layout_constraintBottom_toBottomOf="@id/btn_view_post"
             app:layout_constraintEnd_toStartOf="@id/btn_view_post"/>
@@ -106,6 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginVertical="16dp"
+            android:text="@string/btn_view_post_text"
             app:layout_constraintTop_toBottomOf="@id/tv_post_body"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/cv_around_post"/>
