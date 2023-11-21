@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/activity_main_sb_hint"
-                    android:visibility="@{vm.uiState.onPreview ? View.GONE : View.VISIBLE}"
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}"
                     drawer_icon_click= "@{() -> vm.drawerIconClicked()}"
                     app:elevation="6dp"
                     app:navigationIcon="@drawable/icon_drawer"
@@ -54,7 +54,7 @@
                 <com.google.android.material.appbar.AppBarLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="@{vm.uiState.onPreview ? View.VISIBLE : View.GONE}">
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.VISIBLE : View.GONE}">
 
                     <com.google.android.material.appbar.MaterialToolbar
                         android:id="@+id/topAppBar"
@@ -85,13 +85,13 @@
                     app:behavior_fitToContents="false"
                     app:behavior_peekHeight="0dp"
                     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-                    draggable="@{!vm.uiState.onPreview}">
+                    draggable="@{!vm.uiState.isPreviewFragmentShowing}">
 
                     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
                         android:id="@+id/drag_handle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="@{vm.uiState.onPreview ? View.GONE : View.VISIBLE}" />
+                        android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}" />
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/fcv"
@@ -113,7 +113,7 @@
                     android:layout_gravity="top"
                     app:layout_anchorGravity="end"
                     android:contentDescription="@string/activity_main_fab_content_description"
-                    android:visibility="@{vm.uiState.onPreview ? View.GONE : View.VISIBLE}"  />
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}"  />
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

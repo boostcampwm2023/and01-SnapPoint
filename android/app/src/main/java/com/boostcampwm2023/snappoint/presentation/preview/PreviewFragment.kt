@@ -23,6 +23,11 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
 
     private val snapHelper: CarouselSnapHelper = CarouselSnapHelper()
     private val layoutManager: LayoutManager by lazy { binding.rcvPreview.layoutManager!! }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mainViewModel.onPreviewFragmentShowing()
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -37,17 +42,9 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        mainViewModel.openPreview()
-    }
-
-
-    override fun onStop() {
-        super.onStop()
-
-        mainViewModel.closePreview()
+    override fun onDestroy() {
+        super.onDestroy()
+        mainViewModel.onPreviewFragmentClosing()
     }
 
     private fun initBinding() {

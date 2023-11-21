@@ -129,18 +129,18 @@ class MainViewModel @Inject constructor(
 
     }
 
-    fun openPreview() {
+    fun onPreviewFragmentShowing() {
         _uiState.update {
             it.copy(
-                onPreview = true
+                isPreviewFragmentShowing = true
             )
         }
     }
 
-    fun closePreview() {
+    fun onPreviewFragmentClosing() {
         _uiState.update {
             it.copy(
-                onPreview = false
+                isPreviewFragmentShowing = false
             )
         }
     }
