@@ -1,25 +1,24 @@
-import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put } from '@nestjs/common';
 import { PostApiService } from './post-api.service';
+import { SavePostApiDto } from './dtos/save-post-api.dto';
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
-import { BlockTypeAndFilesValidationPipe } from './pipes/block-type-files-validation.pipe';
 
 @Controller('posts')
 export class PostApiController {
-  constructor(private postApiService: PostApiService) {}
-
-  @Get('/')
-  posts() {
-    return this.postApiService.posts();
-  }
-
-  @Get('/:uuid')
-  post(@Param('uuid') uuid: string) {
-    return this.postApiService.post({ uuid: uuid });
-  }
+  constructor(private readonly postApiService: PostApiService) {}
 
   @Post('/')
-  @UsePipes(BlockTypeAndFilesValidationPipe)
   create(@Body() createPostDto: CreatePostApiDto) {
     return this.postApiService.create(createPostDto);
+  }
+
+  @Put('/:uuid')
+  save(@Param('uuid') uuid: string, @Body() savePostDto: SavePostApiDto) {
+    return this.postApiService.save(uuid, savePostDto);
+  }
+
+  @Put('/:uuid/publish')
+  publish(@Param('uuid') uuid: string, @Body() savePostDto: SavePostApiDto) {
+    return this.postApiService.publish(uuid, savePostDto);
   }
 }

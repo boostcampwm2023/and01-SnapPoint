@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
 import { PrismaProvider } from '@/prisma.service';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -8,26 +8,43 @@ export class PostService {
   constructor(private prisma: PrismaProvider) {}
 
   async create(createPostDto: CreatePostDto): Promise<Post> {
-    const { title } = createPostDto;
-    const userUuid = 'test';
-
     return this.prisma.get().post.create({
-      data: {
-        title,
-        userUuid,
-      },
+      data: createPostDto,
     });
   }
 
-  async post(where: Prisma.PostWhereUniqueInput): Promise<Post | null> {
-    return this.prisma.get().post.findUnique({
-      where,
-    });
+  async findOne(uuid: string): Promise<Post> {
+    const post = await this.prisma.get().post.findUnique({ where: { uuid } });
+
+    if (!post) {
+      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
+    }
+
+    return post;
   }
 
-  async posts(where?: Prisma.PostWhereInput): Promise<Post[] | null> {
+  async findMany(where?: Prisma.PostWhereInput): Promise<Post[] | null> {
     return this.prisma.get().post.findMany({
       where,
     });
+  }
+
+  async update(uuid: string, updatePostDto: Prisma.PostUpdateInput) {
+    const post = await this.findOne(uuid);
+
+    return this.prisma.get().post.update({
+      data: updatePostDto,
+      where: { uuid: post.uuid },
+    });
+  }
+
+  async publish(uuid: string) {
+    const post = await this.findOne(uuid);
+
+    if (post.isPublished) {
+      throw new ConflictException(`Post with UUID: ${post.uuid} is already published.`);
+    }
+
+    return this.prisma.get().post.update({ data: { isPublished: true }, where: { uuid: post.uuid } });
   }
 }

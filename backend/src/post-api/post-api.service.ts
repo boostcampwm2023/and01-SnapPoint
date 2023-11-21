@@ -1,18 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostService } from '@/post/post.service';
 import { BlockService } from '@/block/block.service';
 import { BlockFileService } from '@/block-file/block-file.service';
-import { BlockFileDto } from '@/block-file/dtos/block-files.dto';
 import { BlockDto } from '@/block/dtos/block.dto';
 import { PostDto } from '@/post/dtos/post.dto';
 import { PrismaProvider } from '@/prisma.service';
-import { Post, Prisma } from '@prisma/client';
+import { FileService } from '@/file/file.service';
+import { SaveBlockDto } from '@/block/dtos/save-block.dto';
+import { SavePostApiDto } from './dtos/save-post-api.dto';
+import { FileDto } from '@/file/dto/file.dto';
 
 @Injectable()
 export class PostApiService {
   constructor(
     private postService: PostService,
+    private fileService: FileService,
     private blockService: BlockService,
     private blockFileService: BlockFileService,
     private prisma: PrismaProvider,
@@ -24,14 +27,31 @@ export class PostApiService {
     }
   }
 
-  private async geneatePostDto(post: Post): Promise<PostDto> {
-    const blocks = await this.blockService.blocks({ postUuid: post.uuid });
+  private async readPost(uuid: string) {
+    const post = await this.postService.findOne(uuid);
+
+    if (!post) {
+      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
+    }
+
+    const blocks = await this.blockService.findMany({ postUuid: uuid });
 
     const blockDtos = await Promise.all(
       blocks.map(async (block) => {
-        const files = await this.blockFileService.blockFiles({ blockUuid: block.uuid });
-        const fileDtos = files.map((file) => BlockFileDto.of(file));
+        if (!this.isMediaBlock(block.type)) {
+          return BlockDto.of(block);
+        }
 
+        const blockFiles = await this.blockFileService.findMany({ blockUuid: block.uuid });
+        const fileDtos = await Promise.all(
+          blockFiles.map(async (blockFile) => {
+            const file = await this.fileService.findOne(blockFile.fileUuid);
+            if (!file) {
+              throw new NotFoundException(`Cloud not found file with UUID: ${uuid}`);
+            }
+            return FileDto.of(file);
+          }),
+        );
         return BlockDto.of(block, fileDtos);
       }),
     );
@@ -39,55 +59,54 @@ export class PostApiService {
     return PostDto.of(post, blockDtos);
   }
 
-  async post(where?: Prisma.PostWhereUniqueInput): Promise<PostDto> {
-    const post = await this.postService.post(where);
+  private async saveBlocks(postUuid: string, blockDtos: SaveBlockDto[]) {
+    const savePromises = blockDtos.map(async (blockDto) => {
+      const { uuid, content, order, type, latitude, longitude, files } = blockDto;
 
-    if (!post) {
-      throw new NotFoundException('Cloud not found posts');
-    }
+      const block = await this.blockService.save(postUuid, { uuid, content, order, type, latitude, longitude });
 
-    return this.geneatePostDto(post);
-  }
+      if (this.isMediaBlock(block.type)) {
+        await this.blockFileService.attachFiles(block.uuid, files);
+      }
+    });
 
-  async posts(where?: Prisma.PostWhereInput): Promise<PostDto[] | null> {
-    const posts = await this.postService.posts(where);
-
-    if (!posts) {
-      throw new NotFoundException('Cloud not found posts.');
-    }
-
-    return Promise.all(posts.map((post) => this.geneatePostDto(post)));
+    return Promise.all(savePromises);
   }
 
   async create(createPostApiDto: CreatePostApiDto) {
     const { title, blocks } = createPostApiDto;
-    const userUuid = 'test';
 
     const postDto = await this.prisma.beginTransaction(async () => {
-      const createdPost = await this.postService.create({ title, userUuid });
-
-      const blockDtos = await Promise.all(
-        blocks.map(async (block, index) => {
-          const createdBlock = await this.blockService.create(createdPost.uuid, {
-            content: block.content,
-            order: index,
-            type: block.type,
-          });
-          if (!this.isMediaBlock(block.type)) {
-            return BlockDto.of(createdBlock, []);
-          }
-
-          const blockFileDtos = await Promise.all(
-            block.files.map(async (blockFile) => {
-              const createdBlockFile = await this.blockFileService.create(createdBlock.uuid, blockFile);
-              return BlockFileDto.of(createdBlockFile);
-            }),
-          );
-          return BlockDto.of(createdBlock, blockFileDtos);
-        }),
-      );
-      return PostDto.of(createdPost, blockDtos);
+      const post = await this.postService.create({ userUuid: '6b781970-a1af-4f72-a7db-dc65ada31d4a', title });
+      await this.saveBlocks(post.uuid, blocks);
+      return this.readPost(post.uuid);
     });
+
+    return postDto;
+  }
+
+  async save(uuid: string, savePostApiDto: SavePostApiDto) {
+    const postDto = await this.prisma.beginTransaction(async () => {
+      const { title, blocks } = savePostApiDto;
+
+      await this.postService.update(uuid, { title });
+      await this.saveBlocks(uuid, blocks);
+      return this.readPost(uuid);
+    });
+
+    return postDto;
+  }
+
+  async publish(uuid: string, savePostApiDto: SavePostApiDto) {
+    const postDto = await this.prisma.beginTransaction(async () => {
+      const { title, blocks } = savePostApiDto;
+
+      await this.postService.update(uuid, { title });
+      await this.saveBlocks(uuid, blocks);
+      await this.postService.publish(uuid);
+      return this.readPost(uuid);
+    });
+
     return postDto;
   }
 }

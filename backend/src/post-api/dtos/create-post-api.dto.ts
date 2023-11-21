@@ -1,10 +1,11 @@
 import { CreateBlockDto } from '@/block/dtos/create-block.dto';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class CreatePostApiDto {
+  @IsOptional()
   @IsString()
-  readonly title: string;
+  readonly title?: string;
 
   @ArrayNotEmpty()
   @ValidateNested({ each: true })
