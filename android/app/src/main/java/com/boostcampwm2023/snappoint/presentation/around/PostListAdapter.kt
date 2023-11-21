@@ -12,13 +12,28 @@ import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 class PostListAdapter(
 ) : ListAdapter<PostSummaryState, PostItemViewHolder>(diffUtil) {
 
+    private var expandedIndexSet: MutableSet<Int> = mutableSetOf()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return PostItemViewHolder(ItemAroundPostBinding.inflate(inflater, parent, false))
+        return PostItemViewHolder(
+            binding = ItemAroundPostBinding.inflate(inflater, parent, false),
+            onExpandButtonClicked = { index ->
+                if (expandedIndexSet.contains(index)) expandedIndexSet.remove(index)
+                else expandedIndexSet.add(index)
+            }
+        )
     }
 
     override fun onBindViewHolder(holder: PostItemViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position, expandedIndexSet.contains(position))
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<PostSummaryState>, currentList: MutableList<PostSummaryState>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        expandedIndexSet.clear()
     }
 
     companion object {
