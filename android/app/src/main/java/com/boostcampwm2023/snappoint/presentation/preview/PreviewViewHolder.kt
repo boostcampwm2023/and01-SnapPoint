@@ -4,16 +4,21 @@ import android.net.Uri
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.request.CachePolicy
 import com.boostcampwm2023.snappoint.databinding.ItemImagePreviewBinding
 
-class PreviewViewHolder(private val binding: ItemImagePreviewBinding) : RecyclerView.ViewHolder(binding.root) {
+class PreviewViewHolder(
+    private val binding: ItemImagePreviewBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(uri: Uri, description: String) {
         with(binding){
-            ivImagePreview.load(uri) {
+            ivPreviewCarouselImage.load(uri) {
+                memoryCachePolicy(CachePolicy.ENABLED)
+                diskCachePolicy(CachePolicy.ENABLED)
                 scale(coil.size.Scale.FILL)
             }
-            tvImageDescription.text = description
+            tvPreviewImageDescription.text = description
         }
     }
 }
