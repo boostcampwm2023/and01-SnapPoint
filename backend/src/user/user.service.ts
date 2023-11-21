@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaProvider } from '@/prisma.service';
@@ -10,16 +10,6 @@ export class UserService {
   constructor(private prisma: PrismaProvider) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.prisma.get().user.findUnique({
-      where: {
-        email: createUserDto.email,
-      },
-    });
-
-    if (user) {
-      throw new BadRequestException();
-    }
-
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const createdUser = await this.prisma.get().user.create({
@@ -29,11 +19,26 @@ export class UserService {
         nickname: createUserDto.nickname,
       },
     });
+
+    if (!createdUser) {
+      throw new InternalServerErrorException();
+    }
+
     return createdUser;
   }
 
   findAll(): Promise<User[]> {
     return this.prisma.get().user.findMany();
+  }
+
+  async findUserByEmail(email: string): Promise<User> {
+    const user = await this.prisma.get().user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    return user;
   }
 
   async findOne(uuid: string): Promise<User> {
