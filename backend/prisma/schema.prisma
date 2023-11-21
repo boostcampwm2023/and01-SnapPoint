@@ -4,7 +4,6 @@
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -23,40 +22,48 @@ model User {
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
-  uuid       String   @unique @default(uuid())
-  userUuid     String
-  title      String
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @default(now())
-  isDeleted  Boolean  @default(false)
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userUuid    String
+  title       String?
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @default(now())
+  isDeleted   Boolean  @default(false)
+  isPublished Boolean  @default(false)
 }
 
 model Like {
-  id     Int    @id @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   userUuid String
   postUuid String
 }
 
 model Block {
   id          Int      @id @default(autoincrement())
-  uuid         String   @unique @default(uuid())
-  postUuid      String
+  uuid        String   @unique @default(uuid())
+  postUuid    String
   type        String
-  content     String
   order       Int
+  content     String
+  latitude    Float?
+  longitude   Float?
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
-  isDeleted  Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
 }
 
 model BlockFile {
   id          Int      @id @default(autoincrement())
   blockUuid   String
-  fileName    String
-  latitude    Float
-  longitude   Float
+  fileUuid    String
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userUuid    String
+  url         String   @unique
+  mimeType    String
   createdAt   DateTime @default(now())
-  modifiedAt  DateTime @default(now())
-  isDeleted  Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
 }
