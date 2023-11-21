@@ -11,14 +11,18 @@ import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -68,6 +72,28 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     }
 
     private fun updateMarker(posts: List<PostSummaryState>) {
+        lifecycleScope.launch {
+            while(googleMap == null){
+                delay(1000)
+
+            }
+            posts.forEach {
+                it.postBlocks.forEach{
+                    when(it){
+                        is PostBlockState.IMAGE -> {
+                            googleMap?.addMarker(
+                                MarkerOptions()
+                                    .position(LatLng(it.position.latitude, it.position.longitude))
+                            )
+                        }
+                        is PostBlockState.STRING -> {}
+                        is PostBlockState.VIDEO -> {
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 
@@ -102,6 +128,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.0,0.0), 17.5f))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(10.0,10.0)))
     }
 }
