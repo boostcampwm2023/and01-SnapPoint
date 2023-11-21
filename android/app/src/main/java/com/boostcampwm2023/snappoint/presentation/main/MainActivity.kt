@@ -1,33 +1,22 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import coil.Coil
-import coil.ImageLoader
-import coil.request.ImageRequest
-import coil.request.SuccessResult
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
-import com.boostcampwm2023.snappoint.presentation.util.getSnapPointFromUri
-import com.google.android.gms.dynamic.IObjectWrapper
+import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -87,10 +76,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
             googleMap?.let { map ->
                 map.clear()
                 snapPoints.forEach {
-                    it.markerOptions.forEach {
-                        map.addMarker(it.icon(BitmapDescriptorFactory.fromBitmap(
-                            this@MainActivity.getSnapPointFromUri("https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_")
-                        )))
+                    it.markerOptions.forEach { markerOptions ->
+                        map.addImageMarker(
+                            context = this@MainActivity,
+                            markerOptions = markerOptions,
+                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_")
                     }
                 }
             }
