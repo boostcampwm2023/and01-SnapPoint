@@ -19,6 +19,8 @@ import { ConfigModule } from '@nestjs/config';
     PostApiModule,
     UserModule,
     AuthModule,
+    FileModule,
+    PrismaModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
