@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -16,8 +17,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.Dash
+import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -62,7 +66,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 launch {
                     viewModel.uiState.collect{uiState ->
                         if (uiState.selectedIndex > -1) {
-                            drawPins()
+                            drawPinsAndRoutes()
                         } else {
                             updateMarker(uiState.snapPoints)
                         }
@@ -89,27 +93,31 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         }
     }
 
-    private fun drawPins() {
+    private fun drawPinsAndRoutes() {
         googleMap?.clear()
 
         val index = viewModel.uiState.value.selectedIndex
+        val polyline = PolylineOptions().color(Color.RED).pattern(listOf(Dash(20f), Gap(20f)))
         viewModel.uiState.value.posts[index].postBlocks.forEach { block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
                     googleMap?.addMarker(MarkerOptions()
                         .position(LatLng(block.position.latitude, block.position.longitude))
                     )
+                    polyline.add(LatLng(block.position.latitude, block.position.longitude))
                 }
 
                 is PostBlockState.VIDEO -> {
                     googleMap?.addMarker(MarkerOptions()
                         .position(LatLng(block.position.latitude, block.position.longitude))
                     )
+                    polyline.add(LatLng(block.position.latitude, block.position.longitude))
                 }
 
                 else -> {}
             }
         }
+        googleMap?.addPolyline(polyline)
     }
 
     private fun initBottomSheetWithNavigation() {
