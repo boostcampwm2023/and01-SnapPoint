@@ -11,13 +11,16 @@ import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -25,11 +28,64 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     OnMapReadyCallback
 {
     private val viewModel: MainViewModel by viewModels()
-    private var _map: GoogleMap? = null
+    private var googleMap: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        initBinding()
+
+        initBottomSheetWithNavigation()
+
+        initMapApi()
+
+        collectViewModelData()
+
+    }
+
+    private fun initMapApi() {
+        val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
+        map.getMapAsync(this)
+    }
+
+    private fun collectViewModelData() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED){
+
+                launch {
+                    viewModel.event.collect{event ->
+                        when(event){
+                            MainActivityEvent.OpenDrawer -> openDrawer()
+                        }
+                    }
+                }
+                launch {
+                    viewModel.uiState.collect{uiState ->
+                        updateMarker(uiState.snapPoints)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateMarker(snapPoints: List<SnapPointState>) {
+        lifecycleScope.launch {
+            while(googleMap == null){
+                delay(1000)
+
+            }
+            googleMap?.let { map ->
+                map.clear()
+                snapPoints.forEach {
+                    it.markerOptions.forEach {
+                        map.addMarker(it)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initBottomSheetWithNavigation() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment
         val navController = navHostFragment.findNavController()
@@ -45,25 +101,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 else -> { behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED }
             }
         }
-
-        val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
-        map.getMapAsync(this)
-
-        initBinding()
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED){
-                viewModel.event.collect{event ->
-                    when(event){
-                        MainActivityEvent.OpenDrawer -> openDrawer()
-                    }
-                }
-            }
-        }
-
-        binding.sb.setOnClickListener {
-            binding.sv.show()
-        }
     }
 
     private fun openDrawer() {
@@ -77,8 +114,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        _map = googleMap
+        this.googleMap = googleMap
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(0.0,0.0), 17.5f))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0,10.0), 10f))
     }
 }

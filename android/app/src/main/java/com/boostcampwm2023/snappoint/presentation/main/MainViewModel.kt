@@ -5,6 +5,9 @@ import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,6 +33,9 @@ class MainViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val event: SharedFlow<MainActivityEvent> = _event.asSharedFlow()
+
+
+
 
     fun drawerIconClicked() {
         _event.tryEmit(MainActivityEvent.OpenDrawer)
@@ -65,7 +71,7 @@ class MainViewModel @Inject constructor(
                         postBlocks = listOf(
                             PostBlockState.IMAGE(
                                 content = "https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201901/20/28017477-0365-4a43-b546-008b603da621.jpg",
-                                position = PositionState(10.000002, 10.000002),
+                                position = PositionState(10.1, 10.1),
                                 description = "강아징입니다.",
                                 address = "내가 키우는 강아지"
                             ),
@@ -83,7 +89,7 @@ class MainViewModel @Inject constructor(
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.000004, 10.000003),
+                                position = PositionState(10.4, 10.3),
                                 description = "이것은 악어~",
                                 address = "제일 좋아하는 동물이에용"
                             )
@@ -92,5 +98,25 @@ class MainViewModel @Inject constructor(
                 )
             )
         }
+        createMarkers()
+    }
+
+    private fun createMarkers() {
+        _uiState.update {
+            it.copy(
+                snapPoints =
+                _uiState.value.posts.mapIndexed { index, postSummaryState ->
+                        SnapPointState(
+                            index = index,
+                            markerOptions = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
+                                    MarkerOptions().apply {
+                                        position(it.position.asLatLng())
+                                    }
+                            }
+                        )
+                }
+            )
+        }
+
     }
 }
