@@ -2,17 +2,20 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -34,6 +37,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     private val viewModel: MainViewModel by viewModels()
     private var googleMap: GoogleMap? = null
 
+    private val navController: NavController =
+        (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment).findNavController()
+
+    private val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> by lazy {
+        BottomSheetBehavior.from(binding.bs)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,6 +55,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         collectViewModelData()
 
+        // FAB 구현할 때 삭제해 주세요!!
+        setFabClickEvent()
     }
 
     private fun initMapApi() {
@@ -59,7 +71,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 launch {
                     viewModel.event.collect{event ->
                         when(event){
-                            MainActivityEvent.OpenDrawer -> openDrawer()
+                            MainActivityEvent.OpenDrawer -> {
+                                openDrawer()
+                            }
+                            MainActivityEvent.NavigatePrev -> {
+                                navController.popBackStack()
+                            }
+                            MainActivityEvent.NavigateClose -> {
+                                navController.popBackStack()
+                                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
                         }
                     }
                 }
@@ -80,13 +101,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         lifecycleScope.launch {
             while(googleMap == null){
                 delay(1000)
-
             }
             googleMap?.let { map ->
                 map.clear()
                 snapPoints.forEach {
-                    it.markerOptions.forEach {
-                        map.addMarker(it)
+                    it.markerOptions.forEach { markerOptions ->
+                        map.addImageMarker(
+                            context = this@MainActivity,
+                            markerOptions = markerOptions,
+                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_")
                     }
                 }
             }
@@ -121,21 +144,27 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     }
 
     private fun initBottomSheetWithNavigation() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment
-        val navController = navHostFragment.findNavController()
         binding.bnv.setupWithNavController(navController)
-
-        val behavior = BottomSheetBehavior.from(binding.bs)
-        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
         binding.bnv.setOnItemReselectedListener { _ ->
-            when (behavior.state) {
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> { behavior.state = BottomSheetBehavior.STATE_EXPANDED }
-                BottomSheetBehavior.STATE_EXPANDED -> { behavior.state = BottomSheetBehavior.STATE_COLLAPSED }
-                else -> { behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED }
+            when (bottomSheetBehavior.state) {
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
+                BottomSheetBehavior.STATE_EXPANDED -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED }
+                else -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED }
             }
         }
+    }
+
+    private fun setFabClickEvent() {
+        binding.fab.setOnClickListener {
+            openPreviewFragment()
+        }
+    }
+
+    private fun openPreviewFragment() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        navController.navigate(R.id.action_aroundFragment_to_previewFragment)
     }
 
     private fun openDrawer() {
