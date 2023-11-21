@@ -11,13 +11,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -77,8 +76,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
             googleMap?.let { map ->
                 map.clear()
                 snapPoints.forEach {
-                    it.markerOptions.forEach {
-                        map.addMarker(it)
+                    it.markerOptions.forEach { markerOptions ->
+                        map.addImageMarker(
+                            context = this@MainActivity,
+                            markerOptions = markerOptions,
+                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_")
                     }
                 }
             }
