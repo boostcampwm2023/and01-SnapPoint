@@ -1,4 +1,4 @@
-import { BlockFileDto } from '@/block-file/dtos/block-files.dto';
+import { FileDto } from '@/file/dto/file.dto';
 import { Block } from '@prisma/client';
 
 export class BlockDto {
@@ -10,15 +10,15 @@ export class BlockDto {
 
   readonly type: string;
 
-  readonly blockFiles?: BlockFileDto[];
+  readonly files?: FileDto[];
 
-  static of(block: Block, blockFileDtos: BlockFileDto[]): BlockDto {
+  static of(block: Block, files?: FileDto[]): BlockDto {
     return {
       uuid: block.uuid,
       content: block.content,
       order: block.order,
       type: block.type,
-      blockFiles: blockFileDtos,
+      files: files,
     };
   }
 }
