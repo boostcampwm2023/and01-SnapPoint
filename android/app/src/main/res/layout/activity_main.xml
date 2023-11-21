@@ -54,7 +54,7 @@
                 <com.google.android.material.appbar.AppBarLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="@{vm.uiState.onPreview ? View.VISIBLE : View.GONE}" >
+                    android:visibility="@{vm.uiState.onPreview ? View.VISIBLE : View.GONE}">
 
                     <com.google.android.material.appbar.MaterialToolbar
                         android:id="@+id/topAppBar"
@@ -64,7 +64,9 @@
                         app:title="@string/app_name"
                         app:titleCentered="true"
                         app:menu="@menu/preview_app_bar_menu"
-                        app:navigationIcon="@drawable/icon_arrow_back" />
+                        app:navigationIcon="@drawable/icon_arrow_back"
+                        navigation_icon_click="@{vm.appbarBackIconClicked}"
+                        menu_item_click="@{vm.appbarCloseIconClicked}"/>
 
                 </com.google.android.material.appbar.AppBarLayout>
 
