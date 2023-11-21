@@ -53,11 +53,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
 
-        // 임시코드입니다.
-        navController.navigate(R.id.action_aroundFragment_to_previewFragment)
-        behavior.isFitToContents = true
-        behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-
         initBinding()
 
         lifecycleScope.launch {
