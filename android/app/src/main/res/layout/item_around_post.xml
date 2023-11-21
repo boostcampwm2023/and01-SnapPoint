@@ -5,6 +5,11 @@
 
     <data>
 
+        <import type="android.view.View"/>
+        <variable
+            name="postItem"
+            type="com.boostcampwm2023.snappoint.presentation.around.PostState" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="제목"
+            android:text="@{postItem.title}"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginStart="16dp"
@@ -49,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="1 Days Ago"
+            android:text="@{postItem.timeStamp}"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/tv_post_title"
             app:layout_constraintTop_toBottomOf="@id/tv_post_title"
@@ -68,19 +75,19 @@
             app:layout_constraintBottom_toTopOf="@id/tv_post_body"/>
 
         <TextView
-            android:visibility="gone"
+            android:visibility="@{postItem.expanded ? View.VISIBLE : View.GONE}"
             android:id="@+id/tv_post_body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:text="@{postItem.body}"
             android:padding="16dp"
             app:layout_constraintStart_toStartOf="@id/cv_around_post"
             app:layout_constraintEnd_toEndOf="@id/cv_around_post"
             app:layout_constraintTop_toBottomOf="@id/btn_expand"
-            app:layout_constraintBottom_toTopOf="@id/btn_view_post"
-            tools:text="동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"/>
+            app:layout_constraintBottom_toTopOf="@id/btn_view_post"/>
 
         <Button
-            android:visibility="gone"
+            android:visibility="@{postItem.expanded ? View.VISIBLE : View.GONE}"
             android:id="@+id/btn_preview_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -90,7 +97,7 @@
             app:layout_constraintEnd_toStartOf="@id/btn_view_post"/>
 
         <Button
-            android:visibility="gone"
+            android:visibility="@{postItem.expanded ? View.VISIBLE : View.GONE}"
             android:id="@+id/btn_view_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

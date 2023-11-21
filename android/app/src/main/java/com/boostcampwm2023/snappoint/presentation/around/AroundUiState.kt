@@ -8,5 +8,6 @@ data class PostState(
     val title: String,
     val author: String,
     val timeStamp: String,
-    val body: String
+    val body: String,
+    val isExpanded: Boolean = false,
 )

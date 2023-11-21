@@ -7,8 +7,12 @@ class PostItemViewHolder(private val binding: ItemAroundPostBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: PostState) {
-        binding.tvPostTitle.text = item.title
-        binding.tvPostTimestamp.text = item.timeStamp
-        binding.tvPostBody.text = item.body
+        with(binding) {
+            postItem = item
+
+            btnExpand.setOnClickListener {
+
+            }
+        }
     }
 }

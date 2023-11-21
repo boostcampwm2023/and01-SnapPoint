@@ -22,7 +22,8 @@ class AroundViewModel @Inject constructor() : ViewModel() {
                         title = "노잼도시 청주를 여행해보자",
                         author = "양희범",
                         timeStamp = "1 Days Ago",
-                        body = "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세"
+                        body = "동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려강산 대한사람 대한으로 길이 보전하세",
+                        isExpanded = true
                     ),
                     PostState(
                         title = "청주의 정통 맛집을 찾아서",
@@ -42,6 +43,32 @@ class AroundViewModel @Inject constructor() : ViewModel() {
                         body = ""
                     )
                 )
+            )
+        }
+    }
+
+    fun expandItem(index: Int) {
+        if (index > uiState.value.posts.lastIndex) return
+
+        _uiState.update {
+            it.copy(
+                posts = it.posts.mapIndexed { idx, postState ->
+                    if (idx == index) {
+                        postState.copy(isExpanded = true)
+                    } else {
+                        postState.copy(isExpanded = false)
+                    }
+                }
+            )
+        }
+    }
+
+    fun clearExpanded() {
+        _uiState.update {
+            it.copy(
+                posts = it.posts.map { postState ->
+                    postState.copy(isExpanded = false)
+                }
             )
         }
     }
