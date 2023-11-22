@@ -13,7 +13,13 @@ export class BlockFileService {
     });
   }
 
-  async attachFile(blockUuid: string, createBlockFileDto: CreateBlockFileDto) {
+  async save(blockUuid: string, createBlockFileDto: CreateBlockFileDto) {
+    const { uuid: fileUuid } = createBlockFileDto;
+
+    const blockFile = await this.prisma.get().blockFile.findFirst({ where: { blockUuid, fileUuid } });
+
+    if (blockFile) return blockFile;
+
     return this.prisma.get().blockFile.create({
       data: {
         fileUuid: createBlockFileDto.uuid,

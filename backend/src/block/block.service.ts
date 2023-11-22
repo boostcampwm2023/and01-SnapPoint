@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Prisma, Block } from '@prisma/client';
 import { PrismaProvider } from '@/prisma.service';
 import { CreateBlockDto } from './dtos/create-block.dto';
-import { SaveBlockDto } from './dtos/save-block.dto';
 
 @Injectable()
 export class BlockService {
@@ -31,7 +30,7 @@ export class BlockService {
     });
   }
 
-  async save(postUuid: string, blockDto: SaveBlockDto) {
+  async save(postUuid: string, blockDto: CreateBlockDto) {
     if (!blockDto.uuid) {
       return this.create(postUuid, blockDto);
     }
@@ -40,6 +39,10 @@ export class BlockService {
 
     if (!block) {
       throw new NotFoundException(`Cloud not found block with UUID: ${blockDto.uuid}`);
+    }
+
+    if (block.postUuid !== postUuid) {
+      throw new BadRequestException(`The block is not part of Post[UUID: ${postUuid}]`);
     }
 
     return this.prisma.get().block.update({
@@ -60,6 +63,13 @@ export class BlockService {
   async findMany(where?: Prisma.BlockWhereInput): Promise<Block[]> {
     return this.prisma.get().block.findMany({
       where,
+    });
+  }
+
+  async update(uuid: string, updateDto: Prisma.BlockUpdateInput) {
+    return this.prisma.get().block.update({
+      data: updateDto,
+      where: { uuid },
     });
   }
 
