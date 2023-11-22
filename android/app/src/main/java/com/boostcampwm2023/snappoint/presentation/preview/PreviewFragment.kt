@@ -46,9 +46,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("LOG", "onDestroyView: asd")
         mainViewModel.onPreviewFragmentClosing()
-        Log.d("LOG", "onDestroyView: asdasd")
 
     }
 
@@ -63,7 +61,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 mainViewModel.uiState.collect{
-                    previewViewModel.updatePost(it.posts[0])
+                    previewViewModel.updatePost(it.posts[it.selectedIndex])
                 }
             }
         }
@@ -71,10 +69,6 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
 
     private fun setScrollEvent() {
         binding.rcvPreview.setOnScrollChangeListener { _, _, _, _, _ ->
-            Log.d(
-                "LOG",
-                "IDX: ${layoutManager.getPosition(snapHelper.findSnapView(layoutManager)!!)}"
-            )
         }
     }
 }

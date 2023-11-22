@@ -225,7 +225,6 @@ class MainActivity :
 
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        Log.d("TAG", "initSnapPointClickListener: $marker")
         viewModel.onMarkerClicked(marker.tag as SnapPointTag)
         return true
     }

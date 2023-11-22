@@ -7,7 +7,6 @@ import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -184,16 +183,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun onMarkerClicked(tag: SnapPointTag) {
-        Log.d("TAG", "onMarkerClicked: $tag")
-        //updateSelectedIndex(tag.postIndex)
-        updateFocusedIndex(tag.postIndex, tag.snapPointIndex)
+        updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
     }
 
-    private fun updateFocusedIndex(index1: Int, index2: Int) {
+    private fun updateClickedSnapPoint(postIndex: Int, snapPointIndex: Int) {
         _uiState.update {
             it.copy(
-                selectedIndex = index1,
-                focusedIndex = index2)
+                selectedIndex = postIndex,
+                focusedIndex = snapPointIndex)
         }
     }
 
