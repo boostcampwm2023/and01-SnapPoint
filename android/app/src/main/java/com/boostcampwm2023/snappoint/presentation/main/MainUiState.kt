@@ -8,6 +8,7 @@ data class MainUiState(
     val snapPoints: List<SnapPointState> = emptyList(),
     val isPreviewFragmentShowing: Boolean = false,
     val selectedIndex: Int = -1,
+    val isBottomSheetExpanded: Boolean = false,
 )
 
 data class SnapPointState(

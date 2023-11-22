@@ -47,6 +47,10 @@ class MainViewModel @Inject constructor(
         _event.tryEmit(MainActivityEvent.NavigateClose)
     }
 
+    fun previewButtonClicked(index: Int) {
+        _event.tryEmit(MainActivityEvent.NavigatePreview(index))
+    }
+
     init{
         loadPosts()
     }
@@ -179,8 +183,15 @@ class MainViewModel @Inject constructor(
     fun onPreviewFragmentClosing() {
         _uiState.update {
             it.copy(
-                isPreviewFragmentShowing = false
+                isPreviewFragmentShowing = false,
+                selectedIndex = -1
             )
+        }
+    }
+
+    fun onBottomSheetChanged(isExpanded: Boolean) {
+        _uiState.update {
+            it.copy(isBottomSheetExpanded = isExpanded)
         }
     }
 }

@@ -82,6 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
+                    android:backgroundTint="@color/surfaceContainerLow"
                     app:behavior_fitToContents="false"
                     app:behavior_peekHeight="0dp"
                     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
@@ -113,7 +114,7 @@
                     android:layout_gravity="top"
                     app:layout_anchorGravity="end"
                     android:contentDescription="@string/activity_main_fab_content_description"
-                    android:visibility="@{vm.uiState.isPreviewFragmentShowing ? View.GONE : View.VISIBLE}"  />
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing || vm.uiState.isBottomSheetExpanded ? View.GONE : View.VISIBLE}"  />
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
