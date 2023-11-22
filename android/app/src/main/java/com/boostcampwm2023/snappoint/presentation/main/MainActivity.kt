@@ -2,7 +2,6 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle

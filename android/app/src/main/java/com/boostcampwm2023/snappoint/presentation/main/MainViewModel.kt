@@ -183,7 +183,8 @@ class MainViewModel @Inject constructor(
     fun onPreviewFragmentClosing() {
         _uiState.update {
             it.copy(
-                isPreviewFragmentShowing = false
+                isPreviewFragmentShowing = false,
+                selectedIndex = -1
             )
         }
     }
