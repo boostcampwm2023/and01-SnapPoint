@@ -144,7 +144,7 @@ class MainActivity :
     }
 
     private fun drawPinsAndRoutes(postIndex: Int) {
-        val polylineOptions = PolylineOptions().color(Color.BLACK).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
+        val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
         val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
