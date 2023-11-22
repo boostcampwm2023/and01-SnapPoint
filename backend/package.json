@@ -25,6 +25,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/swagger": "^7.1.16",
     "@prisma/client": "^5.5.2",
     "aws-sdk": "2.348.0",
     "class-transformer": "^0.5.1",
