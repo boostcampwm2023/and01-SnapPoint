@@ -12,7 +12,6 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     prisma = mockDeep<PrismaClient>();
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
