@@ -12,12 +12,19 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 
 
-suspend fun GoogleMap.addImageMarker(context: Context, markerOptions: MarkerOptions, uri: String){
+suspend fun GoogleMap.addImageMarker(
+    context: Context,
+    markerOptions: MarkerOptions,
+    uri: String,
+    tag: SnapPointTag,
+    focused: Boolean,
+){
 
     val request = ImageRequest.Builder(context)
         .data(uri)
@@ -27,9 +34,20 @@ suspend fun GoogleMap.addImageMarker(context: Context, markerOptions: MarkerOpti
         .build()
     val result = ImageLoader(context).execute(request).drawable
 
-    val userImage = (result as BitmapDrawable).bitmap.scale(width = 69.px(), height = 69.px())
-    val container = BitmapFactory.decodeResource(context.resources, R.drawable.icon_snap_point_container).scale(width = 74.px(), height = 74.px())
-    val snapPointUnFocused = BitmapFactory.decodeResource(context.resources, R.drawable.icon_snap_point_unfocused).scale(width = 85.px(), height = 100.px())
+    val userImage = (result as BitmapDrawable).bitmap
+        .scale(width = 69.px(), height = 69.px())
+    val container = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.icon_snap_point_container
+    ).scale(width = 74.px(), height = 74.px())
+    val snapPointUnFocused = BitmapFactory.decodeResource(
+        context.resources,
+        if(focused) {
+            R.drawable.icon_snap_point_focused
+        } else {
+            R.drawable.icon_snap_point_unfocused
+        }
+    ).scale(width = 85.px(), height = 100.px())
 
     val snapPoint = mergeToSnapPointBitmap(listOf(snapPointUnFocused, container, userImage))
 
@@ -37,7 +55,9 @@ suspend fun GoogleMap.addImageMarker(context: Context, markerOptions: MarkerOpti
         BitmapDescriptorFactory.fromBitmap(
             snapPoint
         )
-    ))
+    )).apply {
+        this?.tag = tag
+    }
 }
 
 fun mergeToSnapPointBitmap(bitmaps: List<Bitmap>): Bitmap {

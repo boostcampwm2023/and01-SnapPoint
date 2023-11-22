@@ -6,8 +6,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 data class MainUiState(
     val posts: List<PostSummaryState> = emptyList(),
     val snapPoints: List<SnapPointState> = emptyList(),
-    val isPreviewFragmentShowing: Boolean = false,
     val selectedIndex: Int = -1,
+    val focusedIndex: Int = -1,
+    val isPreviewFragmentShowing: Boolean = false,
     val isBottomSheetExpanded: Boolean = false,
 )
 

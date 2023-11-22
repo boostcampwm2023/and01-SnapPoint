@@ -1,10 +1,13 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -53,15 +56,7 @@ class MainViewModel @Inject constructor(
                                 position = PositionState(10.0, 10.0),
                                 description = "고양이입니다.",
                                 address = "고양이를 발견한 동네"
-                            )
-                        )
-                    ),
-                    PostSummaryState(
-                        title = "놀러갔다온썰푼다",
-                        author = "이정건",
-                        timeStamp = "456",
-                        postBlocks = listOf(
-                            PostBlockState.IMAGE(
+                            ),PostBlockState.IMAGE(
                                 content = "https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201901/20/28017477-0365-4a43-b546-008b603da621.jpg",
                                 position = PositionState(10.1, 10.1),
                                 description = "강아징입니다.",
@@ -69,15 +64,7 @@ class MainViewModel @Inject constructor(
                             ),
                             PostBlockState.STRING(
                                 content = "ㅎㅇ염"
-                            ),
-                        )
-                    ),
-                    PostSummaryState(
-                        title = "여기좋아용",
-                        author = "안언수",
-                        timeStamp = "678",
-                        postBlocks = listOf(
-                            PostBlockState.STRING(
+                            ),PostBlockState.STRING(
                                 content = "동물원갔다왔슴다 ㅋ"
                             ),
                             PostBlockState.IMAGE(
@@ -162,9 +149,7 @@ class MainViewModel @Inject constructor(
 
 
     fun previewButtonClicked(index: Int) {
-        _uiState.update {
-            it.copy(selectedIndex = index)
-        }
+        updateSelectedIndex(index = index)
         _event.tryEmit(MainActivityEvent.NavigatePreview(index))
     }
 
@@ -175,6 +160,13 @@ class MainViewModel @Inject constructor(
             )
         }
     }
+
+    private fun updateSelectedIndex(index: Int){
+        _uiState.update {
+            it.copy(selectedIndex = index)
+        }
+    }
+
 
     fun onPreviewFragmentClosing() {
         _uiState.update {
@@ -190,4 +182,17 @@ class MainViewModel @Inject constructor(
             it.copy(isBottomSheetExpanded = isExpanded)
         }
     }
+
+    fun onMarkerClicked(tag: SnapPointTag) {
+        Log.d("TAG", "onMarkerClicked: $tag")
+        updateSelectedIndex(tag.postIndex)
+        updateFocusedIndex(tag.snapPointIndex)
+    }
+
+    private fun updateFocusedIndex(index: Int) {
+        _uiState.update {
+            it.copy(focusedIndex = index)
+        }
+    }
+
 }
