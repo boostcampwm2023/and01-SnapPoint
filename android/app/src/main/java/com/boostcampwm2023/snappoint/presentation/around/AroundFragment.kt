@@ -39,6 +39,7 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
                         when (event) {
                             is AroundEvent.ShowSnapPointAndRoute -> {
                                 mainViewModel.updateSelected(event.index)
+                                mainViewModel.previewButtonClicked(event.index)
                             }
                         }
                     }

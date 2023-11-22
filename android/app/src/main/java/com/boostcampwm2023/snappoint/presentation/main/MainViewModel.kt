@@ -47,6 +47,10 @@ class MainViewModel @Inject constructor(
         _event.tryEmit(MainActivityEvent.NavigateClose)
     }
 
+    fun previewButtonClicked(index: Int) {
+        _event.tryEmit(MainActivityEvent.NavigatePreview(index))
+    }
+
     init{
         loadPosts()
     }
