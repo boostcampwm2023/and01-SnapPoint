@@ -2,8 +2,11 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
+import androidx.core.view.doOnLayout
+import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -26,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -147,7 +151,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
     private fun initBottomSheetWithNavigation() {
         binding.bnv.setupWithNavController(navController)
+        bottomSheetBehavior.halfExpandedRatio = 0.45f
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        binding.sb.doOnLayout { bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2 }
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, state: Int) {
+                viewModel.onBottomSheetChanged(state == BottomSheetBehavior.STATE_EXPANDED)
+            }
+
+            override fun onSlide(p0: View, p1: Float) {
+
+            }
+        })
 
         binding.bnv.setOnItemReselectedListener { _ ->
             when (bottomSheetBehavior.state) {

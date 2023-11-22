@@ -188,4 +188,10 @@ class MainViewModel @Inject constructor(
             )
         }
     }
+
+    fun onBottomSheetChanged(expanded: Boolean) {
+        _uiState.update {
+            it.copy(isBottomSheetExpanded = expanded)
+        }
+    }
 }
