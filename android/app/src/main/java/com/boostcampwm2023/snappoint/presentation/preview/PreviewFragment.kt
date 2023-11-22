@@ -42,7 +42,14 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("LOG", "onDestroyView: asd")
         mainViewModel.onPreviewFragmentClosing()
+        Log.d("LOG", "onDestroyView: asdasd")
+
     }
 
     private fun initBinding() {

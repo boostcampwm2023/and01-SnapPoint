@@ -8,11 +8,7 @@
     <fragment
         android:id="@+id/aroundFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.around.AroundFragment"
-        android:label="AroundFragment" >
-        <action
-            android:id="@+id/action_aroundFragment_to_previewFragment"
-            app:destination="@id/previewFragment" />
-    </fragment>
+        android:label="AroundFragment" />
     <fragment
         android:id="@+id/popularPostFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.popularpost.PopularPostFragment"

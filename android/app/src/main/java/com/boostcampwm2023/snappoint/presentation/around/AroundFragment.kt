@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.around
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -38,7 +39,6 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
                     aroundViewModel.event.collect { event ->
                         when (event) {
                             is AroundEvent.ShowSnapPointAndRoute -> {
-                                mainViewModel.updateSelected(event.index)
                                 mainViewModel.previewButtonClicked(event.index)
                             }
                         }
@@ -52,5 +52,24 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
         with(binding) {
             vm = aroundViewModel
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("LOG", "onStop")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("LOG", "onDestroyView")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("LOG", "onDestroy")
     }
 }

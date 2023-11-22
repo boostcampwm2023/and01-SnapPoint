@@ -32,33 +32,8 @@ class MainViewModel @Inject constructor(
     )
     val event: SharedFlow<MainActivityEvent> = _event.asSharedFlow()
 
-
-
-
-    fun drawerIconClicked() {
-        _event.tryEmit(MainActivityEvent.OpenDrawer)
-    }
-
-    fun appbarBackIconClicked() {
-        _event.tryEmit(MainActivityEvent.NavigatePrev)
-    }
-
-    fun appbarCloseIconClicked() {
-        _event.tryEmit(MainActivityEvent.NavigateClose)
-    }
-
-    fun previewButtonClicked(index: Int) {
-        _event.tryEmit(MainActivityEvent.NavigatePreview(index))
-    }
-
-    init{
+    init {
         loadPosts()
-    }
-
-    fun updateSelected(index: Int) {
-        _uiState.update {
-            it.copy(selectedIndex = index)
-        }
     }
 
     private fun loadPosts() {
@@ -158,18 +133,39 @@ class MainViewModel @Inject constructor(
             it.copy(
                 snapPoints =
                 _uiState.value.posts.mapIndexed { index, postSummaryState ->
-                        SnapPointState(
-                            index = index,
-                            markerOptions = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
-                                    MarkerOptions().apply {
-                                        position(it.position.asLatLng())
-                                    }
+                    SnapPointState(
+                        index = index,
+                        markerOptions = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
+                            MarkerOptions().apply {
+                                position(it.position.asLatLng())
                             }
-                        )
+                        }
+                    )
                 }
             )
         }
 
+    }
+
+    fun drawerIconClicked() {
+        _event.tryEmit(MainActivityEvent.OpenDrawer)
+    }
+
+    fun appbarBackIconClicked() {
+        _event.tryEmit(MainActivityEvent.NavigatePrev)
+    }
+
+    fun appbarCloseIconClicked() {
+        _event.tryEmit(MainActivityEvent.NavigateClose)
+    }
+
+
+
+    fun previewButtonClicked(index: Int) {
+        _uiState.update {
+            it.copy(selectedIndex = index)
+        }
+        _event.tryEmit(MainActivityEvent.NavigatePreview(index))
     }
 
     fun onPreviewFragmentShowing() {
