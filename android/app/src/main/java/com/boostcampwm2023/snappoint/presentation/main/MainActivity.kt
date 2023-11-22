@@ -120,11 +120,12 @@ class MainActivity :
             while (googleMap == null) {
                 delay(100)
             }
+            val selectedIndex = viewModel.uiState.value.selectedIndex
             googleMap?.let { map ->
                 map.clear()
                 snapPoints.forEachIndexed { postIndex, snapPointState ->
-                    if(postIndex == viewModel.uiState.value.selectedIndex){
-                        drawPinsAndRoutes()
+                    if(postIndex == selectedIndex){
+                        drawPinsAndRoutes(selectedIndex)
                     }
                     snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
                         val focused =
@@ -142,10 +143,9 @@ class MainActivity :
         }
     }
 
-    private fun drawPinsAndRoutes() {
-        val index = viewModel.uiState.value.selectedIndex
-        val polylineOptions = PolylineOptions()
-        val list = viewModel.uiState.value.posts[index].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
+    private fun drawPinsAndRoutes(postIndex: Int) {
+        val polylineOptions = PolylineOptions().color(Color.BLACK).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
+        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
                     LatLng(block.position.latitude, block.position.longitude)
@@ -158,10 +158,8 @@ class MainActivity :
                 is PostBlockState.STRING -> TODO()
             }
         }
-        polylineOptions.color(Color.BLACK).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
-        polylineOptions.addAll(list)
-        Log.d("TAG", "drawPinsAndRoutes: ${polylineOptions.points}")
-        val polyline = googleMap?.addPolyline(polylineOptions)
+        polylineOptions.addAll(positionList)
+        googleMap?.addPolyline(polylineOptions)
     }
 
     private fun initBottomSheetWithNavigation() {
