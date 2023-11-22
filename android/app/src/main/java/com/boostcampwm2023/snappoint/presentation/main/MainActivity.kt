@@ -1,8 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
@@ -125,7 +123,7 @@ class MainActivity :
                 map.clear()
                 snapPoints.forEachIndexed { postIndex, snapPointState ->
                     if(postIndex == selectedIndex){
-                        drawPinsAndRoutes(selectedIndex)
+                        drawRoutes(selectedIndex)
                     }
                     snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
                         val focused =
@@ -143,7 +141,7 @@ class MainActivity :
         }
     }
 
-    private fun drawPinsAndRoutes(postIndex: Int) {
+    private fun drawRoutes(postIndex: Int) {
         val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
         val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
             when (block) {
