@@ -36,8 +36,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
-    OnMapReadyCallback
-{
+    OnMapReadyCallback {
     private val viewModel: MainViewModel by viewModels()
     private var googleMap: GoogleMap? = null
 
@@ -60,30 +59,39 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         collectViewModelData()
 
+        setBottomNavigationEvent()
+
+        binding.fab.setOnClickListener {
+            openPreviewFragment()
+        }
     }
 
     private fun initMapApi() {
-        val map: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
+        val map: SupportMapFragment =
+            supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
     }
 
     private fun collectViewModelData() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED){
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
 
                 launch {
-                    viewModel.event.collect{event ->
-                        when(event){
+                    viewModel.event.collect { event ->
+                        when (event) {
                             MainActivityEvent.OpenDrawer -> {
                                 openDrawer()
                             }
+
                             MainActivityEvent.NavigatePrev -> {
                                 navController.popBackStack()
                             }
+
                             MainActivityEvent.NavigateClose -> {
                                 navController.popBackStack()
                                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                             }
+
                             is MainActivityEvent.NavigatePreview -> {
                                 openPreviewFragment()
                             }
@@ -91,7 +99,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                     }
                 }
                 launch {
-                    viewModel.uiState.collect{uiState ->
+                    viewModel.uiState.collect { uiState ->
                         if (uiState.selectedIndex > -1) {
                             drawPinsAndRoutes()
                         } else {
@@ -105,7 +113,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
     private fun updateMarker(snapPoints: List<SnapPointState>) {
         lifecycleScope.launch {
-            while(googleMap == null){
+            while (googleMap == null) {
                 delay(1000)
             }
             googleMap?.let { map ->
@@ -115,7 +123,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                         map.addImageMarker(
                             context = this@MainActivity,
                             markerOptions = markerOptions,
-                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_")
+                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_"
+                        )
                     }
                 }
             }
@@ -130,15 +139,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         viewModel.uiState.value.posts[index].postBlocks.forEach { block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
-                    googleMap?.addMarker(MarkerOptions()
-                        .position(LatLng(block.position.latitude, block.position.longitude))
+                    googleMap?.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(block.position.latitude, block.position.longitude))
                     )
                     polyline.add(LatLng(block.position.latitude, block.position.longitude))
                 }
 
                 is PostBlockState.VIDEO -> {
-                    googleMap?.addMarker(MarkerOptions()
-                        .position(LatLng(block.position.latitude, block.position.longitude))
+                    googleMap?.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(block.position.latitude, block.position.longitude))
                     )
                     polyline.add(LatLng(block.position.latitude, block.position.longitude))
                 }
@@ -153,7 +164,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         binding.bnv.setupWithNavController(navController)
         bottomSheetBehavior.halfExpandedRatio = 0.45f
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-        binding.sb.doOnLayout { bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2 }
+        binding.sb.doOnLayout {
+            bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2
+        }
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, state: Int) {
                 viewModel.onBottomSheetChanged(state == BottomSheetBehavior.STATE_EXPANDED)
@@ -165,17 +178,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         })
 
         binding.bnv.setOnItemReselectedListener { _ ->
-            when (bottomSheetBehavior.state) {
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
-                BottomSheetBehavior.STATE_EXPANDED -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED }
-                else -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED }
+            if (viewModel.uiState.value.isPreviewFragmentShowing) {
+                return@setOnItemReselectedListener
             }
+
+            bottomSheetBehavior.state = when (bottomSheetBehavior.state) {
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
+                else -> BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+        }
+    }
+
+    private fun setBottomNavigationEvent() {
+        binding.bnv.setOnItemSelectedListener { menuItem ->
+            navController.popBackStack()
+            navController.navigate(menuItem.itemId)
+            true
         }
     }
 
     private fun openPreviewFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-        navController.navigate(R.id.action_aroundFragment_to_previewFragment)
+        navController.navigate(R.id.previewFragment)
     }
 
     private fun openDrawer() {
@@ -183,7 +208,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     }
 
     private fun initBinding() {
-        with(binding){
+        with(binding) {
             vm = viewModel
         }
     }
@@ -191,6 +216,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0,10.0), 10f))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0, 10.0), 10f))
     }
 }

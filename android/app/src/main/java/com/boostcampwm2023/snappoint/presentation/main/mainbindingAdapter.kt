@@ -32,9 +32,15 @@ fun navigationIconClick(view: MaterialToolbar, event: () -> Unit) {
 @BindingAdapter("menu_item_click")
 fun menuItemClick(view: MaterialToolbar, event: () -> Unit) {
     view.setOnMenuItemClickListener {
-        when(it.itemId) {
-            R.id.preview_close -> event.invoke()
+        return@setOnMenuItemClickListener when (it.itemId) {
+            R.id.preview_close -> {
+                event.invoke()
+                true
+            }
+
+            else -> {
+                true
+            }
         }
-        true
     }
 }
