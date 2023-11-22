@@ -21,6 +21,7 @@ import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
+import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
@@ -108,9 +109,6 @@ class MainActivity :
                 launch {
                     viewModel.uiState.collect { uiState ->
                         updateMarker(uiState.snapPoints)
-                        if (uiState.selectedIndex > -1) {
-                            drawPinsAndRoutes()
-                        }
                     }
                 }
             }
@@ -125,6 +123,9 @@ class MainActivity :
             googleMap?.let { map ->
                 map.clear()
                 snapPoints.forEachIndexed { postIndex, snapPointState ->
+                    if(postIndex == viewModel.uiState.value.selectedIndex){
+                        drawPinsAndRoutes()
+                    }
                     snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
                         val focused =
                             (postIndex == viewModel.uiState.value.selectedIndex) && (snapPointIndex == viewModel.uiState.value.focusedIndex)
@@ -142,23 +143,25 @@ class MainActivity :
     }
 
     private fun drawPinsAndRoutes() {
-
         val index = viewModel.uiState.value.selectedIndex
-        val polyline = PolylineOptions().color(Color.RED).pattern(listOf(Dash(20f), Gap(20f)))
-        viewModel.uiState.value.posts[index].postBlocks.forEach { block ->
+        val polylineOptions = PolylineOptions()
+        val list = viewModel.uiState.value.posts[index].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
-                    polyline.add(LatLng(block.position.latitude, block.position.longitude))
+                    LatLng(block.position.latitude, block.position.longitude)
                 }
 
                 is PostBlockState.VIDEO -> {
-                    polyline.add(LatLng(block.position.latitude, block.position.longitude))
+                    LatLng(block.position.latitude, block.position.longitude)
                 }
 
-                else -> {}
+                is PostBlockState.STRING -> TODO()
             }
         }
-        googleMap?.addPolyline(polyline)
+        polylineOptions.color(Color.BLACK).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
+        polylineOptions.addAll(list)
+        Log.d("TAG", "drawPinsAndRoutes: ${polylineOptions.points}")
+        val polyline = googleMap?.addPolyline(polylineOptions)
     }
 
     private fun initBottomSheetWithNavigation() {

@@ -185,13 +185,15 @@ class MainViewModel @Inject constructor(
 
     fun onMarkerClicked(tag: SnapPointTag) {
         Log.d("TAG", "onMarkerClicked: $tag")
-        updateSelectedIndex(tag.postIndex)
-        updateFocusedIndex(tag.snapPointIndex)
+        //updateSelectedIndex(tag.postIndex)
+        updateFocusedIndex(tag.postIndex, tag.snapPointIndex)
     }
 
-    private fun updateFocusedIndex(index: Int) {
+    private fun updateFocusedIndex(index1: Int, index2: Int) {
         _uiState.update {
-            it.copy(focusedIndex = index)
+            it.copy(
+                selectedIndex = index1,
+                focusedIndex = index2)
         }
     }
 
