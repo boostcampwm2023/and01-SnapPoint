@@ -15,7 +15,7 @@ export class BlockService {
       throw new BadRequestException('Latitude and longitude should not be provided for media type');
     }
 
-    if ((type === 'video' || type === 'image') && (!latitude || !longitude)) {
+    if (type === 'media' && (!latitude || !longitude)) {
       throw new BadRequestException('Latitude and longitude should be provided for media type');
     }
 

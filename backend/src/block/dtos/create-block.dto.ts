@@ -6,7 +6,7 @@ export class CreateBlockDto {
   @IsString()
   readonly content: string;
 
-  @IsIn(['text', 'image', 'video'])
+  @IsIn(['text', 'media'])
   readonly type: string;
 
   @IsOptional()
