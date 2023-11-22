@@ -14,8 +14,10 @@ import com.boostcampwm2023.snappoint.databinding.FragmentPreviewBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
 import com.google.android.material.carousel.CarouselSnapHelper
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_preview) {
 
     private val previewViewModel: PreviewViewModel by viewModels()
@@ -28,18 +30,14 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         super.onCreate(savedInstanceState)
         mainViewModel.onPreviewFragmentShowing()
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
         collectViewModelData()
 
-        binding.rcvPreview.setOnScrollChangeListener { _, _, _, _, _ ->
-            Log.d(
-                "LOG",
-                "IDX: ${layoutManager.getPosition(snapHelper.findSnapView(layoutManager)!!)}"
-            )
-        }
+        setScrollEvent()
     }
 
     override fun onDestroy() {
@@ -61,6 +59,15 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
                     previewViewModel.updatePost(it.posts[0])
                 }
             }
+        }
+    }
+
+    private fun setScrollEvent() {
+        binding.rcvPreview.setOnScrollChangeListener { _, _, _, _, _ ->
+            Log.d(
+                "LOG",
+                "IDX: ${layoutManager.getPosition(snapHelper.findSnapView(layoutManager)!!)}"
+            )
         }
     }
 }
