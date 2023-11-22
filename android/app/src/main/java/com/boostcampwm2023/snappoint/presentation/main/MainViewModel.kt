@@ -130,7 +130,19 @@ class MainViewModel @Inject constructor(
                 }
             )
         }
+    }
 
+    fun getMediaPositions(): List<PositionState> {
+        return uiState.value.posts[uiState.value.selectedIndex].postBlocks
+            .filter { block ->
+                block !is PostBlockState.STRING
+            }.map { mediaBlock ->
+                when (mediaBlock) {
+                    is PostBlockState.IMAGE -> mediaBlock.position
+                    is PostBlockState.VIDEO -> mediaBlock.position
+                    else -> PositionState(0.0, 0.0)
+                }
+            }
     }
 
     fun drawerIconClicked() {

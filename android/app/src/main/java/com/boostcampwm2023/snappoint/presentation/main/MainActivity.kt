@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
@@ -35,6 +36,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.log2
 
 @AndroidEntryPoint
 class MainActivity :
@@ -65,10 +67,6 @@ class MainActivity :
         collectViewModelData()
 
         setBottomNavigationEvent()
-
-        binding.fab.setOnClickListener {
-            openPreviewFragment()
-        }
     }
 
     private fun initMapFragment() {
@@ -99,6 +97,7 @@ class MainActivity :
                             }
 
                             is MainActivityEvent.NavigatePreview -> {
+                                moveCameraToFitScreen()
                                 openPreviewFragment()
                             }
                         }
@@ -158,6 +157,43 @@ class MainActivity :
         }
         polylineOptions.addAll(positionList)
         googleMap?.addPolyline(polylineOptions)
+    }
+
+    private fun moveCameraToFitScreen() {
+        val positions = viewModel.getMediaPositions()
+        if (positions.isEmpty()) {
+            return
+        }
+
+        // 화면 크기 (픽셀 수)
+        val height = binding.run { fcvMainMap.height - sb.height - sb.marginTop - bnv.height } / 2
+        val width = binding.fcvMainMap.width
+        //Log.d("LOG", "$width X $height")
+
+        // 아프리카 적도기니를 기준
+        // latitude: 북반구(+) 남반구(-)
+        // longitude: 서쪽(-) 동쪽(+)
+        val top: Double = positions.maxOf { it.latitude }
+        val bottom: Double = positions.minOf { it.latitude }
+        val left: Double = positions.minOf { it.longitude }
+        val right: Double = positions.maxOf { it.longitude }
+
+        // zoom과 ppl은 Logcat으로 알아낸 값
+        // 식1: 1 / ppl = 2 ^ (zoom / x) -> x = -0.81031
+        // 식2: zoom = 17, 1 / ppl = 2 ^ (17 / -0.81031) -> ppl = 2067742
+        val heightPerLat: Float = (height / (top - bottom)).toFloat()
+        val widthPerLon: Float = (width / (right - left)).toFloat()
+        val pixelPerLatLng = minOf(heightPerLat, widthPerLon).coerceAtMost(2067742f)
+
+        val shiftUp: Double = (height / pixelPerLatLng.toDouble()) / 1.2
+
+        val center: LatLng = LatLng((top + bottom) / 2 - shiftUp, (left + right) / 2)
+        val zoom = (-0.81031 * log2(1 / pixelPerLatLng)).coerceAtMost(17.0).toFloat()
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(center, zoom))
+
+        //Log.d("LOG", "PPL: $pixelPerLatLng, ZOOM: $zoom")
+        //Log.d("LOG", googleMap?.cameraPosition?.target.toString())
+        //Log.d("LOG", googleMap?.cameraPosition?.zoom.toString())
     }
 
     private fun initBottomSheetWithNavigation() {
