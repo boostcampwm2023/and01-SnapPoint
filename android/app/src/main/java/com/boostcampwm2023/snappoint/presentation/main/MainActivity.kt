@@ -60,6 +60,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         collectViewModelData()
 
+        setBottomNavigationEvent()
     }
 
     private fun initMapApi() {
@@ -165,17 +166,51 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         })
 
         binding.bnv.setOnItemReselectedListener { _ ->
-            when (bottomSheetBehavior.state) {
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED }
-                BottomSheetBehavior.STATE_EXPANDED -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED }
-                else -> { bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED }
+            if (viewModel.uiState.value.isPreviewFragmentShowing) {
+                return@setOnItemReselectedListener
+            }
+
+            bottomSheetBehavior.state = when (bottomSheetBehavior.state) {
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
+                else -> BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+        }
+    }
+
+    private fun setBottomNavigationEvent() {
+        binding.bnv.setOnItemSelectedListener { menuItem ->
+            when(menuItem.itemId) {
+                R.id.aroundFragment -> {
+                    navController.popBackStack()
+                    navController.navigate(R.id.aroundFragment)
+                    true
+                }
+                R.id.subscriptionFragment -> {
+                    navController.popBackStack()
+                    navController.navigate(R.id.subscriptionFragment)
+                    true
+                }
+                R.id.popularPostFragment -> {
+                    navController.popBackStack()
+                    navController.navigate(R.id.popularPostFragment)
+                    true
+                }
+                R.id.settingFragment -> {
+                    navController.popBackStack()
+                    navController.navigate(R.id.settingFragment)
+                    true
+                }
+                else -> false
             }
         }
     }
 
     private fun openPreviewFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-        navController.navigate(R.id.action_aroundFragment_to_previewFragment)
+        navController.popBackStack()
+        navController.navigate(R.id.aroundFragment)
+        navController.navigate(R.id.previewFragment)
     }
 
     private fun openDrawer() {
