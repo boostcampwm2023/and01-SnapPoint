@@ -11,4 +11,5 @@
     <color name="surfaceContainerHighest">#E3E3DB</color>
     <color name="surfaceContainerLow">#F5F4EC</color>
     <color name="errorContainer">#93000A</color>
+    <color name="error80">#FF5449</color>
 </resources>

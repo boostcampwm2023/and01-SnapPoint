@@ -54,22 +54,4 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d("LOG", "onStop")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.d("LOG", "onDestroyView")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("LOG", "onDestroy")
-    }
 }

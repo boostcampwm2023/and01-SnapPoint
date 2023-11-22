@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -18,15 +17,18 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
+import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
@@ -35,8 +37,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
-    OnMapReadyCallback {
+class MainActivity :
+    BaseActivity<ActivityMainBinding>(R.layout.activity_main),
+    OnMapReadyCallback,
+    OnMarkerClickListener
+{
     private val viewModel: MainViewModel by viewModels()
     private var googleMap: GoogleMap? = null
 
@@ -55,7 +60,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
 
         initBottomSheetWithNavigation()
 
-        initMapApi()
+        initMapFragment()
 
         collectViewModelData()
 
@@ -66,10 +71,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         }
     }
 
-    private fun initMapApi() {
+    private fun initMapFragment() {
         val map: SupportMapFragment =
             supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
+
     }
 
     private fun collectViewModelData() {
@@ -100,11 +106,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
                 }
                 launch {
                     viewModel.uiState.collect { uiState ->
-                        if (uiState.selectedIndex > -1) {
-                            drawPinsAndRoutes()
-                        } else {
-                            updateMarker(uiState.snapPoints)
-                        }
+                        updateMarker(uiState.snapPoints)
                     }
                 }
             }
@@ -114,16 +116,24 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     private fun updateMarker(snapPoints: List<SnapPointState>) {
         lifecycleScope.launch {
             while (googleMap == null) {
-                delay(1000)
+                delay(100)
             }
+            val selectedIndex = viewModel.uiState.value.selectedIndex
             googleMap?.let { map ->
                 map.clear()
-                snapPoints.forEach {
-                    it.markerOptions.forEach { markerOptions ->
+                snapPoints.forEachIndexed { postIndex, snapPointState ->
+                    if(postIndex == selectedIndex){
+                        drawRoutes(selectedIndex)
+                    }
+                    snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
+                        val focused =
+                            (postIndex == viewModel.uiState.value.selectedIndex) && (snapPointIndex == viewModel.uiState.value.focusedIndex)
                         map.addImageMarker(
                             context = this@MainActivity,
                             markerOptions = markerOptions,
-                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_"
+                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_",
+                            tag = SnapPointTag(postIndex = postIndex, snapPointIndex = snapPointIndex),
+                            focused = focused
                         )
                     }
                 }
@@ -131,33 +141,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
         }
     }
 
-    private fun drawPinsAndRoutes() {
-        googleMap?.clear()
-
-        val index = viewModel.uiState.value.selectedIndex
-        val polyline = PolylineOptions().color(Color.RED).pattern(listOf(Dash(20f), Gap(20f)))
-        viewModel.uiState.value.posts[index].postBlocks.forEach { block ->
+    private fun drawRoutes(postIndex: Int) {
+        val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
+        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
-                    googleMap?.addMarker(
-                        MarkerOptions()
-                            .position(LatLng(block.position.latitude, block.position.longitude))
-                    )
-                    polyline.add(LatLng(block.position.latitude, block.position.longitude))
+                    LatLng(block.position.latitude, block.position.longitude)
                 }
 
                 is PostBlockState.VIDEO -> {
-                    googleMap?.addMarker(
-                        MarkerOptions()
-                            .position(LatLng(block.position.latitude, block.position.longitude))
-                    )
-                    polyline.add(LatLng(block.position.latitude, block.position.longitude))
+                    LatLng(block.position.latitude, block.position.longitude)
                 }
 
-                else -> {}
+                is PostBlockState.STRING -> TODO()
             }
         }
-        googleMap?.addPolyline(polyline)
+        polylineOptions.addAll(positionList)
+        googleMap?.addPolyline(polylineOptions)
     }
 
     private fun initBottomSheetWithNavigation() {
@@ -216,6 +216,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main),
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
 
+        googleMap.setOnMarkerClickListener(this)
+
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0, 10.0), 10f))
+    }
+
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        viewModel.onMarkerClicked(marker.tag as SnapPointTag)
+        return true
     }
 }
