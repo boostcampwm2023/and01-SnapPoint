@@ -4,6 +4,11 @@ import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaProvider } from '@/prisma.service';
 import { PrismaClient, RefreshToken } from '@prisma/client';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+
+jest.mock('@nestjs/jwt');
+jest.mock('@nestjs/config');
 
 describe('RefreshTokenService', () => {
   let service: RefreshTokenService;
@@ -21,6 +26,8 @@ describe('RefreshTokenService', () => {
             get: () => prisma,
           },
         },
+        JwtService,
+        ConfigService,
       ],
     }).compile();
 
