@@ -89,9 +89,7 @@ class MainActivity :
 
         initLocationData()
 
-        binding.fab.setOnClickListener {
-            checkPermissionAndMoveCameraToUserLocation()
-        }
+
     }
 
 
@@ -295,6 +293,10 @@ class MainActivity :
     private fun initBinding() {
         with(binding) {
             vm = viewModel
+
+            fab.setOnClickListener {
+                checkPermissionAndMoveCameraToUserLocation()
+            }
         }
     }
 
