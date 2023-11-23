@@ -197,6 +197,9 @@ class MainActivity :
         binding.bnv.setOnItemSelectedListener { menuItem ->
             navController.popBackStack()
             navController.navigate(menuItem.itemId)
+            if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
             true
         }
     }

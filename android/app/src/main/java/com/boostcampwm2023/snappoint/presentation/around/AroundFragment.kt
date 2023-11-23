@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.around
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -53,5 +52,4 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
             vm = aroundViewModel
         }
     }
-
 }

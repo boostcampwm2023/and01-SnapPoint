@@ -132,13 +132,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:padding="20dp"
             blocks="@{vm.uiState.postBlocks}"
-            onContentChange="@{vm.uiState.onTextChanged}"
-            onDeleteButtonClick="@{vm.uiState.onDeleteButtonClicked}"
-            onAddressIconClick = "@{vm.uiState.onAddressIconClicked}"
-            onEditButtonClick="@{vm.uiState.onEditButtonClicked}"
-            onCheckButtonClick="@{vm.uiState.onCheckButtonClicked}"
-            onUpButtonClick="@{vm.uiState.onUpButtonClicked}"
-            onDownButtonClick="@{vm.uiState.onDownButtonClicked}"
+            blockItemEvent="@{vm.uiState.blockItemEvent}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_text_block"/>
 

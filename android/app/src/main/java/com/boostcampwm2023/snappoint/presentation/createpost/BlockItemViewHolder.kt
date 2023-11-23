@@ -16,42 +16,39 @@ import com.google.android.material.card.MaterialCardView
 
 sealed class BlockItemViewHolder(
     binding: ViewDataBinding,
-    onContentChanged: (Int, String) -> Unit
+    blockItemEvent: BlockItemEventListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    val textWatcher = EditTextWatcher(onContentChanged)
+    val textWatcher = EditTextWatcher(blockItemEvent.onTextChange)
 
     abstract fun attachTextWatcherToEditText()
     abstract fun detachTextWatcherFromEditText()
 
     class TextBlockViewHolder(
         private val binding: ItemTextBlockBinding,
-        private val onContentChanged: (Int, String) -> Unit,
-        private val onEditButtonClicked: (Int) -> Unit,
-        private val onCheckButtonClicked: (Int) -> Unit,
-        private val onUpButtonClicked: (Int) -> Unit,
-        private val onDownButtonClicked: (Int) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit,
-    ) : BlockItemViewHolder(binding, onContentChanged) {
+        private val blockItemEvent: BlockItemEventListener,
+    ) : BlockItemViewHolder(binding, blockItemEvent) {
 
-        fun bind(block: PostBlockState.TEXT, position: Int) {
-            binding.tilText.editText?.setText(block.content)
-            binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
-            binding.btnEditBlock.setOnClickListener {
-                itemView.rootView.clearFocus()
-                onEditButtonClicked(position)
+        fun bind(block: PostBlockState.TEXT, index: Int) {
+            with(binding) {
+                tilText.editText?.setText(block.content)
+                btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
+                btnEditBlock.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onEditButtonClick(index)
+                }
+                btnEditComplete.setOnClickListener { blockItemEvent.onCheckButtonClick(index) }
+                btnUp.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onUpButtonClick(index)
+                }
+                btnDown.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onDownButtonClick(index)
+                }
+                editMode = block.isEditMode
             }
-            binding.btnEditComplete.setOnClickListener { onCheckButtonClicked(position) }
-            binding.btnUp.setOnClickListener {
-                itemView.rootView.clearFocus()
-                onUpButtonClicked(position)
-            }
-            binding.btnDown.setOnClickListener {
-                itemView.rootView.clearFocus()
-                onDownButtonClicked(position)
-            }
-            binding.editMode = block.isEditMode
-            textWatcher.updatePosition(position)
+            textWatcher.updatePosition(index)
         }
 
         override fun attachTextWatcherToEditText() {
@@ -65,33 +62,27 @@ sealed class BlockItemViewHolder(
 
     class ImageBlockViewHolder(
         private val binding: ItemImageBlockBinding,
-        private val onContentChanged: (Int, String) -> Unit,
-        private val onAddressIconClicked: (Int) -> Unit,
-        private val onDeleteButtonClicked: (Int) -> Unit,
-        private val onEditButtonClicked: (Int) -> Unit,
-        private val onCheckButtonClicked: (Int) -> Unit,
-        private val onUpButtonClicked: (position: Int) -> Unit,
-        private val onDownButtonClicked: (position: Int) -> Unit,
-    ) : BlockItemViewHolder(binding, onContentChanged) {
+        private val blockItemEvent: BlockItemEventListener,
+    ) : BlockItemViewHolder(binding, blockItemEvent) {
 
         fun bind(block: PostBlockState.IMAGE, index: Int) {
-            with(binding){
+            with(binding) {
                 tilDescription.editText?.setText(block.content)
                 tilAddress.editText?.setText(block.address)
-                onDeleteButtonClick = { onDeleteButtonClicked(index) }
+                btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
                 btnEditBlock.setOnClickListener {
                     itemView.rootView.clearFocus()
-                    onEditButtonClicked(index)
+                    blockItemEvent.onEditButtonClick(index)
                 }
-                tilAddress.setEndIconOnClickListener { onAddressIconClicked.invoke(index) }
-                btnEditComplete.setOnClickListener { onCheckButtonClicked(index) }
+                tilAddress.setEndIconOnClickListener { blockItemEvent.onAddressIconClick(index) }
+                btnEditComplete.setOnClickListener { blockItemEvent.onCheckButtonClick(index) }
                 btnUp.setOnClickListener {
                     itemView.rootView.clearFocus()
-                    onUpButtonClicked(index)
+                    blockItemEvent.onUpButtonClick(index)
                 }
                 btnDown.setOnClickListener {
                     itemView.rootView.clearFocus()
-                    onDownButtonClicked(index)
+                    blockItemEvent.onDownButtonClick(index)
                 }
                 uri = block.uri
                 editMode = block.isEditMode
@@ -143,7 +134,7 @@ fun MaterialCardView.isEditMode(editMode: Boolean) {
     val value = TypedValue()
     if (editMode) {
         context.theme.resolveAttribute(com.google.android.material.R.attr.colorSecondary, value, true)
-        strokeWidth =4
+        strokeWidth = 4
     } else {
         context.theme.resolveAttribute(com.google.android.material.R.attr.colorOutline, value, true)
         strokeWidth = 1

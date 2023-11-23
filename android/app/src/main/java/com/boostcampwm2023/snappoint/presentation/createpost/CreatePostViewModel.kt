@@ -30,27 +30,15 @@ class CreatePostViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<CreatePostUiState> = MutableStateFlow(CreatePostUiState(
-        onTextChanged = { index, content ->
-            updatePostBlocks(index, content)
+        blockItemEvent = object : BlockItemEventListener {
+            override val onTextChange: (Int, String) -> Unit = { index, content -> updatePostBlocks(index, content) }
+            override val onDeleteButtonClick: (Int) -> Unit = { index -> deletePostBlock(index) }
+            override val onEditButtonClick: (Int) -> Unit = { index -> changeToEditMode(index) }
+            override val onCheckButtonClick: (Int) -> Unit = { position -> clearEditMode(position) }
+            override val onUpButtonClick: (Int) -> Unit = { position -> moveUp(position) }
+            override val onDownButtonClick: (Int) -> Unit = { position -> moveDown(position) }
+            override val onAddressIconClick: (Int) -> Unit = { index -> findAddress(index) }
         },
-        onDeleteButtonClicked = { index ->
-            deletePostBlock(index)
-        },
-        onAddressIconClicked = { index ->
-            findAddress(index)
-        },
-        onEditButtonClicked = { position ->
-            changeToEditMode(position)
-        },
-        onCheckButtonClicked = { position ->
-            clearEditMode(position)
-        },
-        onUpButtonClicked = { position ->
-            moveUp(position)
-        },
-        onDownButtonClicked = { position ->
-            moveDown(position)
-        }
     ))
 
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
