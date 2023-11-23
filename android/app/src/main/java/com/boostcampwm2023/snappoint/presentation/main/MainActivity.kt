@@ -1,15 +1,14 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.Manifest
-import android.content.pm.PackageManager
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
@@ -28,8 +27,12 @@ import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_PERMISSION_REQUEST_CODE
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
@@ -64,6 +67,8 @@ class MainActivity :
         BottomSheetBehavior.from(binding.bs)
     }
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,8 +82,17 @@ class MainActivity :
 
         setBottomNavigationEvent()
 
+        initLocationClient()
+
         binding.fab.setOnClickListener {
+            checkPermissionAndMoveCameraToUserLocation()
         }
+    }
+
+
+
+    private fun initLocationClient() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     private fun initMapFragment() {
@@ -271,26 +285,24 @@ class MainActivity :
 
         googleMap.setOnMarkerClickListener(this)
 
+        checkPermissionAndMoveCameraToUserLocation()
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun checkPermissionAndMoveCameraToUserLocation() {
         if(this.isMyLocationGranted()){
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0, 10.0), 10f))
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener {location ->
+                    Log.d("TAG", "checkPermissionAndMoveCameraToUserLocation: $location")
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.longitude, location.latitude)))
+                }
         }else{
-            permissionRequest()
+            locationPermissionRequest()
         }
-
-
     }
 
-    private fun permissionRequest() {
 
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ),
-            LOCATION_PERMISSION_REQUEST_CODE
-        )
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

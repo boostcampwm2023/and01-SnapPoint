@@ -1,8 +1,10 @@
 package com.boostcampwm2023.snappoint.presentation.util
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 
@@ -33,5 +35,16 @@ object PermissionUtil{
             }
         }
         return false
+    }
+
+    fun Activity.locationPermissionRequest() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
     }
 }
