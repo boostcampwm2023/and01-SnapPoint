@@ -186,6 +186,10 @@ class MainViewModel @Inject constructor(
         updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
     }
 
+    fun focusOfImageMoved(imageIndex: Int) {
+        updateClickedSnapPoint(_uiState.value.selectedIndex, imageIndex)
+    }
+
     private fun updateClickedSnapPoint(postIndex: Int, snapPointIndex: Int) {
         _uiState.update {
             it.copy(
