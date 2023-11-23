@@ -34,11 +34,20 @@ jobs:
             NCP_BUCKET_ENDPOINT: ${{ secrets.NCP_BUCKET_ENDPOINT }}
             NCP_BUCKET_NAME: ${{ secrets.NCP_BUCKET_NAME }}
             NCP_BUCKET_REGION: ${{ secrets.NCP_BUCKET_REGION }}
+            NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
+            NCP_SECRET_KEY: ${{ secrets.NCP_SECRET_KEY }}
         run: |
             cd backend
             touch .env
             echo "DATABASE_URL=$DATABASE_URL" >> .env
             echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
+            echo "NCP_DOCKER_REGISTORY=$NCP_DOCKER_REGISTORY" >> .env
+            echo "BUCKET_URL=$BUCKET_URL" >> .env
+            echo "NCP_BUCKET_ENDPOINT=$NCP_BUCKET_ENDPOINT" >> .env
+            echo "NCP_BUCKET_NAME=$NCP_BUCKET_NAME" >> .env
+            echo "NCP_BUCKET_REGION=$NCP_BUCKET_REGION" >> .env
+            echo "NCP_ACCESS_KEY=$NCP_ACCESS_KEY" >> .env
+            echo "NCP_SECRET_KEY=$NCP_SECRET_KEY" >> .env
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest ./backend
