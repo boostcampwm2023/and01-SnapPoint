@@ -10,10 +10,30 @@ data class PostSummaryState(
     val postBlocks: List<PostBlockState>
 )
 
-sealed class PostBlockState(open val content: String, open val isEditMode: Boolean) {
-    data class STRING(override val content: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class IMAGE(override val content: String = "", val uri: Uri = Uri.EMPTY, val description: String = "", val position: PositionState = PositionState(0.0, 0.0), val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
-    data class VIDEO(override val content: String = "", val uri: Uri = Uri.EMPTY, val description: String = "", val position: PositionState = PositionState(0.0, 0.0), val address: String = "", override val isEditMode: Boolean = false) : PostBlockState(content, isEditMode)
+sealed class PostBlockState(open val content: String, open val isEditMode: Boolean, open val uuid: String) {
+    data class TEXT(
+        override val content: String = "",
+        override val isEditMode: Boolean = false,
+        override val uuid: String = "",
+    ) : PostBlockState(content, isEditMode, uuid)
+    data class IMAGE(
+        override val content: String = "",
+        override val isEditMode: Boolean = false,
+        override val uuid: String = "",
+        val uri: Uri = Uri.EMPTY,
+        val description: String = "",
+        val position: PositionState = PositionState(0.0, 0.0),
+        val address: String = ""
+    ) : PostBlockState(content, isEditMode, uuid)
+    data class VIDEO(
+        override val content: String = "",
+        override val isEditMode: Boolean = false,
+        override val uuid: String = "",
+        val uri: Uri = Uri.EMPTY,
+        val description: String = "",
+        val position: PositionState = PositionState(0.0, 0.0),
+        val address: String = ""
+    ) : PostBlockState(content, isEditMode, uuid)
 }
 
 data class PositionState(

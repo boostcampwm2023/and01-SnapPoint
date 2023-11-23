@@ -146,7 +146,7 @@ class MainActivity :
 
     private fun drawRoutes(postIndex: Int) {
         val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
-        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
+        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
                     LatLng(block.position.latitude, block.position.longitude)
@@ -156,7 +156,7 @@ class MainActivity :
                     LatLng(block.position.latitude, block.position.longitude)
                 }
 
-                is PostBlockState.STRING -> TODO()
+                is PostBlockState.TEXT -> TODO()
             }
         }
         polylineOptions.addAll(positionList)

@@ -21,7 +21,7 @@ interface SnapPointApi {
         @Query ("image") image: String,
     ): ImageUriResponse
 
-    @POST("create_post")
+    @POST("posts/publish")
     suspend fun createPost(
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse

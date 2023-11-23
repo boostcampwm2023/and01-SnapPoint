@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
@@ -47,7 +46,7 @@ class MainViewModel @Inject constructor(
                         author = "원승빈",
                         timeStamp = "123",
                         postBlocks = listOf(
-                            PostBlockState.STRING(
+                            PostBlockState.TEXT(
                                 content = "안녕하세요, 하하"
                             ),
                             PostBlockState.IMAGE(
@@ -61,9 +60,9 @@ class MainViewModel @Inject constructor(
                                 description = "강아징입니다.",
                                 address = "내가 키우는 강아지"
                             ),
-                            PostBlockState.STRING(
+                            PostBlockState.TEXT(
                                 content = "ㅎㅇ염"
-                            ),PostBlockState.STRING(
+                            ),PostBlockState.TEXT(
                                 content = "동물원갔다왔슴다 ㅋ"
                             ),
                             PostBlockState.IMAGE(
@@ -85,7 +84,7 @@ class MainViewModel @Inject constructor(
                         author = "TEST",
                         timeStamp = "1",
                         postBlocks = listOf(
-                            PostBlockState.STRING(
+                            PostBlockState.TEXT(
                                 content = "123"
                             ),
                             PostBlockState.IMAGE(
