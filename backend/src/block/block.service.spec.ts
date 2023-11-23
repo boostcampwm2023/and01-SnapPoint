@@ -33,5 +33,15 @@ describe('BlocksService', () => {
         }),
       ).rejects.toThrow(BadRequestException);
     });
+
+    it('미디어 블록은 위도, 경도 값을 가져야 한다.', async () => {
+      await expect(
+        service.create('589bb04b-9aa3-4a2b-bc66-8ea8235c4c01', {
+          type: 'media',
+          content: 'This is Media Block.',
+          order: 1,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 });
