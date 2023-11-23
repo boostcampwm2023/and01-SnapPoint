@@ -34,7 +34,7 @@ sealed class BlockItemViewHolder(
         private val onDeleteButtonClicked: (Int) -> Unit,
     ) : BlockItemViewHolder(binding, onContentChanged) {
 
-        fun bind(block: PostBlockState.STRING, position: Int) {
+        fun bind(block: PostBlockState.TEXT, position: Int) {
             binding.tilText.editText?.setText(block.content)
             binding.onDeleteButtonClick = { onDeleteButtonClicked(position) }
             binding.btnEditBlock.setOnClickListener {

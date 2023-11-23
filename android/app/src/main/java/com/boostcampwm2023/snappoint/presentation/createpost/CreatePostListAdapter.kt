@@ -50,7 +50,7 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (blocks[position]) {
-            is PostBlockState.STRING -> ViewType.STRING.ordinal
+            is PostBlockState.TEXT -> ViewType.STRING.ordinal
             is PostBlockState.IMAGE -> ViewType.IMAGE.ordinal
             is PostBlockState.VIDEO -> ViewType.VIDEO.ordinal
         }
@@ -108,7 +108,7 @@ class CreatePostListAdapter(
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.STRING, position)
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.TEXT, position)
             is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.IMAGE, position)
         }
     }

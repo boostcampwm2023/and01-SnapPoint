@@ -1,24 +1,21 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.Manifest
-import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.databinding.FragmentCreatePostBinding
-import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
+import com.boostcampwm2023.snappoint.databinding.ActivityCreatePostBinding
+import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
@@ -26,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.fragment_create_post) {
+class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.activity_create_post) {
 
     private val viewModel: CreatePostViewModel by viewModels()
 
@@ -36,7 +33,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                 launchImageSelectionLauncher()
             } else {
                 Toast.makeText(
-                    requireContext(),
+                    this,
                     getString(R.string.message_permission_denied),
                     Toast.LENGTH_SHORT
                 ).show()
@@ -47,7 +44,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val imageUri = result.data?.data ?: return@registerForActivityResult
-                val inputStream = requireContext().contentResolver.openInputStream(imageUri)
+                val inputStream = this.contentResolver.openInputStream(imageUri)
                     ?: return@registerForActivityResult
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
@@ -58,9 +55,9 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
         }
 
     private val addressSelectionLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
-            if(result.resultCode == RESULT_OK){
-                result.data?.let{
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let {
                     viewModel.setAddressAndPosition(
                         index = it.getIntExtra("index", 0),
                         address = it.getStringExtra("address") ?: "",
@@ -73,9 +70,8 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
             }
         }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         initBinding()
         collectViewModelData()
     }
@@ -87,7 +83,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     }
 
     private fun collectViewModelData() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
@@ -100,7 +96,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
                         }
 
                         is CreatePostEvent.NavigatePrev -> {
-                            findNavController().popBackStack()
+                            finish()
                         }
 
                         is CreatePostEvent.FindAddress -> {
@@ -114,7 +110,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     }
 
     private fun showToastMessage(resId: Int) {
-        Toast.makeText(requireContext(), getString(resId), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
     }
 
     private fun selectImage() {
@@ -147,7 +143,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
     private fun getImageWithPermissionCheck(permissions: Array<String>) {
         val permissionCheck = permissions.filter {
             ContextCompat.checkSelfPermission(
-                requireContext(),
+                this,
                 it
             ) == PackageManager.PERMISSION_DENIED
         }
@@ -155,7 +151,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
         if (permissionCheck.isNotEmpty()) {
             if (permissionCheck.any { shouldShowRequestPermissionRationale(it) }) {
                 Toast.makeText(
-                    requireContext(),
+                    this,
                     getString(R.string.message_permission_required),
                     Toast.LENGTH_SHORT
                 ).show()
@@ -166,7 +162,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>(R.layout.frag
 
 
     private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
-        val intent = Intent(requireContext(), MarkerPointSelectorActivity::class.java)
+        val intent = Intent(this, MarkerPointSelectorActivity::class.java)
         intent.putExtra("index", index)
         intent.putExtra("position", position.asDoubleArray())
         addressSelectionLauncher.launch(intent)

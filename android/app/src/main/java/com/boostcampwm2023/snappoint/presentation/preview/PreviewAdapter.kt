@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImagePreviewBinding
-import com.boostcampwm2023.snappoint.presentation.around.PostListAdapter
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 class PreviewAdapter : RecyclerView.Adapter<PreviewViewHolder>() {
@@ -27,13 +26,13 @@ class PreviewAdapter : RecyclerView.Adapter<PreviewViewHolder>() {
             when (postBlock) {
                 is PostBlockState.IMAGE -> holder.bind(Uri.parse(postBlock.content), postBlock.description)
                 is PostBlockState.VIDEO -> holder.bind(Uri.parse(postBlock.content), postBlock.description)
-                is PostBlockState.STRING -> {}
+                is PostBlockState.TEXT -> {}
             }
         }
     }
 
     fun updateList(blocks: List<PostBlockState>) {
-        mediaBlocks = blocks.filter { (it is PostBlockState.STRING).not() }
+        mediaBlocks = blocks.filter { (it is PostBlockState.TEXT).not() }
         notifyDataSetChanged()
     }
 }
