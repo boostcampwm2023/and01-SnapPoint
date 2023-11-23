@@ -181,6 +181,7 @@ class MainViewModel @Inject constructor(
 
     fun onMarkerClicked(tag: SnapPointTag) {
         updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
+        _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
     }
 
     fun focusOfImageMoved(imageIndex: Int) {

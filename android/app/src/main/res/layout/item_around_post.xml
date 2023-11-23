@@ -38,7 +38,8 @@
             android:layout_marginStart="16dp"
             app:layout_constraintBottom_toBottomOf="@id/btn_expand"
             app:layout_constraintStart_toStartOf="@id/cv_around_post"
-            app:layout_constraintTop_toTopOf="@id/btn_expand" />
+            app:layout_constraintTop_toTopOf="@id/btn_expand"
+            profileImage="@{postItem.postBlocks}"/>
 
         <TextView
             android:id="@+id/tv_post_title"

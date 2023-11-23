@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
@@ -41,7 +40,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
@@ -148,8 +146,10 @@ class MainActivity :
                             }
 
                             is MainActivityEvent.NavigatePreview -> {
+                                if (navController.currentDestination?.id != R.id.previewFragment) {
+                                    openPreviewFragment()
+                                }
                                 moveCameraToFitScreen()
-                                openPreviewFragment()
                             }
                         }
                     }
