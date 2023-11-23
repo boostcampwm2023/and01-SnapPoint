@@ -76,13 +76,23 @@ class MainActivity :
             val intent = Intent(this, CreatePostActivity::class.java)
             startActivity(intent)
         }
+
+        cachingBottomSheetSize()
     }
 
     private fun initMapFragment() {
         val map: SupportMapFragment =
             supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
+    }
 
+    private fun cachingBottomSheetSize() {
+        with(binding) {
+            root.post {
+                viewModel.bottomSheetHeight =
+                    (cl.height * Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO).toInt()
+            }
+        }
     }
 
     private fun collectViewModelData() {

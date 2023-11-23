@@ -36,6 +36,8 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
+        initViewSize()
+
         collectViewModelData()
 
         setScrollEvent()
@@ -55,6 +57,16 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         with(binding) {
             vm = previewViewModel
             snapHelper.attachToRecyclerView(rcvPreview)
+        }
+    }
+
+    private fun initViewSize() {
+        with(binding) {
+            root.post {
+                rcvPreview.layoutParams.height =
+                    mainViewModel.bottomSheetHeight - glTop.top
+                Log.d("LOG", "${rcvPreview.layoutParams.height}")
+            }
         }
     }
 
