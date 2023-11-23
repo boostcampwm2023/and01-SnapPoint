@@ -69,10 +69,6 @@ class MainActivity :
         collectViewModelData()
 
         setBottomNavigationEvent()
-
-        binding.fab.setOnClickListener {
-            Log.d("LOG", "Z:${googleMap?.cameraPosition?.zoom} LL:${googleMap?.cameraPosition?.target}")
-        }
     }
 
     private fun initMapFragment() {
