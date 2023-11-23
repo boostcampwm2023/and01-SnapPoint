@@ -51,12 +51,12 @@ class MainViewModel @Inject constructor(
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://health.chosun.com/site/data/img_dir/2023/07/17/2023071701753_0.jpg",
-                                position = PositionState(10.0, 10.0),
+                                position = PositionState(10.001, 10.002),
                                 description = "고양이입니다.",
                                 address = "고양이를 발견한 동네"
                             ),PostBlockState.IMAGE(
                                 content = "https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201901/20/28017477-0365-4a43-b546-008b603da621.jpg",
-                                position = PositionState(10.1, 10.1),
+                                position = PositionState(10.005, 10.006),
                                 description = "강아징입니다.",
                                 address = "내가 키우는 강아지"
                             ),
@@ -67,13 +67,13 @@ class MainViewModel @Inject constructor(
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.4, 10.3),
+                                position = PositionState(10.004, 10.003),
                                 description = "이것은 악어~",
                                 address = "제일 좋아하는 동물이에용"
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.8, 9.8),
+                                position = PositionState(10.008, 9.998),
                                 description = "이것은 악어~",
                                 address = "제일 좋아하는 동물이에용"
                             ),
@@ -129,7 +129,6 @@ class MainViewModel @Inject constructor(
                 }
             )
         }
-
     }
 
     fun drawerIconClicked() {
@@ -143,8 +142,6 @@ class MainViewModel @Inject constructor(
     fun appbarCloseIconClicked() {
         _event.tryEmit(MainActivityEvent.NavigateClose)
     }
-
-
 
     fun previewButtonClicked(index: Int) {
         updateSelectedIndex(index = index)
@@ -164,7 +161,6 @@ class MainViewModel @Inject constructor(
             it.copy(selectedIndex = index)
         }
     }
-
 
     fun onPreviewFragmentClosing() {
         _uiState.update {
@@ -196,5 +192,4 @@ class MainViewModel @Inject constructor(
                 focusedIndex = snapPointIndex)
         }
     }
-
 }

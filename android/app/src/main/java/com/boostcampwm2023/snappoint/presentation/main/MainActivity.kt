@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
@@ -20,6 +21,7 @@ import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -30,6 +32,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,6 +40,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.log2
 
 @AndroidEntryPoint
 class MainActivity :
@@ -102,6 +106,7 @@ class MainActivity :
                             }
 
                             is MainActivityEvent.NavigatePreview -> {
+                                moveCameraToFitScreen()
                                 openPreviewFragment()
                             }
                         }
@@ -163,9 +168,48 @@ class MainActivity :
         googleMap?.addPolyline(polylineOptions)
     }
 
+    private fun moveCameraToFitScreen() {
+        val postIndex = viewModel.uiState.value.selectedIndex
+        val snapPoints = viewModel.uiState.value.snapPoints[postIndex]
+        val positions = snapPoints.markerOptions.map { it.position }
+
+        // 아프리카 적도기니를 기준
+        // latitude: 북반구(+) 남반구(-)
+        // longitude: 서쪽(-) 동쪽(+)
+        val topOfBound: Double = positions.maxOf { it.latitude }
+        val bottomOfBound: Double = positions.minOf { it.latitude }
+        val leftOfBound: Double = positions.minOf { it.longitude }
+        val rightOfBound: Double = positions.maxOf { it.longitude }
+
+        // 단위: Pixel
+        val padding: Int = maxOf(binding.topAppBar.height, binding.sb.height)
+
+        val heightOfMap: Double = binding.fcvMainMap.height.toDouble()
+        val heightOfLayout: Double = binding.cl.height.toDouble()
+
+        val topAppBarRatio: Double = padding / heightOfMap
+        val bottomNavViewRatio: Double = binding.bnv.height / heightOfMap
+        val bottomSheetRatio: Double = (Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO * heightOfLayout
+                + binding.dragHandle.height) / heightOfMap
+        val visibleRatio: Double = 1.0 - (topAppBarRatio + bottomNavViewRatio + bottomSheetRatio)
+
+
+        val heightOfBound: Double = topOfBound - bottomOfBound
+
+        val newTopOfBound: Double = topOfBound + heightOfBound * topAppBarRatio / visibleRatio
+        val newBottomOfBound: Double = bottomOfBound - heightOfBound * (bottomNavViewRatio + bottomSheetRatio) / visibleRatio
+
+        val bound: LatLngBounds = LatLngBounds(
+            LatLng(newBottomOfBound, leftOfBound),
+            LatLng(newTopOfBound, rightOfBound)
+        )
+
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bound, padding))
+    }
+
     private fun initBottomSheetWithNavigation() {
         binding.bnv.setupWithNavController(navController)
-        bottomSheetBehavior.halfExpandedRatio = 0.45f
+        bottomSheetBehavior.halfExpandedRatio = Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         binding.sb.doOnLayout {
             bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2
