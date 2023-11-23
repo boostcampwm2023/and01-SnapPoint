@@ -233,7 +233,7 @@ class CreatePostViewModel @Inject constructor(
             .onEach {
                 Log.d("TAG", "onCheckButtonClicked: api request success")
                 Log.d("TAG", "onCheckButtonClicked: ${it}")
-
+                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
                 _event.tryEmit(CreatePostEvent.NavigatePrev)
             }
             .launchIn(viewModelScope)
