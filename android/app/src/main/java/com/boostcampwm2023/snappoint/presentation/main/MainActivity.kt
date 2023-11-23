@@ -1,11 +1,15 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
@@ -18,10 +22,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_PERMISSION_REQUEST_CODE
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -40,7 +46,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.log2
 
 @AndroidEntryPoint
 class MainActivity :
@@ -73,8 +78,6 @@ class MainActivity :
         setBottomNavigationEvent()
 
         binding.fab.setOnClickListener {
-            val intent = Intent(this, CreatePostActivity::class.java)
-            startActivity(intent)
         }
     }
 
@@ -268,8 +271,57 @@ class MainActivity :
 
         googleMap.setOnMarkerClickListener(this)
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0, 10.0), 10f))
+        if(this.isMyLocationGranted()){
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0, 10.0), 10f))
+        }else{
+            permissionRequest()
+        }
+
+
     }
+
+    private fun permissionRequest() {
+
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            LOCATION_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            super.onRequestPermissionsResult(
+                requestCode,
+                permissions,
+                grantResults
+            )
+            return
+        }
+
+        if (isPermissionGranted(
+                permissions,
+                grantResults,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) || isPermissionGranted(
+                permissions,
+                grantResults,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        ) {
+            Toast.makeText(this, "권한 ㄳ염 ", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "내 위치 정보를 사용하려면 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
 
     override fun onMarkerClick(marker: Marker): Boolean {
