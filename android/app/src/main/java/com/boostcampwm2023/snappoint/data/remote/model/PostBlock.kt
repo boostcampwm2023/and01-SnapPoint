@@ -5,24 +5,30 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PostBlock(
-    @SerialName("type")
-    val type: BlockType,
+    @SerialName("uuid")
+    val blockUuid: String? = null,
     @SerialName("content")
     val content: String,
-    @SerialName("file_content")
-    val fileContent: String? = null,
-    @SerialName("position")
-    val position: Position? = null
+    @SerialName("type")
+    val type: String,
+    @SerialName("latitude")
+    val latitude: Double? = null,
+    @SerialName("longitude")
+    val longitude: Double? = null,
+    @SerialName("files")
+    val files: List<File>? = null,
 )
 
 @Serializable
-data class Position (
-    @SerialName("x")
-    val x: Double,
-    @SerialName("y")
-    val y:Double
+data class File(
+    @SerialName("uuid")
+    val fileUuid: String,
+    @SerialName("url")
+    val url: String? = null,
+    @SerialName("mimeType")
+    val mimeType: String? = null,
 )
 
 enum class BlockType(val type: String) {
-    TEXT("Text"), IMAGE("Image"), VIDEO("Video")
+    TEXT("text"), MEDIA("media")
 }

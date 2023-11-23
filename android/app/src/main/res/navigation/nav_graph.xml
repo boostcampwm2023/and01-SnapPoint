@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/createPostFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity"
         android:label="CreatePostFragment" />
     <fragment
         android:id="@+id/featureListFragment"

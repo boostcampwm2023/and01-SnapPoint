@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPreviewBinding
@@ -62,13 +63,27 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 mainViewModel.uiState.collect{
                     previewViewModel.updatePost(it.posts[it.selectedIndex])
+                    moveScroll(it.focusedIndex)
                 }
             }
         }
     }
 
+    private fun moveScroll(focusedSnapPointIndex: Int) {
+        if (binding.rcvPreview.scrollState == RecyclerView.SCROLL_STATE_IDLE)
+            layoutManager.scrollToPosition(focusedSnapPointIndex)
+    }
+
     private fun setScrollEvent() {
         binding.rcvPreview.setOnScrollChangeListener { _, _, _, _, _ ->
+            val currentFocusImageIndex =
+                layoutManager.getPosition(
+                    snapHelper.findSnapView(layoutManager) ?: return@setOnScrollChangeListener
+                )
+
+            if (mainViewModel.uiState.value.focusedIndex != currentFocusImageIndex) {
+                mainViewModel.focusOfImageMoved(currentFocusImageIndex)
+            }
         }
     }
 }
