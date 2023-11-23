@@ -174,19 +174,23 @@ class MainActivity :
         val leftOfBound: Double = positions.minOf { it.longitude }
         val rightOfBound: Double = positions.maxOf { it.longitude }
 
-        val heightOfBound: Double = topOfBound - bottomOfBound
-
         // 단위: Pixel
         val padding: Int = maxOf(binding.topAppBar.height, binding.sb.height)
 
-        val upperShadeRange: Double = 1.0 * padding / binding.fcvMainMap.height
-        val lowerShadeRange: Double = 1.2 * Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO
-        val visibleRange: Double = 1.0 - upperShadeRange - lowerShadeRange
+        val heightOfMap: Double = binding.fcvMainMap.height.toDouble()
+        val heightOfLayout: Double = binding.cl.height.toDouble()
 
-        val newTopOfBound: Double =
-            topOfBound + heightOfBound * upperShadeRange / visibleRange
-        val newBottomOfBound: Double =
-            bottomOfBound - heightOfBound * lowerShadeRange / visibleRange
+        val topAppBarRatio: Double = padding / heightOfMap
+        val bottomNavViewRatio: Double = binding.bnv.height / heightOfMap
+        val bottomSheetRatio: Double = (Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO * heightOfLayout
+                + binding.dragHandle.height) / heightOfMap
+        val visibleRatio: Double = 1.0 - (topAppBarRatio + bottomNavViewRatio + bottomSheetRatio)
+
+
+        val heightOfBound: Double = topOfBound - bottomOfBound
+
+        val newTopOfBound: Double = topOfBound + heightOfBound * topAppBarRatio / visibleRatio
+        val newBottomOfBound: Double = bottomOfBound - heightOfBound * (bottomNavViewRatio + bottomSheetRatio) / visibleRatio
 
         val bound: LatLngBounds = LatLngBounds(
             LatLng(newBottomOfBound, leftOfBound),
