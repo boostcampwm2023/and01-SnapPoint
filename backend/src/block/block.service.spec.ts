@@ -22,9 +22,11 @@ describe('BlocksService', () => {
   });
 
   describe('create', () => {
+    const postUuid = '589bb04b-9aa3-4a2b-bc66-8ea8235c4c01';
+
     it('텍스트 블록은 위도, 경도 값을 가질 수 없다.', async () => {
       await expect(
-        service.create('589bb04b-9aa3-4a2b-bc66-8ea8235c4c01', {
+        service.create(postUuid, {
           type: 'text',
           content: 'This is Text Block.',
           latitude: 8.1414,
@@ -36,7 +38,7 @@ describe('BlocksService', () => {
 
     it('미디어 블록은 위도, 경도 값을 가져야 한다.', async () => {
       await expect(
-        service.create('589bb04b-9aa3-4a2b-bc66-8ea8235c4c01', {
+        service.create(postUuid, {
           type: 'media',
           content: 'This is Media Block.',
           order: 1,
@@ -46,7 +48,7 @@ describe('BlocksService', () => {
 
     it('미디어 블록은 위도, 경도 값을 모두 가져야 한다.', async () => {
       await expect(
-        service.create('589bb04b-9aa3-4a2b-bc66-8ea8235c4c01', {
+        service.create(postUuid, {
           type: 'media',
           content: 'This is Media Block.',
           longitude: -74.3538,
