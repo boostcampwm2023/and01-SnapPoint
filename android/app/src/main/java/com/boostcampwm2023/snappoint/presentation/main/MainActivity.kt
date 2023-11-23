@@ -102,7 +102,8 @@ class MainActivity :
                             }
 
                             is MainActivityEvent.NavigatePreview -> {
-                                openPreviewFragment()
+                                if (navController.currentDestination?.id != R.id.previewFragment)
+                                    openPreviewFragment()
                             }
                         }
                     }

@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.preview
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -62,7 +61,9 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 mainViewModel.uiState.collect{
-                    previewViewModel.updatePost(it.posts[it.selectedIndex])
+                    if (it.selectedIndex > -1) {
+                        previewViewModel.updatePost(it.posts[it.selectedIndex])
+                    }
                     moveScroll(it.focusedIndex)
                 }
             }
