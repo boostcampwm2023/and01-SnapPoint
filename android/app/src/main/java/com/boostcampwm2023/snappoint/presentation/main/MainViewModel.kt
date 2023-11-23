@@ -69,7 +69,7 @@ class MainViewModel @Inject constructor(
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.004, 10.003),
+                                position = PositionState(10.004, 10.004),
                                 description = "이것은 악어~",
                                 address = "null"
                             ),
