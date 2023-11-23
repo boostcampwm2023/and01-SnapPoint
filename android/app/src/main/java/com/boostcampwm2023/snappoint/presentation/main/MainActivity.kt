@@ -19,6 +19,7 @@ import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -67,6 +69,10 @@ class MainActivity :
         collectViewModelData()
 
         setBottomNavigationEvent()
+
+        binding.fab.setOnClickListener {
+            Log.d("LOG", "Z:${googleMap?.cameraPosition?.zoom} LL:${googleMap?.cameraPosition?.target}")
+        }
     }
 
     private fun initMapFragment() {
@@ -160,45 +166,43 @@ class MainActivity :
     }
 
     private fun moveCameraToFitScreen() {
-        val positions = viewModel.getMediaPositions()
-        if (positions.isEmpty()) {
-            return
-        }
-
-        // 화면 크기 (픽셀 수)
-        val height = binding.run { fcvMainMap.height - sb.height - sb.marginTop - bnv.height } / 2
-        val width = binding.fcvMainMap.width
-        //Log.d("LOG", "$width X $height")
+        val postIndex = viewModel.uiState.value.selectedIndex
+        val snapPoints = viewModel.uiState.value.snapPoints[postIndex]
+        val positions = snapPoints.markerOptions.map { it.position }
 
         // 아프리카 적도기니를 기준
         // latitude: 북반구(+) 남반구(-)
         // longitude: 서쪽(-) 동쪽(+)
-        val top: Double = positions.maxOf { it.latitude }
-        val bottom: Double = positions.minOf { it.latitude }
-        val left: Double = positions.minOf { it.longitude }
-        val right: Double = positions.maxOf { it.longitude }
+        val topOfBound: Double = positions.maxOf { it.latitude }
+        val bottomOfBound: Double = positions.minOf { it.latitude }
+        val leftOfBound: Double = positions.minOf { it.longitude }
+        val rightOfBound: Double = positions.maxOf { it.longitude }
 
-        // zoom과 ppl은 Logcat으로 알아낸 값
-        // 식1: 1 / ppl = 2 ^ (zoom / x) -> x = -0.81031
-        // 식2: zoom = 17, 1 / ppl = 2 ^ (17 / -0.81031) -> ppl = 2067742
-        val heightPerLat: Float = (height / (top - bottom)).toFloat()
-        val widthPerLon: Float = (width / (right - left)).toFloat()
-        val pixelPerLatLng = minOf(heightPerLat, widthPerLon).coerceAtMost(2067742f)
+        val heightOfBound: Double = topOfBound - bottomOfBound
 
-        val shiftUp: Double = (height / pixelPerLatLng.toDouble()) / 1.2
+        // 단위: Pixel
+        val padding: Int = maxOf(binding.topAppBar.height, binding.sb.height)
 
-        val center: LatLng = LatLng((top + bottom) / 2 - shiftUp, (left + right) / 2)
-        val zoom = (-0.81031 * log2(1 / pixelPerLatLng)).coerceAtMost(17.0).toFloat()
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(center, zoom))
+        val upperShadeRange: Double = 1.0 * padding / binding.fcvMainMap.height
+        val lowerShadeRange: Double = 1.2 * Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO
+        val visibleRange: Double = 1.0 - upperShadeRange - lowerShadeRange
 
-        //Log.d("LOG", "PPL: $pixelPerLatLng, ZOOM: $zoom")
-        //Log.d("LOG", googleMap?.cameraPosition?.target.toString())
-        //Log.d("LOG", googleMap?.cameraPosition?.zoom.toString())
+        val newTopOfBound: Double =
+            topOfBound + heightOfBound * upperShadeRange / visibleRange
+        val newBottomOfBound: Double =
+            bottomOfBound - heightOfBound * lowerShadeRange / visibleRange
+
+        val bound: LatLngBounds = LatLngBounds(
+            LatLng(newBottomOfBound, leftOfBound),
+            LatLng(newTopOfBound, rightOfBound)
+        )
+
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bound, padding))
     }
 
     private fun initBottomSheetWithNavigation() {
         binding.bnv.setupWithNavController(navController)
-        bottomSheetBehavior.halfExpandedRatio = 0.45f
+        bottomSheetBehavior.halfExpandedRatio = Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         binding.sb.doOnLayout {
             bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2
