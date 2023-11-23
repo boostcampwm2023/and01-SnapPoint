@@ -93,6 +93,8 @@ dependencies {
 
     //maps
     implementation (libs.play.services.maps)
+    //location
+    implementation (libs.play.services.location)
 
     //mockwebserver
     testImplementation(libs.mockwebserver)

@@ -1,9 +1,13 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.content.Intent
+import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
@@ -17,12 +21,20 @@ import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_PERMISSION_REQUEST_CODE
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
+import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
@@ -57,6 +69,9 @@ class MainActivity :
         BottomSheetBehavior.from(binding.bs)
     }
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,17 +85,44 @@ class MainActivity :
 
         setBottomNavigationEvent()
 
-        binding.fab.setOnClickListener {
-            val intent = Intent(this, CreatePostActivity::class.java)
-            startActivity(intent)
+        initLocationData()
+
+
+    }
+
+
+
+    private fun initLocationData() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                super.onLocationResult(p0)
+                Log.d("TAG", "onLocationResult: ${p0}")
+            }
         }
+
+        cachingBottomSheetSize()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     private fun initMapFragment() {
         val map: SupportMapFragment =
             supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         map.getMapAsync(this)
+    }
 
+    private fun cachingBottomSheetSize() {
+        with(binding) {
+            root.post {
+                viewModel.bottomSheetHeight =
+                    (cl.height * Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO).toInt()
+            }
+        }
     }
 
     private fun collectViewModelData() {
@@ -260,6 +302,10 @@ class MainActivity :
     private fun initBinding() {
         with(binding) {
             vm = viewModel
+
+            fab.setOnClickListener {
+                checkPermissionAndMoveCameraToUserLocation()
+            }
         }
     }
 
@@ -268,8 +314,68 @@ class MainActivity :
 
         googleMap.setOnMarkerClickListener(this)
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(10.0, 10.0), 10f))
+        checkPermissionAndMoveCameraToUserLocation()
+
     }
+
+    @SuppressLint("MissingPermission")
+    private fun checkPermissionAndMoveCameraToUserLocation() {
+        if(this.isMyLocationGranted()){
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener {location ->
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude),17.5f))
+                }
+        }else{
+            locationPermissionRequest()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(this.isMyLocationGranted()){
+            startLocationUpdates()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdates() {
+        fusedLocationClient.requestLocationUpdates(LocationRequest.Builder(1000L).build(),
+            locationCallback,
+            Looper.getMainLooper()
+            )
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
+            super.onRequestPermissionsResult(
+                requestCode,
+                permissions,
+                grantResults
+            )
+            return
+        }
+
+        if (isPermissionGranted(
+                permissions,
+                grantResults,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) || isPermissionGranted(
+                permissions,
+                grantResults,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        ) {
+            Toast.makeText(this, "권한 ㄳ염 ", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "내 위치 정보를 사용하려면 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
 
     override fun onMarkerClick(marker: Marker): Boolean {
