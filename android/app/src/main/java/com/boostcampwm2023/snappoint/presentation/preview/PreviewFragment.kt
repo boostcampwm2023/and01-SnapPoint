@@ -76,7 +76,11 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
     }
 
     private fun setScrollEvent() {
-        binding.rcvPreview.setOnScrollChangeListener { _, _, _, _, _ ->
+        binding.rcvPreview.setOnScrollChangeListener { _, _, _, scrollX, _ ->
+            if (scrollX == 0) {
+                layoutManager.scrollToPosition(mainViewModel.uiState.value.focusedIndex)
+                return@setOnScrollChangeListener
+            }
             val currentFocusImageIndex =
                 layoutManager.getPosition(
                     snapHelper.findSnapView(layoutManager) ?: return@setOnScrollChangeListener
