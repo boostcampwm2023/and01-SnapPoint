@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -16,6 +17,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
@@ -67,7 +69,8 @@ class MainActivity :
         setBottomNavigationEvent()
 
         binding.fab.setOnClickListener {
-            openPreviewFragment()
+            val intent = Intent(this, CreatePostActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -143,7 +146,7 @@ class MainActivity :
 
     private fun drawRoutes(postIndex: Int) {
         val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
-        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.STRING }.map{ block ->
+        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
                     LatLng(block.position.latitude, block.position.longitude)
@@ -153,7 +156,7 @@ class MainActivity :
                     LatLng(block.position.latitude, block.position.longitude)
                 }
 
-                is PostBlockState.STRING -> TODO()
+                is PostBlockState.TEXT -> TODO()
             }
         }
         polylineOptions.addAll(positionList)
