@@ -76,7 +76,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         collectViewModelData()
     }
 
-    fun initBinding() {
+    private fun initBinding() {
         with(binding) {
             vm = viewModel
         }
