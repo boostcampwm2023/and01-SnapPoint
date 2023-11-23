@@ -41,5 +41,5 @@ export class CreateBlockDto {
   @Type(() => CreateBlockFileDto)
   readonly files?: CreateBlockFileDto[];
 
-  order: number;
+  order?: number;
 }

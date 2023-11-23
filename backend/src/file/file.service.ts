@@ -1,4 +1,4 @@
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 import { Injectable } from '@nestjs/common';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';

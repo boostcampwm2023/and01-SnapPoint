@@ -1,6 +1,6 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 import { CreatePostDto } from './dtos/create-post.dto';
 
 @Injectable()
@@ -15,10 +15,6 @@ export class PostService {
 
   async findOne(uuid: string): Promise<Post> {
     const post = await this.prisma.get().post.findUnique({ where: { uuid } });
-
-    if (!post) {
-      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
-    }
 
     return post;
   }

@@ -1,4 +1,4 @@
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 import { Injectable } from '@nestjs/common';
 import { CreateBlockFileDto } from './dtos/create-block-files.dto';
 import { BlockFile, Prisma } from '@prisma/client';

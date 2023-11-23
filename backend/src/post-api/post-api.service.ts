@@ -5,7 +5,7 @@ import { BlockService } from '@/block/block.service';
 import { BlockFileService } from '@/block-file/block-file.service';
 import { BlockDto } from '@/block/dtos/block.dto';
 import { PostDto } from '@/post/dtos/post.dto';
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 import { FileService } from '@/file/file.service';
 import { FileDto } from '@/file/dto/file.dto';
 import { CreateBlockDto } from '@/block/dtos/create-block.dto';
@@ -22,7 +22,7 @@ export class PostApiService {
   ) {}
 
   isMediaBlock(type: string) {
-    if (type === 'media') {
+    if (type === 'image' || type === 'video') {
       return true;
     }
   }
@@ -156,6 +156,11 @@ export class PostApiService {
   async publish(uuid: string, createPostApiDto: CreatePostApiDto) {
     const postDto = await this.prisma.beginTransaction(async () => {
       const { title, blocks } = createPostApiDto;
+      const post = await this.postService.findOne(uuid);
+
+      if (!post) {
+        throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
+      }
 
       await this.postService.update(uuid, { title });
       await this.saveBlocks(uuid, blocks);

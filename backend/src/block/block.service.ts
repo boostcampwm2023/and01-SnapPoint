@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Block } from '@prisma/client';
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 import { CreateBlockDto } from './dtos/create-block.dto';
 
 @Injectable()
