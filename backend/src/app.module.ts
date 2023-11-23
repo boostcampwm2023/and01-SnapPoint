@@ -10,6 +10,9 @@ import { PrismaProvider } from './prisma/prisma.provider';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { RefreshTokenService } from './refresh-token/refresh-token.service';
+import { RefreshTokenModule } from './refresh-token/refresh-token.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -25,8 +28,10 @@ import { ConfigModule } from '@nestjs/config';
       cache: true,
       isGlobal: true,
     }),
+    JwtModule,
+    RefreshTokenModule,
   ],
   controllers: [],
-  providers: [PrismaService, PrismaProvider],
+  providers: [PrismaService, PrismaProvider, RefreshTokenService],
 })
 export class AppModule {}
