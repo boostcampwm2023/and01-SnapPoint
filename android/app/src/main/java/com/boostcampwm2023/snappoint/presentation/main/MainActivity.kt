@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
@@ -31,13 +32,16 @@ import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPe
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
@@ -68,6 +72,7 @@ class MainActivity :
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +87,7 @@ class MainActivity :
 
         setBottomNavigationEvent()
 
-        initLocationClient()
+        initLocationData()
 
         binding.fab.setOnClickListener {
             checkPermissionAndMoveCameraToUserLocation()
@@ -91,8 +96,21 @@ class MainActivity :
 
 
 
-    private fun initLocationClient() {
+    private fun initLocationData() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                super.onLocationResult(p0)
+                Log.d("TAG", "onLocationResult: ${p0}")
+            }
+        }
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     private fun initMapFragment() {
@@ -294,14 +312,27 @@ class MainActivity :
         if(this.isMyLocationGranted()){
             fusedLocationClient.lastLocation
                 .addOnSuccessListener {location ->
-                    Log.d("TAG", "checkPermissionAndMoveCameraToUserLocation: $location")
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.longitude, location.latitude)))
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude),17.5f))
                 }
         }else{
             locationPermissionRequest()
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(this.isMyLocationGranted()){
+            startLocationUpdates()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdates() {
+        fusedLocationClient.requestLocationUpdates(LocationRequest.Builder(1000L).build(),
+            locationCallback,
+            Looper.getMainLooper()
+            )
+    }
 
 
     override fun onRequestPermissionsResult(
