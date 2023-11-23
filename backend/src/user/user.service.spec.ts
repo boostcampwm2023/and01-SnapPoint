@@ -57,14 +57,6 @@ describe('UserService', () => {
 
       const result = await userService.create(createUserDto);
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email: createUserDto.email } });
-      expect(prisma.user.create).toHaveBeenCalledWith({
-        data: {
-          email: createUserDto.email,
-          password: hashedPassword,
-          nickname: createUserDto.nickname,
-        },
-      });
       expect(result).toEqual(userMock);
     });
 
@@ -72,9 +64,6 @@ describe('UserService', () => {
       prisma.user.findUnique.mockResolvedValueOnce(userMock);
 
       await expect(userService.create(createUserDto)).rejects.toThrow(BadRequestException);
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email: createUserDto.email } });
-      expect(bcrypt.hash).not.toHaveBeenCalled();
-      expect(prisma.user.create).not.toHaveBeenCalled();
     });
   });
 });

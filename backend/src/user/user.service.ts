@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaProvider } from '@/prisma.service';
@@ -21,7 +21,7 @@ export class UserService {
     });
 
     if (!createdUser) {
-      throw new InternalServerErrorException();
+      throw new BadRequestException();
     }
 
     return createdUser;
