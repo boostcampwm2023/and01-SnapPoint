@@ -33,6 +33,8 @@ class MainViewModel @Inject constructor(
     )
     val event: SharedFlow<MainActivityEvent> = _event.asSharedFlow()
 
+    var bottomSheetHeight: Int = 0
+
     init {
         loadPosts()
     }
