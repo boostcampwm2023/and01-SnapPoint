@@ -5,14 +5,29 @@ import { PrismaService } from '@/prisma.service';
 import { PrismaModule } from '@/prisma/prisma.module';
 import { PrismaProvider } from '@/prisma/prisma.provider';
 import { mockDeep } from 'jest-mock-extended';
+import { BlockFileService } from '@/block-file/block-file.service';
+import { BucketService } from '@/bucket.service';
+import { FileService } from '@/file/file.service';
+import { PostService } from '@/post/post.service';
+import { PostApiService } from './post-api.service';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule, PostApiController],
-      providers: [BlockService, PrismaService, PrismaProvider],
+      controllers: [PostApiController],
+      imports: [PrismaModule],
+      providers: [
+        PostApiService,
+        PrismaService,
+        PostService,
+        BucketService,
+        BlockService,
+        BlockFileService,
+        PrismaProvider,
+        FileService,
+      ],
     })
       .overrideProvider(PrismaService)
       .useValue(mockDeep<PrismaService>())
