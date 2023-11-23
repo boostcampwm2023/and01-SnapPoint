@@ -22,7 +22,7 @@ export class PostApiService {
   ) {}
 
   isMediaBlock(type: string) {
-    if (type === 'image' || type === 'video') {
+    if (type === 'media') {
       return true;
     }
   }
