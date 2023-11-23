@@ -43,14 +43,9 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         setScrollEvent()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         mainViewModel.onPreviewFragmentClosing()
-
     }
 
     private fun initBinding() {
@@ -65,7 +60,6 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
             root.post {
                 rcvPreview.layoutParams.height =
                     mainViewModel.bottomSheetHeight - glTop.top
-                Log.d("LOG", "${rcvPreview.layoutParams.height}")
             }
         }
     }
