@@ -4,7 +4,6 @@
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -12,44 +11,59 @@ generator client {
 }
 
 model User {
-  seq        Int      @id @default(autoincrement())
-  id         String   @unique @default(uuid())
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
   email      String   @unique
   password   String
   nickname   String
   createdAt  DateTime @default(now())
   modifiedAt DateTime @default(now())
+  isDeleted  Boolean  @default(false)
 }
 
 model Post {
-  seq        Int      @id @default(autoincrement())
-  id         String   @unique @default(uuid())
-  userId     String
-  title      String
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userUuid    String
+  title       String?
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @default(now())
+  isDeleted   Boolean  @default(false)
+  isPublished Boolean  @default(false)
 }
 
 model Like {
-  seq    Int    @id @default(autoincrement())
-  userId String
-  postId String
+  id       Int        @id @default(autoincrement())
+  userUuid String
+  postUuid String
 }
 
 model Block {
-  seq         Int      @id @default(autoincrement())
-  id          String   @unique @default(uuid())
-  postId      String
-  typeSeq     Int
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  postUuid    String
+  type        String
+  order       Int
   content     String
-  order       Decimal
+  latitude    Float?
+  longitude   Float?
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
-  fileName    String?
-  coordinates String?
+  isDeleted   Boolean  @default(false)
 }
 
-model BlockType {
-  seq  Int    @id @default(autoincrement())
-  type String
+model BlockFile {
+  id          Int      @id @default(autoincrement())
+  blockUuid   String
+  fileUuid    String
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userUuid    String
+  url         String   @unique
+  mimeType    String
+  createdAt   DateTime @default(now())
+  isDeleted   Boolean  @default(false)
 }
