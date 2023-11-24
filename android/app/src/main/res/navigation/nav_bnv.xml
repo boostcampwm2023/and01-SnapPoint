@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_bnv"
+    app:startDestination="@id/aroundFragment">
+
+
+    <fragment
+        android:id="@+id/aroundFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.around.AroundFragment"
+        android:label="AroundFragment" />
+    <fragment
+        android:id="@+id/popularPostFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.popularpost.PopularPostFragment"
+        android:label="PopularPostFragment" />
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.setting.SettingFragment"
+        android:label="SettingFragment" />
+    <fragment
+        android:id="@+id/subscriptionFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.subscription.SubscriptionFragment"
+        android:label="SubscriptionFragment" />
+    <fragment
+        android:id="@+id/previewFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.preview.PreviewFragment"
+        android:label="PreviewFragment" />
+</navigation>

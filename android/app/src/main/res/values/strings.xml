@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">SnapPoint</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_post_fragment_appbar_title">게시글 작성하기</string>
+    <string name="create_post_fragment_til_title_hint">제목</string>
+    <string name="item_text_block_til_hint">본문 내용</string>
+    <string name="item_image_block_til_address_hint">이미지 주소</string>
+    <string name="item_image_block_til_description_hint">이미지 설명</string>
+    <string name="create_post_fragment_empty_title">제목을 입력해주세요.</string>
+    <string name="create_post_fragment_empty_blocks">내용을 입력해주세요.</string>
+    <string name="create_post_fragment_empty_text">비어있는 블록이 존재합니다.</string>
+    <string name="create_post_fragment_empty_media">사진이나 동영상을 추가해주세요.</string>
+    <string name="create_post_fragment_post_api_success">요청 성공 !</string>
+    <string name="message_permission_denied">이미지를 추가하려면 저장소에 접근할 수 있는 권한이 필요합니다.</string>
+    <string name="message_permission_required">이미지를 추가하려면 권한을 허용해야 합니다.</string>
+    <string name="menu_around">주변</string>
+    <string name="menu_subscription">구독</string>
+    <string name="menu_popular_post">인기글</string>
+    <string name="menu_settings">설정</string>
+    <string name="activity_main_fab_content_description">present_location_button</string>
+    <string name="activity_main_sb_hint">검색할 주소를 입력하세요.</string>
+    <string name="around_title">주변 게시글</string>
+    <string name="btn_preview_text">미리보기</string>
+    <string name="btn_view_post_text">게시글 보기</string>
+    <string name="create_post_activity_post_creation_success">게시글 작성 성공했습니다 !</string>
+</resources>

@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  email      String   @unique
+  password   String
+  nickname   String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
+  isDeleted  Boolean  @default(false)
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userUuid    String
+  title       String?
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @default(now())
+  isDeleted   Boolean  @default(false)
+  isPublished Boolean  @default(false)
+}
+
+model Like {
+  id       Int        @id @default(autoincrement())
+  userUuid String
+  postUuid String
+}
+
+model Block {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  postUuid    String
+  type        String
+  order       Int
+  content     String
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @default(now())
+  isDeleted   Boolean  @default(false)
+}
+
+model BlockFile {
+  id          Int      @id @default(autoincrement())
+  blockUuid   String
+  fileUuid    String
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userUuid    String
+  url         String   @unique
+  mimeType    String
+  createdAt   DateTime @default(now())
+  isDeleted   Boolean  @default(false)
+}

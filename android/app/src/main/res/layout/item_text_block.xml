@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="stringBlock"
+            type="com.boostcampwm2023.snappoint.presentation.model.PostBlockState.TEXT" />
+
+        <import type="android.view.View"/>
+        <import type="kotlin.jvm.functions.Function0"/>
+        <import type="kotlin.Unit"/>
+        <variable
+            name="onDeleteButtonClick"
+            type="Function0&lt;Unit>" />
+        <variable
+            name="editMode"
+            type="Boolean" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cv_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/til_text"
+            app:cardBackgroundColor="@color/surfaceColor"
+            editMode="@{editMode}">
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <ImageButton
+            android:id="@+id/btn_delete_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_edit_block"
+            app:layout_constraintTop_toTopOf="@id/cv_text"
+            app:layout_constraintBottom_toTopOf="@id/til_text"
+            android:src="@drawable/icon_delete"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            app:tint="@color/errorContainer"
+            android:onClick="@{() -> onDeleteButtonClick.invoke()}"
+            android:visibility="@{editMode ? View.INVISIBLE : View.VISIBLE}"/>
+
+        <ImageButton
+            android:id="@+id/btn_edit_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/cv_text"
+            app:layout_constraintTop_toTopOf="@id/cv_text"
+            app:layout_constraintBottom_toTopOf="@id/til_text"
+            android:src="@drawable/icon_edit"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="@{editMode ? View.INVISIBLE : View.VISIBLE}"/>
+
+        <ImageButton
+            android:id="@+id/btn_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_down"
+            app:layout_constraintTop_toTopOf="@id/cv_text"
+            app:layout_constraintBottom_toTopOf="@id/til_text"
+            android:src="@drawable/icon_arrow_up"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
+
+        <ImageButton
+            android:id="@+id/btn_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_edit_cancel"
+            app:layout_constraintTop_toTopOf="@id/cv_text"
+            app:layout_constraintBottom_toTopOf="@id/til_text"
+            android:src="@drawable/icon_arrow_down"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
+
+        <ImageButton
+            android:id="@+id/btn_edit_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/btn_edit_block"
+            app:layout_constraintTop_toTopOf="@id/cv_text"
+            app:layout_constraintBottom_toTopOf="@id/til_text"
+            android:src="@drawable/icon_cancel"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
+
+        <ImageButton
+            android:id="@+id/btn_edit_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/cv_text"
+            app:layout_constraintTop_toTopOf="@id/cv_text"
+            app:layout_constraintBottom_toTopOf="@id/til_text"
+            android:src="@drawable/icon_check"
+            android:background="?attr/actionBarItemBackground"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginVertical="8dp"
+            android:visibility="@{editMode ? View.VISIBLE : View.INVISIBLE}"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_delete_block"
+            android:hint="@string/item_text_block_til_hint">
+
+            <com.google.android.material.textfield.TextInputEditText
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

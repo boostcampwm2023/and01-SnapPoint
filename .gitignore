@@ -33,3 +33,9 @@
 */!.vscode/tasks.json
 */!.vscode/launch.json
 */!.vscode/extensions.json
+
+# Keep environment variables out of version control
+backend/**/migrations
+*/.env
+/.idea/
+

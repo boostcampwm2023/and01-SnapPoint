@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.preview.PreviewViewModel" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.preview.PreviewFragment">
+
+        <ImageView
+            android:id="@+id/iv_preview_profile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="26dp"
+            android:layout_marginTop="16dp"
+            android:foreground="@drawable/ic_launcher_foreground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_preview_post_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="@{vm.uiState.title}"
+            app:layout_constraintStart_toEndOf="@id/iv_preview_profile"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="제목" />
+
+        <TextView
+            android:id="@+id/tv_preview_post_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:text="@{vm.uiState.timeStamp}"
+            app:layout_constraintStart_toStartOf="@id/tv_preview_post_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title"
+            tools:text="1 Days Ago" />
+
+        <ImageView
+            android:id="@+id/iv_preview_arrow"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginTop="16dp"
+            android:foreground="@drawable/icon_arrow_down_left"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/gl_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="72dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_preview"
+            android:layout_width="match_parent"
+            android:layout_height="232dp"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            app:layoutManager="com.google.android.material.carousel.CarouselLayoutManager"
+            app:layout_constraintTop_toBottomOf="@+id/gl_top"
+            blocks="@{vm.uiState.blocks}"
+            tools:listitem="@layout/item_image_preview" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
