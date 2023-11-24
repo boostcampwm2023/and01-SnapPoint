@@ -175,13 +175,15 @@ class MainActivity :
                     if(postIndex == selectedIndex){
                         drawRoutes(selectedIndex)
                     }
+                    val mediaBlock = viewModel.uiState.value.posts[postIndex].postBlocks
+                        .filterIsInstance<PostBlockState.IMAGE>()
                     snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
                         val focused =
                             (postIndex == viewModel.uiState.value.selectedIndex) && (snapPointIndex == viewModel.uiState.value.focusedIndex)
                         map.addImageMarker(
                             context = this@MainActivity,
                             markerOptions = markerOptions,
-                            uri = "https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcRoT6NNDUONDQmlthWrqIi_frTjsjQT4UZtsJsuxqxLiaFGNl5s3_pBIVxS6-VsFUP_",
+                            uri = mediaBlock[snapPointIndex].content,
                             tag = SnapPointTag(postIndex = postIndex, snapPointIndex = snapPointIndex),
                             focused = focused
                         )
