@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RefreshTokenService } from './refresh-token.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 import { PrismaClient, RefreshToken } from '@prisma/client';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { JwtService } from '@nestjs/jwt';
