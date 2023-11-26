@@ -12,19 +12,13 @@ export class UserService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const createdUser = await this.prisma.get().user.create({
+    return this.prisma.get().user.create({
       data: {
         email: createUserDto.email,
         password: hashedPassword,
         nickname: createUserDto.nickname,
       },
     });
-
-    if (!createdUser) {
-      throw new BadRequestException();
-    }
-
-    return createdUser;
   }
 
   findAll(): Promise<User[]> {
@@ -32,25 +26,17 @@ export class UserService {
   }
 
   async findUserByUniqueInput(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
-    const user = await this.prisma.get().user.findUnique({
+    return this.prisma.get().user.findUnique({
       where,
     });
-
-    return user;
   }
 
-  async findOne(uuid: string): Promise<User> {
-    const user = await this.prisma.get().user.findUnique({
+  async findOne(uuid: string): Promise<User | null> {
+    return this.prisma.get().user.findUnique({
       where: {
         uuid: uuid,
       },
     });
-
-    if (!user) {
-      throw new BadRequestException();
-    }
-
-    return user;
   }
 
   async update(uuid: string, updateUserDto: UpdateUserDto): Promise<User> {
@@ -66,7 +52,7 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
 
-    const updatedUser = await this.prisma.get().user.update({
+    return this.prisma.get().user.update({
       where: {
         uuid: uuid,
       },
@@ -75,8 +61,6 @@ export class UserService {
         nickname: updateUserDto.nickname,
       },
     });
-
-    return updatedUser;
   }
 
   async remove(uuid: string) {
@@ -90,7 +74,7 @@ export class UserService {
       throw new BadRequestException();
     }
 
-    const deletedUser = await this.prisma.get().user.update({
+    return this.prisma.get().user.update({
       where: {
         uuid: uuid,
       },
@@ -98,7 +82,5 @@ export class UserService {
         isDeleted: true,
       },
     });
-
-    return deletedUser;
   }
 }

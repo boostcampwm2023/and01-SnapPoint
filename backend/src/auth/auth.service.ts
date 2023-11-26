@@ -2,10 +2,12 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UserService } from '@/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { LoginAuthDto } from './dto/login-auth.dto';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/refresh-token/refresh-token.service';
 import { RefreshTokenDto } from './dto/refresh-auth.dto';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,10 +30,7 @@ export class AuthService {
     const refreshToken = await this.refreshTokenService.generateRefreshToken(user);
     await this.setCurrentRefreshToken(refreshToken, user.uuid);
 
-    return {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    };
+    return LoginDto.of(accessToken, refreshToken);
   }
 
   async verifyPassword(plainText: string, hash: string) {
@@ -64,7 +63,7 @@ export class AuthService {
 
     const accessToken = await this.refreshTokenService.generateAccessToken(user);
 
-    return { accessToken };
+    return RefreshDto.of(accessToken);
   }
 
   async setCurrentRefreshToken(refreshToken: string, userUuid: string) {

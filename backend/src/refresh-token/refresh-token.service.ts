@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { PrismaProvider } from '@/prisma/prisma.provider';
 import { Prisma, RefreshToken, User } from '@prisma/client';
@@ -14,19 +14,27 @@ export class RefreshTokenService {
   ) {}
 
   async create(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
-    const createdRefreshToken = await this.prisma.get().refreshToken.create({
+    return this.prisma.get().refreshToken.create({
       data: {
         userUuid: createRefreshTokenDto.userUuid,
         token: createRefreshTokenDto.token,
         expiresAt: createRefreshTokenDto.expiresAt,
       },
     });
-
-    return createdRefreshToken;
   }
 
   async update(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
-    const updatedRefreshToken = await this.prisma.get().refreshToken.update({
+    const refreshToken = await this.prisma.get().refreshToken.findUnique({
+      where: {
+        userUuid: createRefreshTokenDto.userUuid,
+      },
+    });
+
+    if (!refreshToken) {
+      throw new BadRequestException();
+    }
+
+    return this.prisma.get().refreshToken.update({
       where: {
         userUuid: createRefreshTokenDto.userUuid,
       },
@@ -35,16 +43,12 @@ export class RefreshTokenService {
         expiresAt: createRefreshTokenDto.expiresAt,
       },
     });
-
-    return updatedRefreshToken;
   }
 
   async findRefreshTokenByUnique(where: Prisma.RefreshTokenWhereUniqueInput): Promise<RefreshToken | null> {
-    const refreshToken = await this.prisma.get().refreshToken.findUnique({
+    return this.prisma.get().refreshToken.findUnique({
       where,
     });
-
-    return refreshToken;
   }
 
   async generateAccessToken(user: User): Promise<string> {

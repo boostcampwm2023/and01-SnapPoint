@@ -1,11 +1,13 @@
-import { Controller, Post, Body, Get, UseGuards, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Response } from 'express';
 import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { UserService } from '@/user/user.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -14,43 +16,36 @@ export class AuthController {
   ) {}
 
   @Post()
+  @ApiOperation({
+    summary: '',
+    description: '',
+  })
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.userService.create(createAuthDto);
   }
 
   @Post('login')
   async login(@Body() loginAuthDto: LoginAuthDto, @Res({ passthrough: true }) res: Response) {
-    const { accessToken, refreshToken } = await this.authService.validateUser(loginAuthDto);
+    const loginDto = await this.authService.validateUser(loginAuthDto);
 
-    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
-    res.cookie('access_token', accessToken, {
+    res.setHeader('Authorization', 'Bearer ' + [loginDto.accessToken, loginDto.refreshToken]);
+    res.cookie('access_token', loginDto.accessToken, {
       httpOnly: true,
     });
-    res.cookie('refresh_token', refreshToken, {
+    res.cookie('refresh_token', loginDto.refreshToken, {
       httpOnly: true,
     });
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
+    return loginDto;
   }
 
   @Post('refresh')
   async refresh(@Body() refreshTokenDto: RefreshTokenDto, @Res({ passthrough: true }) res: Response) {
-    const { accessToken } = await this.authService.refresh(refreshTokenDto);
-    res.setHeader('Authorization', 'Bearer ' + accessToken);
-    res.cookie('access_token', accessToken, {
+    const refreshDto = await this.authService.refresh(refreshTokenDto);
+    res.setHeader('Authorization', 'Bearer ' + refreshDto.accessToken);
+    res.cookie('access_token', refreshDto.accessToken, {
       httpOnly: true,
     });
-    res.send({ access_token: accessToken });
-  }
-
-  @Get('test')
-  @UseGuards(JwtAuthGuard)
-  test() {
-    return {
-      test: 'testtest',
-    };
+    return refreshDto;
   }
 }
