@@ -7,10 +7,21 @@ import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/auth.jwt.strategy';
 import { RefreshTokenService } from '@/refresh-token/refresh-token.service';
 import { UserService } from '@/user/user.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
+import { PrismaService } from '@/prisma.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, UserService, ConfigService, JwtStrategy, ConfigService, RefreshTokenService],
+  providers: [
+    AuthService,
+    UserService,
+    ConfigService,
+    JwtStrategy,
+    ConfigService,
+    RefreshTokenService,
+    PrismaProvider,
+    PrismaService,
+  ],
   imports: [
     PassportModule.register({
       defaultStrategy: 'jwt',

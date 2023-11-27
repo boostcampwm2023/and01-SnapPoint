@@ -3,9 +3,10 @@ import { RefreshTokenService } from './refresh-token.service';
 import { PrismaProvider } from '@/prisma/prisma.provider';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '@/prisma.service';
 
 @Module({
-  providers: [RefreshTokenService, PrismaProvider, ConfigService],
+  providers: [RefreshTokenService, PrismaProvider, ConfigService, PrismaService],
   imports: [
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
