@@ -7,7 +7,7 @@ import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { FileService } from '@/domain/file/file.service';
-import { FileDto } from '@/domain/file/dto/file.dto';
+import { FileDto } from '@/api/file-api/dto/file.dto';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
 import { Block } from '@prisma/client';
 import { UserService } from '@/domain/user/user.service';
@@ -46,7 +46,7 @@ export class PostApiService {
         const blockFiles = await this.blockFileService.findMany({ blockUuid: block.uuid });
         const fileDtos = await Promise.all(
           blockFiles.map(async (blockFile) => {
-            const file = await this.fileService.findOne(blockFile.fileUuid);
+            const file = await this.fileService.findFile({ uuid: blockFile.fileUuid });
             if (!file) {
               throw new NotFoundException(`Cloud not found file with UUID: ${uuid}`);
             }
@@ -103,7 +103,7 @@ export class PostApiService {
 
       if (this.isMediaBlock(block.type)) {
         const attachPromises = uploadFiles.map(async (uploadFile) => {
-          const file = await this.fileService.findOne(uploadFile.uuid);
+          const file = await this.fileService.findFile({ uuid: uploadFile.uuid });
 
           if (!file) {
             throw new NotFoundException(`Cloud not found file with UUID: ${uuid}`);

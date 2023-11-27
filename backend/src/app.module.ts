@@ -15,6 +15,7 @@ import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module'
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { ApiModule } from './api/api.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     }),
     JwtModule,
     RefreshTokenModule,
+    ApiModule,
   ],
   controllers: [],
   providers: [

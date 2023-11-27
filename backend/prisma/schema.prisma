@@ -75,4 +75,6 @@ model File {
   mimeType    String
   createdAt   DateTime @default(now())
   isDeleted   Boolean  @default(false)
+  source      String?
+  sourceUuid  String?
 }
