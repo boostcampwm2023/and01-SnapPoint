@@ -41,21 +41,21 @@ export class AuthService {
   }
 
   async refresh(refreshTokenDto: RefreshTokenDto): Promise<{ accessToken: string }> {
-    const { refresh_token } = refreshTokenDto;
+    const { refreshToken } = refreshTokenDto;
 
-    const decodedRefreshToken = await this.jwtService.verifyAsync(refresh_token, {
+    const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });
 
-    const refreshToken = await this.refreshTokenService.findRefreshTokenByUnique({
+    const refreshTokenEntity = await this.refreshTokenService.findRefreshTokenByUnique({
       userUuid: decodedRefreshToken.uuid,
     });
 
-    if (!refreshToken) {
+    if (!refreshTokenEntity) {
       throw new NotFoundException('리프레시 토큰이 존재하지 않습니다.');
     }
 
-    const user = await this.userService.findUserByUniqueInput({ uuid: refreshToken.userUuid });
+    const user = await this.userService.findUserByUniqueInput({ uuid: refreshTokenEntity.userUuid });
 
     if (!user) {
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
