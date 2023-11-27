@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaProvider } from '@/prisma/prisma.provider';
@@ -71,7 +71,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException();
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
     }
 
     return this.prisma.get().user.update({

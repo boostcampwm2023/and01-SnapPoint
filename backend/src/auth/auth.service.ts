@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '@/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -22,7 +22,7 @@ export class AuthService {
     const user = await this.userService.findUserByUniqueInput({ email: loginAuthDto.email });
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
     }
 
     await this.verifyPassword(loginAuthDto.password, user.password);
@@ -36,7 +36,7 @@ export class AuthService {
   async verifyPassword(plainText: string, hash: string) {
     const isPasswordMatching = await bcrypt.compare(plainText, hash);
     if (!isPasswordMatching) {
-      throw new BadRequestException();
+      throw new BadRequestException('잘못된 비밀번호입니다.');
     }
   }
 
@@ -52,13 +52,13 @@ export class AuthService {
     });
 
     if (!refreshToken) {
-      throw new BadRequestException();
+      throw new NotFoundException('리프레시 토큰이 존재하지 않습니다.');
     }
 
     const user = await this.userService.findUserByUniqueInput({ uuid: refreshToken.userUuid });
 
     if (!user) {
-      throw new BadRequestException();
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
     }
 
     const accessToken = await this.refreshTokenService.generateAccessToken(user);

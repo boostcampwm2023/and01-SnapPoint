@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { PrismaProvider } from '@/prisma/prisma.provider';
 import { Prisma, RefreshToken, User } from '@prisma/client';
@@ -31,7 +31,7 @@ export class RefreshTokenService {
     });
 
     if (!refreshToken) {
-      throw new BadRequestException();
+      throw new NotFoundException('해당 유저의 리프레시 토큰이 존재하지 않습니다.');
     }
 
     return this.prisma.get().refreshToken.update({
