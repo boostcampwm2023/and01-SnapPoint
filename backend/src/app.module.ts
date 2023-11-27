@@ -13,6 +13,8 @@ import { ConfigModule } from '@nestjs/config';
 import { RefreshTokenService } from './refresh-token/refresh-token.service';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -32,6 +34,14 @@ import { JwtModule } from '@nestjs/jwt';
     RefreshTokenModule,
   ],
   controllers: [],
-  providers: [PrismaService, PrismaProvider, RefreshTokenService],
+  providers: [
+    PrismaService,
+    PrismaProvider,
+    RefreshTokenService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
