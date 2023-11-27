@@ -7,7 +7,7 @@ import { RefreshTokenService } from '@/refresh-token/refresh-token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshToken, User } from '@prisma/client';
 import { RefreshTokenDto } from './dto/refresh-auth.dto';
-import { PrismaProvider } from '@/prisma.service';
+import { PrismaProvider } from '@/prisma/prisma.provider';
 
 jest.mock('@nestjs/jwt');
 jest.mock('@nestjs/config');
@@ -74,7 +74,7 @@ describe('AuthSerivce', () => {
 
   describe('refresh', () => {
     const refreshTokenDto: RefreshTokenDto = {
-      refresh_token: 'test_refresh_token',
+      refreshToken: 'test_refresh_token',
     };
     const access_token = 'test_access_token';
     const userMock: User = {
