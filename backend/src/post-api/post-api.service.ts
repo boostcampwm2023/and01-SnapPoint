@@ -1,5 +1,5 @@
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PostService } from '@/post/post.service';
 import { BlockService } from '@/block/block.service';
 import { BlockFileService } from '@/block-file/block-file.service';
@@ -10,6 +10,7 @@ import { FileService } from '@/file/file.service';
 import { FileDto } from '@/file/dto/file.dto';
 import { CreateBlockDto } from '@/block/dtos/create-block.dto';
 import { Block } from '@prisma/client';
+import { UserService } from '@/user/user.service';
 
 @Injectable()
 export class PostApiService {
@@ -18,6 +19,7 @@ export class PostApiService {
     private fileService: FileService,
     private blockService: BlockService,
     private blockFileService: BlockFileService,
+    private userService: UserService,
     private prisma: PrismaProvider,
   ) {}
 
@@ -116,11 +118,19 @@ export class PostApiService {
     return Promise.all(savePromises);
   }
 
-  async write(createPostApiDto: CreatePostApiDto) {
+  async write(createPostApiDto: CreatePostApiDto, uuid: string) {
     const { title, blocks } = createPostApiDto;
 
+    const user = this.userService.findUserByUniqueInput({
+      uuid: uuid,
+    });
+
+    if (!user) {
+      throw new BadRequestException('해당 유저는 존재하지 않습니다.');
+    }
+
     const postDto = await this.prisma.beginTransaction(async () => {
-      const post = await this.postService.create({ userUuid: '6b781970-a1af-4f72-a7db-dc65ada31d4a', title });
+      const post = await this.postService.create({ userUuid: uuid, title });
       await this.saveBlocks(post.uuid, blocks);
       return this.readPost(post.uuid);
     });
@@ -128,11 +138,19 @@ export class PostApiService {
     return postDto;
   }
 
-  async writeAndPublish(createPostApiDto: CreatePostApiDto) {
+  async writeAndPublish(createPostApiDto: CreatePostApiDto, uuid: string) {
     const { title, blocks } = createPostApiDto;
 
+    const user = this.userService.findUserByUniqueInput({
+      uuid: uuid,
+    });
+
+    if (!user) {
+      throw new BadRequestException('해당 유저는 존재하지 않습니다.');
+    }
+
     const postDto = await this.prisma.beginTransaction(async () => {
-      const post = await this.postService.create({ userUuid: '6b781970-a1af-4f72-a7db-dc65ada31d4a', title });
+      const post = await this.postService.create({ userUuid: uuid, title });
       await this.saveBlocks(post.uuid, blocks);
 
       await this.postService.publish(post.uuid);
@@ -142,7 +160,15 @@ export class PostApiService {
     return postDto;
   }
 
-  async save(uuid: string, createPostApiDto: CreatePostApiDto) {
+  async save(uuid: string, createPostApiDto: CreatePostApiDto, userUuid: string) {
+    const user = this.userService.findUserByUniqueInput({
+      uuid: userUuid,
+    });
+
+    if (!user) {
+      throw new BadRequestException('해당 유저는 존재하지 않습니다.');
+    }
+
     const postDto = await this.prisma.beginTransaction(async () => {
       const { title, blocks } = createPostApiDto;
       await this.postService.update(uuid, { title });
@@ -153,7 +179,15 @@ export class PostApiService {
     return postDto;
   }
 
-  async publish(uuid: string, createPostApiDto: CreatePostApiDto) {
+  async publish(uuid: string, createPostApiDto: CreatePostApiDto, userUuid: string) {
+    const user = this.userService.findUserByUniqueInput({
+      uuid: userUuid,
+    });
+
+    if (!user) {
+      throw new BadRequestException('해당 유저는 존재하지 않습니다.');
+    }
+
     const postDto = await this.prisma.beginTransaction(async () => {
       const { title, blocks } = createPostApiDto;
       const post = await this.postService.findOne(uuid);

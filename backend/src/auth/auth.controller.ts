@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { UserService } from '@/user/user.service';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { NoAuth } from '@/decorator/no-auth.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,6 +17,7 @@ export class AuthController {
   ) {}
 
   @Post()
+  @NoAuth()
   @ApiOperation({
     summary: '새로운 유저를 생성하는 API',
     description: '생성한 유저의 정보를 반환한다.',
@@ -27,6 +29,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @NoAuth()
   @ApiOperation({
     summary: '로그인 API',
     description: '엑세스, 리프레시 토큰을 반환한다.',
@@ -48,6 +51,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @NoAuth()
   @ApiOperation({
     summary: '엑세스 토큰 재발급 API',
     description: '새로운 엑세스 토큰을 반환한다.',
