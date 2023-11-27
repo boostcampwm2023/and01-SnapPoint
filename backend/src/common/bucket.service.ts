@@ -1,15 +1,26 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
-import { config } from 'dotenv';
-
-config();
-const { NCP_ACCESS_KEY, NCP_SECRET_KEY, NCP_BUCKET_ENDPOINT, NCP_BUCKET_REGION, NCP_BUCKET_NAME } = process.env;
 
 @Injectable()
 export class BucketService {
   private bucket: S3;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
+    const NCP_ACCESS_KEY = this.configService.get<string>('NCP_ACCESS_KEY');
+    const NCP_SECRET_KEY = this.configService.get<string>('NCP_SECRET_KEY');
+
+    if (!NCP_ACCESS_KEY || !NCP_SECRET_KEY) {
+      throw new Error('Authentication not provided for BucketService.');
+    }
+
+    const NCP_BUCKET_ENDPOINT = this.configService.get<string>('NCP_BUCKET_ENDPOINT');
+    const NCP_BUCKET_REGION = this.configService.get<string>('NCP_BUCKET_REGION');
+
+    if (!NCP_BUCKET_ENDPOINT || !NCP_BUCKET_REGION) {
+      throw new Error('Bucket info not provided for BucketService.');
+    }
+
     this.bucket = new S3({
       endpoint: NCP_BUCKET_ENDPOINT,
       region: NCP_BUCKET_REGION,
@@ -21,6 +32,11 @@ export class BucketService {
   }
 
   async uploadFile(file: Express.Multer.File) {
+    const NCP_BUCKET_NAME = this.configService.get<string>('NCP_BUCKET_NAME');
+    if (!NCP_BUCKET_NAME) {
+      throw new Error('Bucket info not provided for BucketService.');
+    }
+
     return this.bucket
       .upload({
         Bucket: NCP_BUCKET_NAME,
