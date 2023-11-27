@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
-import { BlocksModule } from './block/block.module';
-import { PostModule } from './post/post.module';
-import { BlockFileModule } from './block-file/block-file.module';
-import { PostApiModule } from './post-api/post-api.module';
-import { FileModule } from './file/file.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { PrismaService } from './prisma.service';
-import { PrismaProvider } from './prisma/prisma.provider';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
+import { BlocksModule } from './domain/block/block.module';
+import { PostModule } from './domain/post/post.module';
+import { BlockFileModule } from './domain/block-file/block-file.module';
+import { PostApiModule } from './api/post-api/post-api.module';
+import { FileModule } from './domain/file/file.module';
+import { PrismaModule } from './common/prisma/prisma.module';
+import { PrismaService } from './common/prisma/prisma.service';
+import { PrismaProvider } from './common/prisma/prisma.provider';
+import { UserModule } from './domain/user/user.module';
+import { AuthModule } from './api/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { RefreshTokenService } from './refresh-token/refresh-token.service';
-import { RefreshTokenModule } from './refresh-token/refresh-token.module';
+import { RefreshTokenService } from './domain/refresh-token/refresh-token.service';
+import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 
 @Module({
   imports: [
