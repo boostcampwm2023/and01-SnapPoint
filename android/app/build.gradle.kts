@@ -9,6 +9,8 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 
     kotlin("plugin.serialization") version "1.9.0"
+
+    alias(libs.plugins.googleServices)
 }
 
 android {
@@ -102,4 +104,8 @@ dependencies {
 
     //kotlinx-coroutines-test
     testImplementation(libs.kotlinx.coroutines.test)
+
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }
