@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.login
 
-data class LoginResult(
-    val success: String? = null,
-    val error: Int? = null
-)
+sealed class LoginResult{
+    data class Success(val token: String)
+    data class Fail(val error: Int)
+}
