@@ -160,7 +160,10 @@ class MainViewModel @Inject constructor(
 
     private fun updateSelectedIndex(index: Int){
         _uiState.update {
-            it.copy(selectedIndex = index)
+            it.copy(
+                selectedIndex = index,
+                focusedIndex = 0
+            )
         }
     }
 
@@ -168,7 +171,8 @@ class MainViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isPreviewFragmentShowing = false,
-                selectedIndex = -1
+                selectedIndex = -1,
+                focusedIndex = -1
             )
         }
     }
