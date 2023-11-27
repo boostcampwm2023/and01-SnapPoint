@@ -77,6 +77,7 @@ describe('RefreshTokenService', () => {
 
     it('정상 입력인 경우 특정 유저의 리프레쉬 토큰을 생성한다.', async () => {
       prisma.refreshToken.update.mockResolvedValueOnce(refreshTokenMock);
+      prisma.refreshToken.findUnique.mockResolvedValueOnce(refreshTokenMock);
 
       const result = await service.update(updatedRefreshTokenDtoMock);
 

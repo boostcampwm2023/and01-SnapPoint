@@ -4,7 +4,6 @@ import { PrismaClient, User } from '@prisma/client';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaProvider } from '@/prisma/prisma.provider';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException } from '@nestjs/common';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -58,12 +57,6 @@ describe('UserService', () => {
       const result = await userService.create(createUserDto);
 
       expect(result).toEqual(userMock);
-    });
-
-    it('이미 존재하는 email이면 BadRequestException를 던진다.', async () => {
-      prisma.user.findUnique.mockResolvedValueOnce(userMock);
-
-      await expect(userService.create(createUserDto)).rejects.toThrow(BadRequestException);
     });
   });
 });

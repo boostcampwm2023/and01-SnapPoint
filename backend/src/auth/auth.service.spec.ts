@@ -8,6 +8,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshToken, User } from '@prisma/client';
 import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { PrismaProvider } from '@/prisma/prisma.provider';
+import { PrismaService } from '@/prisma.service';
 
 jest.mock('@nestjs/jwt');
 jest.mock('@nestjs/config');
@@ -22,7 +23,15 @@ describe('AuthSerivce', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, UserService, ConfigService, JwtService, RefreshTokenService, PrismaProvider],
+      providers: [
+        AuthService,
+        UserService,
+        ConfigService,
+        JwtService,
+        RefreshTokenService,
+        PrismaProvider,
+        PrismaService,
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
