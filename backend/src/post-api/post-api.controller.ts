@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { PostApiService } from './post-api.service';
 import { CreatePostApiDto } from './dtos/create-post-api.dto';
 import {
@@ -38,8 +38,9 @@ export class PostApiController {
     type: PostDto,
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
-  create(@Body() createPostDto: CreatePostApiDto) {
-    return this.postApiService.write(createPostDto);
+  create(@Body() createPostDto: CreatePostApiDto, @Req() request: any) {
+    const { uuid } = request.uuid;
+    return this.postApiService.write(createPostDto, uuid);
   }
 
   @Post('/publish')
@@ -52,8 +53,9 @@ export class PostApiController {
     type: PostDto,
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
-  createAndPublish(@Body() createPostDto: CreatePostApiDto) {
-    return this.postApiService.writeAndPublish(createPostDto);
+  createAndPublish(@Body() createPostDto: CreatePostApiDto, @Req() request: any) {
+    const { uuid } = request.uuid;
+    return this.postApiService.writeAndPublish(createPostDto, uuid);
   }
 
   @Put('/:uuid')
@@ -66,8 +68,9 @@ export class PostApiController {
   @ApiNotFoundResponse({ description: '지정한 게시글을 찾을 수 없습니다.' })
   @ApiNotFoundResponse({ description: '지정한 블록을 찾을 수 없습니다.' })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
-  save(@Param('uuid') uuid: string, @Body() savePostDto: CreatePostApiDto) {
-    return this.postApiService.save(uuid, savePostDto);
+  save(@Param('uuid') uuid: string, @Body() savePostDto: CreatePostApiDto, @Req() request: any) {
+    const userUuid = request.uuid;
+    return this.postApiService.save(uuid, savePostDto, userUuid);
   }
 
   @Put('/:uuid/publish')
@@ -78,7 +81,8 @@ export class PostApiController {
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
   @ApiNotFoundResponse({ description: '지정한 블록을 찾을 수 없습니다.' })
   @ApiConflictResponse({ description: '이미 게시된 게시물입니다.' })
-  saveAndPublish(@Param('uuid') uuid: string, @Body() savePostDto: CreatePostApiDto) {
-    return this.postApiService.publish(uuid, savePostDto);
+  saveAndPublish(@Param('uuid') uuid: string, @Body() savePostDto: CreatePostApiDto, @Req() request: any) {
+    const userUuid = request.uuid;
+    return this.postApiService.publish(uuid, savePostDto, userUuid);
   }
 }

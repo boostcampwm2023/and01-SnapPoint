@@ -9,6 +9,7 @@ import { FileService } from '@/file/file.service';
 import { BucketService } from '@/bucket.service';
 import { PrismaModule } from '@/prisma/prisma.module';
 import { PrismaService } from '@/prisma.service';
+import { UserService } from '@/user/user.service';
 
 @Module({
   imports: [PrismaModule],
@@ -22,6 +23,7 @@ import { PrismaService } from '@/prisma.service';
     BlockFileService,
     PrismaProvider,
     FileService,
+    UserService,
   ],
 })
 export class PostApiModule {}
