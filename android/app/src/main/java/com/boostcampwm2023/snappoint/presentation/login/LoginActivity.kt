@@ -15,8 +15,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityLoginBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login) {
 
     private val viewModel: LoginViewModel by viewModels()

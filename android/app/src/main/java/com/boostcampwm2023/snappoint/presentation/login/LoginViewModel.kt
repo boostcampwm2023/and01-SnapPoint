@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.update
 
 class LoginViewModel : ViewModel() {
 
-    private val _loginState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState())
-    val loginState: StateFlow<LoginFormState> = _loginState.asStateFlow()
+    private val _uiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState())
+    val uiState: StateFlow<LoginFormState> = _uiState.asStateFlow()
 
     fun updateUsername(username: String) {
-        _loginState.update {
+        _uiState.update {
             it.copy(
                 isUsernameValid = isUsernameValid(username)
             )
@@ -21,7 +21,7 @@ class LoginViewModel : ViewModel() {
     }
 
     fun updatePassword(password: String) {
-        _loginState.update {
+        _uiState.update {
             it.copy(
                 isPasswordValid = isPasswordValid(password)
             )
@@ -30,7 +30,7 @@ class LoginViewModel : ViewModel() {
 
     fun tryLogin() {
         // TODO
-        _loginState.update {
+        _uiState.update {
             it.copy(
                 isLoginInProgress = true
             )
