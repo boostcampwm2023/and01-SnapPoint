@@ -46,5 +46,5 @@ jobs:
       with:
         appId: ${{ secrets.FIREBASE_APP_ID }}
         serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-        groups: testers
+        groups: "부스트캠프-8기"
         file: android/app/realease/app-release.apk
