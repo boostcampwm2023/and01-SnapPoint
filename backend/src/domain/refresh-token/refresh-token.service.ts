@@ -4,6 +4,7 @@ import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Prisma, RefreshToken, User } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { DeleteRefreshTokenDto } from './dto/delete-refresh-token.dto';
 
 @Injectable()
 export class RefreshTokenService {
@@ -41,6 +42,14 @@ export class RefreshTokenService {
       data: {
         token: createRefreshTokenDto.token,
         expiresAt: createRefreshTokenDto.expiresAt,
+      },
+    });
+  }
+
+  async delete(deleteRefreshTokenDto: DeleteRefreshTokenDto) {
+    return this.prisma.get().refreshToken.delete({
+      where: {
+        userUuid: deleteRefreshTokenDto.userUuid,
       },
     });
   }

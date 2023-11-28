@@ -25,21 +25,6 @@ jobs:
           cd backend
           yarn install --frozen-lockfile
 
-      # - name: env file create
-      #   env:
-      #       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      #       SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
-      #       NCP_DOCKER_REGISTORY: ${{ secrets.NCP_DOCKER_REGISTORY }}
-      #       BUCKET_URL: ${{ secrets.BUCKET_URL }}
-      #       NCP_BUCKET_ENDPOINT: ${{ secrets.NCP_BUCKET_ENDPOINT }}
-      #       NCP_BUCKET_NAME: ${{ secrets.NCP_BUCKET_NAME }}
-      #       NCP_BUCKET_REGION: ${{ secrets.NCP_BUCKET_REGION }}
-      #   run: |
-      #       cd backend
-      #       touch .env
-      #       echo "DATABASE_URL=$DATABASE_URL" >> .env
-      #       echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
-
       - name: Build Docker image
         run: docker build -t ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest ./backend
 
@@ -75,4 +60,4 @@ jobs:
             -e JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" \
             -e JWT_ACCESS_EXPIRATION_TIME="${{ secrets.JWT_ACCESS_EXPIRATION_TIME }}" \
             -e JWT_REFRESH_EXPIRATION_TIME="${{ secrets.JWT_REFRESH_EXPIRATION_TIME }}" \
-            ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
+            ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest 

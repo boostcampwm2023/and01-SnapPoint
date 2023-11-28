@@ -21,8 +21,6 @@ RUN yarn config set cache-folder /var/cache/yarn
 
 COPY package.json /src
 
-COPY .env /src
-
 COPY tsconfig.json /src
 
 COPY yarn.lock /src
@@ -38,4 +36,4 @@ COPY --from=builder /src/dist/ dist
 
 EXPOSE 3000
 
-CMD ["yarn", "start", "migrate", "prod"]
+CMD ["yarn", "start", "prod"]

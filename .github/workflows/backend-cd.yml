@@ -22,18 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-            cd backend
-            yarn install --frozen-lockfile
-
-      - name: env file create
-        env:
-            DATABASE_URL: ${{ secrets.DATABASE_URL }}
-            SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
-        run: |
-            cd backend
-            touch .env
-            echo "DATABASE_URL=$DATABASE_URL" >> .env
-            echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
+          cd backend
+          yarn install --frozen-lockfile
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest ./backend
@@ -47,14 +37,27 @@ jobs:
       - name: SSH into Ubuntu server and pull the latest image
         uses: appleboy/ssh-action@master
         with:
-            host: ${{ secrets.SSH_HOST }}
-            username: ${{ secrets.SSH_USER }}
-            password: ${{ secrets.SSH_PASSWORD }}
-            key: ${{ secrets.SSH_PEM_KEY }}
-            port: ${{ secrets.SSH_PORT }}
-            script: |
-                docker login ${{ secrets.NCP_DOCKER_REGISTORY }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
-                docker pull ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
-                docker stop snap-point-container ner || true
-                docker rm snap-point-container || true
-                docker run -d -p 3000:3000 --name snap-point-container ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_PEM_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker login ${{ secrets.NCP_DOCKER_REGISTORY }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
+            docker stop snap-point-container || true
+            docker rm snap-point-container || true
+            docker image prune -f
+            docker pull ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
+            docker run -d -p 3000:3000 --name snap-point-container \
+            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -e SHADOW_DATABASE_URL="${{ secrets.SHADOW_DATABASE_URL }}" \
+            -e NCP_DOCKER_REGISTORY="${{ secrets.NCP_DOCKER_REGISTORY }}" \
+            -e BUCKET_URL="${{ secrets.BUCKET_URL }}" \
+            -e NCP_BUCKET_ENDPOINT="${{ secrets.NCP_BUCKET_ENDPOINT }}" \
+            -e NCP_BUCKET_NAME="${{ secrets.NCP_BUCKET_NAME }}" \
+            -e NCP_BUCKET_REGION="${{ secrets.NCP_BUCKET_REGION }}" \
+            -e JWT_ACCESS_SECRET="${{ secrets.JWT_ACCESS_SECRET }}" \
+            -e JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" \
+            -e JWT_ACCESS_EXPIRATION_TIME="${{ secrets.JWT_ACCESS_EXPIRATION_TIME }}" \
+            -e JWT_REFRESH_EXPIRATION_TIME="${{ secrets.JWT_REFRESH_EXPIRATION_TIME }}" \
+            ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest 
