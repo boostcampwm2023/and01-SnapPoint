@@ -18,11 +18,10 @@ class AroundViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<AroundUiState> = MutableStateFlow(AroundUiState(
-        onPreviewButtonClicked = { index ->
-            previewButtonClicked(index)
-        }
-    ))
+    private val _uiState: MutableStateFlow<AroundUiState> = MutableStateFlow(
+        AroundUiState(
+            onPreviewButtonClicked = { index -> previewButtonClicked(index) })
+    )
     val uiState: StateFlow<AroundUiState> = _uiState.asStateFlow()
 
     private val _event: MutableSharedFlow<AroundEvent> = MutableSharedFlow(

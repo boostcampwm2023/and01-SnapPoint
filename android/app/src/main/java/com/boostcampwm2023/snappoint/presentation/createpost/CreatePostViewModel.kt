@@ -30,27 +30,15 @@ class CreatePostViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<CreatePostUiState> = MutableStateFlow(CreatePostUiState(
-        onTextChanged = { index, content ->
-            updatePostBlocks(index, content)
+        blockItemEvent = object : BlockItemEventListener {
+            override val onTextChange: (Int, String) -> Unit = { index, content -> updatePostBlocks(index, content) }
+            override val onDeleteButtonClick: (Int) -> Unit = { index -> deletePostBlock(index) }
+            override val onEditButtonClick: (Int) -> Unit = { index -> changeToEditMode(index) }
+            override val onCheckButtonClick: (Int) -> Unit = { position -> clearEditMode(position) }
+            override val onUpButtonClick: (Int) -> Unit = { position -> moveUp(position) }
+            override val onDownButtonClick: (Int) -> Unit = { position -> moveDown(position) }
+            override val onAddressIconClick: (Int) -> Unit = { index -> findAddress(index) }
         },
-        onDeleteButtonClicked = { index ->
-            deletePostBlock(index)
-        },
-        onAddressIconClicked = { index ->
-            findAddress(index)
-        },
-        onEditButtonClicked = { position ->
-            changeToEditMode(position)
-        },
-        onCheckButtonClicked = { position ->
-            clearEditMode(position)
-        },
-        onUpButtonClicked = { position ->
-            moveUp(position)
-        },
-        onDownButtonClicked = { position ->
-            moveDown(position)
-        }
     ))
 
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
@@ -65,7 +53,7 @@ class CreatePostViewModel @Inject constructor(
     fun addTextBlock() {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.plus(PostBlockState.STRING())
+                postBlocks = it.postBlocks.plus(PostBlockState.TEXT())
             )
         }
     }
@@ -106,7 +94,7 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
                     if(index == idx) {
                         when(postBlock){
-                            is PostBlockState.STRING -> postBlock.copy(content = content)
+                            is PostBlockState.TEXT -> postBlock.copy(content = content)
                             is PostBlockState.IMAGE -> postBlock.copy(content = content)
                             is PostBlockState.VIDEO -> TODO()
                         }
@@ -124,13 +112,13 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
                     if (position == index) {
                         when (postBlock) {
-                            is PostBlockState.STRING -> postBlock.copy(isEditMode = true)
+                            is PostBlockState.TEXT -> postBlock.copy(isEditMode = true)
                             is PostBlockState.IMAGE -> postBlock.copy(isEditMode = true)
                             is PostBlockState.VIDEO -> postBlock.copy(isEditMode = true)
                         }
                     } else {
                         when (postBlock) {
-                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.TEXT -> postBlock.copy(isEditMode = false)
                             is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
                             is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
                         }
@@ -146,7 +134,7 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { index, postBlock ->
                     if (position == index) {
                         when (postBlock) {
-                            is PostBlockState.STRING -> postBlock.copy(isEditMode = false)
+                            is PostBlockState.TEXT -> postBlock.copy(isEditMode = false)
                             is PostBlockState.IMAGE -> postBlock.copy(isEditMode = false)
                             is PostBlockState.VIDEO -> postBlock.copy(isEditMode = false)
                         }
@@ -189,17 +177,17 @@ class CreatePostViewModel @Inject constructor(
     }
 
     private fun isValidTextBlock(): Boolean {
-        return _uiState.value.postBlocks.find { it is PostBlockState.STRING && it.content.isEmpty() } == null
+        return _uiState.value.postBlocks.find { it is PostBlockState.TEXT && it.content.isEmpty() } == null
     }
 
     private fun isValidMediaBlock(): Boolean {
-        return _uiState.value.postBlocks.find { (it is PostBlockState.STRING).not() } != null
+        return _uiState.value.postBlocks.find { (it is PostBlockState.TEXT).not() } != null
     }
 
     private fun isValidContents(): Boolean {
         _uiState.value.postBlocks.forEach {
             when(it){
-                is PostBlockState.STRING -> {if(it.content.isEmpty()) return false}
+                is PostBlockState.TEXT -> {if(it.content.isEmpty()) return false}
                 is PostBlockState.IMAGE -> {if(it.content.isEmpty()) return false}
                 is PostBlockState.VIDEO -> {if(it.content.isEmpty()) return false}
             }
@@ -208,7 +196,7 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun onCheckButtonClicked() {
-        println(uiState.value.postBlocks)
+        println(uiState.value)
         if(isValidTitle().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
@@ -221,10 +209,11 @@ class CreatePostViewModel @Inject constructor(
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
             return
         }
-        if(isValidMediaBlock().not()){
+      /*  if(isValidMediaBlock().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
             return
-        }
+        }*/
+
 
         postRepository.postCreatePost(
             title = _uiState.value.title,
@@ -243,6 +232,8 @@ class CreatePostViewModel @Inject constructor(
             }
             .onEach {
                 Log.d("TAG", "onCheckButtonClicked: api request success")
+                Log.d("TAG", "onCheckButtonClicked: ${it}")
+                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
                 _event.tryEmit(CreatePostEvent.NavigatePrev)
             }
             .launchIn(viewModelScope)
@@ -260,7 +251,7 @@ class CreatePostViewModel @Inject constructor(
     private fun findAddress(index: Int) {
 
         when(val target = _uiState.value.postBlocks[index]){
-            is PostBlockState.STRING -> {return}
+            is PostBlockState.TEXT -> {return}
             is PostBlockState.IMAGE -> {
                 _event.tryEmit(CreatePostEvent.FindAddress(index, target.position))
             }
@@ -279,7 +270,7 @@ class CreatePostViewModel @Inject constructor(
                         when(postBlock){
                             is PostBlockState.IMAGE ->  PostBlockState.IMAGE(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
                             is PostBlockState.VIDEO -> PostBlockState.VIDEO(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
-                            is PostBlockState.STRING -> postBlock
+                            is PostBlockState.TEXT -> postBlock
                         }
                     }else{
                         postBlock

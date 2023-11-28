@@ -1,13 +1,13 @@
 package com.boostcampwm2023.snappoint.presentation.preview
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPreviewBinding
@@ -35,19 +35,16 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
+        initViewSize()
+
         collectViewModelData()
 
         setScrollEvent()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         mainViewModel.onPreviewFragmentClosing()
-
     }
 
     private fun initBinding() {
@@ -57,18 +54,47 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         }
     }
 
+    private fun initViewSize() {
+        with(binding) {
+            root.post {
+                rcvPreview.layoutParams.height =
+                    mainViewModel.bottomSheetHeight - glTop.top
+            }
+        }
+    }
+
     private fun collectViewModelData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 mainViewModel.uiState.collect{
-                    previewViewModel.updatePost(it.posts[it.selectedIndex])
+                    if (it.selectedIndex > -1) {
+                        previewViewModel.updatePost(it.posts[it.selectedIndex])
+                    }
+                    moveScroll(it.focusedIndex)
                 }
             }
         }
     }
 
+    private fun moveScroll(focusedSnapPointIndex: Int) {
+        if (binding.rcvPreview.scrollState == RecyclerView.SCROLL_STATE_IDLE)
+            layoutManager.scrollToPosition(focusedSnapPointIndex)
+    }
+
     private fun setScrollEvent() {
-        binding.rcvPreview.setOnScrollChangeListener { _, _, _, _, _ ->
+        binding.rcvPreview.setOnScrollChangeListener { _, _, _, scrollX, _ ->
+            if (scrollX == 0) {
+                layoutManager.scrollToPosition(mainViewModel.uiState.value.focusedIndex)
+                return@setOnScrollChangeListener
+            }
+            val currentFocusImageIndex =
+                layoutManager.getPosition(
+                    snapHelper.findSnapView(layoutManager) ?: return@setOnScrollChangeListener
+                )
+
+            if (mainViewModel.uiState.value.focusedIndex != currentFocusImageIndex) {
+                mainViewModel.focusOfImageMoved(currentFocusImageIndex)
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
@@ -34,6 +33,8 @@ class MainViewModel @Inject constructor(
     )
     val event: SharedFlow<MainActivityEvent> = _event.asSharedFlow()
 
+    var bottomSheetHeight: Int = 0
+
     init {
         loadPosts()
     }
@@ -45,65 +46,65 @@ class MainViewModel @Inject constructor(
                     PostSummaryState(
                         title = "하이",
                         author = "원승빈",
-                        timeStamp = "123",
+                        timeStamp = "2 Days Ago",
                         postBlocks = listOf(
-                            PostBlockState.STRING(
+                            PostBlockState.TEXT(
                                 content = "안녕하세요, 하하"
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://health.chosun.com/site/data/img_dir/2023/07/17/2023071701753_0.jpg",
-                                position = PositionState(10.0, 10.0),
+                                position = PositionState(37.421793077676774, -122.09180117366115),
                                 description = "고양이입니다.",
-                                address = "고양이를 발견한 동네"
+                                address = "null"
                             ),PostBlockState.IMAGE(
                                 content = "https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201901/20/28017477-0365-4a43-b546-008b603da621.jpg",
-                                position = PositionState(10.1, 10.1),
+                                position = PositionState(37.41887606344049, -122.0879954078449),
                                 description = "강아징입니다.",
-                                address = "내가 키우는 강아지"
+                                address = "null"
                             ),
-                            PostBlockState.STRING(
+                            PostBlockState.TEXT(
                                 content = "ㅎㅇ염"
-                            ),PostBlockState.STRING(
+                            ),PostBlockState.TEXT(
                                 content = "동물원갔다왔슴다 ㅋ"
                             ),
                             PostBlockState.IMAGE(
                                 content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.4, 10.3),
+                                position = PositionState(37.42155682099068, -122.08342886715077),
                                 description = "이것은 악어~",
-                                address = "제일 좋아하는 동물이에용"
+                                address = "null"
                             ),
                             PostBlockState.IMAGE(
-                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.8, 9.8),
-                                description = "이것은 악어~",
-                                address = "제일 좋아하는 동물이에용"
+                                content = "https://upload.wikimedia.org/wikipedia/commons/4/41/Siberischer_tiger_de_edit02.jpg",
+                                position = PositionState(37.4227919844394, -122.08028507548029),
+                                description = "어흥",
+                                address = "null"
                             ),
                         )
                     ),
                     PostSummaryState(
-                        title = "마커 테스트",
-                        author = "TEST",
-                        timeStamp = "1",
+                        title = "여름 철새 구경",
+                        author = "익명",
+                        timeStamp = "3 Weeks Ago",
                         postBlocks = listOf(
-                            PostBlockState.STRING(
+                            PostBlockState.TEXT(
                                 content = "123"
                             ),
                             PostBlockState.IMAGE(
-                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.0, 9.7),
-                                description = "test",
+                                content = "https://upload.wikimedia.org/wikipedia/commons/8/85/Columbina_passerina.jpg",
+                                position = PositionState(37.40837052881207, -122.10293026989889),
+                                description = "비둘기야 먹자 구구구구",
                                 address = "address"
                             ),
                             PostBlockState.IMAGE(
-                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(9.9, 10.1),
-                                description = "test",
+                                content = "https://upload.wikimedia.org/wikipedia/commons/f/f0/Nipponia_nippon_20091230131054.png",
+                                position = PositionState(37.40272239693208, -122.06577824456974),
+                                description = "떴따 오기",
                                 address = "address"
                             ),
                             PostBlockState.IMAGE(
-                                content = "https://i.namu.wiki/i/Nvsy3_i1lyInOB79UBbcDeR6MocJ4C8TBN8NjepPwqTnojCbb3Xwge9gQXfAGgW74ZA3c3i16odhBLE0bSwgFA.webp",
-                                position = PositionState(10.3, 10.5),
-                                description = "test",
+                                content = "https://upload.wikimedia.org/wikipedia/commons/8/82/Watercock_%28Gallicrex_cinerea%29.jpg",
+                                position = PositionState(37.414911773823924, -122.0536102126485),
+                                description = "뜸 부기",
                                 address = "address"
                             ),
                         )
@@ -130,7 +131,6 @@ class MainViewModel @Inject constructor(
                 }
             )
         }
-
     }
 
     fun drawerIconClicked() {
@@ -144,8 +144,6 @@ class MainViewModel @Inject constructor(
     fun appbarCloseIconClicked() {
         _event.tryEmit(MainActivityEvent.NavigateClose)
     }
-
-
 
     fun previewButtonClicked(index: Int) {
         updateSelectedIndex(index = index)
@@ -166,7 +164,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
     fun onPreviewFragmentClosing() {
         _uiState.update {
             it.copy(
@@ -184,6 +181,11 @@ class MainViewModel @Inject constructor(
 
     fun onMarkerClicked(tag: SnapPointTag) {
         updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
+        _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
+    }
+
+    fun focusOfImageMoved(imageIndex: Int) {
+        updateClickedSnapPoint(_uiState.value.selectedIndex, imageIndex)
     }
 
     private fun updateClickedSnapPoint(postIndex: Int, snapPointIndex: Int) {
@@ -193,5 +195,4 @@ class MainViewModel @Inject constructor(
                 focusedIndex = snapPointIndex)
         }
     }
-
 }

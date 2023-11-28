@@ -9,13 +9,7 @@ import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 class CreatePostListAdapter(
-    private val onAddressIconClicked: (Int) -> Unit,
-    private val onContentChanged: (Int, String) -> Unit,
-    private val onDeleteButtonClicked: (Int) -> Unit,
-    private val onEditButtonClicked: (Int) -> Unit,
-    private val onCheckButtonClicked: (Int) -> Unit,
-    private val onUpButtonClicked: (position: Int) -> Unit,
-    private val onDownButtonClicked: (position: Int) -> Unit,
+    private val blockItemEvent: BlockItemEventListener
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
     private var blocks: MutableList<PostBlockState> = mutableListOf()
@@ -50,7 +44,7 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (blocks[position]) {
-            is PostBlockState.STRING -> ViewType.STRING.ordinal
+            is PostBlockState.TEXT -> ViewType.STRING.ordinal
             is PostBlockState.IMAGE -> ViewType.IMAGE.ordinal
             is PostBlockState.VIDEO -> ViewType.VIDEO.ordinal
         }
@@ -58,29 +52,30 @@ class CreatePostListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
+        val itemEvent = object : BlockItemEventListener {
+            override val onTextChange: (Int, String) -> Unit = blockItemEvent.onTextChange
+            override val onDeleteButtonClick: (Int) -> Unit = { index ->
+                blockItemEvent.onDeleteButtonClick(index)
+                deleteBlocks(index)
+            }
+            override val onEditButtonClick: (Int) -> Unit = blockItemEvent.onEditButtonClick
+            override val onCheckButtonClick: (Int) -> Unit = blockItemEvent.onCheckButtonClick
+            override val onUpButtonClick: (Int) -> Unit = { index ->
+                blockItemEvent.onUpButtonClick(index)
+                moveUpBlock(index)
+            }
+            override val onDownButtonClick: (Int) -> Unit = { index ->
+                blockItemEvent.onDownButtonClick(index)
+                moveDownBlock(index)
+            }
+            override val onAddressIconClick: (Int) -> Unit = blockItemEvent.onAddressIconClick
+        }
 
         when (viewType) {
             ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     binding = ItemImageBlockBinding.inflate(inflater, parent, false),
-                    onContentChanged = onContentChanged,
-                    onAddressIconClicked = { index ->
-                        onAddressIconClicked(index)
-                    },
-                    onDeleteButtonClicked = { index ->
-                        onDeleteButtonClicked(index)
-                        deleteBlocks(index)
-                    },
-                    onEditButtonClicked = onEditButtonClicked,
-                    onCheckButtonClicked = onCheckButtonClicked,
-                    onUpButtonClicked = { index ->
-                        onUpButtonClicked(index)
-                        moveUpBlock(index)
-                    },
-                    onDownButtonClicked = { index ->
-                        onDownButtonClicked(index)
-                        moveDownBlock(index)
-                    },
+                    blockItemEvent = itemEvent
                 )
             }
 
@@ -90,15 +85,7 @@ class CreatePostListAdapter(
         }
         return BlockItemViewHolder.TextBlockViewHolder(
             binding = ItemTextBlockBinding.inflate(inflater, parent, false),
-            onContentChanged = onContentChanged,
-            onDeleteButtonClicked = { index ->
-                onDeleteButtonClicked(index)
-                deleteBlocks(index)
-            },
-            onEditButtonClicked = onEditButtonClicked,
-            onCheckButtonClicked = onCheckButtonClicked,
-            onUpButtonClicked = onUpButtonClicked,
-            onDownButtonClicked = onDownButtonClicked,
+            blockItemEvent = itemEvent
         )
     }
 
@@ -108,7 +95,7 @@ class CreatePostListAdapter(
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.STRING, position)
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.TEXT, position)
             is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.IMAGE, position)
         }
     }
@@ -132,35 +119,12 @@ class CreatePostListAdapter(
     }
 }
 
-@BindingAdapter(
-    "blocks",
-    "onContentChange",
-    "onDeleteButtonClick",
-    "onEditButtonClick",
-    "onCheckButtonClick",
-    "onUpButtonClick",
-    "onDownButtonClick",
-    "onAddressIconClick"
-)
+@BindingAdapter("blocks", "blockItemEvent")
 fun RecyclerView.bindRecyclerViewAdapter(
     blocks: List<PostBlockState>,
-    onContentChanged: (Int, String) -> Unit,
-    onDeleteButtonClicked: (Int) -> Unit,
-    onEditButtonClicked: (Int) -> Unit,
-    onCheckButtonClicked: (Int) -> Unit,
-    onUpButtonClicked: (Int) -> Unit,
-    onDownButtonClicked: (Int) -> Unit,
-    onAddressIconClicked: (Int) -> Unit
+    blockItemEvent: BlockItemEventListener
 ) {
-    if (adapter == null) adapter = CreatePostListAdapter(
-        onDeleteButtonClicked = onDeleteButtonClicked,
-        onContentChanged = onContentChanged,
-        onEditButtonClicked = onEditButtonClicked,
-        onCheckButtonClicked = onCheckButtonClicked,
-        onUpButtonClicked = onUpButtonClicked,
-        onDownButtonClicked = onDownButtonClicked,
-        onAddressIconClicked = onAddressIconClicked
-    )
+    if (adapter == null) adapter = CreatePostListAdapter(blockItemEvent)
 
     when {
         // 아이템 추가

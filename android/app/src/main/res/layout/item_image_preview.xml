@@ -27,12 +27,14 @@
             android:id="@+id/tv_preview_image_description"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="20dp"
-            android:textSize="18sp"
-            android:shadowColor="#FFFFFF"
-            android:textColor="#000000"
-            android:shadowRadius="80.0"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
             android:gravity="bottom"
-            android:textAlignment="gravity" />
+            android:shadowColor="@color/black"
+            android:shadowRadius="12.0"
+            android:textAlignment="gravity"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
     </com.google.android.material.carousel.MaskableFrameLayout>
 </layout>

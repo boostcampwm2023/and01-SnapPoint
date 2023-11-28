@@ -10,7 +10,13 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
     <application
+        android:usesCleartextTraffic="true"
         android:name=".SnapPointApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -42,6 +48,11 @@
 
         <activity
             android:name=".presentation.markerpointselector.MarkerPointSelectorActivity"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".presentation.createpost.CreatePostActivity"
             android:exported="true">
         </activity>
     </application>
