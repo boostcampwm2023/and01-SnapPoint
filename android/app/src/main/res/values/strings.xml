@@ -27,5 +27,5 @@
     <string name="login_activity_e_mail">E-MAIL</string>
     <string name="login_activity_password">PASSWORD</string>
     <string name="login_activity_sign_in">SIGN IN</string>
-    <string name="login_activity_fail">로그인에 실패했습니다.</string>
+    <string name="login_activity_fail">이메일 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.</string>
 </resources>
