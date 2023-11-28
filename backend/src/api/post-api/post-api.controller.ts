@@ -27,7 +27,7 @@ export class PostApiController {
 
   readPosts() {}
 
-  @Post('/')
+  @Post('/publish')
   @UsePipes(PostRequestDecompositionPipe, validationPipe)
   @ApiOperation({
     summary: '게시글을 작성하는 API',
@@ -39,9 +39,10 @@ export class PostApiController {
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
   writePost(@Body() postDto: ComposedPostDto, @Req() request: any) {
-    const { uuid: userUuid } = request.user;
+    request;
+    // const { uuid: userUuid } = request.user;
     Logger.debug(inspect(postDto));
-    return this.postApiService.writePost(postDto, userUuid);
+    return this.postApiService.writePost(postDto, 'c6a7c590-6239-4d12-ad8f-c8065db60d6a');
   }
 
   @Put('/:uuid')
