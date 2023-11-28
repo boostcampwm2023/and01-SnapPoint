@@ -20,7 +20,9 @@ class AroundViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<AroundUiState> = MutableStateFlow(
         AroundUiState(
-            onPreviewButtonClicked = { index -> previewButtonClicked(index) })
+            onPreviewButtonClicked = { index -> previewButtonClicked(index) },
+            onViewPostButtonClicked = { index -> viewPostButtonClicked(index) }
+        )
     )
     val uiState: StateFlow<AroundUiState> = _uiState.asStateFlow()
 
@@ -40,5 +42,10 @@ class AroundViewModel @Inject constructor(
 
     private fun previewButtonClicked(index: Int) {
         _event.tryEmit(AroundEvent.ShowSnapPointAndRoute(index))
+    }
+
+    // TODO - uuid 전달하여 ViewPostActivity에서 uuid를 통해 게시글 정보 받아오도록 수정
+    private fun viewPostButtonClicked(index: Int) {
+        _event.tryEmit(AroundEvent.ViewPost(index))
     }
 }

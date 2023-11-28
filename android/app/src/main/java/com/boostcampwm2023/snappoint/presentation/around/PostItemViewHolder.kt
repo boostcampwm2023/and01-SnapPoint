@@ -17,6 +17,7 @@ class PostItemViewHolder(
     private val binding: ItemAroundPostBinding,
     private val onExpandButtonClicked: (Int) -> Unit,
     private val onPreviewButtonClicked: (Int) -> Unit,
+    private val onViewPostButtonClicked: (Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
 
@@ -38,9 +39,11 @@ class PostItemViewHolder(
                 toggleLayout(expandState, it, layoutExpanded)
                 onExpandButtonClicked(index)
             }
-
             btnPreviewPost.setOnClickListener {
                 onPreviewButtonClicked(index)
+            }
+            btnViewPost.setOnClickListener {
+                onViewPostButtonClicked(index)
             }
         }
     }
