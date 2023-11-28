@@ -1,14 +1,8 @@
 on:
   pull_request:
-<<<<<<< HEAD
-      branches:
-      - relase-be-develop
-      types:
-=======
     branches:
-      - relase-be-develop
+      - release-be-develop
     types:
->>>>>>> f89465e ([SETTING]: JWT key 추가, env 추가 변경)
       - closed
 
 jobs:
@@ -31,22 +25,6 @@ jobs:
           cd backend
           yarn install --frozen-lockfile
 
-<<<<<<< HEAD
-      - name: env file create
-        env:
-            DATABASE_URL: ${{ secrets.DATABASE_URL }}
-            SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
-            NCP_DOCKER_REGISTORY: ${{ secrets.NCP_DOCKER_REGISTORY }}
-            BUCKET_URL: ${{ secrets.BUCKET_URL }}
-            NCP_BUCKET_ENDPOINT: ${{ secrets.NCP_BUCKET_ENDPOINT }}
-            NCP_BUCKET_NAME: ${{ secrets.NCP_BUCKET_NAME }}
-            NCP_BUCKET_REGION: ${{ secrets.NCP_BUCKET_REGION }}
-        run: |
-            cd backend
-            touch .env
-            echo "DATABASE_URL=$DATABASE_URL" >> .env
-            echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
-=======
       # - name: env file create
       #   env:
       #       DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -61,7 +39,6 @@ jobs:
       #       touch .env
       #       echo "DATABASE_URL=$DATABASE_URL" >> .env
       #       echo "SHADOW_DATABASE_URL=$SHADOW_DATABASE_URL" >> .env
->>>>>>> f89465e ([SETTING]: JWT key 추가, env 추가 변경)
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest ./backend
