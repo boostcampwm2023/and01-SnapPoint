@@ -1,12 +1,18 @@
 package com.boostcampwm2023.snappoint.presentation.login
 
+import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.LoginRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -23,6 +29,12 @@ class LoginViewModel @Inject constructor(
 
     private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState())
     val loginFormUiState: StateFlow<LoginFormState> = _loginFormUiState.asStateFlow()
+
+    private val _event: MutableSharedFlow<LoginEvent> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val event: SharedFlow<LoginEvent> = _event.asSharedFlow()
 
     fun updateEmail(email: String) {
         _loginFormUiState.update {
@@ -41,24 +53,33 @@ class LoginViewModel @Inject constructor(
     }
 
     fun tryLogin() {
-        loginRepository.postLogin(loginFormUiState.value.isEmailValid.toString(), loginFormUiState.value.isPasswordValid.toString())
+        loginRepository.postLogin(
+            "abc@abc.abc",
+            "abcdabcd"
+        )
             .onStart {
-                _loginFormUiState.update {
-                    it.copy(
-                        isLoginInProgress = true
-                    )
-                }
+                setProgressBarState(true)
             }
             .onEach {
-
+                _event.emit(LoginEvent.Success(it))
+                Log.d("LOG", it)
             }
             .catch {
-
+                _event.emit(LoginEvent.Fail(R.string.app_name))
+                Log.d("LOG", "CATCH: ${it.message}")
             }
             .onCompletion {
-
+                setProgressBarState(false)
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun setProgressBarState(isInProgress: Boolean) {
+        _loginFormUiState.update {
+            it.copy(
+                isLoginInProgress = isInProgress
+            )
+        }
     }
 
     private fun isEmailValid(username: String): Boolean {
