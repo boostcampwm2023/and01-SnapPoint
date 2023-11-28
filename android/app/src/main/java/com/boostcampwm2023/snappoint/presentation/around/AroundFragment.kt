@@ -11,7 +11,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentAroundBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
-import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
 import com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,16 +43,20 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
                                 mainViewModel.previewButtonClicked(event.index)
                             }
 
-                            is AroundEvent.ViewPost -> {
-                                val intent = Intent(requireContext(), ViewPostActivity::class.java)
-                                intent.putExtra("index", event.index)
-                                startActivity(intent)
+                            is AroundEvent.NavigateViewPost -> {
+                                navigateToViewPost(event.index)
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun navigateToViewPost(index: Int) {
+        val intent = Intent(requireContext(), ViewPostActivity::class.java)
+        intent.putExtra("index", index)
+        startActivity(intent)
     }
 
     private fun initBinding() {

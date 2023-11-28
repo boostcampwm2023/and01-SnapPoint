@@ -36,7 +36,7 @@ sealed class PostBlockState(open val content: String, open val isEditMode: Boole
     ) : PostBlockState(content, isEditMode, uuid)
 
     enum class ViewType {
-        STRING,
+        TEXT,
         IMAGE,
         VIDEO,
     }
