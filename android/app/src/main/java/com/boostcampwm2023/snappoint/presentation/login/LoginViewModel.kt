@@ -42,6 +42,6 @@ class LoginViewModel : ViewModel() {
     }
 
     private fun isPasswordValid(password: String): Boolean {
-        return password.length > 5
+        return password.isNotEmpty()
     }
 }
