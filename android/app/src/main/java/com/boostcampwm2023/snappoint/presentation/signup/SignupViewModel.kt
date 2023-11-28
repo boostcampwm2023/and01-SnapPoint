@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,27 @@ class SignupViewModel : ViewModel() {
     fun updateNickname(nickname: String) {
         _uiState.update {
             it.copy(nickname = nickname)
+        }
+    }
+
+    fun trySignup() {
+        with(uiState.value) {
+            val email = email
+            val password = password
+            val passwordConfirm = passwordConfirm
+            val nickname = nickname
+
+            if (password != passwordConfirm) {
+                Log.d("LOG", "mismatch")
+            } else if (!Regex("[a-zA-Z]+").matches(password)) {
+                Log.d("LOG", "alphabet")
+            } else if (!Regex("[0-9]").matches(password)) {
+                Log.d("LOG", "number")
+            } else if (!Regex("[!@#$%^&*()\\-_]").matches(password)) {
+                Log.d("LOG", "special char")
+            } else {
+
+            }
         }
     }
 }
