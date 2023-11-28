@@ -71,7 +71,7 @@ export class AuthController {
   @NoAuth()
   @ApiOperation({
     summary: '로그아웃 API',
-    description: '',
+    description: '로그아웃에 성공하면 201번을 반환한다.',
   })
   @ApiOkResponse({ description: '성공적으로 로그아웃이 완료되었습니다.' })
   async logout(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
