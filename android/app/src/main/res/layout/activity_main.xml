@@ -74,7 +74,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:layout_anchor="@id/sb"
-                    android:id="@+id/sv"/>
+                    android:id="@+id/sv">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rcv_search_auto_complete"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        autoCompleteTexts="@{vm.searchViewUiState.texts}"/>
+
+                </com.google.android.material.search.SearchView>
 
                 <LinearLayout
                     android:id="@+id/bs"

@@ -347,9 +347,12 @@ class MainActivity :
 
         placesClient.findAutocompletePredictions(request)
             .addOnSuccessListener { response ->
-                for (prediction in response.autocompletePredictions) {
-                    println(prediction.getFullText(null).toString())
-                }
+//                for (prediction in response.autocompletePredictions) {
+//                    println(prediction.getFullText(null).toString())
+//                }
+                viewModel.updateAutoCompleteTexts(response.autocompletePredictions.map {
+                    it.getFullText(null).toString()
+                })
             }.addOnFailureListener { exception ->
                 if (exception is ApiException) {
                     Log.e("TAG", "Place not found: ${exception.statusCode}")

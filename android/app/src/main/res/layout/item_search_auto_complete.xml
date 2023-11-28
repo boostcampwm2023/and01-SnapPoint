@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="String" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/iv_marker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_location_pin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_auto_complete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{item}"
+            android:textSize="16sp"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/iv_marker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iv_marker"
+            app:layout_constraintBottom_toBottomOf="@id/iv_marker"
+            tools:text="울산광역시 중구 신기11길 10-10"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
