@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -32,11 +31,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
             if (map.containsValue(false).not()) {
                 launchImageSelectionLauncher()
             } else {
-                Toast.makeText(
-                    this,
-                    getString(R.string.message_permission_denied),
-                    Toast.LENGTH_SHORT
-                ).show()
+                showToastMessage(R.string.message_permission_denied)
             }
         }
 
@@ -105,12 +100,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                     }
                 }
             }
-
         }
-    }
-
-    private fun showToastMessage(resId: Int) {
-        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
     }
 
     private fun selectImage() {
@@ -150,16 +140,11 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
 
         if (permissionCheck.isNotEmpty()) {
             if (permissionCheck.any { shouldShowRequestPermissionRationale(it) }) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.message_permission_required),
-                    Toast.LENGTH_SHORT
-                ).show()
+                showToastMessage(R.string.message_permission_required)
             }
         }
         imagePermissionLauncher.launch(permissions)
     }
-
 
     private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
         val intent = Intent(this, MarkerPointSelectorActivity::class.java)
