@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,12 +25,14 @@ import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants
+import com.boostcampwm2023.snappoint.presentation.util.Constants.API_KEY
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_PERMISSION_REQUEST_CODE
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -45,10 +49,23 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -59,6 +76,8 @@ class MainActivity :
 {
     private val viewModel: MainViewModel by viewModels()
     private var googleMap: GoogleMap? = null
+    private lateinit var placesClient: PlacesClient
+    private val token = AutocompleteSessionToken.newInstance()
 
     private val navController: NavController by lazy {
         (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment).findNavController()
@@ -74,6 +93,8 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        initPlacesClient()
+
         initBinding()
 
         initBottomSheetWithNavigation()
@@ -85,6 +106,11 @@ class MainActivity :
         setBottomNavigationEvent()
 
         initLocationData()
+    }
+
+    private fun initPlacesClient() {
+        Places.initializeWithNewPlacesApiEnabled(applicationContext, API_KEY)
+        placesClient = Places.createClient(this)
     }
 
     private fun initLocationData() {
@@ -296,6 +322,7 @@ class MainActivity :
         binding.dl.open()
     }
 
+    @OptIn(FlowPreview::class)
     private fun initBinding() {
         with(binding) {
             vm = viewModel
@@ -303,7 +330,40 @@ class MainActivity :
             fab.setOnClickListener {
                 checkPermissionAndMoveCameraToUserLocation()
             }
+
+            sv.editText.onTextChanged()
+                .filterNot { it.isBlank() }
+                .debounce(500)
+                .onEach { query -> getAddressAutoCompletion(query) }
+                .launchIn(lifecycleScope)
         }
+    }
+
+    private fun getAddressAutoCompletion(query: String) {
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setSessionToken(token)
+            .setQuery(query)
+            .build()
+
+        placesClient.findAutocompletePredictions(request)
+            .addOnSuccessListener { response ->
+                for (prediction in response.autocompletePredictions) {
+                    println(prediction.getFullText(null).toString())
+                }
+            }.addOnFailureListener { exception ->
+                if (exception is ApiException) {
+                    Log.e("TAG", "Place not found: ${exception.statusCode}")
+                }
+            }
+    }
+
+    private fun EditText.onTextChanged(): Flow<String> {
+        return callbackFlow {
+            val listener = doAfterTextChanged {
+                trySend(it.toString())
+            }
+            awaitClose { removeTextChangedListener(listener) }
+        }.onStart { emit("") }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
