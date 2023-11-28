@@ -40,4 +40,8 @@ abstract class BaseFragment<B : ViewDataBinding>(
     protected fun showToastMessage(resId: Int) {
         Toast.makeText(activity, getString(resId), Toast.LENGTH_LONG).show()
     }
+
+    protected fun showToastMessage(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+    }
 }
