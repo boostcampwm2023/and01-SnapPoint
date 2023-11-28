@@ -27,7 +27,7 @@ interface SnapPointApi {
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse
 
-    @POST("auth/login")
+    @POST("signin")
     suspend fun postLogin(
         @Body loginRequest: LoginRequest
     ): String
