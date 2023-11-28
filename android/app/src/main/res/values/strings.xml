@@ -24,4 +24,7 @@
     <string name="btn_preview_text">미리보기</string>
     <string name="btn_view_post_text">게시글 보기</string>
     <string name="create_post_activity_post_creation_success">게시글 작성 성공했습니다 !</string>
+    <string name="login_activity_e_mail">E-MAIL</string>
+    <string name="login_activity_password">PASSWORD</string>
+    <string name="login_activity_sign_in">SIGN IN</string>
 </resources>
