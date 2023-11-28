@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
-import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
@@ -40,9 +39,7 @@ export class AuthService {
     }
   }
 
-  async refresh(refreshTokenDto: RefreshTokenDto): Promise<{ accessToken: string }> {
-    const { refreshToken } = refreshTokenDto;
-
+  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
     const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });

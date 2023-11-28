@@ -3,20 +3,20 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { Response } from 'express';
-import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { UserService } from '@/domain/user/user.service';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
+import { Cookies } from '@/common/decorator/cookie.decorator';
 
-@ApiTags('auth')
-@Controller('auth')
+@ApiTags('')
+@Controller('')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
 
-  @Post()
+  @Post('signup')
   @NoAuth()
   @ApiOperation({
     summary: '새로운 유저를 생성하는 API',
@@ -28,7 +28,7 @@ export class AuthController {
     return this.userService.create(createAuthDto);
   }
 
-  @Post('login')
+  @Post('signin')
   @NoAuth()
   @ApiOperation({
     summary: '로그인 API',
@@ -58,8 +58,8 @@ export class AuthController {
   })
   @ApiOkResponse({ description: '성공적으로 엑세스 토큰 발급이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 리프레시 토큰으로 새로운 엑세스 토큰을 발급할 수 없습니다.' })
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto, @Res({ passthrough: true }) res: Response) {
-    const refreshDto = await this.authService.refresh(refreshTokenDto);
+  async refresh(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    const refreshDto = await this.authService.refresh(refreshToken);
     res.setHeader('Authorization', 'Bearer ' + refreshDto.accessToken);
     res.cookie('access_token', refreshDto.accessToken, {
       httpOnly: true,
