@@ -44,9 +44,9 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (blocks[position]) {
-            is PostBlockState.TEXT -> ViewType.STRING.ordinal
-            is PostBlockState.IMAGE -> ViewType.IMAGE.ordinal
-            is PostBlockState.VIDEO -> ViewType.VIDEO.ordinal
+            is PostBlockState.TEXT -> PostBlockState.ViewType.STRING.ordinal
+            is PostBlockState.IMAGE -> PostBlockState.ViewType.IMAGE.ordinal
+            is PostBlockState.VIDEO -> PostBlockState.ViewType.VIDEO.ordinal
         }
     }
 
@@ -72,14 +72,14 @@ class CreatePostListAdapter(
         }
 
         when (viewType) {
-            ViewType.IMAGE.ordinal -> {
+            PostBlockState.ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     binding = ItemImageBlockBinding.inflate(inflater, parent, false),
                     blockItemEvent = itemEvent
                 )
             }
 
-            ViewType.VIDEO.ordinal -> {
+            PostBlockState.ViewType.VIDEO.ordinal -> {
                 TODO()
             }
         }
@@ -108,14 +108,6 @@ class CreatePostListAdapter(
     override fun onViewDetachedFromWindow(holder: BlockItemViewHolder) {
         super.onViewDetachedFromWindow(holder)
         holder.detachTextWatcherFromEditText()
-    }
-
-    companion object {
-        enum class ViewType {
-            STRING,
-            IMAGE,
-            VIDEO,
-        }
     }
 }
 
