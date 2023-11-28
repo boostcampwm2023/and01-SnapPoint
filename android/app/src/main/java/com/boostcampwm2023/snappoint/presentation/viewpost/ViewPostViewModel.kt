@@ -114,6 +114,6 @@ class ViewPostViewModel @Inject constructor() : ViewModel() {
     }
 
     fun finishPostView() {
-        _event.tryEmit(ViewPostEvent.finishActivity)
+        _event.tryEmit(ViewPostEvent.FinishActivity)
     }
 }

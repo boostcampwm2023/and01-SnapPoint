@@ -1,9 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost.post
 
 import androidx.lifecycle.ViewModel
-import com.boostcampwm2023.snappoint.presentation.main.MainUiState
-import com.boostcampwm2023.snappoint.presentation.model.PositionState
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -40,6 +37,6 @@ class PostViewModel @Inject constructor() : ViewModel() {
     }
 
     fun navigateToPrevious() {
-        _event.tryEmit(PostEvent.navigatePrev)
+        _event.tryEmit(PostEvent.NavigatePrev)
     }
 }

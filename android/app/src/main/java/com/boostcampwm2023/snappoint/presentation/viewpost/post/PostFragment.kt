@@ -39,7 +39,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         lifecycleScope.launch {
             postViewModel.event.collect {
                 when (it) {
-                    PostEvent.navigatePrev -> {
+                    PostEvent.NavigatePrev -> {
                         if (!findNavController().popBackStack()) {
                             viewPostViewModel.finishPostView()
                         }
