@@ -111,7 +111,7 @@
             android:layout_gravity="start"
             android:layout_marginTop="64dp"
             android:enabled="@{}"
-            android:onClick="@{()->()}"
+            android:onClick="@{()->vm.trySignup()}"
             android:text="SIGN UP"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
