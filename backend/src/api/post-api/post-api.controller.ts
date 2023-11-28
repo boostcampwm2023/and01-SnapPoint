@@ -48,7 +48,7 @@ export class PostApiController {
   @ApiOperation({ summary: '게시글을 수정하는 API', description: 'UUID에 맞는 게시글의 내용을 업데이트한다.' })
   @ApiParam({ name: 'uuid', required: true })
   @ApiOkResponse({
-    description: '임시로 저장된 게시글의 내용 및 블록 정보를 업데이트한다.',
+    description: '작성한 게시글의 내용 및 블록 정보를 업데이트한다.',
     type: PostDto,
   })
   modifyPost(
