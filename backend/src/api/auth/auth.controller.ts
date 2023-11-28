@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -65,5 +65,24 @@ export class AuthController {
       httpOnly: true,
     });
     return refreshDto;
+  }
+
+  @Get('logout')
+  @NoAuth()
+  @ApiOperation({
+    summary: '로그아웃 API',
+    description: '',
+  })
+  @ApiOkResponse({ description: '성공적으로 로그아웃이 완료되었습니다.' })
+  async logout(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(refreshToken);
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
   }
 }

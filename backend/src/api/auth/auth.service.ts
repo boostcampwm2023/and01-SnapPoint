@@ -63,6 +63,20 @@ export class AuthService {
     return RefreshDto.of(accessToken);
   }
 
+  async logout(refreshToken: string) {
+    const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+
+    const user = await this.userService.findUserByUniqueInput({ uuid: decodedRefreshToken.uuid });
+
+    if (!user) {
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
+    }
+
+    await this.refreshTokenService.delete({ userUuid: user.uuid });
+  }
+
   async setCurrentRefreshToken(refreshToken: string, userUuid: string) {
     const isRefreshToken = await this.refreshTokenService.findRefreshTokenByUnique({ userUuid: userUuid });
 
