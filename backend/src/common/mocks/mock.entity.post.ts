@@ -8,5 +8,4 @@ export const mockPostEntity: Post = {
   createdAt: new Date('2023-11-23T15:02:10.626Z'),
   modifiedAt: new Date('2023-11-23T15:02:10.626Z'),
   isDeleted: false,
-  isPublished: false,
 };

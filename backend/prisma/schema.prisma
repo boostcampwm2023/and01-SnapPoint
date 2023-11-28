@@ -38,7 +38,6 @@ model Post {
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
-  isPublished Boolean  @default(false)
 }
 
 model Like {
