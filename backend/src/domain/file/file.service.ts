@@ -10,9 +10,13 @@ export class FileService {
     return this.prisma.get().file.create({ data });
   }
 
+  async createFiles(data: Prisma.FileCreateManyInput) {
+    return this.prisma.get().file.createMany({ data });
+  }
+
   async findFile(fileWhereUniqueInput: Prisma.FileWhereUniqueInput): Promise<File | null> {
     return this.prisma.get().file.findUnique({
-      where: fileWhereUniqueInput,
+      where: { ...fileWhereUniqueInput, isDeleted: false },
     });
   }
 
@@ -28,7 +32,7 @@ export class FileService {
       skip,
       take,
       cursor,
-      where,
+      where: { ...where, isDeleted: false },
       orderBy,
     });
   }

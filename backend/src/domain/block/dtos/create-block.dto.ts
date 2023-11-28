@@ -5,6 +5,8 @@ export class CreateBlockDto {
 
   readonly type: string;
 
+  readonly order: number;
+
   readonly latitude?: number;
 
   readonly longitude?: number;

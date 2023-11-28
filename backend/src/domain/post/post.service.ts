@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
+import { CreatePostDto } from './dtos/create-post.dto';
 
 @Injectable()
 export class PostService {
   constructor(private prisma: PrismaProvider) {}
 
-  async createPost(data: Prisma.PostCreateInput) {
-    return this.prisma.get().post.create({ data });
+  async createPost(userUuid: string, dto: CreatePostDto) {
+    return this.prisma.get().post.create({ data: { ...dto, userUuid } });
   }
 
   async findPost(postWhereUniqueInput: Prisma.PostWhereUniqueInput): Promise<Post | null> {
     return this.prisma.get().post.findUnique({
-      where: postWhereUniqueInput,
+      where: { ...postWhereUniqueInput, isDeleted: false },
     });
   }
 
@@ -28,7 +29,7 @@ export class PostService {
       skip,
       take,
       cursor,
-      where,
+      where: { ...where, isDeleted: false },
       orderBy,
     });
   }
