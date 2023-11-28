@@ -57,4 +57,11 @@ export class BlockService {
       where,
     });
   }
+
+  async deleteBlocks(where: Prisma.BlockWhereInput) {
+    return this.prisma.get().block.updateMany({
+      data: { isDeleted: true },
+      where,
+    });
+  }
 }

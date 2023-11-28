@@ -51,4 +51,11 @@ export class FileService {
       where,
     });
   }
+
+  async deleteFiles(where: Prisma.FileWhereInput) {
+    return this.prisma.get().file.updateMany({
+      data: { isDeleted: true },
+      where,
+    });
+  }
 }
