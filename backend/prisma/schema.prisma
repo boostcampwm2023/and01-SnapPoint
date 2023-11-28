@@ -18,7 +18,16 @@ model User {
   nickname   String
   createdAt  DateTime @default(now())
   modifiedAt DateTime @default(now())
-  isDeleted  Boolean  @default(false)
+  isDeleted  Boolean  @default(false)  
+}
+
+model RefreshToken {
+  id        Int   @id @default(autoincrement())
+  userUuid  String   @unique
+  token     String   
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  modifiedAt DateTime @updatedAt
 }
 
 model Post {
