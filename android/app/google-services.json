@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "129898512976",
+    "project_id": "snappoint-e2472",
+    "storage_bucket": "snappoint-e2472.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:129898512976:android:ffda4adb7c5737d95fc755",
+        "android_client_info": {
+          "package_name": "com.boostcampwm2023.snappoint"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXLMl8yZrFp8F-l0epuZvossJo5jWRyNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
