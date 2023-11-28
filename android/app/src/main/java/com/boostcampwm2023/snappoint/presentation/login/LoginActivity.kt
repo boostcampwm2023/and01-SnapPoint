@@ -1,14 +1,8 @@
 package com.boostcampwm2023.snappoint.presentation.login
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
-import android.view.View
-import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -27,11 +21,31 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login
         super.onCreate(savedInstanceState)
 
         initBinding()
+
+        collectViewModelData()
     }
 
     private fun initBinding() {
         with(binding) {
             vm = viewModel
+        }
+    }
+
+    private fun collectViewModelData() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is LoginEvent.Fail -> {
+                            showToastMessage(event.error)
+                        }
+
+                        is LoginEvent.Success -> {
+                            Log.d("LOG", "LoginActivity: ${event.token}")
+                        }
+                    }
+                }
+            }
         }
     }
 }
