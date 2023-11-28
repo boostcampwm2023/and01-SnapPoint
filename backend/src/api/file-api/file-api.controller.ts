@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, Req, Logger, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, Req, UsePipes } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -42,8 +42,7 @@ export class FileApiController {
   })
   @ApiCreatedResponse({ type: FileDto })
   upload(@UploadedFile() file: Express.Multer.File, @Req() request: any) {
-    const userUuid = request.uuid;
-    Logger.debug(userUuid);
+    const { uuid: userUuid } = request.user;
     return this.fileApiService.uploadFile(file, userUuid);
   }
 
@@ -55,7 +54,7 @@ export class FileApiController {
   })
   @ApiOkResponse({ type: [FileDto] })
   findFiles(@Req() request: any) {
-    const { uuid: userUuid } = request;
+    const { uuid: userUuid } = request.user;
     return this.fileApiService.findFiles(userUuid);
   }
 
@@ -69,7 +68,7 @@ export class FileApiController {
   @ApiNotFoundResponse({ description: '해당 파일 정보를 찾을 수 없습니다.' })
   @ApiForbiddenResponse({ description: '해당 파일에 접근할 권한이 없습니다.' })
   findFile(@Param('uuid') uuid: string, @Req() request: any) {
-    const { uuid: userUuid } = request;
+    const { uuid: userUuid } = request.user;
     return this.fileApiService.findFile(uuid, userUuid);
   }
 }

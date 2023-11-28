@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BlocksModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
-import { BlockFileModule } from './domain/block-file/block-file.module';
-import { PostApiModule } from './api/post-api/post-api.module';
 import { FileModule } from './domain/file/file.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { PrismaService } from './common/prisma/prisma.service';
@@ -21,8 +19,6 @@ import { ApiModule } from './api/api.module';
   imports: [
     BlocksModule,
     PostModule,
-    BlockFileModule,
-    PostApiModule,
     UserModule,
     AuthModule,
     FileModule,

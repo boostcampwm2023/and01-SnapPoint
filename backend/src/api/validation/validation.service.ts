@@ -51,20 +51,6 @@ export class ValidationService {
     return post;
   }
 
-  async validateModifyPost(uuid: string, userUuid: string): Promise<Post> {
-    const post = await this.postService.findPost({ uuid });
-
-    if (!post || post.isDeleted) {
-      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
-    }
-
-    if (post.userUuid !== userUuid) {
-      throw new ForbiddenException('Could not access this post. please check your permission.');
-    }
-
-    return post;
-  }
-
   async validateBlocks(blockDtos: WriteBlockDto[]) {
     if (blockDtos.length === 0) {
       throw new BadRequestException('Post must have at least one block.');
