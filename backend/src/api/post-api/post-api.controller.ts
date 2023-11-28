@@ -11,6 +11,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PostDto } from '@/domain/post/dtos/post.dto';
+import { NoAuth } from '@/common/decorator/no-auth.decorator';
 
 @ApiTags('posts')
 @Controller('posts')
@@ -44,6 +45,7 @@ export class PostApiController {
   }
 
   @Post('/publish')
+  @NoAuth() // 임시 인증 제외
   @ApiOperation({
     summary: '게시글을 생성 및 즉시 발행하는 API',
     description: '작성 중인 게시글 블록을 받아 게시글을 생성하고 게시글을 발행한다.',
