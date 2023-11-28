@@ -41,7 +41,6 @@ export class PostApiController {
   writePost(@Body() postDto: ComposedPostDto, @Req() request: any) {
     request;
     // const { uuid: userUuid } = request.user;
-    Logger.debug(inspect(postDto));
     return this.postApiService.writePost(postDto, 'c6a7c590-6239-4d12-ad8f-c8065db60d6a');
   }
 
