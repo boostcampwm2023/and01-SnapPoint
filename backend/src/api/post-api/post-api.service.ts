@@ -78,7 +78,10 @@ export class PostApiService {
       await this.blockService.deleteBlocks({ postUuid: uuid });
       await Promise.all(
         blocks.map((block) =>
-          this.blockService.updateBlock({ where: { uuid: block.uuid }, data: { ...block, isDeleted: false } }),
+          this.blockService.upsertBlock({
+            where: { uuid: block.uuid },
+            data: { ...block, postUuid: uuid, isDeleted: false },
+          }),
         ),
       );
 

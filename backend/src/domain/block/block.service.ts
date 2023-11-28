@@ -43,10 +43,19 @@ export class BlockService {
     });
   }
 
-  async updateBlock(params: { where: Prisma.BlockWhereUniqueInput; data: Prisma.BlockUpdateInput }) {
+  async updateBlock(params: { where: Prisma.BlockWhereUniqueInput; data: Prisma.BlockCreateInput }) {
     const { data, where } = params;
     return this.prisma.get().block.update({
       data,
+      where,
+    });
+  }
+
+  async upsertBlock(params: { where: Prisma.BlockWhereUniqueInput; data: Prisma.BlockCreateInput }) {
+    const { data, where } = params;
+    return this.prisma.get().block.upsert({
+      create: data,
+      update: data,
       where,
     });
   }
