@@ -21,7 +21,7 @@ abstract class BaseActivity<B: ViewDataBinding>(
         binding.lifecycleOwner = this@BaseActivity
     }
 
-    internal fun showToastMessage(resId: Int) {
+    protected fun showToastMessage(resId: Int) {
         Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
     }
 }
