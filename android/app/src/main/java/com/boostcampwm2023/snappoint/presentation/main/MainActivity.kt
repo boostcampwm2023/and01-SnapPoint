@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -98,7 +97,7 @@ class MainActivity :
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
-                Log.d("TAG", "onLocationResult: ${p0}")
+//                Log.d("TAG", "onLocationResult: ${p0}")
             }
         }
 

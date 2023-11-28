@@ -36,6 +36,25 @@ sealed class PostBlockState(open val content: String, open val isEditMode: Boole
     ) : PostBlockState(content, isEditMode, uuid)
 }
 
+sealed class PostState(open val content: String) {
+    data class TEXT(
+        override val content: String = "",
+    ) : PostState(content)
+    data class IMAGE(
+        override val content: String = "",
+        val imageByteArray: ByteArray,
+        val description: String = "",
+        val position: PositionState = PositionState(0.0, 0.0),
+        val fileUuid: String = ""
+    ) : PostState(content)
+    data class VIDEO(
+        override val content: String = "",
+        val description: String = "",
+        val position: PositionState = PositionState(0.0, 0.0),
+        val fileUuid: String = ""
+    ) : PostState(content)
+}
+
 data class PositionState(
     val latitude: Double,
     val longitude: Double

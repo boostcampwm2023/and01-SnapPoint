@@ -79,28 +79,34 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     private fun initBinding() {
         with(binding) {
             vm = viewModel
+            btnCheck.setOnClickListener {
+//                viewModel.postImagesIfExist(this@CreatePostActivity, binding.rcvPostBlock.width)
+                viewModel.onCheckButtonClicked(this@CreatePostActivity, binding.rcvPostBlock.width)
+            }
         }
     }
 
     private fun collectViewModelData() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        is CreatePostEvent.ShowMessage -> {
-                            showToastMessage(event.resId)
-                        }
+                launch {
+                    viewModel.event.collect { event ->
+                        when (event) {
+                            is CreatePostEvent.ShowMessage -> {
+                                showToastMessage(event.resId)
+                            }
 
-                        is CreatePostEvent.SelectImageFromLocal -> {
-                            selectImage()
-                        }
+                            is CreatePostEvent.SelectImageFromLocal -> {
+                                selectImage()
+                            }
 
-                        is CreatePostEvent.NavigatePrev -> {
-                            finish()
-                        }
+                            is CreatePostEvent.NavigatePrev -> {
+                                finish()
+                            }
 
-                        is CreatePostEvent.FindAddress -> {
-                            startMapActivityAndFindAddress(event.index, event.position)
+                            is CreatePostEvent.FindAddress -> {
+                                startMapActivityAndFindAddress(event.index, event.position)
+                            }
                         }
                     }
                 }

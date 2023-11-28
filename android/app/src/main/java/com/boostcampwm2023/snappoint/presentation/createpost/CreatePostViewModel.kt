@@ -1,13 +1,19 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
+import com.boostcampwm2023.snappoint.data.mapper.asPostState
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostState
+import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
+import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,6 +48,9 @@ class CreatePostViewModel @Inject constructor(
     ))
 
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
+
+    private val _createPostState: MutableStateFlow<CreatePostState> = MutableStateFlow(CreatePostState())
+    val createPostState: StateFlow<CreatePostState> = _createPostState.asStateFlow()
 
     private val _event: MutableSharedFlow<CreatePostEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
@@ -195,8 +204,7 @@ class CreatePostViewModel @Inject constructor(
         return true
     }
 
-    fun onCheckButtonClicked() {
-        println(uiState.value)
+    fun postImagesIfExist(context: Context, layoutWidth: Int) {
         if(isValidTitle().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
@@ -209,15 +217,52 @@ class CreatePostViewModel @Inject constructor(
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
             return
         }
+//        _uiState.update { state ->
+//            state.copy(postBlocks = state.postBlocks.map { block ->
+//                when (block) {
+//                    is PostBlockState.IMAGE -> {
+//                        var newBlock = block
+//                        postRepository.postImage(resizeBitmap(getBitmapFromUri(context, block.uri), layoutWidth))
+//                            .onStart {}
+//                            .catch { Log.d("TAG", "postImages: Image Upload Error :${it.message}") }
+//                            .onCompletion {}
+//                            .onEach { response ->
+//                                println(response)
+//                                newBlock = block.copy(fileUuid = response.imageUuid)
+//                            }
+//                            .launchIn(viewModelScope)
+//                        newBlock
+//                    }
+//                    else -> block
+//                }
+//            })
+//        }
+    }
+
+    fun onCheckButtonClicked(context: Context, layoutWidth: Int) {
+        if(isValidTitle().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
+            return
+        }
+        if(isValidBlocks().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_blocks))
+            return
+        }
+        if(isValidTextBlock().not()){
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
+            return
+        }
+
       /*  if(isValidMediaBlock().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
             return
         }*/
 
-
         postRepository.postCreatePost(
             title = _uiState.value.title,
-            postBlocks = _uiState.value.postBlocks
+            postBlocks = _uiState.value.postBlocks.map {
+                it.asPostState(context, layoutWidth)
+            }
         )
             .onStart {
                 _uiState.update {

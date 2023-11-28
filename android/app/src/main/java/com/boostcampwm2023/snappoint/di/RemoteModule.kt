@@ -16,12 +16,14 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     @Provides
     @Singleton
     fun provideSnapPointApi(): SnapPointApi{
         return Retrofit.Builder()
-            .baseUrl("http://175.45.195.45:3000/")
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .baseUrl("http://175.45.195.153:3000/")
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(SnapPointApi::class.java)
     }

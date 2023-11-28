@@ -47,7 +47,6 @@
             android:padding="16dp"
             android:layout_marginVertical="8dp"
             app:tint="@color/errorContainer"
-            android:onClick="@{() -> onDeleteButtonClick.invoke()}"
             android:visibility="@{editMode ? View.INVISIBLE : View.VISIBLE}"/>
 
         <ImageButton
