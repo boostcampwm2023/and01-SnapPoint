@@ -59,7 +59,8 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:afterTextChanged="@{(s)->vm.updateUsername(s.toString())}" />
+                android:inputType="textPassword"
+                android:afterTextChanged="@{(s)->vm.updatePassword(s.toString())}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
