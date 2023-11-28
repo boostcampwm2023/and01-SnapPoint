@@ -50,7 +50,5 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login
         }
     }
 
-    private fun showToastMessage(resId: Int) {
-        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
-    }
+
 }

@@ -109,10 +109,6 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         }
     }
 
-    private fun showToastMessage(resId: Int) {
-        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
-    }
-
     private fun selectImage() {
         val permissions = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
