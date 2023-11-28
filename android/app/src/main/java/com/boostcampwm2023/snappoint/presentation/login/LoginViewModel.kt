@@ -63,7 +63,7 @@ class LoginViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                _event.emit(LoginEvent.Success(it))
+                _event.emit(LoginEvent.Success(it.accessToken))
             }
             .catch {
                 _event.emit(LoginEvent.Fail(R.string.login_activity_fail))
