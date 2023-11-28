@@ -22,7 +22,7 @@
         tools:context=".presentation.login.LoginActivity">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_login_username"
+            android:id="@+id/til_login_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="96dp"
@@ -37,7 +37,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:afterTextChanged="@{(s)->vm.updateUsername(s.toString())}"
+                android:afterTextChanged="@{(s)->vm.updateEmail(s.toString())}"
                 android:inputType="textEmailAddress" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -55,7 +55,7 @@
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_login_username">
+            app:layout_constraintTop_toBottomOf="@+id/til_login_email">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -72,7 +72,7 @@
             android:layout_gravity="start"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"
-            android:enabled="@{vm.uiState.usernameValid &amp;&amp; vm.uiState.passwordValid}"
+            android:enabled="@{vm.loginFormUiState.emailValid &amp;&amp; vm.loginFormUiState.passwordValid}"
             android:onClick="@{()->vm.tryLogin()}"
             android:text="@string/login_activity_sign_in"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -88,7 +88,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="64dp"
             android:layout_marginBottom="64dp"
-            android:visibility="@{vm.uiState.isLoginInProgress ? View.VISIBLE : View.GONE}"
+            android:visibility="@{vm.loginFormUiState.loginInProgress ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/til_login_password"
             app:layout_constraintStart_toStartOf="@+id/til_login_password"
