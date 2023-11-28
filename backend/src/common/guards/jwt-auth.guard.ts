@@ -20,10 +20,10 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest();
       const access_token = request.cookies['access_token'];
-      const user = await this.jwtService.verifyAsync(access_token, {
+      const uuid = await this.jwtService.verifyAsync(access_token, {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
       });
-      request.uuid = user.uuid;
+      request.uuid = uuid;
       return true;
     } catch (err) {
       return false;
