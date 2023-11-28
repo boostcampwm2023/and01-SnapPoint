@@ -2,7 +2,6 @@ package com.boostcampwm2023.snappoint.presentation.login
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +48,4 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login
             }
         }
     }
-
-
 }
