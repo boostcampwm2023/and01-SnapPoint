@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.data.repository
 
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.request.LoginRequest
+import com.boostcampwm2023.snappoint.data.remote.model.response.LoginResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -12,7 +13,7 @@ class LoginRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi
 ) : LoginRepository {
 
-    override fun postLogin(email: String, password: String): Flow<String> {
+    override fun postLogin(email: String, password: String): Flow<LoginResponse> {
 
         val request: LoginRequest = LoginRequest(
             email = email,
