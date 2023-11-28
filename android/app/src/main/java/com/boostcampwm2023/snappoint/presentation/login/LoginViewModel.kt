@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.login
 
-import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,7 +66,7 @@ class LoginViewModel @Inject constructor(
                 _event.emit(LoginEvent.Success(it))
             }
             .catch {
-                _event.emit(LoginEvent.Fail(R.string.app_name))
+                _event.emit(LoginEvent.Fail(R.string.login_activity_fail))
             }
             .onCompletion {
                 setProgressBarState(false)

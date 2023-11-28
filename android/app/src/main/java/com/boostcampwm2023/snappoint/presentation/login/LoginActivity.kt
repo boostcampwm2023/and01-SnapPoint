@@ -27,11 +27,35 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login
         super.onCreate(savedInstanceState)
 
         initBinding()
+
+        collectViewModelData()
     }
 
     private fun initBinding() {
         with(binding) {
             vm = viewModel
         }
+    }
+
+    private fun collectViewModelData() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is LoginEvent.Fail -> {
+                            showToastMessage(event.error)
+                        }
+
+                        is LoginEvent.Success -> {
+                            Log.d("LOG", "LoginActivity: ${event.token}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showToastMessage(resId: Int) {
+        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
     }
 }
