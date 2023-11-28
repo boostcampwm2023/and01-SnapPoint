@@ -6,7 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshToken, User } from '@prisma/client';
-import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
@@ -82,10 +81,8 @@ describe('AuthSerivce', () => {
   });
 
   describe('refresh', () => {
-    const refreshTokenDto: RefreshTokenDto = {
-      refreshToken: 'test_refresh_token',
-    };
     const access_token = 'test_access_token';
+    const refreshToken = 'test_refresh_token';
     const userMock: User = {
       id: 1,
       email: 'test@example.com',
@@ -111,7 +108,7 @@ describe('AuthSerivce', () => {
       jest.spyOn(refreshTokenService, 'generateAccessToken').mockResolvedValueOnce(access_token);
       jest.spyOn(refreshTokenService, 'findRefreshTokenByUnique').mockResolvedValueOnce(refreshTokenMock);
 
-      const result = await service.refresh(refreshTokenDto);
+      const result = await service.refresh(refreshToken);
 
       expect(result).toEqual({
         accessToken: access_token,
