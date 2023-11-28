@@ -38,4 +38,4 @@ COPY --from=builder /src/dist/ dist
 
 EXPOSE 3000
 
-CMD ["yarn", "start", "prod"]
+CMD ["yarn", "start", "migrate", "prod"]
