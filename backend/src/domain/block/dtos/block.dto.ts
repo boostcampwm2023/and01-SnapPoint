@@ -37,8 +37,8 @@ export class BlockDto {
     return {
       uuid: block.uuid,
       content: block.content,
-      latitude: block.latitude,
-      longitude: block.longitude,
+      latitude: block.latitude!,
+      longitude: block.longitude!,
       type: block.type,
       files: files,
     };
