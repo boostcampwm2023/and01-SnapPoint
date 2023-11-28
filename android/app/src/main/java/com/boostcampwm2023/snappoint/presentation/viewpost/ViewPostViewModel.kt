@@ -1,14 +1,16 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost
 
 import androidx.lifecycle.ViewModel
-import com.boostcampwm2023.snappoint.presentation.main.MainUiState
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.viewpost.post.PostUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -21,6 +23,12 @@ class ViewPostViewModel @Inject constructor() : ViewModel() {
 
     private val _posts: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
     val posts: StateFlow<List<PostSummaryState>> = _posts.asStateFlow()
+
+    private val _event: MutableSharedFlow<ViewPostEvent> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val event: SharedFlow<ViewPostEvent> = _event.asSharedFlow()
 
     fun updateSelectedIndex(index: Int) {
         _selectedIndex.value = index
@@ -103,5 +111,9 @@ class ViewPostViewModel @Inject constructor() : ViewModel() {
                 ),
             )
         }
+    }
+
+    fun finishPostView() {
+        _event.tryEmit(ViewPostEvent.finishActivity)
     }
 }

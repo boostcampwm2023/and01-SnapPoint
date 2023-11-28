@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostViewModel
+import kotlinx.coroutines.launch
 
 class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
@@ -21,6 +24,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
         with(binding) {
             vm = postViewModel
+        }
+
+        lifecycleScope.launch {
+            postViewModel.event.collect {
+                when (it) {
+                    PostEvent.navigatePrev -> {
+                        if (!findNavController().popBackStack()) {
+                            viewPostViewModel.finishPostView()
+                        }
+                    }
+                }
+            }
         }
     }
 }

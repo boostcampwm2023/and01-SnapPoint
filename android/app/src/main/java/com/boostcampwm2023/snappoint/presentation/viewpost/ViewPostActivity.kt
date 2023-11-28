@@ -2,10 +2,11 @@ package com.boostcampwm2023.snappoint.presentation.viewpost
 
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityViewPostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
+import kotlinx.coroutines.launch
 
 class ViewPostActivity : BaseActivity<ActivityViewPostBinding>(R.layout.activity_view_post) {
 
@@ -16,5 +17,13 @@ class ViewPostActivity : BaseActivity<ActivityViewPostBinding>(R.layout.activity
 
         val selectedIndex = intent.getIntExtra("index", 0)
         viewModel.updateSelectedIndex(selectedIndex)
+
+        lifecycleScope.launch {
+            viewModel.event.collect {
+                when (it) {
+                    ViewPostEvent.finishActivity -> { finish() }
+                }
+            }
+        }
     }
 }

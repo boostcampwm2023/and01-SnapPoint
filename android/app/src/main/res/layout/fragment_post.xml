@@ -14,7 +14,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.viewpost.post.PostFragment">
+        tools:context=".presentation.viewpost.post.PostFragment"
+        android:clipChildren="false">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -24,17 +25,19 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/surfaceColor"
+                android:background="@color/white"
+                app:navigationIcon="@drawable/icon_arrow_back"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:title="게시글 보기"
-                app:titleCentered="true" />
+                app:titleCentered="true"
+                onNavigationClick="@{() -> vm.navigateToPrevious()}"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/sv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="64dp"
             android:layout_marginBottom="60dp"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
