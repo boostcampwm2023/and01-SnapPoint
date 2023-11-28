@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '@/domain/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -7,6 +7,8 @@ import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.servic
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { SignUpDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +18,18 @@ export class AuthService {
     readonly configService: ConfigService,
     readonly refreshTokenService: RefreshTokenService,
   ) {}
+
+  async signup(createAuthDto: CreateAuthDto) {
+    const user = await this.userService.findUserByUniqueInput({ email: createAuthDto.email });
+
+    if (user) {
+      throw new ConflictException('이미 존재하는 이메일입니다.');
+    }
+
+    const newUser = await this.userService.create(createAuthDto);
+
+    return SignUpDto.of(newUser);
+  }
 
   async validateUser(loginAuthDto: LoginAuthDto) {
     const user = await this.userService.findUserByUniqueInput({ email: loginAuthDto.email });

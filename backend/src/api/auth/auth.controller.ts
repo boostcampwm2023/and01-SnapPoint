@@ -25,7 +25,7 @@ export class AuthController {
   @ApiOkResponse({ description: '성공적으로 유저 생성이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 유저를 생성할 수 없습니다.' })
   create(@Body() createAuthDto: CreateAuthDto) {
-    return this.userService.create(createAuthDto);
+    return this.authService.signup(createAuthDto);
   }
 
   @Post('signin')

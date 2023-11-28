@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.base
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -18,5 +19,9 @@ abstract class BaseActivity<B: ViewDataBinding>(
 
         binding = DataBindingUtil.setContentView(this, layoutResId)
         binding.lifecycleOwner = this@BaseActivity
+    }
+
+    protected fun showToastMessage(resId: Int) {
+        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
     }
 }

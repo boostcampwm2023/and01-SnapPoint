@@ -56,8 +56,9 @@ export class PostApiController {
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
   createAndPublish(@Body() createPostDto: CreatePostApiDto, @Req() request: any) {
-    const { uuid } = request.uuid;
-    return this.postApiService.writeAndPublish(createPostDto, uuid);
+    request;
+    // const { uuid } = request.uuid;
+    return this.postApiService.writeAndPublish(createPostDto, 'c6a7c590-6239-4d12-ad8f-c8065db60d6a');
   }
 
   @Put('/:uuid')

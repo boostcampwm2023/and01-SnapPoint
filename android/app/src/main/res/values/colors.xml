@@ -7,6 +7,7 @@
     <color name="secondaryContainer">#DBE7C8</color>
     <color name="surfaceColor">#FAFAF2</color>
     <color name="onSurfaceColor">#1B1C18</color>
+    <color name="onSurfaceVariant">#44483D</color>
     <color name="surfaceContainer">#EFEEE7</color>
     <color name="surfaceContainerHighest">#E3E3DB</color>
     <color name="surfaceContainerLow">#F5F4EC</color>

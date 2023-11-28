@@ -60,4 +60,4 @@ jobs:
             -e JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" \
             -e JWT_ACCESS_EXPIRATION_TIME="${{ secrets.JWT_ACCESS_EXPIRATION_TIME }}" \
             -e JWT_REFRESH_EXPIRATION_TIME="${{ secrets.JWT_REFRESH_EXPIRATION_TIME }}" \
-            ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest 
+            ${{ secrets.NCP_DOCKER_REGISTORY }}/snap-point:latest
