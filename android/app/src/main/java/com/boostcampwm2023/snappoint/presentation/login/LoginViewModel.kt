@@ -39,6 +39,7 @@ class LoginViewModel @Inject constructor(
     fun updateEmail(email: String) {
         _loginFormUiState.update {
             it.copy(
+                email = email,
                 isEmailValid = isEmailValid(email)
             )
         }
@@ -47,26 +48,26 @@ class LoginViewModel @Inject constructor(
     fun updatePassword(password: String) {
         _loginFormUiState.update {
             it.copy(
+                password = password,
                 isPasswordValid = isPasswordValid(password)
             )
         }
     }
 
     fun tryLogin() {
-        loginRepository.postLogin(
-            "abc@abc.abc",
-            "abcdabcd"
-        )
+        val email = loginFormUiState.value.email
+        // TODO 암호화
+        val password = loginFormUiState.value.password
+
+        loginRepository.postLogin(email, password)
             .onStart {
                 setProgressBarState(true)
             }
             .onEach {
                 _event.emit(LoginEvent.Success(it))
-                Log.d("LOG", it)
             }
             .catch {
                 _event.emit(LoginEvent.Fail(R.string.app_name))
-                Log.d("LOG", "CATCH: ${it.message}")
             }
             .onCompletion {
                 setProgressBarState(false)
