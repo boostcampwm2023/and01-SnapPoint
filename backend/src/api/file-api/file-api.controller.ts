@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, Req, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, Req, Logger, UsePipes } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -13,6 +13,7 @@ import {
 } from '@nestjs/swagger';
 import { FileDto } from '../../api/file-api/dto/file.dto';
 import { FileApiService } from './file-api.service';
+import { validationPipe } from '@/common/pipes/validation.pipe';
 
 @ApiTags('files')
 @Controller('files')
@@ -21,6 +22,7 @@ export class FileApiController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(validationPipe)
   @ApiOperation({
     summary: '파일 업로드 API',
     description: '파일을 서버에 업로드하고, 파일의 정보를 받는다.',
@@ -46,6 +48,7 @@ export class FileApiController {
   }
 
   @Get()
+  @UsePipes(validationPipe)
   @ApiOperation({
     summary: '파일 조회 API',
     description: '자신이 업로드한 모든 파일 정보를 받는다.',
@@ -57,6 +60,7 @@ export class FileApiController {
   }
 
   @Get(':uuid')
+  @UsePipes(validationPipe)
   @ApiOperation({
     summary: '파일 개별 조회 API',
     description: '업로드한 파일의 개별 정보를 받는다.',
