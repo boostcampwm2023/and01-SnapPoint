@@ -27,7 +27,7 @@ class PostListAdapter : ListAdapter<PostBlockState, RecyclerView.ViewHolder>(dif
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is PostBlockState.TEXT -> PostBlockState.ViewType.STRING.ordinal
+            is PostBlockState.TEXT -> PostBlockState.ViewType.TEXT.ordinal
             is PostBlockState.IMAGE -> PostBlockState.ViewType.IMAGE.ordinal
             is PostBlockState.VIDEO -> PostBlockState.ViewType.VIDEO.ordinal
         }

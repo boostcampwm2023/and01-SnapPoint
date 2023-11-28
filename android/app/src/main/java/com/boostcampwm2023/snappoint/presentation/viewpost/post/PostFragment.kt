@@ -10,8 +10,10 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
     private val postViewModel: PostViewModel by viewModels()
@@ -22,10 +24,18 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
         postViewModel.updatePost(viewPostViewModel.posts.value[viewPostViewModel.selectedIndex.value])
 
+        initBinding()
+
+        collectViewModelData()
+    }
+
+    private fun initBinding() {
         with(binding) {
             vm = postViewModel
         }
+    }
 
+    private fun collectViewModelData() {
         lifecycleScope.launch {
             postViewModel.event.collect {
                 when (it) {

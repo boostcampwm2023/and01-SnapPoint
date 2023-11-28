@@ -44,7 +44,7 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (blocks[position]) {
-            is PostBlockState.TEXT -> PostBlockState.ViewType.STRING.ordinal
+            is PostBlockState.TEXT -> PostBlockState.ViewType.TEXT.ordinal
             is PostBlockState.IMAGE -> PostBlockState.ViewType.IMAGE.ordinal
             is PostBlockState.VIDEO -> PostBlockState.ViewType.VIDEO.ordinal
         }
