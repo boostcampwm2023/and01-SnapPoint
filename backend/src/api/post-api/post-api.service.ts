@@ -61,7 +61,7 @@ export class PostApiService {
 
     const existPost = await this.postService.findPost({ uuid });
 
-    if (!existPost || existPost.isDeleted) {
+    if (!existPost) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
 
