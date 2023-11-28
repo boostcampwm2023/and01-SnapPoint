@@ -25,11 +25,12 @@ export class ValidationService {
 
   async validateBlocks(blockDtos: ValidateBlockDto[], blockFileDtos: ValidateFileDto[]) {
     const sourceFileMap = new Map<string, WriteBlockFileDto[]>();
+
     blockFileDtos.forEach((blockFile) => {
       if (!sourceFileMap.has(blockFile.sourceUuid)) {
         sourceFileMap.set(blockFile.sourceUuid, []);
       }
-      sourceFileMap.get(blockFile.sourceUuid).push(blockFile);
+      sourceFileMap.get(blockFile.sourceUuid)!.push(blockFile);
     });
 
     blockDtos.forEach((blockDto) => {
