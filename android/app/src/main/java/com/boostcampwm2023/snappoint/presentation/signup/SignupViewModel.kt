@@ -85,7 +85,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
         return if (nickname.length > 1) null else R.string.signup_fragment_error_nickname
     }
 
-    fun trySignup() {
+    fun onSignUpButtonClicked() {
         with(uiState.value) {
             if (isInputValid.not()) {
                 return
