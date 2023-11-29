@@ -36,7 +36,7 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
@@ -51,6 +51,7 @@ android {
     }
 
     buildFeatures{
+        buildConfig = true
         dataBinding = true
     }
 
