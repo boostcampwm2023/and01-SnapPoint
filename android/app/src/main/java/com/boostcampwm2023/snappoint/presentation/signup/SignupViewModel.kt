@@ -87,12 +87,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
 
     fun trySignup() {
         with(uiState.value) {
-            if (
-                emailCode != null ||
-                passwordCode != null ||
-                passwordConfirmCode != null ||
-                nicknameCode != null
-            ) {
+            if (isInputValid.not()) {
                 return
             }
 
@@ -100,8 +95,6 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             val password = password
             val passwordConfirm = passwordConfirm
             val nickname = nickname
-
-
         }
     }
 }
