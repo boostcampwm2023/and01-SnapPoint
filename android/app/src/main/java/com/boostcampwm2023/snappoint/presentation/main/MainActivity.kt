@@ -8,12 +8,10 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -60,16 +58,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCa
 import com.google.android.material.search.SearchView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -332,7 +321,6 @@ class MainActivity :
         binding.dl.open()
     }
 
-    @OptIn(FlowPreview::class)
     private fun initBinding() {
         with(binding) {
             vm = viewModel
@@ -341,15 +329,8 @@ class MainActivity :
                 checkPermissionAndMoveCameraToUserLocation()
             }
 
-            sv.editText.onTextChanged()
-                .filterNot { it.isBlank() }
-                .debounce(500)
-                .onEach { query -> getAddressAutoCompletion(query) }
-                .launchIn(lifecycleScope)
-
             sv.editText.setOnEditorActionListener { v, _, _ ->
-                val address = v.text.toString()
-                moveCameraToAddress(address)
+                getAddressAutoCompletion(v.text.toString())
                 true
             }
 
@@ -409,15 +390,6 @@ class MainActivity :
                     Log.e("TAG", "Place not found: ${exception.statusCode}")
                 }
             }
-    }
-
-    private fun EditText.onTextChanged(): Flow<String> {
-        return callbackFlow {
-            val listener = doAfterTextChanged {
-                trySend(it.toString())
-            }
-            awaitClose { removeTextChangedListener(listener) }
-        }.onStart { emit("") }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
