@@ -51,6 +51,8 @@
             android:hint="PASSWORD"
             android:inputType="textPassword"
             android:selectAllOnFocus="true"
+            app:endIconMode="password_toggle"
+            app:errorIconDrawable="@{null}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/til_sign_up_username"
@@ -73,6 +75,8 @@
             android:hint="PASSWORD CONFIRM"
             android:inputType="textPassword"
             android:selectAllOnFocus="true"
+            app:endIconMode="password_toggle"
+            app:errorIconDrawable="@{null}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password"
@@ -104,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:afterTextChanged="@{(s)->vm.updateNickname(s.toString())}"
-                android:inputType="textPassword" />
+                android:inputType="textPersonName" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
