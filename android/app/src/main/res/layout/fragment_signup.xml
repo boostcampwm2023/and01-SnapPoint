@@ -31,7 +31,8 @@
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            setErrorMessage="@{vm.uiState.emailCode}">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -52,7 +53,8 @@
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_username">
+            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_username"
+            setErrorMessage="@{vm.uiState.passwordCode}">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -73,7 +75,8 @@
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password">
+            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password"
+            setErrorMessage="@{vm.uiState.passwordConfirmCode}">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -94,7 +97,8 @@
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password_confirm">
+            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password_confirm"
+            setErrorMessage="@{vm.uiState.nicknameCode}">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

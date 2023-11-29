@@ -4,6 +4,7 @@ import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.presentation.util.TextVerificationUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,30 +55,19 @@ class SignupViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun takeEmailErrorCode(email: String): Int? {
-        return if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) null else R.string.app_name
+        return if (TextVerificationUtil.isEmailValid(email)) null else R.string.signup_fragment_error_email_form
     }
 
     private fun takePasswordErrorCode(password: String): Int? {
-        return if (!Regex("[a-zA-Z]+").matches(password)) {
-            Log.d("LOG", "alphabet")
-            R.string.app_name
-        } else if (!Regex("[0-9]").matches(password)) {
-            Log.d("LOG", "number")
-            R.string.create_post_fragment_appbar_title
-        } else if (!Regex("[!@#$%^&*()\\-_]").matches(password)) {
-            Log.d("LOG", "special char")
-            R.string.menu_around
-        } else {
-            null
-        }
+        return if (TextVerificationUtil.isPasswordValid(password)) null else R.string.signup_fragment_error_password_length
     }
 
     private fun takePasswordConfirmErrorCode(password: String): Int? {
-        return if (uiState.value.password == password) null else R.string.app_name
+        return if (uiState.value.password == password) null else R.string.signup_fragment_error_password_confirm_mismatch
     }
 
     private fun takeNicknameErrorCode(nickname: String): Int? {
-        return if (nickname.length > 2) null else R.string.app_name
+        return if (nickname.length > 1) null else R.string.signup_fragment_error_nickname
     }
 
     fun trySignup() {
@@ -86,18 +76,6 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             val password = password
             val passwordConfirm = passwordConfirm
             val nickname = nickname
-
-            if (password != passwordConfirm) {
-                Log.d("LOG", "mismatch")
-            } else if (!Regex("[a-zA-Z]+").matches(password)) {
-                Log.d("LOG", "alphabet")
-            } else if (!Regex("[0-9]").matches(password)) {
-                Log.d("LOG", "number")
-            } else if (!Regex("[!@#$%^&*()\\-_]").matches(password)) {
-                Log.d("LOG", "special char")
-            } else {
-
-            }
         }
     }
 }
