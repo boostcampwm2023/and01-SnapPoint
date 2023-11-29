@@ -51,6 +51,18 @@
                     app:navigationIcon="@drawable/icon_drawer"
                     app:menu="@menu/search_view_menu"/>
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_search_here"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="현재 위치에서 다시 검색"
+                    android:textSize="12sp"
+                    app:layout_anchor="@id/sb"
+                    app:layout_anchorGravity="bottom|center"
+                    android:layout_gravity="bottom|center"
+                    android:translationY="16dp"
+                    android:minHeight="0dp"/>
+
                 <com.google.android.material.appbar.AppBarLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

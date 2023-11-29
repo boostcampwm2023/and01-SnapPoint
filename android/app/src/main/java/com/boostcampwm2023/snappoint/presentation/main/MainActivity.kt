@@ -339,6 +339,10 @@ class MainActivity :
                     viewModel.updateAutoCompleteTexts(emptyList())
                 }
             }
+
+            btnSearchHere.setOnClickListener {
+                searchSnapPoints()
+            }
         }
     }
 
@@ -390,6 +394,11 @@ class MainActivity :
                     Log.e("TAG", "Place not found: ${exception.statusCode}")
                 }
             }
+    }
+
+    private fun searchSnapPoints() {
+        val latLngBound = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+        Log.d("TAG", "searchSnapPoints: $latLngBound")
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
