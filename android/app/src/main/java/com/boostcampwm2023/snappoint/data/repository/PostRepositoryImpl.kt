@@ -62,4 +62,11 @@ class PostRepositoryImpl @Inject constructor(
                 snapPointApi.createPost(request)
             }
     }
+
+    override fun logout(): Flow<Unit> {
+        return flowOf(true)
+            .map{
+                snapPointApi.logout()
+            }
+    }
 }
