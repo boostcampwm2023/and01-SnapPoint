@@ -40,10 +40,7 @@ export class PostApiService {
   async writePost(postDto: ComposedPostDto, userUuid: string) {
     const { post, blocks, files } = postDto;
 
-    await Promise.all([
-      this.validation.validateBlocks(blocks, files),
-      this.validation.validateAttachFiles(files, userUuid),
-    ]);
+    await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
 
     return this.prisma.beginTransaction(async () => {
       const { uuid: postUuid } = await this.postService.createPost(userUuid, post);
@@ -64,7 +61,7 @@ export class PostApiService {
 
     const existPost = await this.postService.findPost({ uuid });
 
-    if (!existPost || existPost.isDeleted) {
+    if (!existPost) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
 
