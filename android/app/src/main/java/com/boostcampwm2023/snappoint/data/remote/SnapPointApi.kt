@@ -35,5 +35,5 @@ interface SnapPointApi {
     ): LoginResponse
 
     @GET("logout")
-    suspend fun logout()
+    suspend fun getLogout()
 }
