@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -58,6 +59,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.search.SearchView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -69,6 +71,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity :
@@ -361,15 +364,31 @@ class MainActivity :
     private fun moveCameraToAddress(address: String) {
 
         with(binding) {
-            val results = geocoder.getFromLocationName(address, 1)
 
-            if (results == null || results.size == 0) {
-                showToastMessage(R.string.search_location_fail)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocationName(address, 1) { results ->
+                    if (results.size == 0) {
+                        runOnUiThread { showToastMessage(R.string.search_location_fail) }
+                    } else {
+                        val latLng = LatLng(results[0].latitude, results[0].longitude)
+                        runOnUiThread {
+                            googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            sv.hide()
+                        }
+                    }
+                }
             } else {
-                val latLng = LatLng(results[0].latitude, results[0].longitude)
-                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                sv.hide()
+                val results = runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
+
+                if (results == null || results.size == 0) {
+                    showToastMessage(R.string.search_location_fail)
+                } else {
+                    val latLng = LatLng(results[0].latitude, results[0].longitude)
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    sv.hide()
+                }
             }
         }
     }
