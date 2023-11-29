@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main.search
 
 data class SearchViewUiState(
-    val texts: List<String> = emptyList()
+    val texts: List<String> = emptyList(),
+    val onAutoCompleteItemClicked: (Int) -> Unit = {},
 )

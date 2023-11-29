@@ -79,6 +79,7 @@ class MainActivity :
     private var googleMap: GoogleMap? = null
     private lateinit var placesClient: PlacesClient
     private val token = AutocompleteSessionToken.newInstance()
+    private val geocoder by lazy { Geocoder(applicationContext) }
 
     private val navController: NavController by lazy {
         (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment).findNavController()
@@ -120,7 +121,6 @@ class MainActivity :
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
-                Log.d("TAG", "onLocationResult: ${p0}")
             }
         }
 
@@ -172,6 +172,11 @@ class MainActivity :
                                     openPreviewFragment()
                                 }
                                 moveCameraToFitScreen()
+                            }
+
+                            is MainActivityEvent.MoveCameraToAddress -> {
+                                val address = viewModel.searchViewUiState.value.texts[event.index]
+                                moveCameraToAddress(address)
                             }
                         }
                     }
@@ -339,26 +344,25 @@ class MainActivity :
                 .launchIn(lifecycleScope)
         }
 
-        onSearchButtonClickedInSearchView()
+        binding.sv.editText.setOnEditorActionListener { v, _, _ ->
+            val address = v.text.toString()
+            moveCameraToAddress(address)
+            true
+        }
     }
 
-    private fun onSearchButtonClickedInSearchView() {
-        val geocoder = Geocoder(applicationContext)
+    private fun moveCameraToAddress(address: String) {
 
         with(binding) {
-            sv.editText.setOnEditorActionListener { v, _, _ ->
-                val address = v.text.toString()
-                val results = geocoder.getFromLocationName(address, 1)
+            val results = geocoder.getFromLocationName(address, 1)
 
-                if (results == null || results.size == 0) {
-                    showToastMessage(R.string.search_location_fail)
-                } else {
-                    val latLng = LatLng(results[0].latitude, results[0].longitude)
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    sv.hide()
-                }
-                true
+            if (results == null || results.size == 0) {
+                showToastMessage(R.string.search_location_fail)
+            } else {
+                val latLng = LatLng(results[0].latitude, results[0].longitude)
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                sv.hide()
             }
         }
     }

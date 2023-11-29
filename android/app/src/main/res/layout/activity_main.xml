@@ -81,7 +81,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        autoCompleteTexts="@{vm.searchViewUiState.texts}"/>
+                        autoCompleteTexts="@{vm.searchViewUiState.texts}"
+                        onAutoCompleteItemClick="@{vm.searchViewUiState.onAutoCompleteItemClicked}"/>
 
                 </com.google.android.material.search.SearchView>
 

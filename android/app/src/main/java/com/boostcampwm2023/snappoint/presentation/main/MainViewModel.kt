@@ -29,7 +29,9 @@ class MainViewModel @Inject constructor(
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     private val _searchViewUiState: MutableStateFlow<SearchViewUiState> = MutableStateFlow(
-        SearchViewUiState()
+        SearchViewUiState(onAutoCompleteItemClicked = { index ->
+            moveCameraToAddress(index)
+        })
     )
     val searchViewUiState: StateFlow<SearchViewUiState> = _searchViewUiState.asStateFlow()
 
@@ -210,5 +212,9 @@ class MainViewModel @Inject constructor(
         _searchViewUiState.update {
             it.copy(texts = texts)
         }
+    }
+
+    private fun moveCameraToAddress(index: Int) {
+        _event.tryEmit(MainActivityEvent.MoveCameraToAddress(index))
     }
 }

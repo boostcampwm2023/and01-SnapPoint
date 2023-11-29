@@ -8,20 +8,19 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemSearchAutoCompleteBinding
 
-class AutoCompletionListAdapter() : ListAdapter<String, AutoCompletionViewHolder>(diffUtil) {
+class AutoCompletionListAdapter(
+    private val onAutoCompleteItemClicked: (Int) -> Unit
+) : ListAdapter<String, AutoCompletionViewHolder>(diffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompletionViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return AutoCompletionViewHolder(
-            ItemSearchAutoCompleteBinding.inflate(
-                inflater,
-                parent,
-                false
-            )
+            binding = ItemSearchAutoCompleteBinding.inflate(inflater, parent, false),
+            onAutoCompleteItemClicked = onAutoCompleteItemClicked
         )
     }
 
     override fun onBindViewHolder(holder: AutoCompletionViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position)
     }
 
     companion object {
@@ -38,8 +37,8 @@ class AutoCompletionListAdapter() : ListAdapter<String, AutoCompletionViewHolder
     }
 }
 
-@BindingAdapter("autoCompleteTexts")
-fun RecyclerView.bindRecyclerViewAdapter(texts: List<String>) {
-    if (adapter == null) adapter = AutoCompletionListAdapter()
+@BindingAdapter("autoCompleteTexts", "onAutoCompleteItemClick")
+fun RecyclerView.bindRecyclerViewAdapter(texts: List<String>, onAutoCompleteItemClicked:(Int) -> Unit) {
+    if (adapter == null) adapter = AutoCompletionListAdapter(onAutoCompleteItemClicked)
     (adapter as AutoCompletionListAdapter).submitList(texts)
 }
