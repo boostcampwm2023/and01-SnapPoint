@@ -68,8 +68,6 @@ class LoginViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                token.accessToken = it.accessToken
-                token.refreshToken = it.refreshToken
                 _event.emit(LoginEvent.Success)
             }
             .catch {
