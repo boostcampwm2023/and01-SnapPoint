@@ -25,6 +25,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 emailCode = takeEmailErrorCode(email)
             )
         }
+        updateButtonState()
     }
 
     fun updatePassword(password: String) {
@@ -34,6 +35,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 passwordCode = takePasswordErrorCode(password)
             )
         }
+        updateButtonState()
     }
 
     fun updatePasswordConfirm(password: String) {
@@ -43,6 +45,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 passwordConfirmCode = takePasswordConfirmErrorCode(password)
             )
         }
+        updateButtonState()
     }
 
     fun updateNickname(nickname: String) {
@@ -50,6 +53,18 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             it.copy(
                 nickname = nickname,
                 nicknameCode = takeNicknameErrorCode(nickname)
+            )
+        }
+        updateButtonState()
+    }
+
+    private fun updateButtonState() {
+        _uiState.update {
+            it.copy(
+                isInputValid = it.emailCode != null ||
+                        it.passwordCode != null ||
+                        it.passwordConfirmCode != null ||
+                        it.nicknameCode != null
             )
         }
     }
@@ -72,10 +87,21 @@ class SignupViewModel @Inject constructor() : ViewModel() {
 
     fun trySignup() {
         with(uiState.value) {
+            if (
+                emailCode != null ||
+                passwordCode != null ||
+                passwordConfirmCode != null ||
+                nicknameCode != null
+            ) {
+                return
+            }
+
             val email = email
             val password = password
             val passwordConfirm = passwordConfirm
             val nickname = nickname
+
+
         }
     }
 }
