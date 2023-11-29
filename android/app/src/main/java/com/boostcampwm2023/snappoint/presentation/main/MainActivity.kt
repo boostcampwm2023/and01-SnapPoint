@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
@@ -85,11 +84,7 @@ class MainActivity :
         setBottomNavigationEvent()
 
         initLocationData()
-
-
     }
-
-
 
     private fun initLocationData() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -316,7 +311,6 @@ class MainActivity :
         googleMap.setOnMarkerClickListener(this)
 
         checkPermissionAndMoveCameraToUserLocation()
-
     }
 
     @SuppressLint("MissingPermission")
@@ -346,7 +340,6 @@ class MainActivity :
             )
     }
 
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -371,13 +364,11 @@ class MainActivity :
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         ) {
-            Toast.makeText(this, "권한 ㄳ염 ", Toast.LENGTH_LONG).show()
+            showToastMessage(R.string.activity_main_permission_allow)
         } else {
-            Toast.makeText(this, "내 위치 정보를 사용하려면 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+            showToastMessage(R.string.activity_main_permission_deny)
         }
     }
-
-
 
     override fun onMarkerClick(marker: Marker): Boolean {
         viewModel.onMarkerClicked(marker.tag as SnapPointTag)

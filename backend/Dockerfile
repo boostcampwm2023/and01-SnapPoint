@@ -21,8 +21,6 @@ RUN yarn config set cache-folder /var/cache/yarn
 
 COPY package.json /src
 
-COPY .env /src
-
 COPY tsconfig.json /src
 
 COPY yarn.lock /src

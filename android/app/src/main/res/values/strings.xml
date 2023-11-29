@@ -20,8 +20,14 @@
     <string name="menu_settings">설정</string>
     <string name="activity_main_fab_content_description">present_location_button</string>
     <string name="activity_main_sb_hint">검색할 주소를 입력하세요.</string>
+    <string name="activity_main_permission_allow">사용자의 위치에 접근하도록 허용합니다.</string>
+    <string name="activity_main_permission_deny">내 위치 정보를 사용하려면 위치 권한이 필요합니다.</string>
     <string name="around_title">주변 게시글</string>
     <string name="btn_preview_text">미리보기</string>
     <string name="btn_view_post_text">게시글 보기</string>
     <string name="create_post_activity_post_creation_success">게시글 작성 성공했습니다 !</string>
+    <string name="login_activity_e_mail">E-MAIL</string>
+    <string name="login_activity_password">PASSWORD</string>
+    <string name="login_activity_sign_in">SIGN IN</string>
+    <string name="login_activity_fail">이메일 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.</string>
 </resources>

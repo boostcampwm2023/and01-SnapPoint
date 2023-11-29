@@ -11,6 +11,7 @@ import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 
 class PostListAdapter(
     private val onPreviewButtonClicked: (Int) -> Unit,
+    private val onViewPostButtonClicked: (Int) -> Unit,
 ) : ListAdapter<PostSummaryState, PostItemViewHolder>(diffUtil) {
 
     private var expandedIndexSet: MutableSet<Int> = mutableSetOf()
@@ -23,7 +24,8 @@ class PostListAdapter(
                 if (expandedIndexSet.contains(index)) expandedIndexSet.remove(index)
                 else expandedIndexSet.add(index)
             },
-            onPreviewButtonClicked = onPreviewButtonClicked
+            onPreviewButtonClicked = onPreviewButtonClicked,
+            onViewPostButtonClicked = onViewPostButtonClicked
         )
     }
 
@@ -52,8 +54,9 @@ class PostListAdapter(
     }
 }
 
-@BindingAdapter("posts", "onPreviewButtonClick")
-fun RecyclerView.bindRecyclerViewAdapter(posts: List<PostSummaryState>, onPreviewButtonClicked: (Int) -> Unit) {
-    if (adapter == null) adapter = PostListAdapter(onPreviewButtonClicked = onPreviewButtonClicked)
+@BindingAdapter("posts", "onPreviewButtonClick", "onViewPostButtonClick")
+fun RecyclerView.bindRecyclerViewAdapter(posts: List<PostSummaryState>, onPreviewButtonClicked: (Int) -> Unit, onViewPostButtonClicked: (Int) -> Unit) {
+    if (adapter == null) adapter = PostListAdapter(onPreviewButtonClicked = onPreviewButtonClicked,
+        onViewPostButtonClicked = onViewPostButtonClicked)
     (adapter as PostListAdapter).submitList(posts)
 }
