@@ -24,4 +24,11 @@ class LoginRepositoryImpl @Inject constructor(
             snapPointApi.postLogin(request)
         }
     }
+
+    override fun getLogout(): Flow<Unit> {
+        return flowOf(true)
+            .map{
+                snapPointApi.logout()
+            }
+    }
 }

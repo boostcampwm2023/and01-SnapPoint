@@ -12,5 +12,4 @@ interface PostRepository {
     fun getVideo(uri: String): Flow<ByteArray>
     fun getVideoUri(video: ByteArray): Flow<Unit>
     fun postCreatePost(title: String, postBlocks: List<PostBlockState>): Flow<CreatePostResponse>
-    fun logout(): Flow<Unit>
 }

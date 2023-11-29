@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface LoginRepository {
 
     fun postLogin(email: String, password: String): Flow<LoginResponse>
+
+    fun getLogout(): Flow<Unit>
 }

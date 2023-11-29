@@ -3,7 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.setting
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.data.repository.LoginRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -12,11 +12,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val loginRepository: LoginRepository
 ) : ViewModel() {
 
     fun tryLogout() {
-        postRepository.logout()
+        loginRepository.getLogout()
             .onEach {
                 Log.d("LOG", "LOGOUT: $it")
             }
