@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BlocksModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
-import { BlockFileModule } from './domain/block-file/block-file.module';
-import { PostApiModule } from './api/post-api/post-api.module';
 import { FileModule } from './domain/file/file.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { PrismaService } from './common/prisma/prisma.service';
@@ -15,13 +13,12 @@ import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module'
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { ApiModule } from './api/api.module';
 
 @Module({
   imports: [
     BlocksModule,
     PostModule,
-    BlockFileModule,
-    PostApiModule,
     UserModule,
     AuthModule,
     FileModule,
@@ -32,6 +29,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     }),
     JwtModule,
     RefreshTokenModule,
+    ApiModule,
   ],
   controllers: [],
   providers: [
