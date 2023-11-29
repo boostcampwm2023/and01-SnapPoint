@@ -56,6 +56,7 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.search.SearchView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -342,12 +343,18 @@ class MainActivity :
                 .debounce(500)
                 .onEach { query -> getAddressAutoCompletion(query) }
                 .launchIn(lifecycleScope)
-        }
 
-        binding.sv.editText.setOnEditorActionListener { v, _, _ ->
-            val address = v.text.toString()
-            moveCameraToAddress(address)
-            true
+            sv.editText.setOnEditorActionListener { v, _, _ ->
+                val address = v.text.toString()
+                moveCameraToAddress(address)
+                true
+            }
+
+            sv.addTransitionListener { _, _, afterState ->
+                if (afterState == SearchView.TransitionState.HIDDEN) {
+                    viewModel.updateAutoCompleteTexts(emptyList())
+                }
+            }
         }
     }
 
