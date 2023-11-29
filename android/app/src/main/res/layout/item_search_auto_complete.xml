@@ -36,8 +36,7 @@
             app:layout_constraintStart_toEndOf="@id/iv_marker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/iv_marker"
-            app:layout_constraintBottom_toBottomOf="@id/iv_marker"
-            tools:text="울산광역시 중구 신기11길 10-10"/>
+            app:layout_constraintBottom_toBottomOf="@id/iv_marker"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

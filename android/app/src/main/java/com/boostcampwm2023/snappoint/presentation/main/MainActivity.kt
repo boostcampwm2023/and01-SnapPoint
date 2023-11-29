@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.location.Geocoder
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -337,6 +338,29 @@ class MainActivity :
                 .onEach { query -> getAddressAutoCompletion(query) }
                 .launchIn(lifecycleScope)
         }
+
+        onSearchButtonClickedInSearchView()
+    }
+
+    private fun onSearchButtonClickedInSearchView() {
+        val geocoder = Geocoder(applicationContext)
+
+        with(binding) {
+            sv.editText.setOnEditorActionListener { v, _, _ ->
+                val address = v.text.toString()
+                val results = geocoder.getFromLocationName(address, 1)
+
+                if (results == null || results.size == 0) {
+                    showToastMessage(R.string.search_location_fail)
+                } else {
+                    val latLng = LatLng(results[0].latitude, results[0].longitude)
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    sv.hide()
+                }
+                true
+            }
+        }
     }
 
     private fun getAddressAutoCompletion(query: String) {
@@ -347,9 +371,6 @@ class MainActivity :
 
         placesClient.findAutocompletePredictions(request)
             .addOnSuccessListener { response ->
-//                for (prediction in response.autocompletePredictions) {
-//                    println(prediction.getFullText(null).toString())
-//                }
                 viewModel.updateAutoCompleteTexts(response.autocompletePredictions.map {
                     it.getFullText(null).toString()
                 })
