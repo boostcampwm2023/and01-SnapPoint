@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -27,7 +25,6 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "apiKey", getApiKey("MAPS_API_KEY"))
     }
     signingConfigs {
         create("release") {
@@ -56,16 +53,11 @@ android {
     buildFeatures{
         buildConfig = true
         dataBinding = true
-        buildConfig = true
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.majorVersion
     }
-}
-
-fun getApiKey(propertyKey: String) : String {
-    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 dependencies {
