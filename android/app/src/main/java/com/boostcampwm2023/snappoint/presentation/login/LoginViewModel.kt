@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.LoginRepository
+import com.boostcampwm2023.snappoint.presentation.util.TokenUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,10 +24,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+    private val loginRepository: LoginRepository,
+    val token: TokenUtil
 ) : ViewModel() {
 
-    private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState())
+    private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState(
+        email = "string@string.com",
+        password = "Str!n8Str!n8",
+        isEmailValid = true,
+        isPasswordValid = true
+    ))
     val loginFormUiState: StateFlow<LoginFormState> = _loginFormUiState.asStateFlow()
 
     private val _event: MutableSharedFlow<LoginEvent> = MutableSharedFlow(
@@ -63,7 +70,7 @@ class LoginViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                _event.emit(LoginEvent.Success(it.accessToken))
+                _event.emit(LoginEvent.Success(it.accessToken, it.refreshToken))
             }
             .catch {
                 _event.emit(LoginEvent.Fail(R.string.login_activity_fail))
