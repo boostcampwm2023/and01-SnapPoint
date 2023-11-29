@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -25,10 +27,20 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "apiKey", getApiKey("MAPS_API_KEY"))
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = file("keystore.jks")
+            storePassword = System.getenv("STORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        }
     }
 
     buildTypes {
-        release {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -42,12 +54,18 @@ android {
     }
 
     buildFeatures{
+        buildConfig = true
         dataBinding = true
+        buildConfig = true
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.majorVersion
     }
+}
+
+fun getApiKey(propertyKey: String) : String {
+    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
 }
 
 dependencies {
@@ -99,6 +117,8 @@ dependencies {
     implementation (libs.play.services.maps)
     //location
     implementation (libs.play.services.location)
+    //places
+    implementation (libs.places)
 
     //mockwebserver
     testImplementation(libs.mockwebserver)

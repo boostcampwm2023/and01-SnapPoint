@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Get } from '@nestjs/common';
+import { Controller, Post, Body, Res, UsePipes, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -7,6 +7,7 @@ import { UserService } from '@/domain/user/user.service';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { Cookies } from '@/common/decorator/cookie.decorator';
+import { validationPipe } from '@/common/pipes/validation.pipe';
 
 @ApiTags('')
 @Controller('')
@@ -25,7 +26,7 @@ export class AuthController {
   @ApiOkResponse({ description: '성공적으로 유저 생성이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 유저를 생성할 수 없습니다.' })
   create(@Body() createAuthDto: CreateAuthDto) {
-    return this.userService.create(createAuthDto);
+    return this.authService.signup(createAuthDto);
   }
 
   @Post('signin')
@@ -51,6 +52,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UsePipes(validationPipe)
   @NoAuth()
   @ApiOperation({
     summary: '엑세스 토큰 재발급 API',

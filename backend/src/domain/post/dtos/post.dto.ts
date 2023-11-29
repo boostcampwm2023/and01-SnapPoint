@@ -15,9 +15,6 @@ export class PostDto {
   @ApiProperty({ description: '게시글의 수정 일시입니다.' })
   readonly modifiedAt: string;
 
-  @ApiProperty({ description: '게시글의 발간 여부를 나타냅니다.', default: false })
-  readonly isPublished: boolean;
-
   @ApiProperty({ type: BlockDto, isArray: true })
   readonly blocks: BlockDto[];
 
@@ -27,7 +24,6 @@ export class PostDto {
       title: post.title,
       createdAt: post.createdAt,
       modifiedAt: post.modifiedAt,
-      isPublished: post.isPublished,
       blocks: blockDtos,
     };
   }
