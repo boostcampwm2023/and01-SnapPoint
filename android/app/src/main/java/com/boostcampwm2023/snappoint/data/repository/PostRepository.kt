@@ -3,8 +3,6 @@ package com.boostcampwm2023.snappoint.data.repository
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
-import java.util.Objects
 
 interface PostRepository {
     fun getImage(uri: String): Flow<ByteArray>
