@@ -43,20 +43,11 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login
                         }
 
                         is LoginEvent.Success -> {
-                            setToken(event.accessToken, event.refreshToken)
                             navigateToMainMapActivity()
-                            Log.d("LOG", "LoginActivity: ${event.accessToken}")
                         }
                     }
                 }
             }
-        }
-    }
-
-    private fun setToken(accessToken: String, refreshToken: String) {
-        with(viewModel) {
-            token.accessToken = accessToken
-            token.refreshToken = refreshToken
         }
     }
 
