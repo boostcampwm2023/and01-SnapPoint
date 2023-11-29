@@ -37,6 +37,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="string@string.com"
                 android:afterTextChanged="@{(s)->vm.updateEmail(s.toString())}"
                 android:inputType="textEmailAddress" />
 
@@ -60,6 +61,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="Str!n8Str!n8"
                 android:afterTextChanged="@{(s)->vm.updatePassword(s.toString())}"
                 android:inputType="textPassword" />
 
@@ -79,6 +81,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/til_login_password"
+            app:layout_constraintVertical_bias="0.2" />
+
+        <Button
+            android:id="@+id/btn_login_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="64dp"
+            android:text="@string/login_activity_sign_in"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_login_enter"
             app:layout_constraintVertical_bias="0.2" />
 
         <ProgressBar
