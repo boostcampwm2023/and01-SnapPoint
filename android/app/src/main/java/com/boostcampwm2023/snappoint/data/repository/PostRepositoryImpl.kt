@@ -9,6 +9,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostRespon
 import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -62,9 +63,15 @@ class PostRepositoryImpl @Inject constructor(
                             it.imageByteArray.toRequestBody("image/webp".toMediaTypeOrNull())
                         val multipartBody =
                             MultipartBody.Part.createFormData("file", "image", requestBody)
-                        val uploadResult = runBlocking {
-                            snapPointApi.postImage(multipartBody).execute()
+                        val uploadResult = try {
+                            runBlocking {
+                                snapPointApi.postImage(multipartBody).execute()
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            return emptyFlow()
                         }
+                        println("Uploading complete.")
 
                         it.asPostBlock().copy(
                             files = listOf(File(uploadResult.body()?.imageUuid ?: ""))
