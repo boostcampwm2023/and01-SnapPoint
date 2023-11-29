@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.LoginRepository
-import com.boostcampwm2023.snappoint.presentation.util.TokenUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,8 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository,
-    val token: TokenUtil
+    private val loginRepository: LoginRepository
 ) : ViewModel() {
 
     private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState(
