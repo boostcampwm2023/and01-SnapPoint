@@ -27,10 +27,14 @@ export class ValidationService {
     const sourceFileMap = new Map<string, WriteBlockFileDto[]>();
 
     blockFileDtos.forEach((blockFile) => {
-      if (!sourceFileMap.has(blockFile.sourceUuid)) {
-        sourceFileMap.set(blockFile.sourceUuid, []);
+      const { sourceUuid } = blockFile;
+      if (!sourceFileMap.has(sourceUuid)) {
+        sourceFileMap.set(sourceUuid, []);
       }
-      sourceFileMap.get(blockFile.sourceUuid)!.push(blockFile);
+      const fileDtos = sourceFileMap.get(sourceUuid);
+      if (fileDtos) {
+        fileDtos.push(blockFile);
+      }
     });
 
     blockDtos.forEach((blockDto) => {
