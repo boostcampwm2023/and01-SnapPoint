@@ -35,6 +35,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             posts="@{vm.uiState.posts}"
             onPreviewButtonClick="@{vm.uiState.onPreviewButtonClicked}"
+            onViewPostButtonClick="@{vm.uiState.onViewPostButtonClicked}"
             tools:listitem="@layout/item_around_post" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

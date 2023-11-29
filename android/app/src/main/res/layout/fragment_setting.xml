@@ -4,6 +4,10 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.setting.SettingViewModel" />
+
     </data>
 
     <FrameLayout
@@ -16,6 +20,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="setting fragment" />
+
+        <Button
+            android:id="@+id/btn_setting_test_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClickListener="@{()->vm.tryLogout()}"
+            android:text="LOGOUT" />
 
     </FrameLayout>
 </layout>

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -7,40 +7,45 @@ import { CreatePostDto } from './dtos/create-post.dto';
 export class PostService {
   constructor(private prisma: PrismaProvider) {}
 
-  async create(createPostDto: CreatePostDto): Promise<Post> {
-    return this.prisma.get().post.create({
-      data: createPostDto,
+  async createPost(userUuid: string, dto: CreatePostDto) {
+    return this.prisma.get().post.create({ data: { ...dto, userUuid } });
+  }
+
+  async findPost(postWhereUniqueInput: Prisma.PostWhereUniqueInput): Promise<Post | null> {
+    return this.prisma.get().post.findUnique({
+      where: { ...postWhereUniqueInput, isDeleted: false },
     });
   }
 
-  async findOne(uuid: string): Promise<Post> {
-    const post = await this.prisma.get().post.findUnique({ where: { uuid } });
-
-    return post;
+  async findPosts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.PostWhereUniqueInput;
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationInput;
+  }): Promise<Post[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.get().post.findMany({
+      skip,
+      take,
+      cursor,
+      where: { ...where, isDeleted: false },
+      orderBy,
+    });
   }
 
-  async findMany(where?: Prisma.PostWhereInput): Promise<Post[] | null> {
-    return this.prisma.get().post.findMany({
+  async updatePost(params: { where: Prisma.PostWhereUniqueInput; data: Prisma.PostUpdateInput }) {
+    const { data, where } = params;
+    return this.prisma.get().post.update({
+      data,
       where,
     });
   }
 
-  async update(uuid: string, updatePostDto: Prisma.PostUpdateInput) {
-    const post = await this.findOne(uuid);
-
+  async deletePost(where: Prisma.PostWhereUniqueInput): Promise<Post> {
     return this.prisma.get().post.update({
-      data: updatePostDto,
-      where: { uuid: post.uuid },
+      data: { isDeleted: true },
+      where,
     });
-  }
-
-  async publish(uuid: string) {
-    const post = await this.findOne(uuid);
-
-    if (post.isPublished) {
-      throw new ConflictException(`Post with UUID: ${post.uuid} is already published.`);
-    }
-
-    return this.prisma.get().post.update({ data: { isPublished: true }, where: { uuid: post.uuid } });
   }
 }

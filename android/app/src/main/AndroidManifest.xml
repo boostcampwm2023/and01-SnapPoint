@@ -17,7 +17,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:name=".SnapPointApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -27,11 +26,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SnapPoint"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+      
         <activity
             android:name=".presentation.signup.SignupTestActivity"
             android:exported="true" >
         </activity>
+        <activity
+            android:name=".presentation.viewpost.ViewPostActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -42,7 +46,7 @@
 
         <activity
             android:name=".presentation.main.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

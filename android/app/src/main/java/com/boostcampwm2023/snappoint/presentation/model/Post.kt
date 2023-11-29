@@ -34,6 +34,12 @@ sealed class PostBlockState(open val content: String, open val isEditMode: Boole
         val position: PositionState = PositionState(0.0, 0.0),
         val address: String = ""
     ) : PostBlockState(content, isEditMode, uuid)
+
+    enum class ViewType {
+        TEXT,
+        IMAGE,
+        VIDEO,
+    }
 }
 
 data class PositionState(

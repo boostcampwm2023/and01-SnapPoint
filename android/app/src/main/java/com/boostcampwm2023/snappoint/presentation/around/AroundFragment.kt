@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.around
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
@@ -11,6 +12,7 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentAroundBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
+import com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -40,11 +42,21 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
                             is AroundEvent.ShowSnapPointAndRoute -> {
                                 mainViewModel.previewButtonClicked(event.index)
                             }
+
+                            is AroundEvent.NavigateViewPost -> {
+                                navigateToViewPost(event.index)
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun navigateToViewPost(index: Int) {
+        val intent = Intent(requireContext(), ViewPostActivity::class.java)
+        intent.putExtra("index", index)
+        startActivity(intent)
     }
 
     private fun initBinding() {

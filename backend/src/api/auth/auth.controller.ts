@@ -1,22 +1,23 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, UsePipes, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { Response } from 'express';
-import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { UserService } from '@/domain/user/user.service';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
+import { Cookies } from '@/common/decorator/cookie.decorator';
+import { validationPipe } from '@/common/pipes/validation.pipe';
 
-@ApiTags('auth')
-@Controller('auth')
+@ApiTags('')
+@Controller('')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
 
-  @Post()
+  @Post('signup')
   @NoAuth()
   @ApiOperation({
     summary: '새로운 유저를 생성하는 API',
@@ -25,10 +26,10 @@ export class AuthController {
   @ApiOkResponse({ description: '성공적으로 유저 생성이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 유저를 생성할 수 없습니다.' })
   create(@Body() createAuthDto: CreateAuthDto) {
-    return this.userService.create(createAuthDto);
+    return this.authService.signup(createAuthDto);
   }
 
-  @Post('login')
+  @Post('signin')
   @NoAuth()
   @ApiOperation({
     summary: '로그인 API',
@@ -51,6 +52,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UsePipes(validationPipe)
   @NoAuth()
   @ApiOperation({
     summary: '엑세스 토큰 재발급 API',
@@ -58,12 +60,31 @@ export class AuthController {
   })
   @ApiOkResponse({ description: '성공적으로 엑세스 토큰 발급이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 리프레시 토큰으로 새로운 엑세스 토큰을 발급할 수 없습니다.' })
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto, @Res({ passthrough: true }) res: Response) {
-    const refreshDto = await this.authService.refresh(refreshTokenDto);
+  async refresh(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    const refreshDto = await this.authService.refresh(refreshToken);
     res.setHeader('Authorization', 'Bearer ' + refreshDto.accessToken);
     res.cookie('access_token', refreshDto.accessToken, {
       httpOnly: true,
     });
     return refreshDto;
+  }
+
+  @Get('logout')
+  @NoAuth()
+  @ApiOperation({
+    summary: '로그아웃 API',
+    description: '로그아웃에 성공하면 201번을 반환한다.',
+  })
+  @ApiOkResponse({ description: '성공적으로 로그아웃이 완료되었습니다.' })
+  async logout(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(refreshToken);
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      maxAge: 0,
+    });
   }
 }

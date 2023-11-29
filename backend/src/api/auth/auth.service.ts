@@ -1,13 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '@/domain/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
-import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { SignUpDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,18 @@ export class AuthService {
     readonly configService: ConfigService,
     readonly refreshTokenService: RefreshTokenService,
   ) {}
+
+  async signup(createAuthDto: CreateAuthDto) {
+    const user = await this.userService.findUserByUniqueInput({ email: createAuthDto.email });
+
+    if (user) {
+      throw new ConflictException('이미 존재하는 이메일입니다.');
+    }
+
+    const newUser = await this.userService.create(createAuthDto);
+
+    return SignUpDto.of(newUser);
+  }
 
   async validateUser(loginAuthDto: LoginAuthDto) {
     const user = await this.userService.findUserByUniqueInput({ email: loginAuthDto.email });
@@ -40,9 +53,7 @@ export class AuthService {
     }
   }
 
-  async refresh(refreshTokenDto: RefreshTokenDto): Promise<{ accessToken: string }> {
-    const { refreshToken } = refreshTokenDto;
-
+  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
     const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });
@@ -64,6 +75,20 @@ export class AuthService {
     const accessToken = await this.refreshTokenService.generateAccessToken(user);
 
     return RefreshDto.of(accessToken);
+  }
+
+  async logout(refreshToken: string) {
+    const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+
+    const user = await this.userService.findUserByUniqueInput({ uuid: decodedRefreshToken.uuid });
+
+    if (!user) {
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
+    }
+
+    await this.refreshTokenService.delete({ userUuid: user.uuid });
   }
 
   async setCurrentRefreshToken(refreshToken: string, userUuid: string) {

@@ -1,53 +1,61 @@
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
-import { BucketService } from '@/common/bucket.service';
 import { File, Prisma } from '@prisma/client';
-import { randomUUID } from 'crypto';
 
 @Injectable()
 export class FileService {
-  constructor(
-    private readonly bucketService: BucketService,
-    private readonly prismaProvider: PrismaProvider,
-  ) {}
+  constructor(private readonly prisma: PrismaProvider) {}
 
-  async create(createFileDto: CreateFileDto) {
-    const { file } = createFileDto;
+  async createFile(data: Prisma.FileCreateInput) {
+    return this.prisma.get().file.create({ data });
+  }
 
-    return this.prismaProvider.beginTransaction(async () => {
-      file.filename = randomUUID();
-      const { Location: url, Key: fileUuid } = await this.bucketService.uploadFile(file);
+  async createFiles(data: Prisma.FileCreateManyInput) {
+    return this.prisma.get().file.createMany({ data });
+  }
 
-      const createdFile = await this.prismaProvider.get().file.create({
-        data: {
-          uuid: fileUuid,
-          userUuid: 'test',
-          mimeType: file.mimetype,
-          url: url,
-        },
-      });
-      return this.findOne(createdFile.uuid);
+  async findFile(fileWhereUniqueInput: Prisma.FileWhereUniqueInput): Promise<File | null> {
+    return this.prisma.get().file.findUnique({
+      where: { ...fileWhereUniqueInput, isDeleted: false },
     });
   }
 
-  async findOne(uuid: string): Promise<File> {
-    const file = await this.prismaProvider.get().file.findUnique({ where: { uuid } });
-    return file;
-  }
-
-  async findMany(where?: Prisma.FileWhereInput): Promise<File[]> {
-    return this.prismaProvider.get().file.findMany({
-      where: where,
+  async findFiles(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.FileWhereUniqueInput;
+    where?: Prisma.FileWhereInput;
+    orderBy?: Prisma.FileOrderByWithRelationInput;
+  }): Promise<File[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.get().file.findMany({
+      skip,
+      take,
+      cursor,
+      where: { ...where, isDeleted: false },
+      orderBy,
     });
   }
-  update(id: number, updateFileDto: UpdateFileDto) {
-    updateFileDto;
-    return `This action updates a #${id} file`;
+
+  async updateFile(params: { where: Prisma.FileWhereUniqueInput; data: Prisma.FileUpdateInput }) {
+    const { data, where } = params;
+    return this.prisma.get().file.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+  async deleteFile(where: Prisma.FileWhereUniqueInput): Promise<File> {
+    return this.prisma.get().file.update({
+      data: { isDeleted: true },
+      where,
+    });
+  }
+
+  async deleteFiles(where: Prisma.FileWhereInput) {
+    return this.prisma.get().file.updateMany({
+      data: { isDeleted: true },
+      where,
+    });
   }
 }

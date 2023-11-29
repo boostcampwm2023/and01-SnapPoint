@@ -1,3 +1,4 @@
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserService } from '@/domain/user/user.service';
@@ -6,20 +7,14 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshToken, User } from '@prisma/client';
-import { RefreshTokenDto } from './dto/refresh-auth.dto';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
-jest.mock('@nestjs/jwt');
-jest.mock('@nestjs/config');
-jest.mock('@/refresh-token/refresh-token.service');
-jest.mock('@/user/user.service');
-
 describe('AuthSerivce', () => {
   let service: AuthService;
-  let jwtService: JwtService;
-  let refreshTokenService: RefreshTokenService;
-  let userService: UserService;
+  let jwtService: DeepMockProxy<JwtService>;
+  let refreshTokenService: DeepMockProxy<RefreshTokenService>;
+  let userService: DeepMockProxy<UserService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,12 +27,19 @@ describe('AuthSerivce', () => {
         PrismaProvider,
         PrismaService,
       ],
-    }).compile();
+    })
+      .overrideProvider(JwtService)
+      .useValue(mockDeep<JwtService>())
+      .overrideProvider(RefreshTokenService)
+      .useValue(mockDeep<RefreshTokenService>())
+      .overrideProvider(UserService)
+      .useValue(mockDeep<UserService>())
+      .compile();
 
     service = module.get<AuthService>(AuthService);
-    jwtService = module.get<JwtService>(JwtService);
-    refreshTokenService = module.get<RefreshTokenService>(RefreshTokenService);
-    userService = module.get<UserService>(UserService);
+    jwtService = module.get(JwtService);
+    refreshTokenService = module.get(RefreshTokenService);
+    userService = module.get(UserService);
   });
 
   describe('로그인: validateUser()', () => {
@@ -69,9 +71,11 @@ describe('AuthSerivce', () => {
     it('존재하는 유저의 경우 accessToken, refreshToken을 반환한다.', async () => {
       jest.spyOn(service, 'verifyPassword').mockResolvedValueOnce();
       jest.spyOn(service, 'setCurrentRefreshToken').mockResolvedValueOnce(refreshToken);
-      jest.spyOn(userService, 'findUserByUniqueInput').mockResolvedValueOnce(userMock);
-      jest.spyOn(refreshTokenService, 'generateAccessToken').mockResolvedValueOnce(access_token);
-      jest.spyOn(refreshTokenService, 'generateRefreshToken').mockResolvedValueOnce(refresh_token);
+      userService.findUserByUniqueInput.mockResolvedValueOnce(userMock);
+      refreshTokenService.generateAccessToken.mockResolvedValueOnce(access_token);
+      refreshTokenService.generateRefreshToken.mockResolvedValueOnce(refresh_token);
+
+      service.verifyPassword;
 
       const result = await service.validateUser(loginAuthDto);
       expect(result).toEqual({
@@ -82,10 +86,8 @@ describe('AuthSerivce', () => {
   });
 
   describe('refresh', () => {
-    const refreshTokenDto: RefreshTokenDto = {
-      refreshToken: 'test_refresh_token',
-    };
     const access_token = 'test_access_token';
+    const refreshToken = 'test_refresh_token';
     const userMock: User = {
       id: 1,
       email: 'test@example.com',
@@ -106,12 +108,12 @@ describe('AuthSerivce', () => {
     };
 
     it('refresh 토큰 검증 이후 access_token을 반환한다.', async () => {
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({ uuid: 'testUuid' });
-      jest.spyOn(userService, 'findUserByUniqueInput').mockResolvedValueOnce(userMock);
-      jest.spyOn(refreshTokenService, 'generateAccessToken').mockResolvedValueOnce(access_token);
-      jest.spyOn(refreshTokenService, 'findRefreshTokenByUnique').mockResolvedValueOnce(refreshTokenMock);
+      jwtService.verifyAsync.mockResolvedValue({ uuid: 'testUuid' });
+      userService.findUserByUniqueInput.mockResolvedValueOnce(userMock);
+      refreshTokenService.generateAccessToken.mockResolvedValueOnce(access_token);
+      refreshTokenService.findRefreshTokenByUnique.mockResolvedValue(refreshTokenMock);
 
-      const result = await service.refresh(refreshTokenDto);
+      const result = await service.refresh(refreshToken);
 
       expect(result).toEqual({
         accessToken: access_token,

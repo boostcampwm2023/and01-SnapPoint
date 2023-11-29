@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import androidx.lifecycle.ViewModel
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
@@ -26,6 +27,13 @@ class MainViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<MainUiState> = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+
+    private val _searchViewUiState: MutableStateFlow<SearchViewUiState> = MutableStateFlow(
+        SearchViewUiState(onAutoCompleteItemClicked = { index ->
+            moveCameraToAddress(index)
+        })
+    )
+    val searchViewUiState: StateFlow<SearchViewUiState> = _searchViewUiState.asStateFlow()
 
     private val _event: MutableSharedFlow<MainActivityEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
@@ -160,7 +168,10 @@ class MainViewModel @Inject constructor(
 
     private fun updateSelectedIndex(index: Int){
         _uiState.update {
-            it.copy(selectedIndex = index)
+            it.copy(
+                selectedIndex = index,
+                focusedIndex = 0
+            )
         }
     }
 
@@ -168,7 +179,8 @@ class MainViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isPreviewFragmentShowing = false,
-                selectedIndex = -1
+                selectedIndex = -1,
+                focusedIndex = -1
             )
         }
     }
@@ -194,5 +206,15 @@ class MainViewModel @Inject constructor(
                 selectedIndex = postIndex,
                 focusedIndex = snapPointIndex)
         }
+    }
+
+    fun updateAutoCompleteTexts(texts: List<String>) {
+        _searchViewUiState.update {
+            it.copy(texts = texts)
+        }
+    }
+
+    private fun moveCameraToAddress(index: Int) {
+        _event.tryEmit(MainActivityEvent.MoveCameraToAddress(index))
     }
 }
