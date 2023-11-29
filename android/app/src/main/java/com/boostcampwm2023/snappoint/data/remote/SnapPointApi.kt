@@ -6,6 +6,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostRespon
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.LoginResponse
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -32,4 +33,7 @@ interface SnapPointApi {
     suspend fun postLogin(
         @Body loginRequest: LoginRequest
     ): LoginResponse
+
+    @GET("logout")
+    suspend fun logout()
 }
