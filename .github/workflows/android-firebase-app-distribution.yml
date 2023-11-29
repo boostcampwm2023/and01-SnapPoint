@@ -30,7 +30,7 @@ jobs:
       run: |
         echo "$LOCAL_PROPERTIES" > local.properties
         echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
-        echo APP_KEYSTORE > keystore_b64.txt
+        echo "$APP_KEYSTORE" > keystore_b64.txt
         base64 --decode --ignore-garbage keystore_b64.txt > app/keystore.jks
 
     - name: build release
