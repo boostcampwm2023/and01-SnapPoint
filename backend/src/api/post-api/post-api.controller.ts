@@ -28,6 +28,7 @@ export class PostApiController {
   readPosts() {}
 
   @Post('/publish')
+  @NoAuth()
   @UsePipes(PostRequestDecompositionPipe, validationPipe)
   @ApiOperation({
     summary: '게시글을 작성하는 API',
