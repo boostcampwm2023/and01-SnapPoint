@@ -1,23 +1,22 @@
-package com.boostcampwm2023.snappoint.presentation.login
+package com.boostcampwm2023.snappoint.presentation.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.databinding.ActivityLoginBinding
+import com.boostcampwm2023.snappoint.databinding.ActivityAuthBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login) {
+class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +37,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(R.layout.activity_login
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is LoginEvent.Fail -> {
-                            showToastMessage(event.error)
-                        }
-
-                        is LoginEvent.Success -> {
+                        is AuthEvent.Success -> {
                             navigateToMainMapActivity()
                         }
                     }

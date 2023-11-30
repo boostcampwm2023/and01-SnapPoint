@@ -6,9 +6,9 @@ data class SignupUiState(
     val passwordConfirm: String = "",
     val nickname: String = "",
     val isSignUpInProgress: Boolean = false,
-    val isInputValid: Boolean = false,
-    val emailCode: Int? = null,
-    val passwordCode: Int? = null,
-    val passwordConfirmCode: Int? = null,
-    val nicknameCode: Int? = null
+    val isButtonEnabled: Boolean = false,
+    val emailErrorResId: Int? = null,
+    val passwordErrorResId: Int? = null,
+    val passwordConfirmErrorResId: Int? = null,
+    val nicknameErrorResId: Int? = null
 )
