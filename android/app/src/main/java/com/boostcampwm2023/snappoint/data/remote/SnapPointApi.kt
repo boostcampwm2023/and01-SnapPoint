@@ -1,12 +1,12 @@
 package com.boostcampwm2023.snappoint.data.remote
 
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
-import com.boostcampwm2023.snappoint.data.remote.model.request.LoginRequest
+import com.boostcampwm2023.snappoint.data.remote.model.request.SignInRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
-import com.boostcampwm2023.snappoint.data.remote.model.response.LoginResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.SignInResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignupResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,12 +31,12 @@ interface SnapPointApi {
     ): CreatePostResponse
 
     @POST("signin")
-    suspend fun postLogin(
-        @Body loginRequest: LoginRequest
-    ): LoginResponse
+    suspend fun postSignIn(
+        @Body loginRequest: SignInRequest
+    ): SignInResponse
 
     @GET("logout")
-    suspend fun getLogout()
+    suspend fun getSignOut()
 
     @POST("signup")
     suspend fun postSignUp(

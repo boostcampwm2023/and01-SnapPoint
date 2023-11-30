@@ -1,39 +1,39 @@
 package com.boostcampwm2023.snappoint.data.repository
 
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
-import com.boostcampwm2023.snappoint.data.remote.model.request.LoginRequest
+import com.boostcampwm2023.snappoint.data.remote.model.request.SignInRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
-import com.boostcampwm2023.snappoint.data.remote.model.response.LoginResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.SignInResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignupResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class LoginRepositoryImpl @Inject constructor(
+class SignInRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi
-) : LoginRepository {
+) : SignInRepository {
 
-    override fun postLogin(email: String, password: String): Flow<LoginResponse> {
+    override fun postSignIn(email: String, password: String): Flow<SignInResponse> {
 
-        val request: LoginRequest = LoginRequest(
+        val request: SignInRequest = SignInRequest(
             email = email,
             password = password
         )
 
         return flowOf(true).map {
-            snapPointApi.postLogin(request)
+            snapPointApi.postSignIn(request)
         }
     }
 
-    override fun getLogout(): Flow<Unit> {
+    override fun getSignOut(): Flow<Unit> {
         return flowOf(true)
             .map{
-                snapPointApi.getLogout()
+                snapPointApi.getSignOut()
             }
     }
 
-    override fun postSignup(
+    override fun postSignUp(
         email: String,
         password: String,
         nickname: String
