@@ -6,7 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshDto } from './dto/refresh.dto';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { SignUpDto } from './dto/signup.dto';
 
@@ -51,30 +50,6 @@ export class AuthService {
     if (!isPasswordMatching) {
       throw new BadRequestException('잘못된 비밀번호입니다.');
     }
-  }
-
-  async refresh(refreshToken: string): Promise<{ accessToken: string }> {
-    const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-    });
-
-    const refreshTokenEntity = await this.refreshTokenService.findRefreshTokenByUnique({
-      userUuid: decodedRefreshToken.uuid,
-    });
-
-    if (!refreshTokenEntity) {
-      throw new NotFoundException('리프레시 토큰이 존재하지 않습니다.');
-    }
-
-    const user = await this.userService.findUserByUniqueInput({ uuid: refreshTokenEntity.userUuid });
-
-    if (!user) {
-      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
-    }
-
-    const accessToken = await this.refreshTokenService.generateAccessToken(user);
-
-    return RefreshDto.of(accessToken);
   }
 
   async logout(refreshToken: string) {
