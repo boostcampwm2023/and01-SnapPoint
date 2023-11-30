@@ -19,7 +19,6 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Response
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
@@ -77,7 +76,7 @@ class PostRepositoryImpl @Inject constructor(
 
                         // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
                         it.asPostBlock().copy(
-                            files = listOf(File(uploadResult.body()?.uuid ?: ""))
+                            files = listOf(File(uploadResult.uuid))
                         )
                     }
                     else -> it.asPostBlock()
@@ -92,11 +91,14 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun postImage(byteArray: ByteArray): Response<PostImageResponse> {
+    override fun postImage(byteArray: ByteArray): Flow<PostImageResponse> {
 
         val requestBody = byteArray.toRequestBody("image/webp".toMediaTypeOrNull())
         val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
 
-        return snapPointApi.postImage(multipartBody)
+        return flowOf(true)
+            .map{
+                snapPointApi.postImage(multipartBody)
+            }
     }
 }

@@ -19,8 +19,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
 
-    private val json = Json { ignoreUnknownKeys = true }
-
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -35,7 +33,7 @@ object RemoteModule {
         return Retrofit.Builder()
             .baseUrl("http://175.45.195.153:3000/")
             .client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(SnapPointApi::class.java)
     }

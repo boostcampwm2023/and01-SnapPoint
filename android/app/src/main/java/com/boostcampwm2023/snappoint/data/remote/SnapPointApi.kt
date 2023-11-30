@@ -45,5 +45,5 @@ interface SnapPointApi {
     @POST("files")
     suspend fun postImage(
         @Part bitmap: MultipartBody.Part?
-    ): Response<PostImageResponse>
+    ): PostImageResponse
 }
