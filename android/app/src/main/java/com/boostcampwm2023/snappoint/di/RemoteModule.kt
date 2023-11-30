@@ -35,7 +35,7 @@ object RemoteModule {
         return Retrofit.Builder()
             .baseUrl("http://175.45.195.153:3000/")
             .client(client)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(SnapPointApi::class.java)
     }

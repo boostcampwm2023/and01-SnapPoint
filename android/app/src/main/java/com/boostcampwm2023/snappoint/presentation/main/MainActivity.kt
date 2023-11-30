@@ -6,6 +6,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
