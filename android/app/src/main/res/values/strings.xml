@@ -43,4 +43,7 @@
     <string name="splash_activity_auto_login">자동로그인 중입니다.</string>
     <string name="sign_in_fragment_auto_login_success">자동로그인 했습니다.</string>
     <string name="sign_in_fragment_auto_login_fail">로그인 정보가 없거나 만료되었습니다.\n다시 시도해주세요</string>
+    <string name="setting_fragment_remove_all_marker">스냅 포인트 지우기</string>
+    <string name="setting_fragment_sign_out">로그아웃!</string>
+    <string name="setting_fragment_sign_out_success">로그아웃 했습니다.</string>
 </resources>
