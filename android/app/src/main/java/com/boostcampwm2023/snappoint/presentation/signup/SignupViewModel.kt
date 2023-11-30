@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
@@ -47,7 +48,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 email = email,
-                emailCode = takeEmailErrorCode(email)
+                emailErrorResId = takeEmailErrorCode(email)
             )
         }
         updateButtonState()
@@ -57,7 +58,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 password = password,
-                passwordCode = takePasswordErrorCode(password)
+                passwordErrorResId = takePasswordErrorCode(password)
             )
         }
         updatePasswordConfirm()
@@ -68,7 +69,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 passwordConfirm = password,
-                passwordConfirmCode = takePasswordConfirmErrorCode(password)
+                passwordConfirmErrorResId = takePasswordConfirmErrorCode(password)
             )
         }
         updateButtonState()
@@ -77,7 +78,7 @@ class SignupViewModel @Inject constructor(
     private fun updatePasswordConfirm() {
         _uiState.update {
             it.copy(
-                passwordConfirmCode = takePasswordConfirmErrorCode(it.passwordConfirm)
+                passwordConfirmErrorResId = takePasswordConfirmErrorCode(it.passwordConfirm)
             )
         }
     }
@@ -86,7 +87,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 nickname = nickname,
-                nicknameCode = takeNicknameErrorCode(nickname)
+                nicknameErrorResId = takeNicknameErrorCode(nickname)
             )
         }
         updateButtonState()
@@ -95,19 +96,19 @@ class SignupViewModel @Inject constructor(
     private fun updateButtonState() {
         _uiState.update {
             it.copy(
-                isButtonEnabled = it.emailCode == null &&
-                        it.passwordCode == null &&
-                        it.passwordConfirmCode == null &&
-                        it.nicknameCode == null
+                isButtonEnabled = it.emailErrorResId == null &&
+                        it.passwordErrorResId == null &&
+                        it.passwordConfirmErrorResId == null &&
+                        it.nicknameErrorResId == null
             )
         }
     }
 
-    private fun updateEmailErrorCode(message: String?) {
+    private fun updateEmailErrorResId(message: String?) {
         if (isMessageDuplicationError(message)) {
             _uiState.update {
                 it.copy(
-                    emailCode = R.string.signup_fragment_error_email_duplicate,
+                    emailErrorResId = R.string.signup_fragment_error_email_duplicate,
                     isButtonEnabled = false
                 )
             }
@@ -141,15 +142,14 @@ class SignupViewModel @Inject constructor(
                     setProgressBarState(true)
                 }
                 .onEach {
+                    Log.d("LOG", "MESSAGE: $it")
                     _event.emit(SignupEvent.Success)
                 }
                 .catch {
-                    updateEmailErrorCode(it.message)
+                    Log.d("LOG", "MESSAGE: ${it.message}")
+                    updateEmailErrorResId(it.message)
                     _event.emit(
-                        SignupEvent.Fail(
-                            takeErrorMessage(it.message),
-                            R.string.signup_fragment_fail
-                        )
+                        SignupEvent.Fail(_uiState.value.emailErrorResId ?: R.string.signup_fragment_fail)
                     )
                 }
                 .onCompletion {

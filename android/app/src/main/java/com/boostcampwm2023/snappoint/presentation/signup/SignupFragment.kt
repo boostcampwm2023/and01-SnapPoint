@@ -49,11 +49,7 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
                 viewModel.event.collect { event ->
                     when (event) {
                         is SignupEvent.Fail -> {
-                            event.error?.let {
-                                showToastMessage(event.error)
-                            } ?: run {
-                                showToastMessage(event.toast)
-                            }
+                            showToastMessage(event.toast)
                         }
 
                         is SignupEvent.Success -> {
