@@ -1,12 +1,20 @@
 package com.boostcampwm2023.snappoint.presentation.signup
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSignupBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
+import com.boostcampwm2023.snappoint.presentation.login.LoginEvent
+import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_signup) {
@@ -18,6 +26,8 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
 
         initBinding()
         loadText()
+
+        collectViewModelData()
     }
 
     private fun initBinding() {
@@ -34,5 +44,31 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
             tilSignUpPasswordConfirm.editText?.setText(viewModel.uiState.value.passwordConfirm)
             tilSignUpNickname.editText?.setText(viewModel.uiState.value.nickname)
         }
+    }
+
+    private fun collectViewModelData() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is SignupEvent.Fail -> {
+                            event.error?.let {
+                                showToastMessage(event.error)
+                            } ?: run {
+                                showToastMessage(event.toast)
+                            }
+                        }
+
+                        is SignupEvent.Success -> {
+                            navigateToLogin()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLogin() {
+        findNavController().popBackStack()
     }
 }

@@ -132,12 +132,15 @@ class SignupViewModel @Inject constructor(
                     setProgressBarState(true)
                 }
                 .onEach {
-                    Log.d("LOG", "${it}")
                     _event.emit(SignupEvent.Success)
                 }
                 .catch {
-                    Log.d("LOG", "${it.message}")
-                    _event.emit(SignupEvent.Fail)
+                    _event.emit(
+                        SignupEvent.Fail(
+                            takeErrorMessage(it.message),
+                            R.string.signup_fragment_fail
+                        )
+                    )
                 }
                 .onCompletion {
                     setProgressBarState(false)
@@ -151,6 +154,13 @@ class SignupViewModel @Inject constructor(
             it.copy(
                 isSignUpInProgress = isInProgress
             )
+        }
+    }
+
+    private fun takeErrorMessage(message: String?): Int? {
+        return when (message) {
+            "HTTP 409 Conflict" -> R.string.signup_fragment_fail_duplicate
+            else -> null
         }
     }
 }
