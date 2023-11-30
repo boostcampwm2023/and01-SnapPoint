@@ -5,6 +5,7 @@ import { PostDto } from '@/domain/post/dtos/post.dto';
 import { ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiParam } from '@nestjs/swagger';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { WritePostDto } from './dtos/write-post.dto';
+import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
 
 @Controller('posts')
 export class PostApiController {
@@ -29,7 +30,7 @@ export class PostApiController {
     summary: '위치정보를 받아 근처 게시글을 조회하는 API',
     description: '근처에 있는 게시글과 연관된 블록 정보를 반환한다.',
   })
-  @ApiOkResponse({ description: '성공적으로 게시글 조회가 완료되었습니다.', type: PostDto, isArray: true })
+  @ApiOkResponse({ description: '성공적으로 게시글 조회가 완료되었습니다.', type: SummaryPostDto, isArray: true })
   readNearbyPosts(@Query() findNearbyPostQuery: FindNearbyPostQuery) {
     return this.postApiService.findNearbyPost(findNearbyPostQuery);
   }

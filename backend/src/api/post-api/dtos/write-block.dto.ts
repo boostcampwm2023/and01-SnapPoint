@@ -30,6 +30,12 @@ export class WriteBlockDto {
   @IsLongitude()
   readonly longitude?: number;
 
+  @ApiProperty({
+    type: WriteBlockFileDto,
+    isArray: true,
+    required: false,
+    description: '미디어 타입인 경우 필수로 파일 정보를 첨부합니다.',
+  })
   @ValidateNested({ each: true })
   @Type(() => WriteBlockFileDto)
   @IsOptional()
