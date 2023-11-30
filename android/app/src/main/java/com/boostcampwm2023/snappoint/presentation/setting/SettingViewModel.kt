@@ -25,7 +25,7 @@ class SettingViewModel @Inject constructor(
     )
     val event: SharedFlow<SettingEvent> = _event.asSharedFlow()
 
-    fun tryLogout() {
+    fun onSignOutClick() {
         loginRepository.getSignOut()
             .onEach {
                 _event.emit(SettingEvent.SignOut)
@@ -34,5 +34,9 @@ class SettingViewModel @Inject constructor(
                 Log.d("LOG", "CATCH: $it")
             }
             .launchIn(viewModelScope)
+    }
+
+    fun onClearSnapPointClick() {
+        _event.tryEmit(SettingEvent.RemoveSnapPoint)
     }
 }

@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:onClickListener="@{}"
+            android:onClickListener="@{()->vm.onClearSnapPointClick()}"
             android:text="@string/setting_fragment_remove_all_marker" />
 
         <Button
@@ -35,7 +35,7 @@
             app:layout_constraintTop_toBottomOf="@+id/btn_setting_remove_marker"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:onClickListener="@{()->vm.tryLogout()}"
+            android:onClickListener="@{()->vm.onSignOutClick()}"
             android:text="@string/setting_fragment_sign_out" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

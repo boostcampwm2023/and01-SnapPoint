@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_setting) {
 
+    private val activityViewModel: MainViewModel by activityViewModels()
     private val viewModel: SettingViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,7 +43,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
                         }
 
                         is SettingEvent.RemoveSnapPoint -> {
-
+                            activityViewModel.clearPosts()
                         }
                     }
                 }

@@ -123,6 +123,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun clearPosts() {
+        _postState.update {
+            listOf()
+        }
+    }
+
     fun drawerIconClicked() {
         _event.tryEmit(MainActivityEvent.OpenDrawer)
     }
