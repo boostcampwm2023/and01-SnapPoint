@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.splash
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.LoginRepository
 import com.boostcampwm2023.snappoint.presentation.util.LoginUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -40,5 +42,6 @@ class SplashViewModel @Inject constructor(
             .catch {
                 _event.emit(SplashEvent.Fail)
             }
+            .launchIn(viewModelScope)
     }
 }
