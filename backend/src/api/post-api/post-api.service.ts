@@ -12,6 +12,7 @@ import { WriteBlockDto } from '@/api/post-api/dtos/write-block.dto';
 import { File, Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
+import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
 
 @Injectable()
 export class PostApiService {
@@ -40,7 +41,7 @@ export class PostApiService {
     return PostDto.of(post, blockDtos);
   }
 
-  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
+  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<SummaryPostDto[]> {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
     // TODO: 제대로 된 영역인지 평가한다. (면적, 서비스 범위?)
@@ -49,7 +50,17 @@ export class PostApiService {
     const blockWheres = blocks.map((block) => ({ uuid: block.postUuid }));
     const posts = await this.postService.findPosts({ where: { OR: blockWheres } });
 
-    return Promise.all(posts.map((post) => this.readPost(post)));
+    return Promise.all(
+      posts.map(async (post) => {
+        const postDto = await this.readPost(post);
+        const textBlocks = postDto.blocks.filter((block) => block.type === 'text');
+        const mediaBlocks = postDto.blocks.filter((block) => block.type === 'media');
+        const summary = textBlocks.length > 0 ? textBlocks[0].content : mediaBlocks[0].content;
+
+        postDto.blocks = mediaBlocks;
+        return SummaryPostDto.of(postDto, mediaBlocks, summary);
+      }),
+    );
   }
 
   async findPost(uuid: string) {
