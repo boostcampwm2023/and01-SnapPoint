@@ -1,4 +1,3 @@
-import { AuthService } from '@/api/auth/auth.service';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { UserService } from '@/domain/user/user.service';
 import {
@@ -22,7 +21,6 @@ export class JwtAuthGuard implements CanActivate {
     private configService: ConfigService,
     private refreshTokenService: RefreshTokenService,
     private userService: UserService,
-    private authSerivce: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<any> {
