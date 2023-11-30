@@ -49,7 +49,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 email = email,
-                emailErrorResId = takeEmailErrorCode(email)
+                emailErrorResId = getEmailErrorCode(email)
             )
         }
         updateButtonState()
@@ -59,7 +59,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 password = password,
-                passwordErrorResId = takePasswordErrorCode(password)
+                passwordErrorResId = getPasswordErrorCode(password)
             )
         }
         updatePasswordConfirm()
@@ -70,7 +70,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 passwordConfirm = password,
-                passwordConfirmErrorResId = takePasswordConfirmErrorCode(password)
+                passwordConfirmErrorResId = getPasswordConfirmErrorCode(password)
             )
         }
         updateButtonState()
@@ -79,7 +79,7 @@ class SignupViewModel @Inject constructor(
     private fun updatePasswordConfirm() {
         _uiState.update {
             it.copy(
-                passwordConfirmErrorResId = takePasswordConfirmErrorCode(it.passwordConfirm)
+                passwordConfirmErrorResId = getPasswordConfirmErrorCode(it.passwordConfirm)
             )
         }
     }
@@ -88,7 +88,7 @@ class SignupViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 nickname = nickname,
-                nicknameErrorResId = takeNicknameErrorCode(nickname)
+                nicknameErrorResId = getNicknameErrorCode(nickname)
             )
         }
         updateButtonState()
@@ -116,19 +116,19 @@ class SignupViewModel @Inject constructor(
         }
     }
 
-    private fun takeEmailErrorCode(email: String): Int? {
+    private fun getEmailErrorCode(email: String): Int? {
         return if (TextVerificationUtil.isEmailValid(email)) null else R.string.signup_fragment_error_email_form
     }
 
-    private fun takePasswordErrorCode(password: String): Int? {
+    private fun getPasswordErrorCode(password: String): Int? {
         return if (TextVerificationUtil.isPasswordValid(password)) null else R.string.signup_fragment_error_password_length
     }
 
-    private fun takePasswordConfirmErrorCode(password: String): Int? {
+    private fun getPasswordConfirmErrorCode(password: String): Int? {
         return if (uiState.value.password == password) null else R.string.signup_fragment_error_password_confirm_mismatch
     }
 
-    private fun takeNicknameErrorCode(nickname: String): Int? {
+    private fun getNicknameErrorCode(nickname: String): Int? {
         return if (nickname.length > 1) null else R.string.signup_fragment_error_nickname
     }
 
@@ -166,7 +166,7 @@ class SignupViewModel @Inject constructor(
         }
     }
 
-    private fun takeErrorMessage(message: String?): Int? {
+    private fun getErrorMessage(message: String?): Int? {
         return when {
             isMessageDuplicationError(message) -> R.string.signup_fragment_fail_duplicate
             else -> null
