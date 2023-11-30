@@ -10,7 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivitySplashBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.login.LoginActivity
+import com.boostcampwm2023.snappoint.presentation.auth.AuthActivity
 import com.boostcampwm2023.snappoint.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -56,7 +56,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
 
     private fun navigateToLogin() {
         startActivity(
-            Intent(this, LoginActivity::class.java).apply {
+            Intent(this, AuthActivity::class.java).apply {
                 setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
             }
         )
