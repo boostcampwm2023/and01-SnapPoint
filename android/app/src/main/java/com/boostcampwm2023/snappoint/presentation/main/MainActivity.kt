@@ -174,9 +174,16 @@ class MainActivity :
                         }
                     }
                 }
+
                 launch {
                     viewModel.uiState.collect { uiState ->
                         updateMarker(uiState.snapPoints)
+                    }
+                }
+
+                launch {
+                    viewModel.postState.collect {
+                        viewModel.createMarkers()
                     }
                 }
             }
@@ -195,7 +202,7 @@ class MainActivity :
                     if(postIndex == selectedIndex){
                         drawRoutes(selectedIndex)
                     }
-                    val mediaBlock = viewModel.uiState.value.posts[postIndex].postBlocks
+                    val mediaBlock = viewModel.postState.value[postIndex].postBlocks
                         .filterIsInstance<PostBlockState.IMAGE>()
                     snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
                         val focused =
@@ -215,7 +222,7 @@ class MainActivity :
 
     private fun drawRoutes(postIndex: Int) {
         val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
-        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
+        val positionList = viewModel.postState.value[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
                     LatLng(block.position.latitude, block.position.longitude)

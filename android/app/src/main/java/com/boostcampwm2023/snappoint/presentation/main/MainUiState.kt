@@ -4,7 +4,7 @@ import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.google.android.gms.maps.model.MarkerOptions
 
 data class MainUiState(
-    val posts: List<PostSummaryState> = emptyList(),
+//    val posts: List<PostSummaryState> = emptyList(),
     val snapPoints: List<SnapPointState> = emptyList(),
     val selectedIndex: Int = -1,
     val focusedIndex: Int = -1,

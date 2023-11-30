@@ -32,8 +32,8 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 launch {
-                    mainViewModel.uiState.collect {
-                        aroundViewModel.updatePosts(it.posts)
+                    mainViewModel.postState.collect {
+                        aroundViewModel.updatePosts(it)
                     }
                 }
                 launch {
