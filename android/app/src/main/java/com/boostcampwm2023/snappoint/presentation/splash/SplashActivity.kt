@@ -25,6 +25,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
 
         collectViewModelEvent()
         viewModel.login()
+        showToastMessage(R.string.splash_activity_auto_login)
     }
 
     private fun collectViewModelEvent() {
@@ -33,10 +34,12 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
                 viewModel.event.collect { event ->
                     when(event) {
                         is SplashEvent.Success -> {
+                            showToastMessage(R.string.sign_in_fragment_auto_login_success)
                             navigateToMainMap()
                         }
 
                         is SplashEvent.Fail -> {
+                            showToastMessage(R.string.sign_in_fragment_auto_login_fail)
                             navigateToLogin()
                         }
                     }
