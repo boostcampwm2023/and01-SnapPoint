@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
 data class MainUiState(
@@ -15,5 +15,5 @@ data class MainUiState(
 data class SnapPointState(
     //todo 게시물의 고유 번호로 변경
     val index: Int,
-    val markerOptions: List<MarkerOptions>
+    val markers: List<Marker?>
 )

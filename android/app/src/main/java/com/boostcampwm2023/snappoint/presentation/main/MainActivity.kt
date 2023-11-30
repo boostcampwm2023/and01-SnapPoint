@@ -48,6 +48,7 @@ import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -177,13 +178,30 @@ class MainActivity :
 
                 launch {
                     viewModel.uiState.collect { uiState ->
-                        updateMarker(uiState.snapPoints)
+//                        updateMarker(uiState.snapPoints)
                     }
                 }
 
                 launch {
-                    viewModel.postState.collect {
-                        viewModel.createMarkers()
+                    viewModel.postState.collect { postState ->
+                        while (googleMap == null) { delay(100) }
+
+                        val snapPoints = postState.mapIndexed { postIndex, postSummaryState ->
+                            SnapPointState(
+                                index = postIndex,
+                                markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().mapIndexed { pointIndex, postBlockState ->
+                                    googleMap?.addImageMarker(
+                                        context = this@MainActivity,
+                                        markerOptions = MarkerOptions().position(postBlockState.position.asLatLng()),
+                                        uri = postBlockState.content,
+                                        tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                        focused = false
+                                    )
+                                }
+                            )
+                        }
+                        println(snapPoints)
+                        viewModel.createMarkers(snapPoints)
                     }
                 }
             }
@@ -204,16 +222,16 @@ class MainActivity :
                     }
                     val mediaBlock = viewModel.postState.value[postIndex].postBlocks
                         .filterIsInstance<PostBlockState.IMAGE>()
-                    snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
+                    snapPointState.markers.forEachIndexed { snapPointIndex, marker ->
                         val focused =
                             (postIndex == viewModel.uiState.value.selectedIndex) && (snapPointIndex == viewModel.uiState.value.focusedIndex)
-                        map.addImageMarker(
-                            context = this@MainActivity,
-                            markerOptions = markerOptions,
-                            uri = mediaBlock[snapPointIndex].content,
-                            tag = SnapPointTag(postIndex = postIndex, snapPointIndex = snapPointIndex),
-                            focused = focused
-                        )
+//                        map.addImageMarker(
+//                            context = this@MainActivity,
+//                            markerOptions = marker,
+//                            uri = mediaBlock[snapPointIndex].content,
+//                            tag = SnapPointTag(postIndex = postIndex, snapPointIndex = snapPointIndex),
+//                            focused = focused
+//                        )
                     }
                 }
             }
@@ -242,7 +260,7 @@ class MainActivity :
     private fun moveCameraToFitScreen() {
         val postIndex = viewModel.uiState.value.selectedIndex
         val snapPoints = viewModel.uiState.value.snapPoints[postIndex]
-        val positions = snapPoints.markerOptions.map { it.position }
+        val positions = snapPoints.markers.map { it?.position ?: return }
 
         // 아프리카 적도기니를 기준
         // latitude: 북반구(+) 남반구(-)
@@ -270,7 +288,7 @@ class MainActivity :
         val newTopOfBound: Double = topOfBound + heightOfBound * topAppBarRatio / visibleRatio
         val newBottomOfBound: Double = bottomOfBound - heightOfBound * (bottomNavViewRatio + bottomSheetRatio) / visibleRatio
 
-        val bound: LatLngBounds = LatLngBounds(
+        val bound = LatLngBounds(
             LatLng(newBottomOfBound, leftOfBound),
             LatLng(newTopOfBound, rightOfBound)
         )

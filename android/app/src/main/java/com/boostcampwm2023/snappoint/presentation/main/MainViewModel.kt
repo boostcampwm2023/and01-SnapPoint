@@ -125,21 +125,19 @@ class MainViewModel @Inject constructor(
 //        createMarkers()
     }
 
-    fun createMarkers() {
+    fun createMarkers(snapPoints: List<SnapPointState>) {
         _uiState.update {
-            it.copy(
-                snapPoints =
-                _postState.value.mapIndexed { index, postSummaryState ->
-                    SnapPointState(
-                        index = index,
-                        markerOptions = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
-                            MarkerOptions().apply {
-                                position(it.position.asLatLng())
-                            }
-                        }
-                    )
-                }
-            )
+//            it.copy(snapPoints = _postState.value.mapIndexed { index, postSummaryState ->
+//                SnapPointState(
+//                    index = index,
+//                    markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
+//                        MarkerOptions().apply {
+//                            position(it.position.asLatLng())
+//                        }
+//                    }
+//                )
+//            })
+            it.copy(snapPoints = snapPoints)
         }
     }
 
