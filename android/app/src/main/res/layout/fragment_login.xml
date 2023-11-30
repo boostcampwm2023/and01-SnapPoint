@@ -80,7 +80,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"
             android:enabled="@{vm.loginFormUiState.emailValid &amp;&amp; vm.loginFormUiState.passwordValid}"
-            android:onClick="@{()->vm.tryLogin()}"
+            android:onClick="@{()->vm.onLoginButtonClick()}"
             android:text="@string/login_activity_sign_in" />
 
         <Button
@@ -91,6 +91,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/login_activity_sign_up"
             android:textColorLink="#CDFFCF"
+            android:onClick="@{()->vm.onSignUpButtonClick()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_login_enter" />

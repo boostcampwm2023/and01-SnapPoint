@@ -7,6 +7,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentLoginBinding
 import com.boostcampwm2023.snappoint.presentation.auth.AuthViewModel
@@ -46,9 +48,17 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(R.layout.fragment_login
                         is LoginEvent.Success -> {
                             activityViewModel.sendSuccessResult()
                         }
+
+                        is LoginEvent.Signup -> {
+                            navigateToSignup()
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun navigateToSignup() {
+        findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
     }
 }

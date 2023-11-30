@@ -58,7 +58,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun tryLogin() {
+    fun onLoginButtonClick() {
         val email = loginFormUiState.value.email
         // TODO 암호화
         val password = loginFormUiState.value.password
@@ -77,6 +77,10 @@ class LoginViewModel @Inject constructor(
                 setProgressBarState(false)
             }
             .launchIn(viewModelScope)
+    }
+
+    fun onSignUpButtonClick() {
+        _event.tryEmit(LoginEvent.Signup)
     }
 
     private fun setProgressBarState(isInProgress: Boolean) {
