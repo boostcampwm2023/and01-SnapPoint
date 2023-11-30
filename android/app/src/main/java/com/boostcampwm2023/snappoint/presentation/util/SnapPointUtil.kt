@@ -15,6 +15,7 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
 
@@ -24,7 +25,7 @@ suspend fun GoogleMap.addImageMarker(
     uri: String,
     tag: SnapPointTag,
     focused: Boolean,
-){
+): Marker? {
 
     val request = ImageRequest.Builder(context)
         .data(uri)
@@ -51,7 +52,7 @@ suspend fun GoogleMap.addImageMarker(
 
     val snapPoint = mergeToSnapPointBitmap(listOf(snapPointUnFocused, container, userImage))
 
-    this.addMarker(markerOptions.icon(
+    return this.addMarker(markerOptions.icon(
         BitmapDescriptorFactory.fromBitmap(
             snapPoint
         )

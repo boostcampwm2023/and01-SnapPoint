@@ -413,7 +413,8 @@ class MainActivity :
     private fun checkPermissionAndMoveCameraToUserLocation() {
         if(this.isMyLocationGranted()){
             fusedLocationClient.lastLocation
-                .addOnSuccessListener {location ->
+                .addOnSuccessListener { location ->
+                    location ?: return@addOnSuccessListener
                     googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude),17.5f))
                 }
         }else{
@@ -433,7 +434,7 @@ class MainActivity :
         fusedLocationClient.requestLocationUpdates(LocationRequest.Builder(1000L).build(),
             locationCallback,
             Looper.getMainLooper()
-            )
+        )
     }
 
     override fun onRequestPermissionsResult(
