@@ -219,9 +219,6 @@ class CreatePostViewModel @Inject constructor(
             postRepository.postCreatePost(
                 title = _uiState.value.title,
                 postBlocks = _uiState.value.postBlocks
-//                    .map {
-//                        it.asUploadablePost()
-//                    }
             )
                 .onStart {}
                 .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
