@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.auth
 
 import androidx.lifecycle.ViewModel
-import com.boostcampwm2023.snappoint.presentation.login.LoginEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

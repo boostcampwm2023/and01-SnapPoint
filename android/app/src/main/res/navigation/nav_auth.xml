@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.login.LoginFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.signin.SigninFragment"
         android:label="LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_signupFragment"

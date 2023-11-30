@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.login
+package com.boostcampwm2023.snappoint.presentation.signin
 
 import android.os.Bundle
 import android.view.View
@@ -7,20 +7,19 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavHostController
 import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.databinding.FragmentLoginBinding
+import com.boostcampwm2023.snappoint.databinding.FragmentSigninBinding
 import com.boostcampwm2023.snappoint.presentation.auth.AuthViewModel
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class LoginFragment : BaseFragment<FragmentLoginBinding>(R.layout.fragment_login) {
+class SigninFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_signin) {
 
     private val activityViewModel: AuthViewModel by activityViewModels()
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel: SigninViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,15 +40,15 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(R.layout.fragment_login
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is LoginEvent.Fail -> {
+                        is SigninEvent.Fail -> {
                             showToastMessage(event.error)
                         }
 
-                        is LoginEvent.Success -> {
+                        is SigninEvent.Success -> {
                             activityViewModel.sendSuccessResult()
                         }
 
-                        is LoginEvent.Signup -> {
+                        is SigninEvent.Signup -> {
                             navigateToSignup()
                         }
                     }
