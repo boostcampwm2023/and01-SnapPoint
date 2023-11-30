@@ -44,11 +44,7 @@ class CreatePostViewModel @Inject constructor(
             override val onAddressIconClick: (Int) -> Unit = { index -> findAddress(index) }
         },
     ))
-
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
-
-    private val _createPostState: MutableStateFlow<CreatePostState> = MutableStateFlow(CreatePostState())
-    val createPostState: StateFlow<CreatePostState> = _createPostState.asStateFlow()
 
     private val _event: MutableSharedFlow<CreatePostEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
@@ -200,41 +196,6 @@ class CreatePostViewModel @Inject constructor(
             }
         }
         return true
-    }
-
-    fun postImagesIfExist(context: Context, layoutWidth: Int) {
-        if(isValidTitle().not()){
-            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
-            return
-        }
-        if(isValidBlocks().not()){
-            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_blocks))
-            return
-        }
-        if(isValidTextBlock().not()){
-            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
-            return
-        }
-//        _uiState.update { state ->
-//            state.copy(postBlocks = state.postBlocks.map { block ->
-//                when (block) {
-//                    is PostBlockState.IMAGE -> {
-//                        var newBlock = block
-//                        postRepository.postImage(resizeBitmap(getBitmapFromUri(context, block.uri), layoutWidth))
-//                            .onStart {}
-//                            .catch { Log.d("TAG", "postImages: Image Upload Error :${it.message}") }
-//                            .onCompletion {}
-//                            .onEach { response ->
-//                                println(response)
-//                                newBlock = block.copy(fileUuid = response.imageUuid)
-//                            }
-//                            .launchIn(viewModelScope)
-//                        newBlock
-//                    }
-//                    else -> block
-//                }
-//            })
-//        }
     }
 
     fun onCheckButtonClicked(context: Context, layoutWidth: Int) {

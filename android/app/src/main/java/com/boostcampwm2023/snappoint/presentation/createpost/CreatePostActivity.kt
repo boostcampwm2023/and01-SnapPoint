@@ -57,8 +57,8 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                         index = it.getIntExtra("index", 0),
                         address = it.getStringExtra("address") ?: "",
                         position = PositionState(
-                            it.getDoubleExtra("longitude", 0.0),
-                            it.getDoubleExtra("latitude", 0.0)
+                            it.getDoubleExtra("latitude", 0.0),
+                            it.getDoubleExtra("longitude", 0.0)
                         )
                     )
                 }
