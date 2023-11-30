@@ -1,17 +1,14 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.content.Context
-import android.net.Uri
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.data.mapper.asPostState
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +22,8 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
@@ -61,12 +58,10 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addImageBlock(uri: Uri?, position: PositionState) {
-        if (uri == null) return
-
+    fun addImageBlock(bitmap: Bitmap, position: PositionState) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlockState.IMAGE(uri = uri, position = position)
+                postBlocks = it.postBlocks + PostBlockState.IMAGE(bitmap = bitmap, position = position)
             )
         }
     }
@@ -198,7 +193,7 @@ class CreatePostViewModel @Inject constructor(
         return true
     }
 
-    fun onCheckButtonClicked(context: Context, layoutWidth: Int) {
+    fun onCheckButtonClicked() {
         if(isValidTitle().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
@@ -217,30 +212,32 @@ class CreatePostViewModel @Inject constructor(
             return
         }*/
 
-        postRepository.postCreatePost(
-            title = _uiState.value.title,
-            postBlocks = _uiState.value.postBlocks.map {
-                runBlocking(Dispatchers.IO) { it.asPostState(context, layoutWidth) }
+        thread {
+            _uiState.update {
+                it.copy(isLoading = true)
             }
-        )
-            .onStart {
-                _uiState.update {
-                    it.copy(isLoading = true)
+            postRepository.postCreatePost(
+                title = _uiState.value.title,
+                postBlocks = _uiState.value.postBlocks
+//                    .map {
+//                        it.asUploadablePost()
+//                    }
+            )
+                .onStart {}
+                .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
+                .onCompletion {
+                    _uiState.update {
+                        it.copy(isLoading = false)
+                    }
                 }
-            }
-            .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
-            .onCompletion {
-                _uiState.update {
-                    it.copy(isLoading = false)
+                .onEach {
+                    Log.d("TAG", "onCheckButtonClicked: api request success")
+                    Log.d("TAG", "onCheckButtonClicked: ${it}")
+                    _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
+                    _event.tryEmit(CreatePostEvent.NavigatePrev)
                 }
-            }
-            .onEach {
-                Log.d("TAG", "onCheckButtonClicked: api request success")
-                Log.d("TAG", "onCheckButtonClicked: ${it}")
-                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
-                _event.tryEmit(CreatePostEvent.NavigatePrev)
-            }
-            .launchIn(viewModelScope)
+                .launchIn(viewModelScope)
+        }
     }
 
     fun onImageBlockButtonClicked() {
@@ -272,8 +269,8 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
                     if(idx == index){
                         when(postBlock){
-                            is PostBlockState.IMAGE ->  PostBlockState.IMAGE(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
-                            is PostBlockState.VIDEO -> PostBlockState.VIDEO(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
+                            is PostBlockState.IMAGE ->  PostBlockState.IMAGE(content = postBlock.content, position = position, address = address, bitmap = postBlock.bitmap)
+                            is PostBlockState.VIDEO -> PostBlockState.VIDEO(content = postBlock.content, position = position, address = address)
                             is PostBlockState.TEXT -> postBlock
                         }
                     }else{

@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.model
 
-import android.net.Uri
+import android.graphics.Bitmap
 import com.google.android.gms.maps.model.LatLng
 
 data class PostSummaryState(
@@ -20,16 +20,15 @@ sealed class PostBlockState(open val content: String, open val isEditMode: Boole
         override val content: String = "",
         override val isEditMode: Boolean = false,
         override val uuid: String = "",
-        val uri: Uri = Uri.EMPTY,
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
-        val address: String = ""
+        val address: String = "",
+        val bitmap: Bitmap? = null
     ) : PostBlockState(content, isEditMode, uuid)
     data class VIDEO(
         override val content: String = "",
         override val isEditMode: Boolean = false,
         override val uuid: String = "",
-        val uri: Uri = Uri.EMPTY,
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
         val address: String = ""
@@ -40,25 +39,6 @@ sealed class PostBlockState(open val content: String, open val isEditMode: Boole
         IMAGE,
         VIDEO,
     }
-}
-
-sealed class PostState(open val content: String) {
-    data class TEXT(
-        override val content: String = "",
-    ) : PostState(content)
-    data class IMAGE(
-        override val content: String = "",
-        val imageByteArray: ByteArray,
-        val description: String = "",
-        val position: PositionState = PositionState(0.0, 0.0),
-        val fileUuid: String = ""
-    ) : PostState(content)
-    data class VIDEO(
-        override val content: String = "",
-        val description: String = "",
-        val position: PositionState = PositionState(0.0, 0.0),
-        val fileUuid: String = ""
-    ) : PostState(content)
 }
 
 data class PositionState(
