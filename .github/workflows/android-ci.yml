@@ -1,0 +1,21 @@
+name: Android CI
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+    paths:
+      - 'android/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+    
+      - name: ktlint
+        uses: ScaCap/action-ktlint@master
+        with:
+          github_token: ${{ secrets.SB_GITHUB_TOKEN }}
+          reporter: github-pr-review
