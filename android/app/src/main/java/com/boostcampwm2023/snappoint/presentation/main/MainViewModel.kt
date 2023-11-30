@@ -7,7 +7,6 @@ import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -122,23 +121,6 @@ class MainViewModel @Inject constructor(
                 ),
             )
         }
-//        createMarkers()
-    }
-
-    fun createMarkers(snapPoints: List<SnapPointState>) {
-//        _uiState.update {
-//            it.copy(snapPoints = _postState.value.mapIndexed { index, postSummaryState ->
-//                SnapPointState(
-//                    index = index,
-//                    markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().map {
-//                        MarkerOptions().apply {
-//                            position(it.position.asLatLng())
-//                        }
-//                    }
-//                )
-//            })
-//            it.copy(snapPoints = snapPoints)
-//        }
     }
 
     fun drawerIconClicked() {

@@ -3,10 +3,8 @@ package com.boostcampwm2023.snappoint.presentation.main
 import com.google.android.gms.maps.model.Marker
 
 data class MainUiState(
-//    val posts: List<PostSummaryState> = emptyList(),
-//    val snapPoints: List<SnapPointState> = emptyList(),
-    val selectedIndex: Int = -1,
-    val focusedIndex: Int = -1,
+    val selectedIndex: Int = -1,    // TODO - MarkerUiState 로 옮기기
+    val focusedIndex: Int = -1,     // TODO - MarkerUiState 로 옮기기
     val isPreviewFragmentShowing: Boolean = false,
     val isBottomSheetExpanded: Boolean = false,
 )

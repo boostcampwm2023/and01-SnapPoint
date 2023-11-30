@@ -182,7 +182,6 @@ class MainActivity :
                     var drawnRoute: Polyline? = null
                     var prevSelectedIndex = -1
                     viewModel.uiState.collect { uiState ->
-//                        updateMarker(uiState.snapPoints)
                         if (uiState.selectedIndex < 0 || uiState.focusedIndex < 0) {
                             prevSelectedMarker?.remove()
                             drawnRoute?.remove()
@@ -191,9 +190,6 @@ class MainActivity :
                         }
                         val block = viewModel.postState.value[uiState.selectedIndex].postBlocks
                             .filterIsInstance<PostBlockState.IMAGE>()[uiState.focusedIndex]
-//                        val selectedMarker =
-//                            uiState.snapPoints[uiState.selectedIndex].markers[uiState.focusedIndex]
-//                                ?: return@collect
 
                         prevSelectedMarker?.remove()
                         prevSelectedMarker = googleMap?.addImageMarker(
@@ -214,7 +210,7 @@ class MainActivity :
                     viewModel.postState.collect { postState ->
                         while (googleMap == null) { delay(100) }
 
-                        val snapPoints = postState.mapIndexed { postIndex, postSummaryState ->
+                        postState.forEachIndexed { postIndex, postSummaryState ->
                             SnapPointState(
                                 index = postIndex,
                                 markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().mapIndexed { pointIndex, postBlockState ->
@@ -228,37 +224,6 @@ class MainActivity :
                                 }
                             )
                         }
-                        viewModel.createMarkers(snapPoints)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun updateMarker(snapPoints: List<SnapPointState>) {
-        lifecycleScope.launch {
-            while (googleMap == null) {
-                delay(100)
-            }
-            val selectedIndex = viewModel.uiState.value.selectedIndex
-            googleMap?.let { map ->
-                map.clear()
-                snapPoints.forEachIndexed { postIndex, snapPointState ->
-                    if(postIndex == selectedIndex){
-                        drawRoutes(selectedIndex)
-                    }
-                    val mediaBlock = viewModel.postState.value[postIndex].postBlocks
-                        .filterIsInstance<PostBlockState.IMAGE>()
-                    snapPointState.markers.forEachIndexed { snapPointIndex, marker ->
-                        val focused =
-                            (postIndex == viewModel.uiState.value.selectedIndex) && (snapPointIndex == viewModel.uiState.value.focusedIndex)
-//                        map.addImageMarker(
-//                            context = this@MainActivity,
-//                            markerOptions = marker,
-//                            uri = mediaBlock[snapPointIndex].content,
-//                            tag = SnapPointTag(postIndex = postIndex, snapPointIndex = snapPointIndex),
-//                            focused = focused
-//                        )
                     }
                 }
             }
