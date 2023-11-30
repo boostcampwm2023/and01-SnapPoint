@@ -53,6 +53,8 @@ jobs:
             -e SHADOW_DATABASE_URL="${{ secrets.SHADOW_DATABASE_URL }}" \
             -e NCP_DOCKER_REGISTORY="${{ secrets.NCP_DOCKER_REGISTORY }}" \
             -e BUCKET_URL="${{ secrets.BUCKET_URL }}" \
+            -e NCP_ACCESS_KEY="${{ secrets.NCP_ACCESS_KEY }}" \
+            -e NCP_SECRET_KEY="${{ secrets.NCP_SECRET_KEY }}" \
             -e NCP_BUCKET_ENDPOINT="${{ secrets.NCP_BUCKET_ENDPOINT }}" \
             -e NCP_BUCKET_NAME="${{ secrets.NCP_BUCKET_NAME }}" \
             -e NCP_BUCKET_REGION="${{ secrets.NCP_BUCKET_REGION }}" \
