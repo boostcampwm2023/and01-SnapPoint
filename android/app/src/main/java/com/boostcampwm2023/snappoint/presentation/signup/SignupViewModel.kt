@@ -35,6 +35,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 passwordCode = takePasswordErrorCode(password)
             )
         }
+        updatePasswordConfirm()
         updateButtonState()
     }
 
@@ -46,6 +47,14 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             )
         }
         updateButtonState()
+    }
+
+    private fun updatePasswordConfirm() {
+        _uiState.update {
+            it.copy(
+                passwordConfirmCode = takePasswordConfirmErrorCode(it.passwordConfirm)
+            )
+        }
     }
 
     fun updateNickname(nickname: String) {
