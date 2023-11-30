@@ -25,6 +25,8 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
+
+        collectViewModelEvent()
     }
 
     private fun initBinding() {
