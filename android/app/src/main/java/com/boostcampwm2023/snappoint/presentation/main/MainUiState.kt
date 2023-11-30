@@ -1,11 +1,10 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 
 data class MainUiState(
 //    val posts: List<PostSummaryState> = emptyList(),
-    val snapPoints: List<SnapPointState> = emptyList(),
+//    val snapPoints: List<SnapPointState> = emptyList(),
     val selectedIndex: Int = -1,
     val focusedIndex: Int = -1,
     val isPreviewFragmentShowing: Boolean = false,

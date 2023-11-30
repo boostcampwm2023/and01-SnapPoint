@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -177,8 +178,35 @@ class MainActivity :
                 }
 
                 launch {
+                    var prevSelectedMarker: Marker? = null
+                    var drawnRoute: Polyline? = null
+                    var prevSelectedIndex = -1
                     viewModel.uiState.collect { uiState ->
 //                        updateMarker(uiState.snapPoints)
+                        if (uiState.selectedIndex < 0 || uiState.focusedIndex < 0) {
+                            prevSelectedMarker?.remove()
+                            drawnRoute?.remove()
+                            prevSelectedIndex = -1
+                            return@collect
+                        }
+                        val block = viewModel.postState.value[uiState.selectedIndex].postBlocks
+                            .filterIsInstance<PostBlockState.IMAGE>()[uiState.focusedIndex]
+//                        val selectedMarker =
+//                            uiState.snapPoints[uiState.selectedIndex].markers[uiState.focusedIndex]
+//                                ?: return@collect
+
+                        prevSelectedMarker?.remove()
+                        prevSelectedMarker = googleMap?.addImageMarker(
+                            context = this@MainActivity,
+                            markerOptions = MarkerOptions().position(block.position.asLatLng()),
+                            uri = block.content,
+                            tag = SnapPointTag(uiState.selectedIndex, uiState.focusedIndex),
+                            focused = true
+                        )
+                        if (prevSelectedIndex != uiState.selectedIndex) {
+                            drawnRoute?.remove()
+                            drawnRoute = drawRoutes(uiState.selectedIndex)
+                        }
                     }
                 }
 
@@ -200,7 +228,6 @@ class MainActivity :
                                 }
                             )
                         }
-                        println(snapPoints)
                         viewModel.createMarkers(snapPoints)
                     }
                 }
@@ -238,7 +265,7 @@ class MainActivity :
         }
     }
 
-    private fun drawRoutes(postIndex: Int) {
+    private fun drawRoutes(postIndex: Int): Polyline? {
         val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
         val positionList = viewModel.postState.value[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
             when (block) {
@@ -254,13 +281,13 @@ class MainActivity :
             }
         }
         polylineOptions.addAll(positionList)
-        googleMap?.addPolyline(polylineOptions)
+        return googleMap?.addPolyline(polylineOptions)
     }
 
     private fun moveCameraToFitScreen() {
         val postIndex = viewModel.uiState.value.selectedIndex
-        val snapPoints = viewModel.uiState.value.snapPoints[postIndex]
-        val positions = snapPoints.markers.map { it?.position ?: return }
+        val snapPoints = viewModel.postState.value[postIndex].postBlocks.filterIsInstance<PostBlockState.IMAGE>()
+        val positions = snapPoints.map { it.position }
 
         // 아프리카 적도기니를 기준
         // latitude: 북반구(+) 남반구(-)

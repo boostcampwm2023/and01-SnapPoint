@@ -126,7 +126,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun createMarkers(snapPoints: List<SnapPointState>) {
-        _uiState.update {
+//        _uiState.update {
 //            it.copy(snapPoints = _postState.value.mapIndexed { index, postSummaryState ->
 //                SnapPointState(
 //                    index = index,
@@ -137,8 +137,8 @@ class MainViewModel @Inject constructor(
 //                    }
 //                )
 //            })
-            it.copy(snapPoints = snapPoints)
-        }
+//            it.copy(snapPoints = snapPoints)
+//        }
     }
 
     fun drawerIconClicked() {
