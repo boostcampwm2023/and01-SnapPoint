@@ -47,7 +47,7 @@ class LoginRepositoryImpl @Inject constructor(
 
         return flowOf(true)
             .map {
-                snapPointApi.postSignup(request)
+                snapPointApi.postSignUp(request)
             }
     }
 }

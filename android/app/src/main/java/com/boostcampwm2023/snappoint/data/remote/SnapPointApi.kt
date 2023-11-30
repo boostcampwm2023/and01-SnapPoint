@@ -39,7 +39,7 @@ interface SnapPointApi {
     suspend fun getLogout()
 
     @POST("signup")
-    suspend fun postSignup(
+    suspend fun postSignUp(
         @Body signupRequest: SignupRequest
     ): SignupResponse
 }
