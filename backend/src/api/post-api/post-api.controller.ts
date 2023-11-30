@@ -1,12 +1,10 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { PostApiService } from '@/api/post-api/post-api.service';
-import { PostRequestDecompositionPipe } from '@/api/post-api/pipes/post-request-decompositon.pipe';
-import { ComposedPostDto } from '@/api/post-api/dtos/composed-post.dto';
-import { validationPipe } from '@/common/pipes/validation.pipe';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiParam } from '@nestjs/swagger';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
+import { WritePostDto } from './dtos/write-post.dto';
 
 @Controller('posts')
 export class PostApiController {
@@ -37,7 +35,6 @@ export class PostApiController {
   }
 
   @Post('/publish')
-  @UsePipes(PostRequestDecompositionPipe, validationPipe)
   @ApiOperation({
     summary: '게시글을 작성하는 API',
     description: '작성 중인 게시글 블록을 받아 게시글을 생성하고, 임시 저장한다.',
@@ -47,7 +44,7 @@ export class PostApiController {
     type: PostDto,
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
-  writePost(@Body() postDto: ComposedPostDto, @Req() request: any) {
+  writePost(@Body() postDto: WritePostDto, @Req() request: any) {
     const { uuid: userUuid } = request.user;
     return this.postApiService.writePost(postDto, userUuid);
   }
@@ -59,11 +56,7 @@ export class PostApiController {
     description: '작성한 게시글의 내용 및 블록 정보를 업데이트한다.',
     type: PostDto,
   })
-  modifyPost(
-    @Param('uuid') uuid: string,
-    @Body(PostRequestDecompositionPipe, validationPipe) postDto: ComposedPostDto,
-    @Req() request: any,
-  ) {
+  modifyPost(@Param('uuid') uuid: string, @Body() postDto: WritePostDto, @Req() request: any) {
     const { uuid: userUuid } = request.user;
     return this.postApiService.modifyPost(uuid, userUuid, postDto);
   }

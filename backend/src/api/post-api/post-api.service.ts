@@ -1,5 +1,4 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ComposedPostDto } from '@/api/post-api/dtos/composed-post.dto';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
@@ -8,11 +7,12 @@ import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/file-api/dto/file.dto';
-import { WriteBlockDto } from '@/api/post-api/dtos/write-block.dto';
 import { File, Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
+import { WritePostDto } from './dtos/write-post.dto';
+import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
 
 @Injectable()
 export class PostApiService {
@@ -71,8 +71,9 @@ export class PostApiService {
     return this.readPost(post);
   }
 
-  async writePost(postDto: ComposedPostDto, userUuid: string) {
-    const { post, blocks, files } = postDto;
+  async writePost(postDto: WritePostDto, userUuid: string) {
+    const decomposedPostDto = this.transform.decomposePostRequest(postDto);
+    const { post, blocks, files } = decomposedPostDto;
 
     await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
 
@@ -90,8 +91,9 @@ export class PostApiService {
     });
   }
 
-  async modifyPost(uuid: string, userUuid: string, postDto: ComposedPostDto) {
-    const { post, blocks, files } = postDto;
+  async modifyPost(uuid: string, userUuid: string, postDto: WritePostDto) {
+    const decomposedPostDto = this.transform.decomposePostRequest(postDto);
+    const { post, blocks, files } = decomposedPostDto;
 
     const existPost = await this.postService.findPost({ uuid });
 
@@ -106,7 +108,7 @@ export class PostApiService {
     return this.prisma.beginTransaction(async () => {
       await this.postService.updatePost({ where: { uuid }, data: post });
 
-      const blockMap = new Map<string, WriteBlockDto>();
+      const blockMap = new Map<string, CreateBlockDto>();
       blocks.forEach((block) => blockMap.set(block.uuid, block));
 
       await this.blockService.deleteBlocks({ postUuid: uuid });

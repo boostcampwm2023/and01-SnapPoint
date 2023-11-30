@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { FindNearbyPostQuery } from '../post-api/dtos/find-nearby-post.query.dto';
+import { WritePostDto } from '../post-api/dtos/write-post.dto';
+import { randomUUID } from 'crypto';
+import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
+import { CreatePostDto } from '@/domain/post/dtos/create-post.dto';
+import { plainToInstance } from 'class-transformer';
+import { UpdateFileDto } from '@/domain/file/dtos/update-file.dto';
+import { DecomposedPostDto } from '../post-api/dtos/decomposed-post.dto';
 
 @Injectable()
 export class TransformationService {
@@ -22,14 +29,39 @@ export class TransformationService {
     };
   }
 
-  toMapFromArray<T, K, V>(items: T[], keyExtractor: (item: T) => K, valueTransformer: (item: T) => V): Map<K, V[]> {
+  toMapFromArray<T, K, V>(items: T[], extractKeyFn: (item: T) => K, transformFn: (item: T) => V): Map<K, V[]> {
     const map = new Map<K, V[]>();
     items.forEach((item) => {
-      const key = keyExtractor(item);
+      const key = extractKeyFn(item);
       const collection = map.get(key) || [];
-      collection.push(valueTransformer(item));
+      collection.push(transformFn(item));
       map.set(key, collection);
     });
     return map;
+  }
+
+  decomposePostRequest(postDto: WritePostDto) {
+    const fileDtos: UpdateFileDto[] = [];
+
+    const blockDtos = postDto.blocks.map((block, order) => {
+      const { uuid, content, type, latitude, longitude, files } = block;
+      const blockUuid = uuid ? uuid : randomUUID();
+
+      if (files) {
+        fileDtos.push(
+          ...files.map((file) =>
+            plainToInstance(UpdateFileDto, { uuid: file.uuid, source: 'block', sourceUuid: blockUuid }),
+          ),
+        );
+      }
+
+      return plainToInstance(CreateBlockDto, { uuid: blockUuid, content, type, latitude, longitude, order });
+    });
+
+    return plainToInstance(DecomposedPostDto, {
+      post: plainToInstance(CreatePostDto, { title: postDto.title }),
+      blocks: blockDtos,
+      files: fileDtos,
+    });
   }
 }

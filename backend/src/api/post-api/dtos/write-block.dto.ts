@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsIn, IsLatitude, IsLongitude, IsOptional, IsInt } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsIn, IsLatitude, IsLongitude, IsOptional, IsInt, ValidateNested } from 'class-validator';
+import { WriteBlockFileDto } from './write-block-files.dto';
 
 export class WriteBlockDto {
   @ApiProperty({ description: '블록을 수정하는 경우 UUID 식별자를 첨부합니다. 첨부하지 않으면 블록이 생성됩니다.' })
@@ -30,4 +32,9 @@ export class WriteBlockDto {
 
   @IsInt()
   readonly order: number;
+
+  @ValidateNested({ each: true })
+  @Type(() => WriteBlockFileDto)
+  @IsOptional()
+  files?: WriteBlockFileDto[];
 }

@@ -8,15 +8,15 @@ import { FileService } from '@/domain/file/file.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
-import { ComposedPostDto } from './dtos/composed-post.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
+import { WritePostDto } from './dtos/write-post.dto';
 
 describe('PostApiService', () => {
   let service: PostApiService;
   let postService: DeepMockProxy<PostService>;
-  let postDto: ComposedPostDto;
+  let postDto: WritePostDto;
   let postEntity: Post;
 
   beforeEach(async () => {
@@ -46,7 +46,7 @@ describe('PostApiService', () => {
     postService = module.get(PostService);
 
     postDto = {
-      post: { title: 'Test Post' },
+      title: 'Test Post',
       blocks: [
         {
           uuid: 'mock-block-uuid-1',
@@ -55,7 +55,6 @@ describe('PostApiService', () => {
           order: 0,
         },
       ],
-      files: [],
     };
 
     postEntity = {
