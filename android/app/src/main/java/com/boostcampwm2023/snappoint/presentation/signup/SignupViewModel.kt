@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.LoginRepository
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.TextVerificationUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -173,6 +174,6 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun isMessageDuplicationError(message: String?): Boolean {
-        return message == "HTTP 409 Conflict"
+        return message == Constants.EMAIL_DUPLICATE_ERROR
     }
 }
