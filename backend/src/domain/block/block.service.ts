@@ -2,8 +2,9 @@ import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
-import { Block } from './entites/block.entity';
-import { UpsertBlockDto } from './dtos/upsert-block.dto';
+import { Block } from '@/domain/block/entites/block.entity';
+import { UpsertBlockDto } from '@/domain/block/dtos/upsert-block.dto';
+import { FindAreaBlockDto } from '@/domain/block/dtos/find-area-block.dto';
 
 @Injectable()
 export class BlockService {
@@ -53,6 +54,20 @@ export class BlockService {
       where: { ...where, isDeleted: false },
       orderBy,
     });
+  }
+
+  async findBlocksWithCoordsByArea(findAreaBlockDto: FindAreaBlockDto) {
+    const { latitudeMin: latMin, longitudeMin: lonMin, latitudeMax: latMax, longitudeMax: lonMax } = findAreaBlockDto;
+    const blocks: Block[] = await this.prisma.get().$queryRaw`
+      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
+                "createdAt", "modifiedAt", "isDeleted",
+                ST_X("coords") AS "latitude", ST_Y("coords") As "longitude"
+      FROM      "Block"
+      WHERE     "type" = 'media' AND "coords" IS NOT NULL
+                AND ST_Intersects(coords, ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326))
+      ORDER BY  ST_Distance(coords, ST_Centroid(ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326)));
+    `;
+    return blocks;
   }
 
   async findBlocksWithCoordsByPost(postUuid: string): Promise<Block[]> {
