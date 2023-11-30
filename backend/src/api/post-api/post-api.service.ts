@@ -1,14 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ComposedPostDto } from './dtos/composed-post.dto';
+import { ComposedPostDto } from '@/api/post-api/dtos/composed-post.dto';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
-import { ValidationService } from '../validation/validation.service';
+import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
-import { FileDto } from '../file-api/dto/file.dto';
-import { WriteBlockDto } from './dtos/write-block.dto';
+import { FileDto } from '@/api/file-api/dto/file.dto';
+import { WriteBlockDto } from '@/api/post-api/dtos/write-block.dto';
 
 @Injectable()
 export class PostApiService {
