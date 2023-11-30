@@ -6,6 +6,7 @@ import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.Dispatchers
@@ -86,5 +87,9 @@ class PostRepositoryImpl @Inject constructor(
             .map{
                 snapPointApi.createPost(request)
             }
+    }
+
+    override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<GetAroundPostResponse>> {
+        TODO("Not yet implemented")
     }
 }

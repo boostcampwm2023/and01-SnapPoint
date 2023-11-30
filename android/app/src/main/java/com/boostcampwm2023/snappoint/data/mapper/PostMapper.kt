@@ -3,8 +3,10 @@ package com.boostcampwm2023.snappoint.data.mapper
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
+import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 
 fun PostBlock.asPostBlockState(): PostBlockState {
     return when(type){
@@ -69,5 +71,14 @@ fun PostBlock.asPositionState(): PositionState {
     return PositionState(
         latitude = this.latitude!!,
         longitude = this.longitude!!
+    )
+}
+
+fun GetAroundPostResponse.asPostSummaryState(): PostSummaryState {
+    return PostSummaryState(
+        title = this.title,
+        author = "",
+        timeStamp = this.createdAt,
+        postBlocks = this.blocks.map { it.asPostBlockState() }
     )
 }
