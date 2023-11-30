@@ -69,28 +69,23 @@
 
         <Button
             android:id="@+id/btn_login_enter"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/til_login_password"
-            app:layout_constraintVertical_bias="0.2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="64dp"
             android:enabled="@{vm.loginFormUiState.emailValid &amp;&amp; vm.loginFormUiState.passwordValid}"
             android:onClick="@{()->vm.onLoginButtonClick()}"
             android:text="@string/login_activity_sign_in" />
 
         <Button
             android:id="@+id/btn_login_test"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginTop="16dp"
             android:text="@string/login_activity_sign_up"
-            android:textColorLink="#CDFFCF"
             android:onClick="@{()->vm.onSignUpButtonClick()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
