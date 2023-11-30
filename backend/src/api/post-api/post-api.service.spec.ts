@@ -52,7 +52,6 @@ describe('PostApiService', () => {
           uuid: 'mock-block-uuid-1',
           type: 'text',
           content: 'this is text block',
-          order: 0,
         },
       ],
     };
