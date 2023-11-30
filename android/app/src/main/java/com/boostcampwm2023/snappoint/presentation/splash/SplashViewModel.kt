@@ -30,11 +30,6 @@ class SplashViewModel @Inject constructor(
         val email = loginUtil.email
         val password = loginUtil.password
 
-        if (email.isBlank() || password.isBlank()) {
-            _event.tryEmit(SplashEvent.Fail)
-            return
-        }
-
         loginRepository.postLogin(email, password)
             .onEach {
                 _event.emit(SplashEvent.Success)
