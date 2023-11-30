@@ -40,7 +40,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
 
                         is SplashEvent.Fail -> {
                             showToastMessage(R.string.sign_in_fragment_auto_login_fail)
-                            navigateToLogin()
+                            navigateToSignIn()
                         }
                     }
                 }
@@ -57,7 +57,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(R.layout.activity_spl
         finish()
     }
 
-    private fun navigateToLogin() {
+    private fun navigateToSignIn() {
         startActivity(
             Intent(this, AuthActivity::class.java).apply {
                 setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
