@@ -8,8 +8,12 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.LoginRepository
 import com.boostcampwm2023.snappoint.presentation.util.TextVerificationUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -34,6 +38,12 @@ class SignupViewModel @Inject constructor(
         )
     )
     val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
+
+    private val _event: MutableSharedFlow<SignupEvent> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val event: SharedFlow<SignupEvent> = _event.asSharedFlow()
 
     fun updateEmail(email: String) {
         _uiState.update {
@@ -122,10 +132,12 @@ class SignupViewModel @Inject constructor(
                     setProgressBarState(true)
                 }
                 .onEach {
-
+                    Log.d("LOG", "${it}")
+                    _event.emit(SignupEvent.Success)
                 }
                 .catch {
-
+                    Log.d("LOG", "${it.message}")
+                    _event.emit(SignupEvent.Fail)
                 }
                 .onCompletion {
                     setProgressBarState(false)
