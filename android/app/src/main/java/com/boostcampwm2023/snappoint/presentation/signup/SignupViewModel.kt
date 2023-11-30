@@ -105,6 +105,17 @@ class SignupViewModel @Inject constructor(
         }
     }
 
+    private fun updateEmailErrorCode(message: String?) {
+        if (isMessageDuplicationError(message)) {
+            _uiState.update {
+                it.copy(
+                    emailCode = R.string.signup_fragment_error_email_duplicate,
+                    isInputValid = false
+                )
+            }
+        }
+    }
+
     private fun takeEmailErrorCode(email: String): Int? {
         return if (TextVerificationUtil.isEmailValid(email)) null else R.string.signup_fragment_error_email_form
     }
@@ -135,6 +146,7 @@ class SignupViewModel @Inject constructor(
                     _event.emit(SignupEvent.Success)
                 }
                 .catch {
+                    updateEmailErrorCode(it.message)
                     _event.emit(
                         SignupEvent.Fail(
                             takeErrorMessage(it.message),
@@ -158,9 +170,13 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun takeErrorMessage(message: String?): Int? {
-        return when (message) {
-            "HTTP 409 Conflict" -> R.string.signup_fragment_fail_duplicate
+        return when {
+            isMessageDuplicationError(message) -> R.string.signup_fragment_fail_duplicate
             else -> null
         }
+    }
+
+    private fun isMessageDuplicationError(message: String?): Boolean {
+        return message == "HTTP 409 Conflict"
     }
 }
