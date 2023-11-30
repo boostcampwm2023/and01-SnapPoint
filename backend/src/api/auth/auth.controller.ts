@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { Response } from 'express';
-import { UserService } from '@/domain/user/user.service';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { Cookies } from '@/common/decorator/cookie.decorator';
@@ -11,10 +10,7 @@ import { Cookies } from '@/common/decorator/cookie.decorator';
 @ApiTags('')
 @Controller('')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   @NoAuth()
