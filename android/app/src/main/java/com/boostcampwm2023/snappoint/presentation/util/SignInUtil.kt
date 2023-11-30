@@ -5,7 +5,7 @@ import android.content.Context.MODE_PRIVATE
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class LoginUtil @Inject constructor(@ApplicationContext context: Context) {
+class SignInUtil @Inject constructor(@ApplicationContext context: Context) {
 
     private val preferences = context.getSharedPreferences("mPref", MODE_PRIVATE)
     var email: String

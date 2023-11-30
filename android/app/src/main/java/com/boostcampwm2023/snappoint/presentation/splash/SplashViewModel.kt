@@ -2,8 +2,8 @@ package com.boostcampwm2023.snappoint.presentation.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.boostcampwm2023.snappoint.data.repository.LoginRepository
-import com.boostcampwm2023.snappoint.presentation.util.LoginUtil
+import com.boostcampwm2023.snappoint.data.repository.SignInRepository
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val loginUtil: LoginUtil,
-    private val loginRepository: LoginRepository
+    private val loginUtil: SignInUtil,
+    private val loginRepository: SignInRepository
 ) : ViewModel() {
 
     private val _event: MutableSharedFlow<SplashEvent> = MutableSharedFlow(
@@ -30,7 +30,7 @@ class SplashViewModel @Inject constructor(
         val email = loginUtil.email
         val password = loginUtil.password
 
-        loginRepository.postLogin(email, password)
+        loginRepository.postSignIn(email, password)
             .onEach {
                 _event.emit(SplashEvent.Success)
             }
