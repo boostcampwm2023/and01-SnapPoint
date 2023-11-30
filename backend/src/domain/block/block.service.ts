@@ -56,12 +56,12 @@ export class BlockService {
     });
   }
 
-  async findBlocksWithCoordsByArea(findAreaBlockDto: FindAreaBlockDto) {
+  async findBlocksWithCoordsByArea(findAreaBlockDto: FindAreaBlockDto): Promise<Block[]> {
     const { latitudeMin: latMin, longitudeMin: lonMin, latitudeMax: latMax, longitudeMax: lonMax } = findAreaBlockDto;
     const blocks: Block[] = await this.prisma.get().$queryRaw`
       SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
                 "createdAt", "modifiedAt", "isDeleted",
-                ST_X("coords") AS "latitude", ST_Y("coords") As "longitude"
+                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
       FROM      "Block"
       WHERE     "type" = 'media' AND "coords" IS NOT NULL
                 AND ST_Intersects(coords, ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326))
@@ -74,7 +74,7 @@ export class BlockService {
     const blocks: Block[] = await this.prisma.get().$queryRaw`
       SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
               "createdAt", "modifiedAt", "isDeleted",
-              ST_X("coords") AS "latitude", ST_Y("coords") As "longitude"
+              ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
       FROM    "Block"
       WHERE   "postUuid" = ${postUuid}
     `;
