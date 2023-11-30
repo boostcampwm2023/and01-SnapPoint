@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: 17
-        distribution: temurin
+        distribution: corretto
         cache: gradle
 
     - name: Create Properties File
@@ -30,8 +30,25 @@ jobs:
         echo "$LOCAL_PROPERTIES" > local.properties
         echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
-    - name: build release 
-      run: ./gradlew assembleRelease
+    - name: Generate Keystore
+      env:
+        APP_KEYSTORE: ${{ secrets.APP_KEYSTORE }}
+      run: |
+        echo "$APP_KEYSTORE" > keystore_b64.txt
+        base64 --decode --ignore-garbage keystore_b64.txt > keystore.jks
+      working-directory: ./android/app
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: build release
+      env:
+        SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      run: |
+        echo $STORE_PASSWORD
+        ./gradlew assembleRelease
       
     - name: upload artifact to Firebase App Distribution
       uses: wzieba/Firebase-Distribution-Github-Action@v1

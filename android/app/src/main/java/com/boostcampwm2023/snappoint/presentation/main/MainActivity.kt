@@ -2,6 +2,8 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -23,12 +25,14 @@ import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants
+import com.boostcampwm2023.snappoint.presentation.util.Constants.API_KEY
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_PERMISSION_REQUEST_CODE
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -45,11 +49,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.search.SearchView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity :
@@ -59,6 +70,9 @@ class MainActivity :
 {
     private val viewModel: MainViewModel by viewModels()
     private var googleMap: GoogleMap? = null
+    private lateinit var placesClient: PlacesClient
+    private val token = AutocompleteSessionToken.newInstance()
+    private val geocoder by lazy { Geocoder(applicationContext) }
 
     private val navController: NavController by lazy {
         (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment).findNavController()
@@ -74,6 +88,8 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        initPlacesClient()
+
         initBinding()
 
         initBottomSheetWithNavigation()
@@ -87,13 +103,17 @@ class MainActivity :
         initLocationData()
     }
 
+    private fun initPlacesClient() {
+        Places.initializeWithNewPlacesApiEnabled(applicationContext, API_KEY)
+        placesClient = Places.createClient(this)
+    }
+
     private fun initLocationData() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
-                Log.d("TAG", "onLocationResult: ${p0}")
             }
         }
 
@@ -145,6 +165,11 @@ class MainActivity :
                                     openPreviewFragment()
                                 }
                                 moveCameraToFitScreen()
+                            }
+
+                            is MainActivityEvent.MoveCameraToAddress -> {
+                                val address = viewModel.searchViewUiState.value.texts[event.index]
+                                moveCameraToAddress(address)
                             }
                         }
                     }
@@ -303,7 +328,77 @@ class MainActivity :
             fab.setOnClickListener {
                 checkPermissionAndMoveCameraToUserLocation()
             }
+
+            sv.editText.setOnEditorActionListener { v, _, _ ->
+                getAddressAutoCompletion(v.text.toString())
+                true
+            }
+
+            sv.addTransitionListener { _, _, afterState ->
+                if (afterState == SearchView.TransitionState.HIDDEN) {
+                    viewModel.updateAutoCompleteTexts(emptyList())
+                }
+            }
+
+            btnSearchHere.setOnClickListener {
+                searchSnapPoints()
+            }
         }
+    }
+
+    private fun moveCameraToAddress(address: String) {
+
+        with(binding) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocationName(address, 1) { results ->
+                    if (results.size == 0) {
+                        runOnUiThread { showToastMessage(R.string.search_location_fail) }
+                    } else {
+                        val latLng = LatLng(results[0].latitude, results[0].longitude)
+                        runOnUiThread {
+                            googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            sv.hide()
+                        }
+                    }
+                }
+            } else {
+                val results = runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
+
+                if (results == null || results.size == 0) {
+                    showToastMessage(R.string.search_location_fail)
+                } else {
+                    val latLng = LatLng(results[0].latitude, results[0].longitude)
+                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    sv.hide()
+                }
+            }
+        }
+    }
+
+    private fun getAddressAutoCompletion(query: String) {
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setSessionToken(token)
+            .setQuery(query)
+            .build()
+
+        placesClient.findAutocompletePredictions(request)
+            .addOnSuccessListener { response ->
+                viewModel.updateAutoCompleteTexts(response.autocompletePredictions.map {
+                    it.getFullText(null).toString()
+                })
+            }.addOnFailureListener { exception ->
+                if (exception is ApiException) {
+                    Log.e("TAG", "Place not found: ${exception.statusCode}")
+                }
+            }
+    }
+
+    private fun searchSnapPoints() {
+        val latLngBound = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+        Log.d("TAG", "searchSnapPoints: $latLngBound")
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

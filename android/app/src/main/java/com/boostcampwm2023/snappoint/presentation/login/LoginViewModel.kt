@@ -26,7 +26,12 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
-    private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState())
+    private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState(
+        email = "string@string.com",
+        password = "Str!n8Str!n8",
+        isEmailValid = true,
+        isPasswordValid = true
+    ))
     val loginFormUiState: StateFlow<LoginFormState> = _loginFormUiState.asStateFlow()
 
     private val _event: MutableSharedFlow<LoginEvent> = MutableSharedFlow(
@@ -63,7 +68,7 @@ class LoginViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                _event.emit(LoginEvent.Success(it))
+                _event.emit(LoginEvent.Success)
             }
             .catch {
                 _event.emit(LoginEvent.Fail(R.string.login_activity_fail))
