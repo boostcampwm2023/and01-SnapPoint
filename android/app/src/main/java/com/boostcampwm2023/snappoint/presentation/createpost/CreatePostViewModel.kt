@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.net.Uri
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
@@ -40,7 +41,6 @@ class CreatePostViewModel @Inject constructor(
             override val onAddressIconClick: (Int) -> Unit = { index -> findAddress(index) }
         },
     ))
-
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
 
     private val _event: MutableSharedFlow<CreatePostEvent> = MutableSharedFlow(
@@ -58,12 +58,10 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addImageBlock(uri: Uri?, position: PositionState) {
-        if (uri == null) return
-
+    fun addImageBlock(bitmap: Bitmap, position: PositionState) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlockState.IMAGE(uri = uri, position = position)
+                postBlocks = it.postBlocks + PostBlockState.IMAGE(bitmap = bitmap, position = position)
             )
         }
     }
@@ -196,7 +194,6 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun onCheckButtonClicked() {
-        println(uiState.value)
         if(isValidTitle().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
@@ -209,34 +206,35 @@ class CreatePostViewModel @Inject constructor(
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
             return
         }
+
       /*  if(isValidMediaBlock().not()){
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
             return
         }*/
 
-
-        postRepository.postCreatePost(
-            title = _uiState.value.title,
-            postBlocks = _uiState.value.postBlocks
-        )
-            .onStart {
-                _uiState.update {
-                    it.copy(isLoading = true)
+        thread {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
+            postRepository.postCreatePost(
+                title = _uiState.value.title,
+                postBlocks = _uiState.value.postBlocks
+            )
+                .onStart {}
+                .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
+                .onCompletion {
+                    _uiState.update {
+                        it.copy(isLoading = false)
+                    }
                 }
-            }
-            .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
-            .onCompletion {
-                _uiState.update {
-                    it.copy(isLoading = false)
+                .onEach {
+                    Log.d("TAG", "onCheckButtonClicked: api request success")
+                    Log.d("TAG", "onCheckButtonClicked: ${it}")
+                    _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
+                    _event.tryEmit(CreatePostEvent.NavigatePrev)
                 }
-            }
-            .onEach {
-                Log.d("TAG", "onCheckButtonClicked: api request success")
-                Log.d("TAG", "onCheckButtonClicked: ${it}")
-                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
-                _event.tryEmit(CreatePostEvent.NavigatePrev)
-            }
-            .launchIn(viewModelScope)
+                .launchIn(viewModelScope)
+        }
     }
 
     fun onImageBlockButtonClicked() {
@@ -268,8 +266,8 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
                     if(idx == index){
                         when(postBlock){
-                            is PostBlockState.IMAGE ->  PostBlockState.IMAGE(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
-                            is PostBlockState.VIDEO -> PostBlockState.VIDEO(content = postBlock.content, uri = postBlock.uri, position = position, address = address)
+                            is PostBlockState.IMAGE ->  PostBlockState.IMAGE(content = postBlock.content, position = position, address = address, bitmap = postBlock.bitmap)
+                            is PostBlockState.VIDEO -> PostBlockState.VIDEO(content = postBlock.content, position = position, address = address)
                             is PostBlockState.TEXT -> postBlock
                         }
                     }else{

@@ -16,10 +16,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SigninFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_signin) {
+class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_signin) {
 
     private val activityViewModel: AuthViewModel by activityViewModels()
-    private val viewModel: SigninViewModel by viewModels()
+    private val viewModel: SignInViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,15 +40,15 @@ class SigninFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_sig
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is SigninEvent.Fail -> {
+                        is SignInEvent.Fail -> {
                             showToastMessage(event.error)
                         }
 
-                        is SigninEvent.Success -> {
+                        is SignInEvent.Success -> {
                             activityViewModel.sendSuccessResult()
                         }
 
-                        is SigninEvent.Signup -> {
+                        is SignInEvent.Signup -> {
                             navigateToSignup()
                         }
                     }

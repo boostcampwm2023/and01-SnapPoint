@@ -18,6 +18,8 @@ import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
+import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
+import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -43,7 +45,8 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                     ?: return@registerForActivityResult
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
-                viewModel.addImageBlock(imageUri, position)
+                val bitmap = getBitmapFromUri(this, imageUri)
+                viewModel.addImageBlock(bitmap, position)
 
                 startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
             }
@@ -57,8 +60,8 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                         index = it.getIntExtra("index", 0),
                         address = it.getStringExtra("address") ?: "",
                         position = PositionState(
-                            it.getDoubleExtra("longitude", 0.0),
-                            it.getDoubleExtra("latitude", 0.0)
+                            it.getDoubleExtra("latitude", 0.0).untilSixAfterDecimalPoint(),
+                            it.getDoubleExtra("longitude", 0.0).untilSixAfterDecimalPoint()
                         )
                     )
                 }
@@ -74,28 +77,33 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     private fun initBinding() {
         with(binding) {
             vm = viewModel
+            btnCheck.setOnClickListener {
+                viewModel.onCheckButtonClicked()
+            }
         }
     }
 
     private fun collectViewModelData() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        is CreatePostEvent.ShowMessage -> {
-                            showToastMessage(event.resId)
-                        }
+                launch {
+                    viewModel.event.collect { event ->
+                        when (event) {
+                            is CreatePostEvent.ShowMessage -> {
+                                showToastMessage(event.resId)
+                            }
 
-                        is CreatePostEvent.SelectImageFromLocal -> {
-                            selectImage()
-                        }
+                            is CreatePostEvent.SelectImageFromLocal -> {
+                                selectImage()
+                            }
 
-                        is CreatePostEvent.NavigatePrev -> {
-                            finish()
-                        }
+                            is CreatePostEvent.NavigatePrev -> {
+                                finish()
+                            }
 
-                        is CreatePostEvent.FindAddress -> {
-                            startMapActivityAndFindAddress(event.index, event.position)
+                            is CreatePostEvent.FindAddress -> {
+                                startMapActivityAndFindAddress(event.index, event.position)
+                            }
                         }
                     }
                 }

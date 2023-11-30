@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.net.Uri
+import android.graphics.Bitmap
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
@@ -12,6 +12,7 @@ import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.google.android.material.card.MaterialCardView
 
 sealed class BlockItemViewHolder(
@@ -84,9 +85,8 @@ sealed class BlockItemViewHolder(
                     itemView.rootView.clearFocus()
                     blockItemEvent.onDownButtonClick(index)
                 }
-                uri = block.uri
                 editMode = block.isEditMode
-
+                bitmap = block.bitmap
             }
             textWatcher.updatePosition(index)
         }
@@ -124,9 +124,9 @@ class EditTextWatcher(private val listener: (Int, String) -> Unit) : TextWatcher
 }
 
 
-@BindingAdapter("uri")
-fun ImageView.bindUri(uri: Uri) {
-    load(uri)
+@BindingAdapter("bitmap")
+fun ImageView.bindBitmap(bitmap: Bitmap) {
+    load(resizeBitmap(bitmap, width))
 }
 
 @BindingAdapter("editMode")
