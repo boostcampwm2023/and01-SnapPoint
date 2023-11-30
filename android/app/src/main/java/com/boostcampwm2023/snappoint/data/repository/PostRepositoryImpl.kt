@@ -8,6 +8,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -54,6 +55,8 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun postCreatePost(title: String, postBlocks: List<PostState>): Flow<CreatePostResponse> {
 
+        println("postCreatePost started..")
+        println("postBlocks: $postBlocks")
         val request = CreatePostRequest(
             title = title,
             postBlocks = postBlocks.map {
@@ -64,17 +67,16 @@ class PostRepositoryImpl @Inject constructor(
                         val multipartBody =
                             MultipartBody.Part.createFormData("file", "image", requestBody)
                         val uploadResult = try {
-                            runBlocking {
-                                snapPointApi.postImage(multipartBody).execute()
+                            runBlocking(Dispatchers.IO) {
+                                snapPointApi.postImage(multipartBody)
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
                             return emptyFlow()
                         }
-                        println("Uploading complete.")
 
                         it.asPostBlock().copy(
-                            files = listOf(File(uploadResult.body()?.imageUuid ?: ""))
+                            files = listOf(File(uploadResult.body()?.uuid ?: ""))
                         )
                     }
                     else -> it.asPostBlock()
@@ -94,6 +96,6 @@ class PostRepositoryImpl @Inject constructor(
         val requestBody = byteArray.toRequestBody("image/webp".toMediaTypeOrNull())
         val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
 
-        return snapPointApi.postImage(multipartBody).execute()
+        return snapPointApi.postImage(multipartBody)
     }
 }

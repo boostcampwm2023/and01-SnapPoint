@@ -8,7 +8,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.LoginResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
 import okhttp3.MultipartBody
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -45,5 +45,5 @@ interface SnapPointApi {
     @POST("files")
     suspend fun postImage(
         @Part bitmap: MultipartBody.Part?
-    ): Call<PostImageResponse>
+    ): Response<PostImageResponse>
 }

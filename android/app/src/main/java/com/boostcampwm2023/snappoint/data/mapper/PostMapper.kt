@@ -11,6 +11,7 @@ import com.boostcampwm2023.snappoint.presentation.model.PostState
 import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
 import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
+import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 
 fun PostBlock.asPostBlockState(): PostBlockState {
     return when(type){
@@ -75,10 +76,10 @@ fun PostState.asPostBlock(): PostBlock {
         }
         is PostState.IMAGE -> {
             PostBlock(
-                content = this.description,
                 type = BlockType.MEDIA.type,
-                latitude = this.position.latitude,
-                longitude = this.position.longitude,
+                content = this.content,
+                latitude = this.position.latitude.untilSixAfterDecimalPoint(),
+                longitude = this.position.longitude.untilSixAfterDecimalPoint(),
                 files = listOf(File(fileUuid = this.fileUuid)),
             )
         }

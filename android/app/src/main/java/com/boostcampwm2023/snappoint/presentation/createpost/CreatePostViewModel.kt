@@ -6,15 +6,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostState
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
-import com.boostcampwm2023.snappoint.presentation.model.PostState
-import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
-import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +25,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -261,7 +259,7 @@ class CreatePostViewModel @Inject constructor(
         postRepository.postCreatePost(
             title = _uiState.value.title,
             postBlocks = _uiState.value.postBlocks.map {
-                it.asPostState(context, layoutWidth)
+                runBlocking(Dispatchers.IO) { it.asPostState(context, layoutWidth) }
             }
         )
             .onStart {

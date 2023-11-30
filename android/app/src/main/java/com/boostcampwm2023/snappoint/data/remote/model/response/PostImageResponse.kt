@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PostImageResponse(
     @SerialName("uuid")
-    val imageUuid: String,
+    val uuid: String,
     @SerialName("url")
-    val imageUrl: String,
+    val url: String,
     @SerialName("mimeType")
     val mimeType: String,
 )
