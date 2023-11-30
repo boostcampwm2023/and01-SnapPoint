@@ -1,3 +1,4 @@
+import { AuthService } from '@/api/auth/auth.service';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { UserService } from '@/domain/user/user.service';
 import {
@@ -6,6 +7,7 @@ import {
   ExecutionContext,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -20,6 +22,7 @@ export class JwtAuthGuard implements CanActivate {
     private configService: ConfigService,
     private refreshTokenService: RefreshTokenService,
     private userService: UserService,
+    private authSerivce: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<any> {
@@ -65,29 +68,9 @@ export class JwtAuthGuard implements CanActivate {
 
   async checkRefreshToken(context: ExecutionContext, refreshToken: string) {
     try {
-      const decoded = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      });
+      const { newAccessToken, decodedRefreshToken } = await this.refresh(refreshToken);
 
-      const refreshTokenEntity = await this.refreshTokenService.findRefreshTokenByUnique({
-        userUuid: decoded.uuid,
-      });
-
-      if (!refreshTokenEntity) {
-        throw new UnauthorizedException('해당 리프레시 토큰이 존재하지 않습니다.');
-      }
-
-      const user = await this.userService.findUserByUniqueInput({
-        uuid: refreshTokenEntity.userUuid,
-      });
-
-      if (!user) {
-        throw new UnauthorizedException();
-      }
-
-      const newAccessToken = await this.refreshTokenService.generateAccessToken(user);
-
-      context.switchToHttp().getRequest().user = decoded;
+      context.switchToHttp().getRequest().user = decodedRefreshToken;
 
       const res = context.switchToHttp().getResponse();
       res.setHeader('Authorization', 'Bearer ' + [newAccessToken, refreshToken]);
@@ -104,5 +87,29 @@ export class JwtAuthGuard implements CanActivate {
       }
       return false;
     }
+  }
+
+  async refresh(refreshToken: string): Promise<{ newAccessToken: string; decodedRefreshToken: { uuid: string } }> {
+    const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+    });
+
+    const refreshTokenEntity = await this.refreshTokenService.findRefreshTokenByUnique({
+      userUuid: decodedRefreshToken.uuid,
+    });
+
+    if (!refreshTokenEntity) {
+      throw new NotFoundException('리프레시 토큰이 존재하지 않습니다.');
+    }
+
+    const user = await this.userService.findUserByUniqueInput({ uuid: refreshTokenEntity.userUuid });
+
+    if (!user) {
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
+    }
+
+    const newAccessToken = await this.refreshTokenService.generateAccessToken(user);
+
+    return { newAccessToken, decodedRefreshToken };
   }
 }
