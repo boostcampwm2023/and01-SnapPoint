@@ -63,9 +63,11 @@ export class RefreshTokenService {
   async generateAccessToken(user: User): Promise<string> {
     const payload = {
       uuid: user.uuid,
-      email: user.email,
     };
-    return await this.jwtService.signAsync(payload);
+    return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION_TIME'),
+    });
   }
 
   async generateRefreshToken(user: User): Promise<string> {
