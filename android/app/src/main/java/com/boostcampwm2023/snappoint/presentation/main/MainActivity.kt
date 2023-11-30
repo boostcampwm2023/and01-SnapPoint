@@ -177,7 +177,7 @@ class MainActivity :
                             }
 
                             is MainActivityEvent.NavigateSignIn -> {
-                                returnToAuthActivity()
+                                navigateAuthActivity()
                             }
                         }
                     }
@@ -340,7 +340,7 @@ class MainActivity :
         navController.navigate(R.id.previewFragment)
     }
 
-    private fun returnToAuthActivity() {
+    private fun navigateAuthActivity() {
         startActivity(
             Intent(this, AuthActivity::class.java).apply {
                 setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
