@@ -7,8 +7,8 @@
         <import type="android.view.View"/>
         <import type="kotlin.Unit"/>
         <variable
-            name="uri"
-            type="android.net.Uri" />
+            name="bitmap"
+            type="android.graphics.Bitmap" />
         <variable
             name="editMode"
             type="Boolean" />
@@ -118,8 +118,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginHorizontal="1dp"
+            android:scaleType="center"
             app:layout_constraintTop_toBottomOf="@id/btn_delete_block"
-            uri="@{uri}"/>
+            bitmap="@{bitmap}"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_address"

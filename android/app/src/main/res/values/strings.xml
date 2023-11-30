@@ -40,6 +40,7 @@
     <string name="login_activity_fail">이메일 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.</string>
     <string name="search_location_fail">입력한 주소를 찾을 수 없습니다.\n다시 한번 확인해 주세요</string>
     <string name="login_activity_sign_up">SIGN UP</string>
+    <string name="btn_search_here">현재 위치에서 다시 검색</string>
     <string name="splash_activity_auto_login">자동로그인 중입니다.</string>
     <string name="sign_in_fragment_auto_login_success">자동로그인 했습니다.</string>
     <string name="sign_in_fragment_auto_login_fail">로그인 정보가 없거나 만료되었습니다.\n다시 시도해주세요</string>

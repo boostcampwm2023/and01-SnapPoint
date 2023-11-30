@@ -6,11 +6,15 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignInResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignupResponse
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Query
 
 interface SnapPointApi {
@@ -42,4 +46,10 @@ interface SnapPointApi {
     suspend fun postSignUp(
         @Body signupRequest: SignupRequest
     ): SignupResponse
+
+    @Multipart
+    @POST("files")
+    suspend fun postImage(
+        @Part bitmap: MultipartBody.Part
+    ): PostImageResponse
 }
