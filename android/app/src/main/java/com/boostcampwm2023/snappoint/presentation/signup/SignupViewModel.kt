@@ -15,7 +15,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SignupViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState())
+    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState(
+        email = "email@email.com",
+        password = "asdASD123!@#",
+        passwordConfirm = "asdASD123!@#",
+        nickname = "nickname",
+        isInputValid = true
+    ))
     val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
 
     fun updateEmail(email: String) {
@@ -35,6 +41,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 passwordCode = takePasswordErrorCode(password)
             )
         }
+        updatePasswordConfirm()
         updateButtonState()
     }
 
@@ -46,6 +53,14 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             )
         }
         updateButtonState()
+    }
+
+    private fun updatePasswordConfirm() {
+        _uiState.update {
+            it.copy(
+                passwordConfirmCode = takePasswordConfirmErrorCode(it.passwordConfirm)
+            )
+        }
     }
 
     fun updateNickname(nickname: String) {
@@ -61,10 +76,10 @@ class SignupViewModel @Inject constructor() : ViewModel() {
     private fun updateButtonState() {
         _uiState.update {
             it.copy(
-                isInputValid = it.emailCode != null ||
-                        it.passwordCode != null ||
-                        it.passwordConfirmCode != null ||
-                        it.nicknameCode != null
+                isInputValid = it.emailCode == null &&
+                        it.passwordCode == null &&
+                        it.passwordConfirmCode == null &&
+                        it.nicknameCode == null
             )
         }
     }

@@ -17,11 +17,22 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
+        loadText()
     }
 
     private fun initBinding() {
         with(binding) {
             vm = viewModel
+        }
+    }
+
+    // TODO(임시데이터!!)
+    private fun loadText() {
+        with(binding) {
+            tilSignUpEmail.editText?.setText(viewModel.uiState.value.email)
+            tilSignUpPassword.editText?.setText(viewModel.uiState.value.password)
+            tilSignUpPasswordConfirm.editText?.setText(viewModel.uiState.value.passwordConfirm)
+            tilSignUpNickname.editText?.setText(viewModel.uiState.value.nickname)
         }
     }
 }
