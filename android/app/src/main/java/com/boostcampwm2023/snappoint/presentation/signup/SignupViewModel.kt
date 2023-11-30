@@ -3,25 +3,36 @@ package com.boostcampwm2023.snappoint.presentation.signup
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.data.repository.LoginRepository
 import com.boostcampwm2023.snappoint.presentation.util.TextVerificationUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class SignupViewModel @Inject constructor() : ViewModel() {
+class SignupViewModel @Inject constructor(
+    private val loginRepository: LoginRepository
+) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState(
-        email = "email@email.com",
-        password = "asdASD123!@#",
-        passwordConfirm = "asdASD123!@#",
-        nickname = "nickname",
-        isInputValid = true
-    ))
+    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(
+        SignupUiState(
+            email = "email@email.com",
+            password = "asdASD123!@#",
+            passwordConfirm = "asdASD123!@#",
+            nickname = "nickname",
+            isInputValid = true
+        )
+    )
     val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
 
     fun updateEmail(email: String) {
@@ -106,10 +117,28 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 return
             }
 
-            val email = email
-            val password = password
-            val passwordConfirm = passwordConfirm
-            val nickname = nickname
+            loginRepository.postSignup(email, password, nickname)
+                .onStart {
+                    setProgressBarState(true)
+                }
+                .onEach {
+
+                }
+                .catch {
+
+                }
+                .onCompletion {
+                    setProgressBarState(false)
+                }
+                .launchIn(viewModelScope)
+        }
+    }
+
+    private fun setProgressBarState(isInProgress: Boolean) {
+        _uiState.update {
+            it.copy(
+                isSignUpInProgress = isInProgress
+            )
         }
     }
 }
