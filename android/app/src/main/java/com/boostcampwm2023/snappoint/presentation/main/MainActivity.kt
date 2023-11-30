@@ -48,6 +48,8 @@ import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
@@ -174,48 +176,63 @@ class MainActivity :
                         }
                     }
                 }
+
                 launch {
+                    var prevSelectedMarker: Marker? = null
+                    var drawnRoute: Polyline? = null
+                    var prevSelectedIndex = -1
                     viewModel.uiState.collect { uiState ->
-                        updateMarker(uiState.snapPoints)
-                    }
-                }
-            }
-        }
-    }
+                        if (uiState.selectedIndex < 0 || uiState.focusedIndex < 0) {
+                            prevSelectedMarker?.remove()
+                            drawnRoute?.remove()
+                            prevSelectedIndex = -1
+                            return@collect
+                        }
+                        val block = viewModel.postState.value[uiState.selectedIndex].postBlocks
+                            .filterIsInstance<PostBlockState.IMAGE>()[uiState.focusedIndex]
 
-    private fun updateMarker(snapPoints: List<SnapPointState>) {
-        lifecycleScope.launch {
-            while (googleMap == null) {
-                delay(100)
-            }
-            val selectedIndex = viewModel.uiState.value.selectedIndex
-            googleMap?.let { map ->
-                map.clear()
-                snapPoints.forEachIndexed { postIndex, snapPointState ->
-                    if(postIndex == selectedIndex){
-                        drawRoutes(selectedIndex)
-                    }
-                    val mediaBlock = viewModel.uiState.value.posts[postIndex].postBlocks
-                        .filterIsInstance<PostBlockState.IMAGE>()
-                    snapPointState.markerOptions.forEachIndexed { snapPointIndex, markerOptions ->
-                        val focused =
-                            (postIndex == viewModel.uiState.value.selectedIndex) && (snapPointIndex == viewModel.uiState.value.focusedIndex)
-                        map.addImageMarker(
+                        prevSelectedMarker?.remove()
+                        prevSelectedMarker = googleMap?.addImageMarker(
                             context = this@MainActivity,
-                            markerOptions = markerOptions,
-                            uri = mediaBlock[snapPointIndex].content,
-                            tag = SnapPointTag(postIndex = postIndex, snapPointIndex = snapPointIndex),
-                            focused = focused
+                            markerOptions = MarkerOptions().position(block.position.asLatLng()),
+                            uri = block.content,
+                            tag = SnapPointTag(uiState.selectedIndex, uiState.focusedIndex),
+                            focused = true
                         )
+                        if (prevSelectedIndex != uiState.selectedIndex) {
+                            drawnRoute?.remove()
+                            drawnRoute = drawRoutes(uiState.selectedIndex)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.postState.collect { postState ->
+                        while (googleMap == null) { delay(100) }
+
+                        postState.forEachIndexed { postIndex, postSummaryState ->
+                            SnapPointState(
+                                index = postIndex,
+                                markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().mapIndexed { pointIndex, postBlockState ->
+                                    googleMap?.addImageMarker(
+                                        context = this@MainActivity,
+                                        markerOptions = MarkerOptions().position(postBlockState.position.asLatLng()),
+                                        uri = postBlockState.content,
+                                        tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                        focused = false
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun drawRoutes(postIndex: Int) {
+    private fun drawRoutes(postIndex: Int): Polyline? {
         val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
-        val positionList = viewModel.uiState.value.posts[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
+        val positionList = viewModel.postState.value[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
                     LatLng(block.position.latitude, block.position.longitude)
@@ -229,13 +246,13 @@ class MainActivity :
             }
         }
         polylineOptions.addAll(positionList)
-        googleMap?.addPolyline(polylineOptions)
+        return googleMap?.addPolyline(polylineOptions)
     }
 
     private fun moveCameraToFitScreen() {
         val postIndex = viewModel.uiState.value.selectedIndex
-        val snapPoints = viewModel.uiState.value.snapPoints[postIndex]
-        val positions = snapPoints.markerOptions.map { it.position }
+        val snapPoints = viewModel.postState.value[postIndex].postBlocks.filterIsInstance<PostBlockState.IMAGE>()
+        val positions = snapPoints.map { it.position }
 
         // 아프리카 적도기니를 기준
         // latitude: 북반구(+) 남반구(-)
@@ -263,7 +280,7 @@ class MainActivity :
         val newTopOfBound: Double = topOfBound + heightOfBound * topAppBarRatio / visibleRatio
         val newBottomOfBound: Double = bottomOfBound - heightOfBound * (bottomNavViewRatio + bottomSheetRatio) / visibleRatio
 
-        val bound: LatLngBounds = LatLngBounds(
+        val bound = LatLngBounds(
             LatLng(newBottomOfBound, leftOfBound),
             LatLng(newTopOfBound, rightOfBound)
         )
@@ -413,7 +430,8 @@ class MainActivity :
     private fun checkPermissionAndMoveCameraToUserLocation() {
         if(this.isMyLocationGranted()){
             fusedLocationClient.lastLocation
-                .addOnSuccessListener {location ->
+                .addOnSuccessListener { location ->
+                    location ?: return@addOnSuccessListener
                     googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude),17.5f))
                 }
         }else{
@@ -433,7 +451,7 @@ class MainActivity :
         fusedLocationClient.requestLocationUpdates(LocationRequest.Builder(1000L).build(),
             locationCallback,
             Looper.getMainLooper()
-            )
+        )
     }
 
     override fun onRequestPermissionsResult(

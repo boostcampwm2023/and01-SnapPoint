@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.annotation.SuppressLint
 import android.widget.LinearLayout
 import androidx.databinding.BindingAdapter
 import com.boostcampwm2023.snappoint.R
