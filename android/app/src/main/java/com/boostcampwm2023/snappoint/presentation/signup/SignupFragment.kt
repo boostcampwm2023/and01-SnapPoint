@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.signup
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -11,8 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSignupBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
-import com.boostcampwm2023.snappoint.presentation.login.LoginEvent
-import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

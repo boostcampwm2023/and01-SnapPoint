@@ -1,7 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.signup
 
-import android.util.Log
-import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
