@@ -11,6 +11,7 @@ import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { ComposedPostDto } from './dtos/composed-post.dto';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
+import { TransformationService } from '../transformation/transformation.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
@@ -25,6 +26,7 @@ describe('PostApiService', () => {
         PrismaService,
         PrismaProvider,
         ValidationService,
+        TransformationService,
         PostService,
         BlockService,
         FileService,
@@ -34,10 +36,15 @@ describe('PostApiService', () => {
       .useValue(mockPrismaProvider)
       .overrideProvider(PostService)
       .useValue(mockDeep<PostService>())
+      .overrideProvider(BlockService)
+      .useValue(mockDeep<BlockService>())
+      .overrideProvider(FileService)
+      .useValue(mockDeep<FileService>())
       .compile();
 
     service = module.get<PostApiService>(PostApiService);
     postService = module.get(PostService);
+
     postDto = {
       post: { title: 'Test Post' },
       blocks: [
