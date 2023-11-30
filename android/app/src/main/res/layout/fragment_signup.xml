@@ -21,7 +21,7 @@
         android:paddingBottom="16dp">
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_sign_up_username"
+            android:id="@+id/til_sign_up_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="96dp"
@@ -55,7 +55,7 @@
             app:errorIconDrawable="@{null}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_username"
+            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_email"
             setErrorMessage="@{vm.uiState.passwordCode}">
 
             <com.google.android.material.textfield.TextInputEditText

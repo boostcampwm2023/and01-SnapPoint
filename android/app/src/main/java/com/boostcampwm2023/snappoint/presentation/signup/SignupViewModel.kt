@@ -15,7 +15,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SignupViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState())
+    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(SignupUiState(
+        email = "email@email.com",
+        password = "asdASD123!@#",
+        passwordConfirm = "asdASD123!@#",
+        nickname = "nickname",
+        isInputValid = true
+    ))
     val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
 
     fun updateEmail(email: String) {
