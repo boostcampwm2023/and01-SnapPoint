@@ -75,6 +75,7 @@ class PostRepositoryImpl @Inject constructor(
                             return emptyFlow()
                         }
 
+                        // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
                         it.asPostBlock().copy(
                             files = listOf(File(uploadResult.body()?.uuid ?: ""))
                         )
