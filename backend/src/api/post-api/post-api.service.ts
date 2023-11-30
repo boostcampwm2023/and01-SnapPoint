@@ -26,7 +26,7 @@ export class PostApiService {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
 
-    const blocks = await this.blockService.findBlocks({ where: { postUuid: post.uuid } });
+    const blocks = await this.blockService.findBlocksWithCoordsByPost(post.uuid);
     const blockPromises = blocks.map(async (block) => {
       const files = await this.fileService.findFiles({ where: { source: 'block', sourceUuid: block.uuid } });
       const fileDtos = files.map((file) => FileDto.of(file));
@@ -78,9 +78,9 @@ export class PostApiService {
       await this.blockService.deleteBlocks({ postUuid: uuid });
       await Promise.all(
         blocks.map((block) =>
-          this.blockService.upsertBlock({
-            where: { uuid: block.uuid },
-            data: { ...block, postUuid: uuid, isDeleted: false },
+          this.blockService.upsertBlock(uuid, {
+            ...block,
+            isDeleted: false,
           }),
         ),
       );
