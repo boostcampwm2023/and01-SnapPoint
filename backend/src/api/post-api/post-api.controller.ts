@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put, Req, UsePipes } from '@nestjs/common';
-import { PostApiService } from './post-api.service';
-import { PostRequestDecompositionPipe } from './pipes/post-request-decompositon.pipe';
-import { ComposedPostDto } from './dtos/composed-post.dto';
+import { PostApiService } from '@/api/post-api/post-api.service';
+import { PostRequestDecompositionPipe } from '@/api/post-api/pipes/post-request-decompositon.pipe';
+import { ComposedPostDto } from '@/api/post-api/dtos/composed-post.dto';
 import { validationPipe } from '@/common/pipes/validation.pipe';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { PostDto } from '@/domain/post/dtos/post.dto';
