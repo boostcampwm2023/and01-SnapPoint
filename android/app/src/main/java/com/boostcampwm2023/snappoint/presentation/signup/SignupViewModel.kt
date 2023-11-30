@@ -1,10 +1,9 @@
 package com.boostcampwm2023.snappoint.presentation.signup
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.data.repository.LoginRepository
+import com.boostcampwm2023.snappoint.data.repository.SignInRepository
 import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.TextVerificationUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+    private val loginRepository: SignInRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(
@@ -138,7 +137,7 @@ class SignupViewModel @Inject constructor(
                 return
             }
 
-            loginRepository.postSignup(email, password, nickname)
+            loginRepository.postSignUp(email, password, nickname)
                 .onStart {
                     setProgressBarState(true)
                 }

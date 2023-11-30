@@ -28,22 +28,6 @@
         android:theme="@style/Theme.SnapPoint"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-      
-        <activity
-            android:name=".presentation.splash.SplashActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.auth.AuthActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".presentation.viewpost.ViewPostActivity"
-            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -53,16 +37,31 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".presentation.main.MainActivity"
+            android:name=".presentation.splash.SplashActivity"
             android:exported="true">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+
+        <activity
+            android:name=".presentation.auth.AuthActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".presentation.viewpost.ViewPostActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.main.MainActivity"
+            android:exported="true" />
         <activity
             android:name=".presentation.markerpointselector.MarkerPointSelectorActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".presentation.createpost.CreatePostActivity"
-            android:exported="true"/>
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -9,7 +9,7 @@
 
         <variable
             name="vm"
-            type="com.boostcampwm2023.snappoint.presentation.signin.SigninViewModel" />
+            type="com.boostcampwm2023.snappoint.presentation.signin.SignInViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:enabled="@{vm.loginFormUiState.emailValid &amp;&amp; vm.loginFormUiState.passwordValid}"
+            android:enabled="@{vm.signInFormUiState.emailValid &amp;&amp; vm.signInFormUiState.passwordValid}"
             android:onClick="@{()->vm.onLoginButtonClick()}"
             android:text="@string/login_activity_sign_in" />
 
@@ -103,7 +103,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="64dp"
             android:layout_marginBottom="64dp"
-            android:visibility="@{vm.loginFormUiState.loginInProgress ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{vm.signInFormUiState.loginInProgress ? View.VISIBLE : View.GONE}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
