@@ -11,9 +11,10 @@ import { ConfigModule } from '@nestjs/config';
 import { RefreshTokenService } from './domain/refresh-token/refresh-token.service';
 import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ApiModule } from './api/api.module';
+import { validationPipe } from './common/pipes/validation.pipe';
 
 @Module({
   imports: [
@@ -39,6 +40,10 @@ import { ApiModule } from './api/api.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_PIPE,
+      useValue: validationPipe,
     },
   ],
 })

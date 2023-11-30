@@ -85,6 +85,8 @@ dependencies {
     //exif
     implementation(libs.androidx.exifinterface)
 
+    //okHttp
+    implementation(libs.okhttp.urlconnection)
     //retrofit
     implementation(libs.retrofit)
     //kotlinx.serialization json converter

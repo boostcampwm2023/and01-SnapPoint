@@ -11,9 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     readonly configService: ConfigService,
   ) {
     super({
-      // Authorization에서 Bearer Token에 JWT 토큰을 담아 전송
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // Passport에 검증 위임
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_ACCESS_SECRET'),
     });

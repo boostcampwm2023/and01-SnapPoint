@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.login
+package com.boostcampwm2023.snappoint.presentation.signin
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
@@ -22,18 +22,23 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class SigninViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ) : ViewModel() {
 
-    private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState())
-    val loginFormUiState: StateFlow<LoginFormState> = _loginFormUiState.asStateFlow()
+    private val _loginFormUiState: MutableStateFlow<SigninFormState> = MutableStateFlow(SigninFormState(
+        email = "string@string.com",
+        password = "Str!n8Str!n8",
+        isEmailValid = true,
+        isPasswordValid = true
+    ))
+    val loginFormUiState: StateFlow<SigninFormState> = _loginFormUiState.asStateFlow()
 
-    private val _event: MutableSharedFlow<LoginEvent> = MutableSharedFlow(
+    private val _event: MutableSharedFlow<SigninEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val event: SharedFlow<LoginEvent> = _event.asSharedFlow()
+    val event: SharedFlow<SigninEvent> = _event.asSharedFlow()
 
     fun updateEmail(email: String) {
         _loginFormUiState.update {
@@ -53,7 +58,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun tryLogin() {
+    fun onLoginButtonClick() {
         val email = loginFormUiState.value.email
         // TODO 암호화
         val password = loginFormUiState.value.password
@@ -63,15 +68,19 @@ class LoginViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                _event.emit(LoginEvent.Success(it))
+                _event.emit(SigninEvent.Success)
             }
             .catch {
-                _event.emit(LoginEvent.Fail(R.string.login_activity_fail))
+                _event.emit(SigninEvent.Fail(R.string.login_activity_fail))
             }
             .onCompletion {
                 setProgressBarState(false)
             }
             .launchIn(viewModelScope)
+    }
+
+    fun onSignUpButtonClick() {
+        _event.tryEmit(SigninEvent.Signup)
     }
 
     private fun setProgressBarState(isInProgress: Boolean) {

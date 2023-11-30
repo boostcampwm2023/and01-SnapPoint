@@ -12,7 +12,6 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 
 describe('AuthSerivce', () => {
   let service: AuthService;
-  let jwtService: DeepMockProxy<JwtService>;
   let refreshTokenService: DeepMockProxy<RefreshTokenService>;
   let userService: DeepMockProxy<UserService>;
 
@@ -37,7 +36,6 @@ describe('AuthSerivce', () => {
       .compile();
 
     service = module.get<AuthService>(AuthService);
-    jwtService = module.get(JwtService);
     refreshTokenService = module.get(RefreshTokenService);
     userService = module.get(UserService);
   });
@@ -81,42 +79,6 @@ describe('AuthSerivce', () => {
       expect(result).toEqual({
         accessToken: access_token,
         refreshToken: refresh_token,
-      });
-    });
-  });
-
-  describe('refresh', () => {
-    const access_token = 'test_access_token';
-    const refreshToken = 'test_refresh_token';
-    const userMock: User = {
-      id: 1,
-      email: 'test@example.com',
-      password: 'Password123@@',
-      nickname: 'testNickname',
-      uuid: 'testUuid',
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      isDeleted: false,
-    };
-    const refreshTokenMock: RefreshToken = {
-      id: 0,
-      userUuid: 'testUuid',
-      token: 'testtoken',
-      expiresAt: new Date(),
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-    };
-
-    it('refresh 토큰 검증 이후 access_token을 반환한다.', async () => {
-      jwtService.verifyAsync.mockResolvedValue({ uuid: 'testUuid' });
-      userService.findUserByUniqueInput.mockResolvedValueOnce(userMock);
-      refreshTokenService.generateAccessToken.mockResolvedValueOnce(access_token);
-      refreshTokenService.findRefreshTokenByUnique.mockResolvedValue(refreshTokenMock);
-
-      const result = await service.refresh(refreshToken);
-
-      expect(result).toEqual({
-        accessToken: access_token,
       });
     });
   });

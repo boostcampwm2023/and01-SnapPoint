@@ -1,8 +1,7 @@
-import { inspect } from 'util';
-import { Body, Controller, Get, Logger, Param, Post, Put, Req, UsePipes } from '@nestjs/common';
-import { PostApiService } from './post-api.service';
-import { PostRequestDecompositionPipe } from './pipes/post-request-decompositon.pipe';
-import { ComposedPostDto } from './dtos/composed-post.dto';
+import { Body, Controller, Get, Param, Post, Put, Req, UsePipes } from '@nestjs/common';
+import { PostApiService } from '@/api/post-api/post-api.service';
+import { PostRequestDecompositionPipe } from '@/api/post-api/pipes/post-request-decompositon.pipe';
+import { ComposedPostDto } from '@/api/post-api/dtos/composed-post.dto';
 import { validationPipe } from '@/common/pipes/validation.pipe';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { PostDto } from '@/domain/post/dtos/post.dto';
@@ -28,7 +27,6 @@ export class PostApiController {
   readPosts() {}
 
   @Post('/publish')
-  @NoAuth()
   @UsePipes(PostRequestDecompositionPipe, validationPipe)
   @ApiOperation({
     summary: '게시글을 작성하는 API',
@@ -40,9 +38,8 @@ export class PostApiController {
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
   writePost(@Body() postDto: ComposedPostDto, @Req() request: any) {
-    request;
-    // const { uuid: userUuid } = request.user;
-    return this.postApiService.writePost(postDto, 'c6a7c590-6239-4d12-ad8f-c8065db60d6a');
+    const { uuid: userUuid } = request.user;
+    return this.postApiService.writePost(postDto, userUuid);
   }
 
   @Put('/:uuid')

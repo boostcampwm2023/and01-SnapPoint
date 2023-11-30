@@ -5,4 +5,5 @@ import com.boostcampwm2023.snappoint.BuildConfig
 object Constants {
     const val BOTTOM_SHEET_HALF_EXPANDED_RATIO: Float = 0.45f
     const val API_KEY = BuildConfig.MAPS_API_KEY
+    const val EMAIL_DUPLICATE_ERROR: String = "HTTP 409 Conflict"
 }
