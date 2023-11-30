@@ -61,10 +61,10 @@ class SignupViewModel @Inject constructor() : ViewModel() {
     private fun updateButtonState() {
         _uiState.update {
             it.copy(
-                isInputValid = it.emailCode != null ||
-                        it.passwordCode != null ||
-                        it.passwordConfirmCode != null ||
-                        it.nicknameCode != null
+                isInputValid = it.emailCode == null &&
+                        it.passwordCode == null &&
+                        it.passwordConfirmCode == null &&
+                        it.nicknameCode == null
             )
         }
     }
