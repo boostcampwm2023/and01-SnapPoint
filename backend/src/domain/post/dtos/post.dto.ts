@@ -10,10 +10,10 @@ export class PostDto {
   readonly title: string;
 
   @ApiProperty({ description: '게시글의 생성 일시입니다.' })
-  readonly createdAt: string;
+  readonly createdAt: Date;
 
   @ApiProperty({ description: '게시글의 수정 일시입니다.' })
-  readonly modifiedAt: string;
+  readonly modifiedAt: Date;
 
   @ApiProperty({ type: BlockDto, isArray: true })
   readonly blocks: BlockDto[];

@@ -9,32 +9,55 @@ import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/file-api/dto/file.dto';
 import { WriteBlockDto } from '@/api/post-api/dtos/write-block.dto';
+import { File, Post } from '@prisma/client';
+import { TransformationService } from '../transformation/transformation.service';
+import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 
 @Injectable()
 export class PostApiService {
   constructor(
     private readonly prisma: PrismaProvider,
     private readonly validation: ValidationService,
+    private readonly transform: TransformationService,
     private readonly postService: PostService,
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
   ) {}
 
-  async readPost(uuid: string) {
+  private async readPost(post: Post) {
+    const blocks = await this.blockService.findBlocksWithCoordsByPost(post.uuid);
+    const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
+
+    const files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
+
+    const fileDtoMap = this.transform.toMapFromArray(
+      files,
+      (file: File) => file.sourceUuid,
+      (file: File) => FileDto.of(file),
+    );
+
+    const blockDtos = blocks.map((block) => BlockDto.of(block, fileDtoMap.get(block.uuid)));
+    return PostDto.of(post, blockDtos);
+  }
+
+  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
+    const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
+
+    // TODO: 제대로 된 영역인지 평가한다. (면적, 서비스 범위?)
+    const blocks = await this.blockService.findBlocksWithCoordsByArea(findNearbyPostDto);
+
+    const blockWheres = blocks.map((block) => ({ uuid: block.postUuid }));
+    const posts = await this.postService.findPosts({ where: { OR: blockWheres } });
+
+    return Promise.all(posts.map((post) => this.readPost(post)));
+  }
+
+  async findPost(uuid: string) {
     const post = await this.postService.findPost({ uuid });
     if (!post) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
-
-    const blocks = await this.blockService.findBlocksWithCoordsByPost(post.uuid);
-    const blockPromises = blocks.map(async (block) => {
-      const files = await this.fileService.findFiles({ where: { source: 'block', sourceUuid: block.uuid } });
-      const fileDtos = files.map((file) => FileDto.of(file));
-      return BlockDto.of(block, fileDtos);
-    });
-
-    const blockDtos = await Promise.all(blockPromises);
-    return PostDto.of(post, blockDtos);
+    return this.readPost(post);
   }
 
   async writePost(postDto: ComposedPostDto, userUuid: string) {
@@ -52,7 +75,7 @@ export class PostApiService {
           return this.fileService.updateFile({ where: { uuid }, data: { source, sourceUuid } });
         }),
       );
-      return this.readPost(postUuid);
+      return this.findPost(postUuid);
     });
   }
 
@@ -94,7 +117,7 @@ export class PostApiService {
       );
 
       await this.validation.validateBlocks(blocks, files);
-      return this.readPost(uuid);
+      return this.findPost(uuid);
     });
   }
 }

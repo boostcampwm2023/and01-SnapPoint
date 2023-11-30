@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UsePipes } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UsePipes } from '@nestjs/common';
 import { PostApiService } from '@/api/post-api/post-api.service';
 import { PostRequestDecompositionPipe } from '@/api/post-api/pipes/post-request-decompositon.pipe';
 import { ComposedPostDto } from '@/api/post-api/dtos/composed-post.dto';
@@ -6,6 +6,7 @@ import { validationPipe } from '@/common/pipes/validation.pipe';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiParam } from '@nestjs/swagger';
+import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 
 @Controller('posts')
 export class PostApiController {
@@ -18,13 +19,22 @@ export class PostApiController {
     summary: '게시글을 조회하는 API',
     description: '게시글과 연관된 블록 정보를 반환한다.',
   })
-  @ApiOkResponse({ description: '성공적으로 게시글 조회가 완료되었습니다.' })
+  @ApiOkResponse({ description: '성공적으로 게시글 조회가 완료되었습니다.', type: PostDto })
   @ApiNotFoundResponse({ description: '해당 UUID에 맞는 게시글을 찾을 수 없습니다.' })
   readPost(@Param('uuid') uuid: string) {
-    return this.postApiService.readPost(uuid);
+    return this.postApiService.findPost(uuid);
   }
 
-  readPosts() {}
+  @Get('/')
+  @NoAuth()
+  @ApiOperation({
+    summary: '위치정보를 받아 근처 게시글을 조회하는 API',
+    description: '근처에 있는 게시글과 연관된 블록 정보를 반환한다.',
+  })
+  @ApiOkResponse({ description: '성공적으로 게시글 조회가 완료되었습니다.', type: PostDto, isArray: true })
+  readNearbyPosts(@Query() findNearbyPostQuery: FindNearbyPostQuery) {
+    return this.postApiService.findNearbyPost(findNearbyPostQuery);
+  }
 
   @Post('/publish')
   @UsePipes(PostRequestDecompositionPipe, validationPipe)

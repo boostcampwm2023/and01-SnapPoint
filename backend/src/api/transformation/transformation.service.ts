@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FindSnapPointQuery } from '../snap-point/dtos/find-snap-point.query.dto';
+import { FindNearbyPostQuery } from '../post-api/dtos/find-nearby-post.query.dto';
 
 @Injectable()
 export class TransformationService {
@@ -8,7 +8,7 @@ export class TransformationService {
     return { latitude: lat, longitude: lon };
   }
 
-  toFindSnapPointDto(query: FindSnapPointQuery) {
+  toNearbyPostDtoFromQuery(query: FindNearbyPostQuery) {
     const { from, to } = query;
 
     const { latitude: fromLat, longitude: fromLon } = this.parseLatLon(from);
@@ -20,5 +20,16 @@ export class TransformationService {
       longitudeMin: Math.min(fromLon, toLon),
       longitudeMax: Math.max(fromLon, toLon),
     };
+  }
+
+  toMapFromArray<T, K, V>(items: T[], keyExtractor: (item: T) => K, valueTransformer: (item: T) => V): Map<K, V[]> {
+    const map = new Map<K, V[]>();
+    items.forEach((item) => {
+      const key = keyExtractor(item);
+      const collection = map.get(key) || [];
+      collection.push(valueTransformer(item));
+      map.set(key, collection);
+    });
+    return map;
   }
 }

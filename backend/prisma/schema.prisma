@@ -34,7 +34,7 @@ model Post {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique @default(uuid())
   userUuid    String
-  title       String?
+  title       String
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)

@@ -1,4 +1,4 @@
-export class FindSnapPointDto {
+export class FindNearbyPostDto {
   latitudeMin: number;
 
   longitudeMin: number;
