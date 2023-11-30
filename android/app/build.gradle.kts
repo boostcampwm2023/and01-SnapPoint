@@ -36,7 +36,7 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
@@ -51,6 +51,7 @@ android {
     }
 
     buildFeatures{
+        buildConfig = true
         dataBinding = true
     }
 
@@ -84,6 +85,8 @@ dependencies {
     //exif
     implementation(libs.androidx.exifinterface)
 
+    //okHttp
+    implementation(libs.okhttp.urlconnection)
     //retrofit
     implementation(libs.retrofit)
     //kotlinx.serialization json converter
@@ -106,6 +109,8 @@ dependencies {
     implementation (libs.play.services.maps)
     //location
     implementation (libs.play.services.location)
+    //places
+    implementation (libs.places)
 
     //mockwebserver
     testImplementation(libs.mockwebserver)

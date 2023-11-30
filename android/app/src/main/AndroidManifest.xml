@@ -28,6 +28,11 @@
         android:theme="@style/Theme.SnapPoint"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+      
+        <activity
+            android:name=".presentation.signup.SignupTestActivity"
+            android:exported="true" >
+        </activity>
         <activity
             android:name=".presentation.viewpost.ViewPostActivity"
             android:exported="false" />
