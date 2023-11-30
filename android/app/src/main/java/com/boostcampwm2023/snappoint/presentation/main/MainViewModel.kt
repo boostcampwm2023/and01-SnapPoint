@@ -205,4 +205,8 @@ class MainViewModel @Inject constructor(
     private fun moveCameraToAddress(index: Int) {
         _event.tryEmit(MainActivityEvent.MoveCameraToAddress(index))
     }
+
+    fun navigateSignIn() {
+        _event.tryEmit(MainActivityEvent.NavigateSignIn)
+    }
 }

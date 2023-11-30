@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.SignInRepository
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
+    private val signInUtil: SignInUtil,
     private val loginRepository: SignInRepository
 ) : ViewModel() {
 
@@ -28,6 +30,8 @@ class SettingViewModel @Inject constructor(
     fun onSignOutClick() {
         loginRepository.getSignOut()
             .onEach {
+                signInUtil.email = ""
+                signInUtil.password = ""
                 _event.emit(SettingEvent.SignOut)
             }
             .catch {
