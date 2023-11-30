@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginTop="64dp"
-            android:enabled="@{vm.uiState.inputValid}"
+            android:enabled="@{vm.uiState.buttonEnabled}"
             android:onClick="@{()->vm.onSignUpButtonClicked()}"
             android:text="SIGN UP"
             app:layout_constraintEnd_toEndOf="parent"

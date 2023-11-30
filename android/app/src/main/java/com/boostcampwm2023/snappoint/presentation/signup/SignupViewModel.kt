@@ -32,7 +32,7 @@ class SignupViewModel @Inject constructor(
             password = "asdASD123!@#",
             passwordConfirm = "asdASD123!@#",
             nickname = "nickname",
-            isInputValid = true
+            isButtonEnabled = true
         )
     )
     val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
@@ -95,7 +95,7 @@ class SignupViewModel @Inject constructor(
     private fun updateButtonState() {
         _uiState.update {
             it.copy(
-                isInputValid = it.emailCode == null &&
+                isButtonEnabled = it.emailCode == null &&
                         it.passwordCode == null &&
                         it.passwordConfirmCode == null &&
                         it.nicknameCode == null
@@ -108,7 +108,7 @@ class SignupViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     emailCode = R.string.signup_fragment_error_email_duplicate,
-                    isInputValid = false
+                    isButtonEnabled = false
                 )
             }
         }
@@ -132,7 +132,7 @@ class SignupViewModel @Inject constructor(
 
     fun onSignUpButtonClicked() {
         with(uiState.value) {
-            if (isInputValid.not()) {
+            if (isButtonEnabled.not()) {
                 return
             }
 
