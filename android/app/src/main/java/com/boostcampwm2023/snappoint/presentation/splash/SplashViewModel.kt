@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @HiltViewModel
-class SplashViewModel(
+class SplashViewModel @Inject constructor(
     private val loginUtil: LoginUtil,
     private val loginRepository: LoginRepository
 ) : ViewModel() {
