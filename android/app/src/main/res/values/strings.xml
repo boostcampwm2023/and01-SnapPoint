@@ -26,6 +26,7 @@
     <string name="btn_preview_text">미리보기</string>
     <string name="btn_view_post_text">게시글 보기</string>
     <string name="create_post_activity_post_creation_success">게시글 작성 성공했습니다 !</string>
+    <string name="signup_fragment_create_account_success">이메일 형식으로 입력해주세요.</string>
     <string name="signup_fragment_error_email_form">이메일 형식으로 입력해주세요.</string>
     <string name="signup_fragment_error_email_duplicate">이미 사용중인 이메일입니다.</string>
     <string name="signup_fragment_error_password_length">8~16자 영문, 숫자, 특수문자를 사용하세요.</string>

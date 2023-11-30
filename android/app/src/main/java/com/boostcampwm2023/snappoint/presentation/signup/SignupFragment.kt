@@ -53,6 +53,7 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
                         }
 
                         is SignupEvent.Success -> {
+                            showToastMessage(R.string.signup_fragment_create_account_success)
                             navigateToLogin()
                         }
                     }
