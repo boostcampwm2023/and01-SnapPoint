@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsString, IsIn, IsLatitude, IsLongitude, IsOptional, IsInt, ValidateNested } from 'class-validator';
+import { IsString, IsIn, IsLatitude, IsLongitude, IsOptional, ValidateNested } from 'class-validator';
 import { WriteBlockFileDto } from './write-block-files.dto';
 
 export class WriteBlockDto {
@@ -29,9 +29,6 @@ export class WriteBlockDto {
   @IsOptional()
   @IsLongitude()
   readonly longitude?: number;
-
-  @IsInt()
-  readonly order: number;
 
   @ValidateNested({ each: true })
   @Type(() => WriteBlockFileDto)
