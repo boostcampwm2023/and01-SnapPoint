@@ -7,6 +7,7 @@ import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
 import { PostService } from '@/domain/post/post.service';
 import { ValidationService } from '../validation/validation.service';
+import { TransformationService } from '../transformation/transformation.service';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -23,6 +24,7 @@ describe('PostApiController', () => {
         PostService,
         BlockService,
         FileService,
+        TransformationService,
       ],
     }).compile();
 

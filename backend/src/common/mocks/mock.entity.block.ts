@@ -1,4 +1,4 @@
-import { Block } from '@prisma/client';
+import { Block } from '@/domain/block/entites/block.entity';
 
 export const mockBlockEntities: Block[] = [
   {
@@ -11,8 +11,6 @@ export const mockBlockEntities: Block[] = [
     modifiedAt: new Date('2023-11-23T15:02:10.626Z'),
     type: 'text',
     isDeleted: false,
-    latitude: null,
-    longitude: null,
   },
   {
     id: 2,

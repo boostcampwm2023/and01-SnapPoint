@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -34,7 +34,7 @@ model Post {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique @default(uuid())
   userUuid    String
-  title       String?
+  title       String
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
@@ -53,17 +53,11 @@ model Block {
   type        String
   order       Int
   content     String
-  latitude    Float?
-  longitude   Float?
+  coords      Unsupported("geometry(Point, 4326)")?
+  @@index([coords], name: "coord_idx", type: Gist)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
-}
-
-model BlockFile {
-  id          Int      @id @default(autoincrement())
-  blockUuid   String
-  fileUuid    String
 }
 
 model File {
