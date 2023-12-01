@@ -123,6 +123,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // TODO DataStore 확인을 위한 임시 코드
     fun clearPosts() {
         _postState.update {
             listOf()
