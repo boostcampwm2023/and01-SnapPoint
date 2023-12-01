@@ -6,4 +6,5 @@ sealed class MainActivityEvent {
     data object NavigateClose: MainActivityEvent()
     data class NavigatePreview(val index: Int): MainActivityEvent()
     data class MoveCameraToAddress(val index: Int): MainActivityEvent()
+    data object NavigateSignIn: MainActivityEvent()
 }

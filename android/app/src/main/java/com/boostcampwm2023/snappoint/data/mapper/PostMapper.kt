@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.data.mapper
 
-import android.net.Uri
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
@@ -22,15 +21,13 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     description = this.content,
                     content = this.files[0].url!!,
                     position = this.asPositionState(),
-                    uri = Uri.EMPTY
                 )
-            }else{
+            } else {
                 PostBlockState.VIDEO(
                     uuid = blockUuid!!,
                     description = this.content,
                     content = this.files[0].url!!,
                     position = this.asPositionState(),
-                    uri = Uri.EMPTY
                 )
             }
 

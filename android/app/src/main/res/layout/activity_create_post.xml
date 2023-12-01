@@ -54,8 +54,7 @@
             android:src="@drawable/icon_check"
             app:layout_constraintBottom_toBottomOf="@id/tb"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:onClick="@{() -> vm.onCheckButtonClicked()}"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_title"

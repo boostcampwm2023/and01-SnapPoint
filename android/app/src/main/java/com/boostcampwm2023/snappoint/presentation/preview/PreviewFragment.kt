@@ -68,7 +68,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 mainViewModel.uiState.collect{
                     if (it.selectedIndex > -1) {
-                        previewViewModel.updatePost(it.posts[it.selectedIndex])
+                        previewViewModel.updatePost(mainViewModel.postState.value[it.selectedIndex])
                     }
                     moveScroll(it.focusedIndex)
                 }

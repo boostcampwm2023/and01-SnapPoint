@@ -101,8 +101,8 @@ class MarkerPointSelectorActivity : BaseActivity<ActivityMapsMarkerBinding>(R.la
         val newPositionState: PositionState = PositionState(latLng.latitude, latLng.longitude)
 
         marker.tag = when (tag) {
-            is PostBlockState.IMAGE -> tag.copy(tag.content, uri = tag.uri, position = newPositionState)
-            is PostBlockState.VIDEO -> tag.copy(tag.content, uri = tag.uri, position = newPositionState)
+            is PostBlockState.IMAGE -> tag.copy(tag.content, position = newPositionState)
+            is PostBlockState.VIDEO -> tag.copy(tag.content, position = newPositionState)
             else -> return
         }
     }

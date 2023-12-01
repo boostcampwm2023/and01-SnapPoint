@@ -1,7 +1,7 @@
 package com.boostcampwm2023.snappoint.di
 
-import com.boostcampwm2023.snappoint.data.repository.LoginRepository
-import com.boostcampwm2023.snappoint.data.repository.LoginRepositoryImpl
+import com.boostcampwm2023.snappoint.data.repository.SignInRepository
+import com.boostcampwm2023.snappoint.data.repository.SignInRepositoryImpl
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.PostRepositoryImpl
 import dagger.Binds
@@ -24,5 +24,5 @@ abstract class RepositoryImplModule{
     abstract fun bindPostRepository(impl: PostRepositoryImpl): PostRepository
 
     @Binds
-    abstract fun bindLoginRepository(impl: LoginRepositoryImpl): LoginRepository
+    abstract fun bindLoginRepository(impl: SignInRepositoryImpl): SignInRepository
 }

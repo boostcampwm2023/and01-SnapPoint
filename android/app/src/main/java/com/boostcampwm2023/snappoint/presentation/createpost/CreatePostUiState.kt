@@ -8,5 +8,3 @@ data class CreatePostUiState(
     val isLoading: Boolean = false,
     val blockItemEvent: BlockItemEventListener,
 )
-
-

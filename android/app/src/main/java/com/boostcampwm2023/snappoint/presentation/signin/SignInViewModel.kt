@@ -1,10 +1,11 @@
-package com.boostcampwm2023.snappoint.presentation.login
+package com.boostcampwm2023.snappoint.presentation.signin
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.data.repository.LoginRepository
+import com.boostcampwm2023.snappoint.data.repository.SignInRepository
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,26 +23,27 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+class SignInViewModel @Inject constructor(
+    private val loginUtil: SignInUtil,
+    private val loginRepository: SignInRepository
 ) : ViewModel() {
 
-    private val _loginFormUiState: MutableStateFlow<LoginFormState> = MutableStateFlow(LoginFormState(
+    private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(SignInFormState(
         email = "string@string.com",
         password = "Str!n8Str!n8",
         isEmailValid = true,
         isPasswordValid = true
     ))
-    val loginFormUiState: StateFlow<LoginFormState> = _loginFormUiState.asStateFlow()
+    val signInFormUiState: StateFlow<SignInFormState> = _signInFormUiState.asStateFlow()
 
-    private val _event: MutableSharedFlow<LoginEvent> = MutableSharedFlow(
+    private val _event: MutableSharedFlow<SignInEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val event: SharedFlow<LoginEvent> = _event.asSharedFlow()
+    val event: SharedFlow<SignInEvent> = _event.asSharedFlow()
 
     fun updateEmail(email: String) {
-        _loginFormUiState.update {
+        _signInFormUiState.update {
             it.copy(
                 email = email,
                 isEmailValid = isEmailValid(email)
@@ -50,7 +52,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun updatePassword(password: String) {
-        _loginFormUiState.update {
+        _signInFormUiState.update {
             it.copy(
                 password = password,
                 isPasswordValid = isPasswordValid(password)
@@ -58,20 +60,21 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun tryLogin() {
-        val email = loginFormUiState.value.email
+    fun onLoginButtonClick() {
+        val email = signInFormUiState.value.email
         // TODO 암호화
-        val password = loginFormUiState.value.password
+        val password = signInFormUiState.value.password
 
-        loginRepository.postLogin(email, password)
+        loginRepository.postSignIn(email, password)
             .onStart {
                 setProgressBarState(true)
             }
             .onEach {
-                _event.emit(LoginEvent.Success)
+                loginUtil.setUserAuthData(email, password)
+                _event.emit(SignInEvent.Success)
             }
             .catch {
-                _event.emit(LoginEvent.Fail(R.string.login_activity_fail))
+                _event.emit(SignInEvent.Fail(R.string.login_activity_fail))
             }
             .onCompletion {
                 setProgressBarState(false)
@@ -79,8 +82,12 @@ class LoginViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    fun onSignUpButtonClick() {
+        _event.tryEmit(SignInEvent.Signup)
+    }
+
     private fun setProgressBarState(isInProgress: Boolean) {
-        _loginFormUiState.update {
+        _signInFormUiState.update {
             it.copy(
                 isLoginInProgress = isInProgress
             )
