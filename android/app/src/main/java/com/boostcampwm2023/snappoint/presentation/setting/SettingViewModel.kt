@@ -30,8 +30,7 @@ class SettingViewModel @Inject constructor(
     fun onSignOutClick() {
         loginRepository.getSignOut()
             .onEach {
-                signInUtil.email = ""
-                signInUtil.password = ""
+                signInUtil.clearUserAuthData()
                 _event.emit(SettingEvent.SignOut)
             }
             .catch {
