@@ -7,6 +7,7 @@ import javax.inject.Inject
 
 class SignInUtil @Inject constructor(@ApplicationContext context: Context) {
 
+    // TODO 함수 호출로 값 수정하도록 개선
     private val preferences = context.getSharedPreferences("mPref", MODE_PRIVATE)
     var email: String
         get() = preferences.getString("email", "")!!
