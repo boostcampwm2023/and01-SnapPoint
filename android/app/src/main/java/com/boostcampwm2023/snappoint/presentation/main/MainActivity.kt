@@ -106,6 +106,8 @@ class MainActivity :
         setBottomNavigationEvent()
 
         initLocationData()
+
+        searchSnapPoints()
     }
 
     private fun initPlacesClient() {
@@ -218,6 +220,7 @@ class MainActivity :
                     viewModel.postState.collect { postState ->
                         while (googleMap == null) { delay(100) }
 
+                        googleMap?.clear()
                         postState.forEachIndexed { postIndex, postSummaryState ->
                             SnapPointState(
                                 index = postIndex,

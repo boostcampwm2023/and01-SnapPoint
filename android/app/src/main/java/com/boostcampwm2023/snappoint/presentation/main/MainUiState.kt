@@ -7,6 +7,7 @@ data class MainUiState(
     val focusedIndex: Int = -1,     // TODO - MarkerUiState 로 옮기기
     val isPreviewFragmentShowing: Boolean = false,
     val isBottomSheetExpanded: Boolean = false,
+    val isLoading: Boolean = false,
 )
 
 data class SnapPointState(
