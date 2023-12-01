@@ -34,6 +34,7 @@ import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissi
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
+import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -206,6 +207,7 @@ class MainActivity :
                             focused = true
                         )
                         if (prevSelectedIndex != uiState.selectedIndex) {
+                            prevSelectedIndex = uiState.selectedIndex
                             drawnRoute?.remove()
                             drawnRoute = drawRoutes(uiState.selectedIndex)
                         }
@@ -300,6 +302,7 @@ class MainActivity :
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         binding.sb.doOnLayout {
             bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2
+            binding.bs.setPadding(0,0,0,binding.sb.height + binding.sb.marginTop * 2)
         }
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, state: Int) {
@@ -396,7 +399,9 @@ class MainActivity :
                     }
                 }
             } else {
-                val results = runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
+                // TODO - runBlocking 대체
+                val results =
+                    runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
 
                 if (results == null || results.size == 0) {
                     showToastMessage(R.string.search_location_fail)
@@ -429,8 +434,13 @@ class MainActivity :
     }
 
     private fun searchSnapPoints() {
-        val latLngBound = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
-        Log.d("TAG", "searchSnapPoints: $latLngBound")
+        val latLngBounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+        Log.d("TAG", "searchSnapPoints: $latLngBounds")
+        val leftBottom = latLngBounds.southwest.latitude.untilSixAfterDecimalPoint().toString() +
+                "," + latLngBounds.southwest.longitude.untilSixAfterDecimalPoint().toString()
+        val rightTop = latLngBounds.northeast.latitude.untilSixAfterDecimalPoint().toString() +
+                "," + latLngBounds.northeast.longitude.untilSixAfterDecimalPoint().toString()
+        viewModel.loadPosts(leftBottom, rightTop)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

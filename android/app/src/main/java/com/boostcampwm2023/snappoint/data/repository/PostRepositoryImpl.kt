@@ -11,10 +11,10 @@ import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -55,41 +55,44 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun postCreatePost(title: String, postBlocks: List<PostBlockState>): Flow<CreatePostResponse> {
 
-        val request = CreatePostRequest(
-            title = title,
-            postBlocks = postBlocks.map {
-                when (it) {
-                    is PostBlockState.IMAGE -> {
-                        val requestBody = it.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaTypeOrNull())
-                            ?: return emptyFlow()
-                        val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
-                        val uploadResult = try {
-                            runBlocking(Dispatchers.IO) {
+        return flow {
+            val request = CreatePostRequest(
+                title = title,
+                postBlocks = postBlocks.map {
+                    when (it) {
+                        is PostBlockState.IMAGE -> {
+                            val requestBody = it.bitmap?.toByteArray()
+                                ?.toRequestBody("image/webp".toMediaTypeOrNull())
+                                ?: return@flow
+                            val multipartBody =
+                                MultipartBody.Part.createFormData("file", "image", requestBody)
+                            val uploadResult = withContext(Dispatchers.Default) {
                                 snapPointApi.postImage(multipartBody)
                             }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            return emptyFlow()
+                            Log.d("TAG", "postCreatePost: $uploadResult")
+                            // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
+                            it.asPostBlock().copy(files = listOf(File(uploadResult.uuid)))
                         }
 
-                        // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
-                        it.asPostBlock().copy(
-                            files = listOf(File(uploadResult.uuid))
-                        )
+                        else -> it.asPostBlock()
                     }
-                    else -> it.asPostBlock()
                 }
-            }
-        )
-        Log.d("TAG", "postCreatePost: ${Json.encodeToString(request)}")
+            )
 
-        return flowOf(true)
-            .map{
-                snapPointApi.createPost(request)
+            Log.d("TAG", "postCreatePost: ${Json.encodeToString(request)}")
+            try {
+                emit(snapPointApi.createPost(request))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Handle the exception if needed
             }
+        }
     }
 
     override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<GetAroundPostResponse>> {
-        TODO("Not yet implemented")
+
+        return flow {
+            emit(snapPointApi.getAroundPost(leftBottom, rightTop))
+        }
     }
 }

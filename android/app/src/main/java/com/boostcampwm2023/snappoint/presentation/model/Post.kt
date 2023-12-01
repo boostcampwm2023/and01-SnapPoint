@@ -7,6 +7,7 @@ data class PostSummaryState(
     val title: String,
     val author: String,
     val timeStamp: String,
+    val summary: String,
     val postBlocks: List<PostBlockState>
 )
 

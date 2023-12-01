@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.data.remote
 
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
-import com.boostcampwm2023.snappoint.data.remote.model.request.GetAroundPostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignInRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
@@ -57,6 +56,7 @@ interface SnapPointApi {
 
     @GET("posts")
     suspend fun getAroundPost(
-        @Body getAroundPostRequest: GetAroundPostRequest
+        @Query("from") leftBottom: String,
+        @Query("to") rightTop: String
     ): List<GetAroundPostResponse>
 }

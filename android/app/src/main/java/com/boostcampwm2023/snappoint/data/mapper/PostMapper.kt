@@ -17,7 +17,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
             )
         }
         else -> {
-            if(this.files!![0].mimeType!!.startsWith("Image")){
+            if(this.files!![0].mimeType!!.startsWith("image")){
                 PostBlockState.IMAGE(
                     uuid = blockUuid!!,
                     description = this.content,
@@ -48,7 +48,7 @@ fun PostBlockState.asPostBlock(): PostBlock {
         }
         is PostBlockState.IMAGE -> {
             PostBlock(
-                content = this.description,
+                content = this.content,
                 type = BlockType.MEDIA.type,
                 latitude = this.position.latitude,
                 longitude = this.position.longitude,
@@ -79,6 +79,7 @@ fun GetAroundPostResponse.asPostSummaryState(): PostSummaryState {
         title = this.title,
         author = "",
         timeStamp = this.createdAt,
+        summary = this.summary,
         postBlocks = this.blocks.map { it.asPostBlockState() }
     )
 }

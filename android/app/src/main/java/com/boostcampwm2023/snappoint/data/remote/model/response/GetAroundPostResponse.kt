@@ -10,5 +10,6 @@ data class GetAroundPostResponse(
     @SerialName("title") val title: String,
     @SerialName("createdAt") val createdAt: String,
     @SerialName("modifiedAt") val modifiedAt: String,
+    @SerialName("summary") val summary: String,
     @SerialName("blocks") val blocks: List<PostBlock>,
 )
