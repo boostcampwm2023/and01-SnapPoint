@@ -7,15 +7,27 @@ import javax.inject.Inject
 
 class SignInUtil @Inject constructor(@ApplicationContext context: Context) {
 
-    private val preferences = context.getSharedPreferences("mPref", MODE_PRIVATE)
-    var email: String
-        get() = preferences.getString("email", "")!!
-        set(email) {
-            preferences.edit().putString("email", email).apply()
-        }
-    var password: String
-        get() = preferences.getString("password", "")!!
-        set(password) {
-            preferences.edit().putString("password", password).apply()
-        }
+    private val prefName: String = "mPref"
+    private val emailKey: String = "email"
+    private val passwordKey: String = "password"
+
+    private val preferences = context.getSharedPreferences(prefName, MODE_PRIVATE)
+
+    fun getEmail(): String {
+        return preferences.getString(emailKey, "")!!
+    }
+
+    fun getPassword(): String {
+        return preferences.getString(passwordKey, "")!!
+    }
+
+    fun setUserAuthData(email: String, password: String) {
+        preferences.edit().putString(emailKey, email).apply()
+        preferences.edit().putString(passwordKey, password).apply()
+    }
+
+    fun clearUserAuthData() {
+        preferences.edit().putString("email", "").apply()
+        preferences.edit().putString("password", "").apply()
+    }
 }

@@ -10,6 +10,7 @@ import { PostApiService } from '@/api/post-api/post-api.service';
 import { ValidationService } from './validation/validation.service';
 import { BlockService } from '@/domain/block/block.service';
 import { PostService } from '@/domain/post/post.service';
+import { TransformationService } from './transformation/transformation.service';
 
 @Module({
   controllers: [FileApiController, PostApiController],
@@ -23,6 +24,7 @@ import { PostService } from '@/domain/post/post.service';
     FileService,
     BlockService,
     PostService,
+    TransformationService,
   ],
 })
 export class ApiModule {}

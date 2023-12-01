@@ -1,5 +1,5 @@
 import { FileService } from '@/domain/file/file.service';
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { WriteBlockFileDto } from '@/api/post-api/dtos/write-block-files.dto';
 import { ValidateFileDto } from '@/api/validation/dtos/validate-file.dto';
 import { ValidateBlockDto } from '@/api/validation/dtos/validate-block.dto';
@@ -12,13 +12,23 @@ export class ValidationService {
     const fileWhereInputs = fileDtos.map((fileDto) => ({ uuid: fileDto.uuid }));
     const existFiles = await this.fileService.findFiles({ where: { OR: fileWhereInputs } });
 
-    if (fileDtos.length !== existFiles.length) {
-      throw new BadRequestException('The file with uuid is invalid or not exist anymore.');
-    }
+    const existFileUuidSet = new Set(existFiles.map((existFile) => existFile.uuid));
+
+    fileDtos.forEach((fileDto) => {
+      if (!existFileUuidSet.has(fileDto.uuid)) {
+        throw new BadRequestException(`The file with uuid ${fileDto.uuid} is invalid or not exist anymore.`);
+      }
+    });
 
     existFiles.forEach((existFile) => {
       if (existFile.userUuid !== userUuid) {
-        throw new ForbiddenException('Could not access this file. please check your permission.');
+        throw new ForbiddenException(
+          `Could not access the file with uuid ${existFile.uuid}. please check your permission.`,
+        );
+      }
+
+      if (existFile.sourceUuid) {
+        throw new ConflictException(`The file with uuid ${existFile.uuid} is already attached with other resource.`);
       }
     });
   }

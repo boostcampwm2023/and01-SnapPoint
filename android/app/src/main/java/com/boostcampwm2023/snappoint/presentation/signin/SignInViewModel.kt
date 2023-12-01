@@ -70,8 +70,7 @@ class SignInViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                loginUtil.email = email
-                loginUtil.password = password
+                loginUtil.setUserAuthData(email, password)
                 _event.emit(SignInEvent.Success)
             }
             .catch {

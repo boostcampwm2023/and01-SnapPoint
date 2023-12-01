@@ -4,7 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.SignInRepository
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -12,18 +17,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
+    private val signInUtil: SignInUtil,
     private val loginRepository: SignInRepository
 ) : ViewModel() {
 
-    fun tryLogout() {
+    private val _event: MutableSharedFlow<SettingEvent> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val event: SharedFlow<SettingEvent> = _event.asSharedFlow()
+
+    fun onSignOutClick() {
         loginRepository.getSignOut()
             .onEach {
-                Log.d("LOG", "LOGOUT: $it")
+                signInUtil.clearUserAuthData()
+                _event.emit(SettingEvent.SignOut)
             }
             .catch {
-                Log.d("LOG", "CATCH: ${it}")
-                Log.d("LOG", "CATCH: ${it.message}")
+                _event.emit(SettingEvent.FailToSignOut)
             }
             .launchIn(viewModelScope)
+    }
+
+    fun onClearSnapPointClick() {
+        _event.tryEmit(SettingEvent.RemoveSnapPoint)
     }
 }
