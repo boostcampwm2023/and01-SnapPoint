@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
@@ -49,10 +48,6 @@ class MainViewModel @Inject constructor(
     val event: SharedFlow<MainActivityEvent> = _event.asSharedFlow()
 
     var bottomSheetHeight: Int = 0
-
-    init {
-//        loadPosts()
-    }
 
     fun loadPosts(leftBottom: String, rightTop: String) {
 
