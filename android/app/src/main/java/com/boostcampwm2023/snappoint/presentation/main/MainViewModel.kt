@@ -58,7 +58,7 @@ class MainViewModel @Inject constructor(
 
         postRepository.getAroundPost(leftBottom, rightTop)
             .onStart { _uiState.update { it.copy(isLoading = true) } }
-            .catch { Log.d("TAG", "loadPosts: ${it.message}") }
+            .catch { _event.tryEmit(MainActivityEvent.GetAroundPostFailed) }
             .onCompletion { _uiState.update { it.copy(isLoading = false) } }
             .onEach { response ->
                 _postState.value = response.map { it.asPostSummaryState() }

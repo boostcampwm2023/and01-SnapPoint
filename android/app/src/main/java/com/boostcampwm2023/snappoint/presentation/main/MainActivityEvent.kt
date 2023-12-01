@@ -8,4 +8,5 @@ sealed class MainActivityEvent {
     data class MoveCameraToAddress(val index: Int): MainActivityEvent()
     data object NavigateSignIn: MainActivityEvent()
     data object HalfOpenBottomSheet: MainActivityEvent()
+    data object GetAroundPostFailed: MainActivityEvent()
 }

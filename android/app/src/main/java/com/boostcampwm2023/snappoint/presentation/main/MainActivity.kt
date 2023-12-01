@@ -185,6 +185,10 @@ class MainActivity :
                             }
 
                             is MainActivityEvent.HalfOpenBottomSheet -> { halfOpenBottomSheet() }
+
+                            is MainActivityEvent.GetAroundPostFailed -> {
+                                showToastMessage(R.string.get_around_posts_failed)
+                            }
                         }
                     }
                 }
