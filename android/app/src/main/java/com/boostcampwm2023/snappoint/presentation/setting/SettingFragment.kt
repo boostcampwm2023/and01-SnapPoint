@@ -45,6 +45,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
                             activityViewModel.navigateSignIn()
                         }
 
+                        is SettingEvent.FailToSignOut -> {
+                            showToastMessage(R.string.setting_fragment_sign_out_fail)
+                        }
+
                         is SettingEvent.RemoveSnapPoint -> {
                             activityViewModel.clearPosts()
                         }

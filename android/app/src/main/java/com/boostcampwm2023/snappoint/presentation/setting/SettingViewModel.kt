@@ -35,7 +35,7 @@ class SettingViewModel @Inject constructor(
                 _event.emit(SettingEvent.SignOut)
             }
             .catch {
-                Log.d("LOG", "CATCH: $it")
+                _event.emit(SettingEvent.FailToSignOut)
             }
             .launchIn(viewModelScope)
     }
