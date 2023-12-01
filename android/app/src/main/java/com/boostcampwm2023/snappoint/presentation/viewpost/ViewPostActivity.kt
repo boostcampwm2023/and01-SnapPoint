@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.boostcampwm2023.snappoint.R
@@ -23,8 +24,8 @@ class ViewPostActivity : BaseActivity<ActivityViewPostBinding>(R.layout.activity
     }
 
     private fun getPostData() {
-        val selectedIndex = intent.getIntExtra("index", 0)
-        viewModel.updateSelectedIndex(selectedIndex)
+        val uuid = intent.getStringExtra("uuid") ?: ""
+        viewModel.loadPost(uuid)
     }
 
     private fun collectViewModelData() {

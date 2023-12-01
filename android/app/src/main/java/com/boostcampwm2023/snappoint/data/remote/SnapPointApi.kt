@@ -4,7 +4,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignInRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
-import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
@@ -16,6 +16,7 @@ import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SnapPointApi {
@@ -58,5 +59,10 @@ interface SnapPointApi {
     suspend fun getAroundPost(
         @Query("from") leftBottom: String,
         @Query("to") rightTop: String
-    ): List<GetAroundPostResponse>
+    ): List<GetPostResponse>
+
+    @GET("posts/{uuid}")
+    suspend fun getPost(
+        @Path("uuid") uuid: String
+    ): GetPostResponse
 }

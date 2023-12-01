@@ -22,8 +22,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        postViewModel.updatePost(viewPostViewModel.posts.value[viewPostViewModel.selectedIndex.value])
-
         initBinding()
 
         collectViewModelData()
@@ -32,6 +30,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
     private fun initBinding() {
         with(binding) {
             vm = postViewModel
+            activityVm = viewPostViewModel
         }
     }
 

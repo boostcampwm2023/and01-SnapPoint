@@ -44,7 +44,8 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
                             }
 
                             is AroundEvent.NavigateViewPost -> {
-                                navigateToViewPost(event.index)
+                                val uuid = mainViewModel.postState.value[event.index].uuid
+                                navigateToViewPost(uuid)
                             }
                         }
                     }
@@ -53,9 +54,9 @@ class AroundFragment : BaseFragment<FragmentAroundBinding>(R.layout.fragment_aro
         }
     }
 
-    private fun navigateToViewPost(index: Int) {
+    private fun navigateToViewPost(uuid: String) {
         val intent = Intent(requireContext(), ViewPostActivity::class.java)
-        intent.putExtra("index", index)
+        intent.putExtra("uuid", uuid)
         startActivity(intent)
     }
 

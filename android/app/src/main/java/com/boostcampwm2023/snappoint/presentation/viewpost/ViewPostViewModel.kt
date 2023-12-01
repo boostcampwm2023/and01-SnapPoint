@@ -1,6 +1,10 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
+import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -10,16 +14,20 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class ViewPostViewModel @Inject constructor() : ViewModel() {
+class ViewPostViewModel @Inject constructor(
+    private val postRepository: PostRepository
+) : ViewModel() {
 
-    private val _selectedIndex: MutableStateFlow<Int> = MutableStateFlow(0)
-    val selectedIndex: StateFlow<Int> = _selectedIndex.asStateFlow()
-
-    private val _posts: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
-    val posts: StateFlow<List<PostSummaryState>> = _posts.asStateFlow()
+    private val _post: MutableStateFlow<PostSummaryState> = MutableStateFlow(PostSummaryState())
+    val post: StateFlow<PostSummaryState> = _post.asStateFlow()
 
     private val _event: MutableSharedFlow<ViewPostEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
@@ -27,16 +35,14 @@ class ViewPostViewModel @Inject constructor() : ViewModel() {
     )
     val event: SharedFlow<ViewPostEvent> = _event.asSharedFlow()
 
-    fun updateSelectedIndex(index: Int) {
-        _selectedIndex.value = index
-    }
-
-    init {
-        loadPosts()
-    }
-
-    private fun loadPosts() {
-
+    fun loadPost(uuid: String) {
+        postRepository.getPost(uuid)
+            .onStart { Log.d("TAG", "loadPost: $uuid") }
+            .catch { Log.d("TAG", "loadPost: ${it.message}") }
+            .onEach { response ->
+                Log.d("TAG", "loadPost: $response")
+                _post.update { response.asPostSummaryState() }
+            }.launchIn(viewModelScope)
     }
 
     fun finishPostView() {

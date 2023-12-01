@@ -8,6 +8,9 @@
         <variable
             name="vm"
             type="com.boostcampwm2023.snappoint.presentation.viewpost.post.PostViewModel" />
+        <variable
+            name="activityVm"
+            type="com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostViewModel" />
 
     </data>
 
@@ -50,7 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
-                    android:text="@{vm.uiState.title}"
+                    android:text="@{activityVm.post.title}"
                     android:textSize="22sp"
                     app:layout_constraintBottom_toTopOf="@id/iv_profile"
                     app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +72,7 @@
                     android:id="@+id/tv_author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{vm.uiState.author}"
+                    android:text="@{activityVm.post.author}"
                     android:textColor="@color/onSurfaceColor"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toTopOf="@id/tv_timestamp"
@@ -81,7 +84,7 @@
                     android:id="@+id/tv_timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{vm.uiState.timestamp}"
+                    android:text="@{activityVm.post.timeStamp}"
                     android:textColor="@color/onSurfaceVariant"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@id/iv_profile"
@@ -97,7 +100,7 @@
                     app:layout_constraintTop_toBottomOf="@id/iv_profile" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    postBlocks="@{vm.uiState.posts}"
+                    postBlocks="@{activityVm.post.postBlocks}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="20dp"

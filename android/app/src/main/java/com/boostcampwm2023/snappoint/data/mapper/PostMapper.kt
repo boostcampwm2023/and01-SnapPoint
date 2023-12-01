@@ -3,7 +3,7 @@ package com.boostcampwm2023.snappoint.data.mapper
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
-import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
@@ -74,8 +74,9 @@ fun PostBlock.asPositionState(): PositionState {
     )
 }
 
-fun GetAroundPostResponse.asPostSummaryState(): PostSummaryState {
+fun GetPostResponse.asPostSummaryState(): PostSummaryState {
     return PostSummaryState(
+        uuid = this.postUuid,
         title = this.title,
         author = "",
         timeStamp = this.createdAt,
