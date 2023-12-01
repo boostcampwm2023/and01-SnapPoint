@@ -66,6 +66,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.checkerframework.common.subtyping.qual.Bottom
 
 @AndroidEntryPoint
 class MainActivity :
@@ -182,6 +183,8 @@ class MainActivity :
                             is MainActivityEvent.NavigateSignIn -> {
                                 navigateAuthActivity()
                             }
+
+                            is MainActivityEvent.HalfOpenBottomSheet -> { halfOpenBottomSheet() }
                         }
                     }
                 }
@@ -338,6 +341,12 @@ class MainActivity :
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
             true
+        }
+    }
+
+    private fun halfOpenBottomSheet() {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         }
     }
 

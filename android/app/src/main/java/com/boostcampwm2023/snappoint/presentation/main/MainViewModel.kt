@@ -62,6 +62,7 @@ class MainViewModel @Inject constructor(
             .onCompletion { _uiState.update { it.copy(isLoading = false) } }
             .onEach { response ->
                 _postState.value = response.map { it.asPostSummaryState() }
+                _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
             }.launchIn(viewModelScope)
     }
 
