@@ -27,8 +27,8 @@ class SplashViewModel @Inject constructor(
     val event: SharedFlow<SplashEvent> = _event.asSharedFlow()
 
     fun login() {
-        val email = loginUtil.email
-        val password = loginUtil.password
+        val email = loginUtil.getEmail()
+        val password = loginUtil.getPassword()
 
         loginRepository.postSignIn(email, password)
             .onEach {

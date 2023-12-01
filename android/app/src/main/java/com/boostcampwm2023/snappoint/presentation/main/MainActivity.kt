@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
@@ -21,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
+import com.boostcampwm2023.snappoint.presentation.auth.AuthActivity
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
@@ -172,6 +174,10 @@ class MainActivity :
                             is MainActivityEvent.MoveCameraToAddress -> {
                                 val address = viewModel.searchViewUiState.value.texts[event.index]
                                 moveCameraToAddress(address)
+                            }
+
+                            is MainActivityEvent.NavigateSignIn -> {
+                                navigateAuthActivity()
                             }
                         }
                     }
@@ -332,6 +338,15 @@ class MainActivity :
     private fun openPreviewFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         navController.navigate(R.id.previewFragment)
+    }
+
+    private fun navigateAuthActivity() {
+        startActivity(
+            Intent(this, AuthActivity::class.java).apply {
+                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
+            }
+        )
+        finish()
     }
 
     private fun openDrawer() {

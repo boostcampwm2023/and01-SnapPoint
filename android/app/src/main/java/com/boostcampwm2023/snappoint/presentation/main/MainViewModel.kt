@@ -123,6 +123,13 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // TODO DataStore 확인을 위한 임시 코드
+    fun clearPosts() {
+        _postState.update {
+            listOf()
+        }
+    }
+
     fun drawerIconClicked() {
         _event.tryEmit(MainActivityEvent.OpenDrawer)
     }
@@ -198,5 +205,9 @@ class MainViewModel @Inject constructor(
 
     private fun moveCameraToAddress(index: Int) {
         _event.tryEmit(MainActivityEvent.MoveCameraToAddress(index))
+    }
+
+    fun navigateSignIn() {
+        _event.tryEmit(MainActivityEvent.NavigateSignIn)
     }
 }
