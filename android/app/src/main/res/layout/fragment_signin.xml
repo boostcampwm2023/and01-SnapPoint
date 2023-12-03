@@ -9,7 +9,7 @@
 
         <variable
             name="vm"
-            type="com.boostcampwm2023.snappoint.presentation.signin.SignInViewModel" />
+            type="com.boostcampwm2023.snappoint.presentation.auth.signin.SignInViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
