@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UploadModule } from '@/upload/upload.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { FileApiController } from './file-api/file-api.controller';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
     ApiModule,
   ],
+  controllers: [FileApiController],
   providers: [],
 })
 export class ApiModule {}

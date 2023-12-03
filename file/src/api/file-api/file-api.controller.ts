@@ -22,7 +22,7 @@ export class FileApiController {
     @Inject('MAIN_SERVICE') private readonly fileClient: ClientProxy,
   ) {}
 
-  @Post()
+  @Post('/')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({
     summary: '파일 업로드 API',
