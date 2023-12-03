@@ -1,9 +1,11 @@
 package com.boostcampwm2023.snappoint.data.remote
 
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
+import com.boostcampwm2023.snappoint.data.remote.model.request.GetAroundPostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignInRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
@@ -52,4 +54,9 @@ interface SnapPointApi {
     suspend fun postImage(
         @Part bitmap: MultipartBody.Part
     ): PostImageResponse
+
+    @GET("posts")
+    suspend fun getAroundPost(
+        @Body getAroundPostRequest: GetAroundPostRequest
+    ): List<GetAroundPostResponse>
 }
