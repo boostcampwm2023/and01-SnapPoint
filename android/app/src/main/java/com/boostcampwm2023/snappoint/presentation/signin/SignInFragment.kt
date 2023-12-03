@@ -7,7 +7,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSigninBinding
 import com.boostcampwm2023.snappoint.presentation.auth.AuthViewModel
@@ -40,15 +42,15 @@ class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_sig
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is SignInEvent.Fail -> {
-                            showToastMessage(event.error)
+                        is SignInEvent.ShowMessage -> {
+                            showToastMessage(event.errorResId)
                         }
 
-                        is SignInEvent.Success -> {
-                            activityViewModel.sendSuccessResult()
+                        is SignInEvent.NavigateToMainActivity -> {
+                            navigateToMainActivity()
                         }
 
-                        is SignInEvent.Signup -> {
+                        is SignInEvent.NavigateToSignup -> {
                             navigateToSignup()
                         }
                     }
@@ -57,7 +59,13 @@ class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_sig
         }
     }
 
+    private fun navigateToMainActivity() {
+        findNavController().navigate(SignInFragmentDirections.actionLoginFragmentToMainActivity())
+        requireActivity().finish()
+
+    }
+
     private fun navigateToSignup() {
-        findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
+        findNavController().navigate(SignInFragmentDirections.actionLoginFragmentToSignupFragment())
     }
 }

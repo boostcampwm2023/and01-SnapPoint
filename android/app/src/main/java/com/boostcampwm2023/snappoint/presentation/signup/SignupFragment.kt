@@ -48,13 +48,12 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is SignupEvent.Fail -> {
+                        is SignupEvent.ShowMessage -> {
                             showToastMessage(event.messageResId)
                         }
 
-                        is SignupEvent.Success -> {
-                            showToastMessage(R.string.signup_fragment_create_account_success)
-                            navigateToLogin()
+                        is SignupEvent.NavigateToSignIn -> {
+                            navigateToSignIn()
                         }
                     }
                 }
@@ -62,7 +61,7 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
         }
     }
 
-    private fun navigateToLogin() {
+    private fun navigateToSignIn() {
         findNavController().popBackStack()
     }
 }

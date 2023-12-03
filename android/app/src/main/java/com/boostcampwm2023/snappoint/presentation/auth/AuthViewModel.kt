@@ -10,16 +10,4 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor() : ViewModel() {
-
-    private val _event: MutableSharedFlow<AuthEvent> = MutableSharedFlow(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val event: SharedFlow<AuthEvent> = _event.asSharedFlow()
-
-    var idCache: String = ""
-
-    fun sendSuccessResult() {
-        _event.tryEmit(AuthEvent.Success)
-    }
 }

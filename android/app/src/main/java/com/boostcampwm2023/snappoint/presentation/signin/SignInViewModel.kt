@@ -71,10 +71,10 @@ class SignInViewModel @Inject constructor(
             }
             .onEach {
                 loginUtil.setUserAuthData(email, password)
-                _event.emit(SignInEvent.Success)
+                _event.emit(SignInEvent.NavigateToMainActivity)
             }
             .catch {
-                _event.emit(SignInEvent.Fail(R.string.login_activity_fail))
+                _event.emit(SignInEvent.ShowMessage(R.string.login_activity_fail))
             }
             .onCompletion {
                 setProgressBarState(false)
@@ -83,7 +83,7 @@ class SignInViewModel @Inject constructor(
     }
 
     fun onSignUpButtonClick() {
-        _event.tryEmit(SignInEvent.Signup)
+        _event.tryEmit(SignInEvent.NavigateToSignup)
     }
 
     private fun setProgressBarState(isInProgress: Boolean) {

@@ -142,12 +142,12 @@ class SignupViewModel @Inject constructor(
                     setProgressBarState(true)
                 }
                 .onEach {
-                    _event.emit(SignupEvent.Success)
+                    _event.emit(SignupEvent.NavigateToSignIn)
                 }
                 .catch {
                     updateEmailErrorResId(it.message)
                     _event.emit(
-                        SignupEvent.Fail(_uiState.value.emailErrorResId ?: R.string.signup_fragment_fail)
+                        SignupEvent.ShowMessage(_uiState.value.emailErrorResId ?: R.string.signup_fragment_fail)
                     )
                 }
                 .onCompletion {

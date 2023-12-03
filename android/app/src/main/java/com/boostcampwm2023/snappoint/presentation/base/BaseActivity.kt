@@ -22,10 +22,10 @@ abstract class BaseActivity<B: ViewDataBinding>(
     }
 
     protected fun showToastMessage(resId: Int) {
-        Toast.makeText(this, getString(resId), Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getString(resId), Toast.LENGTH_SHORT).show()
     }
 
     protected fun showToastMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
