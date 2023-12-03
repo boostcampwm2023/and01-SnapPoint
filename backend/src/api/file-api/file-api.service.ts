@@ -4,6 +4,7 @@ import { FileDto } from './dto/file.dto';
 import { File } from '@prisma/client';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { CreateFileDataDto } from './dto/create-file-data.dto';
+import { ApplyProcessFileDto } from './dto/apply-process-file.dto';
 
 @Injectable()
 export class FileApiService {
@@ -26,6 +27,11 @@ export class FileApiService {
   async createFile(createFileDataDto: CreateFileDataDto): Promise<FileDto> {
     const createdFile = await this.fileService.createFile(createFileDataDto);
     return FileDto.of(createdFile);
+  }
+
+  async applyFile(applyFileDto: ApplyProcessFileDto) {
+    const { uuid } = applyFileDto;
+    await this.fileService.updateFile({ where: { uuid }, data: { isProcessed: true } });
   }
 
   async findFile(uuid: string, userUuid: string): Promise<FileDto> {

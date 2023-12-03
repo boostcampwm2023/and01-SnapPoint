@@ -13,6 +13,21 @@ import { TransformationService } from './transformation/transformation.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'MEDIA_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost'],
+          queue: 'media_processing_queue',
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+    ]),
+  ],
   controllers: [FileApiController, PostApiController],
   providers: [
     PrismaService,
