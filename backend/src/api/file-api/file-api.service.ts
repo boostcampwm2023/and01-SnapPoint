@@ -1,19 +1,13 @@
-import { BucketService } from '@/common/bucket.service';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { FileService } from '@/domain/file/file.service';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { FileDto } from './dto/file.dto';
 import { File } from '@prisma/client';
 import { AttachFileDto } from './dto/attach-file.dto';
+import { CreateFileDataDto } from './dto/create-file-data.dto';
 
 @Injectable()
 export class FileApiService {
-  constructor(
-    private readonly bucketService: BucketService,
-    private readonly fileService: FileService,
-    private readonly prisma: PrismaProvider,
-  ) {}
+  constructor(private readonly fileService: FileService) {}
 
   private async accessFile(uuid: string, userUuid: string): Promise<File> {
     const file = await this.fileService.findFile({ uuid });
@@ -29,20 +23,9 @@ export class FileApiService {
     return file;
   }
 
-  async uploadFile(file: Express.Multer.File, userUuid: string): Promise<FileDto> {
-    return this.prisma.beginTransaction(async () => {
-      file.filename = randomUUID();
-      const { Location: url, Key: fileUuid } = await this.bucketService.uploadFile(file);
-
-      const createdFile = await this.fileService.createFile({
-        uuid: fileUuid,
-        userUuid,
-        mimeType: file.mimetype,
-        url,
-      });
-
-      return FileDto.of(createdFile);
-    });
+  async createFile(createFileDataDto: CreateFileDataDto): Promise<FileDto> {
+    const createdFile = await this.fileService.createFile(createFileDataDto);
+    return FileDto.of(createdFile);
   }
 
   async findFile(uuid: string, userUuid: string): Promise<FileDto> {
