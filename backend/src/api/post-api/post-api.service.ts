@@ -120,7 +120,6 @@ export class PostApiService {
 
     return this.prisma.beginTransaction(async () => {
       await this.postService.updatePost({ where: { uuid }, data: post });
-      await this.redisService.del(uuid);
 
       const blockMap = new Map<string, CreateBlockDto>();
       blocks.forEach((block) => blockMap.set(block.uuid, block));
