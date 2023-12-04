@@ -29,7 +29,7 @@ export class PostApiService {
 
   private async readPost(post: Post) {
     const blocks = await this.redisService.smembers<Block>(
-      `post:${post.uuid}`,
+      post.uuid,
       (s: string) => {
         return JSON.parse(s);
       },
@@ -80,7 +80,6 @@ export class PostApiService {
     if (!post) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
-    await this.redisService.del(post.uuid);
     return this.readPost(post);
   }
 
@@ -100,6 +99,7 @@ export class PostApiService {
           return this.fileService.updateFile({ where: { uuid }, data: { source, sourceUuid } });
         }),
       );
+      await this.redisService.del(postUuid);
       return this.findPost(postUuid);
     });
   }
@@ -143,6 +143,7 @@ export class PostApiService {
       );
 
       await this.validation.validateBlocks(blocks, files);
+      await this.redisService.del(uuid);
       return this.findPost(uuid);
     });
   }
