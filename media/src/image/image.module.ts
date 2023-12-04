@@ -3,21 +3,26 @@ import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
 import { StorageModule } from '@/storage/storage.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     StorageModule,
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
-        name: 'MAIN_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost'],
-          queue: 'file_processing_queue',
-          queueOptions: {
-            durable: true,
+        name: 'DATA_SERVICE',
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RMQ_HOST')],
+            queue: configService.getOrThrow<string>('RMQ_DATA_QUEUE'),
+            queueOptions: {
+              durable: true,
+            },
           },
-        },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

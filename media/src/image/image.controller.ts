@@ -7,7 +7,7 @@ import { ResizeImageDto } from './dtos/resize-image.dto';
 export class ImageController {
   constructor(
     private readonly imageService: ImageService,
-    @Inject('MAIN_SERVICE') private readonly client: ClientProxy,
+    @Inject('DATA_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   @MessagePattern({ cmd: 'process_image' })
@@ -15,7 +15,7 @@ export class ImageController {
     Logger.debug(`Process ${resizeImageDto.uuid}`);
     await this.imageService.resizeImage(resizeImageDto);
     return this.client.emit(
-      { res: 'process_image' },
+      { cmd: 'process_image_data' },
       { uuid: resizeImageDto.uuid },
     );
   }

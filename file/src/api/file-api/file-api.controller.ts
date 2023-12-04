@@ -19,7 +19,7 @@ import { JwtAuthGuard } from '@/common/guards/jwt.guard';
 export class FileApiController {
   constructor(
     private readonly uploadService: UploadService,
-    @Inject('MAIN_SERVICE') private readonly fileClient: ClientProxy,
+    @Inject('DATA_SERVICE') private readonly client: ClientProxy,
   ) {}
 
   @Post('/')
@@ -45,8 +45,8 @@ export class FileApiController {
   async upload(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
     const uploadedFileDto = await this.uploadService.uploadFile(file);
 
-    this.fileClient.emit(
-      { cmd: 'upload_file' },
+    this.client.emit(
+      { cmd: 'create_image_data' },
       { ...uploadedFileDto, userUuid: req.user.uuid },
     );
 

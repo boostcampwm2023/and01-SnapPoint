@@ -11,20 +11,25 @@ import { BlockService } from '@/domain/block/block.service';
 import { PostService } from '@/domain/post/post.service';
 import { TransformationService } from './transformation/transformation.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'MEDIA_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost'],
-          queue: 'media_processing_queue',
-          queueOptions: {
-            durable: true,
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RMQ_HOST')],
+            queue: configService.getOrThrow<string>('RMQ_MEDIA_QUEUE'),
+            queueOptions: {
+              durable: true,
+            },
           },
-        },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

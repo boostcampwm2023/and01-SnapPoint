@@ -12,13 +12,13 @@ export class FileApiController {
     @Inject('MEDIA_SERVICE') private readonly client: ClientProxy,
   ) {}
 
-  @MessagePattern({ cmd: 'upload_file' })
+  @MessagePattern({ cmd: 'create_image_data' })
   async createFileData(@Payload() createFileDataDto: CreateFileDataDto) {
     this.client.emit({ cmd: 'process_image' }, { uuid: createFileDataDto.uuid });
     return this.fileApiService.createFile(createFileDataDto);
   }
 
-  @MessagePattern({ res: 'process_image' })
+  @MessagePattern({ cmd: 'process_image_data' })
   async procssImageData(@Payload() applyDataDto: ApplyProcessFileDto) {
     Logger.debug(`Apply ${applyDataDto.uuid}`);
     return this.fileApiService.applyFile(applyDataDto);
