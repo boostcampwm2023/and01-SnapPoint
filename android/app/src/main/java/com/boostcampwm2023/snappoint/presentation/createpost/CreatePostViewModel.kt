@@ -240,6 +240,10 @@ class CreatePostViewModel @Inject constructor(
     fun onImageBlockButtonClicked() {
         _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
     }
+    fun onVideoBlockButtonClicked() {
+        _event.tryEmit(CreatePostEvent.SelectVideoFromLocal)
+    }
+
 
     fun onBackButtonClicked(){
         _event.tryEmit(CreatePostEvent.NavigatePrev)

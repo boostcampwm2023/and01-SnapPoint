@@ -105,11 +105,19 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                             is CreatePostEvent.FindAddress -> {
                                 startMapActivityAndFindAddress(event.index, event.position)
                             }
+
+                            CreatePostEvent.SelectVideoFromLocal -> {
+                                selectVideo()
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun selectVideo() {
+
     }
 
     private fun selectImage() {
