@@ -59,6 +59,7 @@ describe('ValidationService', () => {
           isDeleted: false,
           source: null,
           sourceUuid: null,
+          isProcessed: false,
         },
       ]);
 
