@@ -156,4 +156,8 @@ class MainViewModel @Inject constructor(
     fun navigateSignIn() {
         _event.tryEmit(MainActivityEvent.NavigateSignIn)
     }
+
+    fun onMapReady() {
+        _event.tryEmit(MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation)
+    }
 }

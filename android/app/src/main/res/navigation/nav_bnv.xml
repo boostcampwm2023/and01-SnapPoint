@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/aroundFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.around.AroundFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.around.AroundFragment"
         android:label="AroundFragment" >
         <action
             android:id="@+id/action_aroundFragment_to_viewPostActivity"
@@ -15,19 +15,19 @@
     </fragment>
     <fragment
         android:id="@+id/popularPostFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.popularpost.PopularPostFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.popularpost.PopularPostFragment"
         android:label="PopularPostFragment" />
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.setting.SettingFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.setting.SettingFragment"
         android:label="SettingFragment" />
     <fragment
         android:id="@+id/subscriptionFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.subscription.SubscriptionFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.subscription.SubscriptionFragment"
         android:label="SubscriptionFragment" />
     <fragment
         android:id="@+id/previewFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.preview.PreviewFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.preview.PreviewFragment"
         android:label="PreviewFragment" />
     <activity
         android:id="@+id/viewPostActivity"

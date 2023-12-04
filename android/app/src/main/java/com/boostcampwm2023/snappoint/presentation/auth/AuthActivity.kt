@@ -23,7 +23,6 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
         initBinding()
 
-        collectViewModelData()
     }
 
     private fun initBinding() {
@@ -32,24 +31,6 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
         }
     }
 
-    private fun collectViewModelData() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.event.collect { event ->
-                    when (event) {
-                        is AuthEvent.Success -> {
-                            navigateToMainMapActivity()
-                        }
-                    }
-                }
-            }
-        }
-    }
 
-    private fun navigateToMainMapActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
-        startActivity(intent)
-        finish()
-    }
+
 }

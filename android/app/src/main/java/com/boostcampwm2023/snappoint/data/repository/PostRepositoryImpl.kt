@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -55,45 +56,28 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun postCreatePost(title: String, postBlocks: List<PostBlockState>): Flow<CreatePostResponse> {
 
-        return flow {
-            val request = CreatePostRequest(
-                title = title,
-                postBlocks = postBlocks.map {
-                    when (it) {
-                        is PostBlockState.IMAGE -> {
-                            val requestBody = it.bitmap?.toByteArray()
-                                ?.toRequestBody("image/webp".toMediaTypeOrNull())
-                                ?: return@flow
-                            val multipartBody =
-                                MultipartBody.Part.createFormData("file", "image", requestBody)
-                            val uploadResult = withContext(Dispatchers.Default) {
-                                snapPointApi.postImage(multipartBody)
+        return flowOf(true)
+            .map{
+                CreatePostRequest(
+                    title = title,
+                    postBlocks = postBlocks.map {
+                        when (it) {
+                            is PostBlockState.IMAGE -> {
+                                val requestBody = it.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
+                                val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
+                                val uploadResult = snapPointApi.postImage(multipartBody)
+                                // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
+                                it.asPostBlock().copy(
+                                    files = listOf(File(uploadResult.uuid))
+                                )
                             }
-                            Log.d("TAG", "postCreatePost: $uploadResult")
-                            // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
-                            it.asPostBlock().copy(files = listOf(File(uploadResult.uuid)))
+                            else -> it.asPostBlock()
                         }
-
-                        else -> it.asPostBlock()
                     }
-                }
-            )
-
-            Log.d("TAG", "postCreatePost: ${Json.encodeToString(request)}")
-            try {
-                emit(snapPointApi.createPost(request))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // Handle the exception if needed
+                )
+            }.map{request ->
+                snapPointApi.createPost(request)
             }
-        }
-    }
-
-    override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<GetPostResponse>> {
-
-        return flow {
-            emit(snapPointApi.getAroundPost(leftBottom, rightTop))
-        }
     }
 
     override fun getPost(uuid: String): Flow<GetPostResponse> {

@@ -32,8 +32,6 @@ import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_P
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
-import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
-import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -41,19 +39,9 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.Dash
-import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
@@ -68,16 +56,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
-class MainActivity :
-    BaseActivity<ActivityMainBinding>(R.layout.activity_main),
-    OnMapReadyCallback,
-    OnMarkerClickListener
-{
+class MainActivity(
+) : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
     private val viewModel: MainViewModel by viewModels()
-    private var googleMap: GoogleMap? = null
     private lateinit var placesClient: PlacesClient
-    private val token = AutocompleteSessionToken.newInstance()
-    private val geocoder by lazy { Geocoder(applicationContext) }
+    private val token: AutocompleteSessionToken = AutocompleteSessionToken.newInstance()
+    private val geocoder: Geocoder by lazy { Geocoder(applicationContext) }
+    private lateinit var mapManager: MapManager
 
     private val navController: NavController by lazy {
         (supportFragmentManager.findFragmentById(R.id.fcv) as NavHostFragment).findNavController()
@@ -133,7 +118,8 @@ class MainActivity :
     private fun initMapFragment() {
         val map: SupportMapFragment =
             supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
-        map.getMapAsync(this)
+        mapManager = MapManager(viewModel, this)
+        map.getMapAsync(mapManager)
     }
 
     private fun cachingBottomSheetSize() {
@@ -181,6 +167,10 @@ class MainActivity :
                                 navigateAuthActivity()
                             }
 
+                            MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation -> {
+                                checkPermissionAndMoveCameraToUserLocation()
+                            }
+
                             is MainActivityEvent.HalfOpenBottomSheet -> { halfOpenBottomSheet() }
 
                             is MainActivityEvent.GetAroundPostFailed -> {
@@ -191,79 +181,30 @@ class MainActivity :
                 }
 
                 launch {
-                    var prevSelectedMarker: Marker? = null
-                    var drawnRoute: Polyline? = null
-                    var prevSelectedIndex = -1
+
                     viewModel.uiState.collect { uiState ->
                         if (uiState.selectedIndex < 0 || uiState.focusedIndex < 0) {
-                            prevSelectedMarker?.remove()
-                            drawnRoute?.remove()
-                            prevSelectedIndex = -1
+                            mapManager.removeFocus()
                             return@collect
                         }
                         val block = viewModel.postState.value[uiState.selectedIndex].postBlocks
                             .filterIsInstance<PostBlockState.IMAGE>()[uiState.focusedIndex]
+                        mapManager.changeSelectedMarker(block, SnapPointTag(uiState.selectedIndex, uiState.focusedIndex))
 
-                        prevSelectedMarker?.remove()
-                        prevSelectedMarker = googleMap?.addImageMarker(
-                            context = this@MainActivity,
-                            markerOptions = MarkerOptions().position(block.position.asLatLng()),
-                            uri = block.content,
-                            tag = SnapPointTag(uiState.selectedIndex, uiState.focusedIndex),
-                            focused = true
-                        )
-                        if (prevSelectedIndex != uiState.selectedIndex) {
-                            prevSelectedIndex = uiState.selectedIndex
-                            drawnRoute?.remove()
-                            drawnRoute = drawRoutes(uiState.selectedIndex)
+                        if (mapManager.prevSelectedIndex != uiState.selectedIndex) {
+                            mapManager.changeRoute(viewModel.postState.value[uiState.selectedIndex].postBlocks)
                         }
                     }
                 }
 
                 launch {
                     viewModel.postState.collect { postState ->
-                        while (googleMap == null) { delay(100) }
-
-                        viewModel.startLoading()
-                        googleMap?.clear()
-                        postState.forEachIndexed { postIndex, postSummaryState ->
-                            SnapPointState(
-                                index = postIndex,
-                                markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().mapIndexed { pointIndex, postBlockState ->
-                                    googleMap?.addImageMarker(
-                                        context = this@MainActivity,
-                                        markerOptions = MarkerOptions().position(postBlockState.position.asLatLng()),
-                                        uri = postBlockState.content,
-                                        tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
-                                        focused = false
-                                    )
-                                }
-                            )
-                        }
-                        viewModel.finishLoading()
+                        while (mapManager.googleMap == null) { delay(100) }
+                        mapManager.updateMarkers(postState)
                     }
                 }
             }
         }
-    }
-
-    private fun drawRoutes(postIndex: Int): Polyline? {
-        val polylineOptions = PolylineOptions().color(getColor(R.color.error80)).width(3.pxFloat()).pattern(listOf(Dash(20f), Gap(20f)))
-        val positionList = viewModel.postState.value[postIndex].postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
-            when (block) {
-                is PostBlockState.IMAGE -> {
-                    LatLng(block.position.latitude, block.position.longitude)
-                }
-
-                is PostBlockState.VIDEO -> {
-                    LatLng(block.position.latitude, block.position.longitude)
-                }
-
-                is PostBlockState.TEXT -> TODO()
-            }
-        }
-        polylineOptions.addAll(positionList)
-        return googleMap?.addPolyline(polylineOptions)
     }
 
     private fun moveCameraToFitScreen() {
@@ -302,7 +243,7 @@ class MainActivity :
             LatLng(newTopOfBound, rightOfBound)
         )
 
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bound, padding))
+        mapManager.moveCamera(bound, padding)
     }
 
     private fun initBottomSheetWithNavigation() {
@@ -405,9 +346,8 @@ class MainActivity :
                     if (results.size == 0) {
                         runOnUiThread { showToastMessage(R.string.search_location_fail) }
                     } else {
-                        val latLng = LatLng(results[0].latitude, results[0].longitude)
                         runOnUiThread {
-                            googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                            mapManager.moveCamera(results[0].latitude, results[0].longitude)
                             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                             sv.hide()
                         }
@@ -421,8 +361,7 @@ class MainActivity :
                 if (results == null || results.size == 0) {
                     showToastMessage(R.string.search_location_fail)
                 } else {
-                    val latLng = LatLng(results[0].latitude, results[0].longitude)
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                    mapManager.moveCamera(results[0].latitude, results[0].longitude)
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     sv.hide()
                 }
@@ -458,21 +397,14 @@ class MainActivity :
         viewModel.loadPosts(leftBottom, rightTop)
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap = googleMap
-
-        googleMap.setOnMarkerClickListener(this)
-
-        checkPermissionAndMoveCameraToUserLocation()
-    }
-
     @SuppressLint("MissingPermission")
     private fun checkPermissionAndMoveCameraToUserLocation() {
         if(this.isMyLocationGranted()){
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location ->
                     location ?: return@addOnSuccessListener
-                    googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude),17.5f))
+                    mapManager.moveCamera(latitude = location.latitude, longitude = location.longitude, zoom = 17.5f)
+
                 }
         }else{
             locationPermissionRequest()
@@ -522,10 +454,5 @@ class MainActivity :
         } else {
             showToastMessage(R.string.activity_main_permission_deny)
         }
-    }
-
-    override fun onMarkerClick(marker: Marker): Boolean {
-        viewModel.onMarkerClicked(marker.tag as SnapPointTag)
-        return true
     }
 }

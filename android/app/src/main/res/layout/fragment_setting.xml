@@ -7,14 +7,14 @@
 
         <variable
             name="vm"
-            type="com.boostcampwm2023.snappoint.presentation.setting.SettingViewModel" />
+            type="com.boostcampwm2023.snappoint.presentation.main.setting.SettingViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.setting.SettingFragment">
+        tools:context=".presentation.main.setting.SettingFragment">
 
         <Button
             android:id="@+id/btn_setting_remove_marker"
