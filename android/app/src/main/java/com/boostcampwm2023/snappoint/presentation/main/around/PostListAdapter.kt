@@ -30,7 +30,7 @@ class PostListAdapter(
     }
 
     override fun onBindViewHolder(holder: PostItemViewHolder, position: Int) {
-        holder.bind(getItem(position), position, expandedIndexSet.contains(position))
+        holder.bind(getItem(position), expandedIndexSet.contains(position))
     }
 
     override fun onCurrentListChanged(
@@ -43,7 +43,7 @@ class PostListAdapter(
     companion object {
         val diffUtil = object : DiffUtil.ItemCallback<PostSummaryState>() {
             override fun areItemsTheSame(oldItem: PostSummaryState, newItem: PostSummaryState): Boolean {
-                return oldItem == newItem
+                return oldItem.uuid == newItem.uuid
             }
 
             override fun areContentsTheSame(oldItem: PostSummaryState, newItem: PostSummaryState): Boolean {

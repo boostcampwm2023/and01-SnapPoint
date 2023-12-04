@@ -32,7 +32,6 @@ import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_P
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
-import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -332,7 +331,7 @@ class MainActivity(
             }
 
             btnSearchHere.setOnClickListener {
-                searchSnapPoints()
+                mapManager.searchSnapPoints()
             }
         }
     }
@@ -385,16 +384,6 @@ class MainActivity(
                     Log.e("TAG", "Place not found: ${exception.statusCode}")
                 }
             }
-    }
-
-    private fun searchSnapPoints() {
-        val latLngBounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
-
-        val leftBottom = latLngBounds.southwest.latitude.untilSixAfterDecimalPoint().toString() +
-                "," + latLngBounds.southwest.longitude.untilSixAfterDecimalPoint().toString()
-        val rightTop = latLngBounds.northeast.latitude.untilSixAfterDecimalPoint().toString() +
-                "," + latLngBounds.northeast.longitude.untilSixAfterDecimalPoint().toString()
-        viewModel.loadPosts(leftBottom, rightTop)
     }
 
     @SuppressLint("MissingPermission")

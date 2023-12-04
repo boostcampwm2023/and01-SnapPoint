@@ -21,7 +21,7 @@ class PostItemViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
 
-    fun bind(item: PostSummaryState, index: Int, isExpanded: Boolean) {
+    fun bind(item: PostSummaryState, isExpanded: Boolean) {
 
         var expandState = isExpanded
 
@@ -32,18 +32,18 @@ class PostItemViewHolder(
             root.setOnClickListener {
                 expandState = expandState.not()
                 toggleLayout(expandState, btnExpand, layoutExpanded)
-                onExpandButtonClicked(index)
+                onExpandButtonClicked(adapterPosition)
             }
             btnExpand.setOnClickListener {
                 expandState = expandState.not()
                 toggleLayout(expandState, it, layoutExpanded)
-                onExpandButtonClicked(index)
+                onExpandButtonClicked(adapterPosition)
             }
             btnPreviewPost.setOnClickListener {
-                onPreviewButtonClicked(index)
+                onPreviewButtonClicked(adapterPosition)
             }
             btnViewPost.setOnClickListener {
-                onViewPostButtonClicked(index)
+                onViewPostButtonClicked(adapterPosition)
             }
         }
     }
