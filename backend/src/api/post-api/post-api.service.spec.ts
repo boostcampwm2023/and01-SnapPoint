@@ -12,6 +12,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { WritePostDto } from './dtos/write-post.dto';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
@@ -30,6 +31,7 @@ describe('PostApiService', () => {
         PostService,
         BlockService,
         FileService,
+        RedisCacheService,
       ],
     })
       .overrideProvider(PrismaProvider)
@@ -40,6 +42,8 @@ describe('PostApiService', () => {
       .useValue(mockDeep<BlockService>())
       .overrideProvider(FileService)
       .useValue(mockDeep<FileService>())
+      .overrideProvider(RedisCacheService)
+      .useValue(mockDeep<RedisCacheService>())
       .compile();
 
     service = module.get<PostApiService>(PostApiService);
