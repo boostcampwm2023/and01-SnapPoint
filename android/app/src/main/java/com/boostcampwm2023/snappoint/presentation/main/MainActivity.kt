@@ -66,7 +66,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.checkerframework.common.subtyping.qual.Bottom
 
 @AndroidEntryPoint
 class MainActivity :
@@ -107,8 +106,6 @@ class MainActivity :
         setBottomNavigationEvent()
 
         initLocationData()
-
-        searchSnapPoints()
     }
 
     private fun initPlacesClient() {
@@ -227,6 +224,7 @@ class MainActivity :
                     viewModel.postState.collect { postState ->
                         while (googleMap == null) { delay(100) }
 
+                        viewModel.startLoading()
                         googleMap?.clear()
                         postState.forEachIndexed { postIndex, postSummaryState ->
                             SnapPointState(
@@ -242,6 +240,7 @@ class MainActivity :
                                 }
                             )
                         }
+                        viewModel.finishLoading()
                     }
                 }
             }
@@ -451,7 +450,7 @@ class MainActivity :
 
     private fun searchSnapPoints() {
         val latLngBounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
-        Log.d("TAG", "searchSnapPoints: $latLngBounds")
+
         val leftBottom = latLngBounds.southwest.latitude.untilSixAfterDecimalPoint().toString() +
                 "," + latLngBounds.southwest.longitude.untilSixAfterDecimalPoint().toString()
         val rightTop = latLngBounds.northeast.latitude.untilSixAfterDecimalPoint().toString() +

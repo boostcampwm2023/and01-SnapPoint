@@ -37,10 +37,9 @@ class ViewPostViewModel @Inject constructor(
 
     fun loadPost(uuid: String) {
         postRepository.getPost(uuid)
-            .onStart { Log.d("TAG", "loadPost: $uuid") }
+            .onStart {  }
             .catch { Log.d("TAG", "loadPost: ${it.message}") }
             .onEach { response ->
-                Log.d("TAG", "loadPost: $response")
                 _post.update { response.asPostSummaryState() }
             }.launchIn(viewModelScope)
     }

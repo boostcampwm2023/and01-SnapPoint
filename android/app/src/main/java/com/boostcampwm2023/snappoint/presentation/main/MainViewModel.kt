@@ -52,9 +52,9 @@ class MainViewModel @Inject constructor(
     fun loadPosts(leftBottom: String, rightTop: String) {
 
         postRepository.getAroundPost(leftBottom, rightTop)
-            .onStart { _uiState.update { it.copy(isLoading = true) } }
+            .onStart { startLoading() }
             .catch { _event.tryEmit(MainActivityEvent.GetAroundPostFailed) }
-            .onCompletion { _uiState.update { it.copy(isLoading = false) } }
+            .onCompletion { finishLoading() }
             .onEach { response ->
                 _postState.value = response.map { it.asPostSummaryState() }
                 _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
@@ -125,6 +125,14 @@ class MainViewModel @Inject constructor(
 
     fun focusOfImageMoved(imageIndex: Int) {
         updateClickedSnapPoint(_uiState.value.selectedIndex, imageIndex)
+    }
+
+    fun startLoading() {
+        _uiState.update { it.copy(isLoading = true) }
+    }
+
+    fun finishLoading() {
+        _uiState.update { it.copy(isLoading = false) }
     }
 
     private fun updateClickedSnapPoint(postIndex: Int, snapPointIndex: Int) {
