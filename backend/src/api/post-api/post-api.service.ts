@@ -7,12 +7,13 @@ import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/file-api/dto/file.dto';
-import { File, Post } from '@prisma/client';
+import { Block, File, Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
 import { WritePostDto } from './dtos/write-post.dto';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
 
 @Injectable()
 export class PostApiService {
@@ -23,10 +24,20 @@ export class PostApiService {
     private readonly postService: PostService,
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
+    private readonly redisService: RedisCacheService,
   ) {}
 
   private async readPost(post: Post) {
-    const blocks = await this.blockService.findBlocksWithCoordsByPost(post.uuid);
+    const blocks = await this.redisService.smembers<Block>(
+      `post:${post.uuid}`,
+      (s: string) => {
+        return JSON.parse(s);
+      },
+      async (uuid: string) => {
+        return await this.blockService.findBlocksWithCoordsByPost(uuid);
+      },
+    );
+
     const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
 
     const files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
@@ -48,6 +59,7 @@ export class PostApiService {
     const blocks = await this.blockService.findBlocksWithCoordsByArea(findNearbyPostDto);
 
     const blockWheres = blocks.map((block) => ({ uuid: block.postUuid }));
+
     const posts = await this.postService.findPosts({ where: { OR: blockWheres } });
 
     return Promise.all(
@@ -68,6 +80,7 @@ export class PostApiService {
     if (!post) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
+    await this.redisService.del(post.uuid);
     return this.readPost(post);
   }
 
@@ -107,6 +120,7 @@ export class PostApiService {
 
     return this.prisma.beginTransaction(async () => {
       await this.postService.updatePost({ where: { uuid }, data: post });
+      await this.redisService.del(uuid);
 
       const blockMap = new Map<string, CreateBlockDto>();
       blocks.forEach((block) => blockMap.set(block.uuid, block));
