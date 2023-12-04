@@ -47,6 +47,7 @@ export class AuthController {
   }
 
   @Get('logout')
+  @NoAuth()
   @ApiOperation({
     summary: '로그아웃 API',
     description: '로그아웃에 성공하면 201번을 반환한다.',
