@@ -2,7 +2,6 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
@@ -56,7 +55,7 @@ class MainViewModel @Inject constructor(
             .catch { _event.tryEmit(MainActivityEvent.GetAroundPostFailed) }
             .onCompletion { finishLoading() }
             .onEach { response ->
-                _postState.value = response.map { it.asPostSummaryState() }
+                _postState.value = response
                 _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
             }.launchIn(viewModelScope)
     }

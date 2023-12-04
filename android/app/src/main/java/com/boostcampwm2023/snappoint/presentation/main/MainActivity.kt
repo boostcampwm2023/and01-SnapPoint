@@ -170,7 +170,9 @@ class MainActivity(
                                 checkPermissionAndMoveCameraToUserLocation()
                             }
 
-                            is MainActivityEvent.HalfOpenBottomSheet -> { halfOpenBottomSheet() }
+                            is MainActivityEvent.HalfOpenBottomSheet -> {
+                                halfOpenBottomSheetWhenCollapsed()
+                            }
 
                             is MainActivityEvent.GetAroundPostFailed -> {
                                 showToastMessage(R.string.get_around_posts_failed)
@@ -287,7 +289,7 @@ class MainActivity(
         }
     }
 
-    private fun halfOpenBottomSheet() {
+    private fun halfOpenBottomSheetWhenCollapsed() {
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         }

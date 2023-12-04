@@ -1,12 +1,13 @@
 package com.boostcampwm2023.snappoint.data.repository
 
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
+import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
-import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -73,17 +74,19 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<GetPostResponse>> {
+    override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<PostSummaryState>> {
 
         return flowOf(true).map {
-            snapPointApi.getAroundPost(leftBottom, rightTop)
+            snapPointApi.getAroundPost(leftBottom, rightTop).map {
+                it.asPostSummaryState()
+            }
         }
     }
 
-    override fun getPost(uuid: String): Flow<GetPostResponse> {
+    override fun getPost(uuid: String): Flow<PostSummaryState> {
 
         return flowOf(true).map {
-            snapPointApi.getPost(uuid)
+            snapPointApi.getPost(uuid).asPostSummaryState()
         }
     }
 }
