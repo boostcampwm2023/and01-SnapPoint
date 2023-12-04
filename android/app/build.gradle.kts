@@ -107,6 +107,8 @@ dependencies {
 
     //maps
     implementation (libs.play.services.maps)
+    implementation (libs.android.maps.utils)
+    implementation (libs.maps.utils.ktx)
     //location
     implementation (libs.play.services.location)
     //places
