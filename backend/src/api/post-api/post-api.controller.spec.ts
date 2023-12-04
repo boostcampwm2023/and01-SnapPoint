@@ -8,6 +8,8 @@ import { FileService } from '@/domain/file/file.service';
 import { PostService } from '@/domain/post/post.service';
 import { ValidationService } from '../validation/validation.service';
 import { TransformationService } from '../transformation/transformation.service';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { mockDeep } from 'jest-mock-extended';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -17,7 +19,6 @@ describe('PostApiController', () => {
       controllers: [PostApiController],
       providers: [
         PostApiService,
-        PostApiService,
         PrismaService,
         PrismaProvider,
         ValidationService,
@@ -25,8 +26,12 @@ describe('PostApiController', () => {
         BlockService,
         FileService,
         TransformationService,
+        RedisCacheService,
       ],
-    }).compile();
+    })
+      .overrideProvider(RedisCacheService)
+      .useValue(mockDeep<RedisCacheService>())
+      .compile();
 
     controller = module.get<PostApiController>(PostApiController);
   });
