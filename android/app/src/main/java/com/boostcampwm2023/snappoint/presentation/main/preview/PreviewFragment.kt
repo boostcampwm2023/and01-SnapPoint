@@ -66,7 +66,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
     private fun collectViewModelData() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
-                mainViewModel.uiState.collect{
+                mainViewModel.markerState.collect{
                     if (it.selectedIndex > -1) {
                         previewViewModel.updatePost(mainViewModel.postState.value[it.selectedIndex])
                     }
@@ -84,7 +84,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
     private fun setScrollEvent() {
         binding.rcvPreview.setOnScrollChangeListener { _, _, _, scrollX, _ ->
             if (scrollX == 0) {
-                layoutManager.scrollToPosition(mainViewModel.uiState.value.focusedIndex)
+                layoutManager.scrollToPosition(mainViewModel.markerState.value.focusedIndex)
                 return@setOnScrollChangeListener
             }
             val currentFocusImageIndex =
@@ -92,7 +92,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
                     snapHelper.findSnapView(layoutManager) ?: return@setOnScrollChangeListener
                 )
 
-            if (mainViewModel.uiState.value.focusedIndex != currentFocusImageIndex) {
+            if (mainViewModel.markerState.value.focusedIndex != currentFocusImageIndex) {
                 mainViewModel.focusOfImageMoved(currentFocusImageIndex)
             }
         }

@@ -33,6 +33,9 @@ class MainViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<MainUiState> = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
+    private val _markerState: MutableStateFlow<MarkerUiState> = MutableStateFlow(MarkerUiState())
+    val markerState: StateFlow<MarkerUiState> = _markerState.asStateFlow()
+
     private val _searchViewUiState: MutableStateFlow<SearchViewUiState> = MutableStateFlow(
         SearchViewUiState(onAutoCompleteItemClicked = { index ->
             moveCameraToAddress(index)
@@ -93,20 +96,20 @@ class MainViewModel @Inject constructor(
     }
 
     private fun updateSelectedIndex(index: Int){
-        _uiState.update {
-            it.copy(
-                selectedIndex = index,
-                focusedIndex = 0
-            )
-        }
+        _markerState.value = MarkerUiState(
+            selectedIndex = index,
+            focusedIndex = 0
+        )
     }
 
     fun onPreviewFragmentClosing() {
+        _markerState.value = MarkerUiState(
+            selectedIndex = -1,
+            focusedIndex = -1
+        )
         _uiState.update {
             it.copy(
-                isPreviewFragmentShowing = false,
-                selectedIndex = -1,
-                focusedIndex = -1
+                isPreviewFragmentShowing = false
             )
         }
     }
@@ -123,7 +126,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun focusOfImageMoved(imageIndex: Int) {
-        updateClickedSnapPoint(_uiState.value.selectedIndex, imageIndex)
+        updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }
 
     fun startLoading() {
@@ -135,11 +138,10 @@ class MainViewModel @Inject constructor(
     }
 
     private fun updateClickedSnapPoint(postIndex: Int, snapPointIndex: Int) {
-        _uiState.update {
-            it.copy(
-                selectedIndex = postIndex,
-                focusedIndex = snapPointIndex)
-        }
+        _markerState.value = MarkerUiState(
+            selectedIndex = postIndex,
+            focusedIndex = snapPointIndex
+        )
     }
 
     fun updateAutoCompleteTexts(texts: List<String>) {

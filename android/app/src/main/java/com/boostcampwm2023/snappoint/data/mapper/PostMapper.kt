@@ -48,7 +48,7 @@ fun PostBlockState.asPostBlock(): PostBlock {
         }
         is PostBlockState.IMAGE -> {
             PostBlock(
-                content = this.content,
+                content = this.description,
                 type = BlockType.MEDIA.type,
                 latitude = this.position.latitude,
                 longitude = this.position.longitude,

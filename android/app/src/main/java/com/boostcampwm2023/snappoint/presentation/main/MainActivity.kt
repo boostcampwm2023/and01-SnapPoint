@@ -183,17 +183,17 @@ class MainActivity(
 
                 launch {
 
-                    viewModel.uiState.collect { uiState ->
-                        if (uiState.selectedIndex < 0 || uiState.focusedIndex < 0) {
+                    viewModel.markerState.collect { markerState ->
+                        if (markerState.selectedIndex < 0 || markerState.focusedIndex < 0) {
                             mapManager.removeFocus()
                             return@collect
                         }
-                        val block = viewModel.postState.value[uiState.selectedIndex].postBlocks
-                            .filterIsInstance<PostBlockState.IMAGE>()[uiState.focusedIndex]
-                        mapManager.changeSelectedMarker(block, SnapPointTag(uiState.selectedIndex, uiState.focusedIndex))
+                        val block = viewModel.postState.value[markerState.selectedIndex].postBlocks
+                            .filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
+                        mapManager.changeSelectedMarker(block, SnapPointTag(markerState.selectedIndex, markerState.focusedIndex))
 
-                        if (mapManager.prevSelectedIndex != uiState.selectedIndex) {
-                            mapManager.changeRoute(viewModel.postState.value[uiState.selectedIndex].postBlocks)
+                        if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
+                            mapManager.changeRoute(viewModel.postState.value[markerState.selectedIndex].postBlocks)
                         }
                     }
                 }
@@ -209,7 +209,7 @@ class MainActivity(
     }
 
     private fun moveCameraToFitScreen() {
-        val postIndex = viewModel.uiState.value.selectedIndex
+        val postIndex = viewModel.markerState.value.selectedIndex
         val snapPoints = viewModel.postState.value[postIndex].postBlocks.filterIsInstance<PostBlockState.IMAGE>()
         val positions = snapPoints.map { it.position }
 

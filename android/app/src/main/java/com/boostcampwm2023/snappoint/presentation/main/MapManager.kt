@@ -61,7 +61,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     fun changeRoute(postBlocks: List<PostBlockState>) {
-        prevSelectedIndex = viewModel.uiState.value.selectedIndex
+        prevSelectedIndex = viewModel.markerState.value.selectedIndex
         drawnRoute?.remove()
 
         val polylineOptions = PolylineOptions().color(getColor(context, R.color.error80)).width(3.pxFloat()).pattern(listOf(
@@ -104,9 +104,8 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
         viewModel.startLoading()
         postState.forEachIndexed { postIndex, postSummaryState ->
-            SnapPointState(
-                index = postIndex,
-                markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().mapIndexed { pointIndex, postBlockState ->
+            postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>()
+                .forEachIndexed { pointIndex, postBlockState ->
                     googleMap?.addImageMarker(
                         context = context,
                         markerOptions = MarkerOptions().position(postBlockState.position.asLatLng()),
@@ -115,7 +114,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                         focused = false
                     )
                 }
-            )
         }
         viewModel.finishLoading()
     }
