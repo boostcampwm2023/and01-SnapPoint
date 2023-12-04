@@ -169,23 +169,31 @@ class MainActivity(
                             MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation -> {
                                 checkPermissionAndMoveCameraToUserLocation()
                             }
+
+                            is MainActivityEvent.HalfOpenBottomSheet -> {
+                                halfOpenBottomSheetWhenCollapsed()
+                            }
+
+                            is MainActivityEvent.GetAroundPostFailed -> {
+                                showToastMessage(R.string.get_around_posts_failed)
+                            }
                         }
                     }
                 }
 
                 launch {
 
-                    viewModel.uiState.collect { uiState ->
-                        if (uiState.selectedIndex < 0 || uiState.focusedIndex < 0) {
+                    viewModel.markerState.collect { markerState ->
+                        if (markerState.selectedIndex < 0 || markerState.focusedIndex < 0) {
                             mapManager.removeFocus()
                             return@collect
                         }
-                        val block = viewModel.postState.value[uiState.selectedIndex].postBlocks
-                            .filterIsInstance<PostBlockState.IMAGE>()[uiState.focusedIndex]
-                        mapManager.changeSelectedMarker(block, SnapPointTag(uiState.selectedIndex, uiState.focusedIndex))
+                        val block = viewModel.postState.value[markerState.selectedIndex].postBlocks
+                            .filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
+                        mapManager.changeSelectedMarker(block, SnapPointTag(markerState.selectedIndex, markerState.focusedIndex))
 
-                        if (mapManager.prevSelectedIndex != uiState.selectedIndex) {
-                            mapManager.changeRoute(viewModel.postState.value[uiState.selectedIndex].postBlocks)
+                        if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
+                            mapManager.changeRoute(viewModel.postState.value[markerState.selectedIndex].postBlocks)
                         }
                     }
                 }
@@ -201,7 +209,7 @@ class MainActivity(
     }
 
     private fun moveCameraToFitScreen() {
-        val postIndex = viewModel.uiState.value.selectedIndex
+        val postIndex = viewModel.markerState.value.selectedIndex
         val snapPoints = viewModel.postState.value[postIndex].postBlocks.filterIsInstance<PostBlockState.IMAGE>()
         val positions = snapPoints.map { it.position }
 
@@ -245,6 +253,7 @@ class MainActivity(
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         binding.sb.doOnLayout {
             bottomSheetBehavior.expandedOffset = binding.sb.height + binding.sb.marginTop * 2
+            binding.bs.setPadding(0,0,0,binding.sb.height + binding.sb.marginTop * 2)
         }
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, state: Int) {
@@ -277,6 +286,12 @@ class MainActivity(
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
             }
             true
+        }
+    }
+
+    private fun halfOpenBottomSheetWhenCollapsed() {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         }
     }
 
@@ -318,7 +333,7 @@ class MainActivity(
             }
 
             btnSearchHere.setOnClickListener {
-                searchSnapPoints()
+                mapManager.searchSnapPoints()
             }
         }
     }
@@ -340,7 +355,9 @@ class MainActivity(
                     }
                 }
             } else {
-                val results = runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
+                // TODO - runBlocking 대체
+                val results =
+                    runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
 
                 if (results == null || results.size == 0) {
                     showToastMessage(R.string.search_location_fail)
@@ -370,12 +387,6 @@ class MainActivity(
                 }
             }
     }
-
-    private fun searchSnapPoints() {
-
-    }
-
-
 
     @SuppressLint("MissingPermission")
     private fun checkPermissionAndMoveCameraToUserLocation() {
@@ -435,6 +446,4 @@ class MainActivity(
             showToastMessage(R.string.activity_main_permission_deny)
         }
     }
-
-
 }

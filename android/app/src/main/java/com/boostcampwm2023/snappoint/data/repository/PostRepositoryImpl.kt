@@ -1,24 +1,18 @@
 package com.boostcampwm2023.snappoint.data.repository
 
-import android.util.Log
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
+import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
-import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
@@ -80,7 +74,19 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<GetAroundPostResponse>> {
-        TODO("Not yet implemented")
+    override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<PostSummaryState>> {
+
+        return flowOf(true).map {
+            snapPointApi.getAroundPost(leftBottom, rightTop).map {
+                it.asPostSummaryState()
+            }
+        }
+    }
+
+    override fun getPost(uuid: String): Flow<PostSummaryState> {
+
+        return flowOf(true).map {
+            snapPointApi.getPost(uuid).asPostSummaryState()
+        }
     }
 }

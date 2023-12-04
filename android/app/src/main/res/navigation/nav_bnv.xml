@@ -8,7 +8,11 @@
     <fragment
         android:id="@+id/aroundFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.main.around.AroundFragment"
-        android:label="AroundFragment" />
+        android:label="AroundFragment" >
+        <action
+            android:id="@+id/action_aroundFragment_to_viewPostActivity"
+            app:destination="@id/viewPostActivity" />
+    </fragment>
     <fragment
         android:id="@+id/popularPostFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.main.popularpost.PopularPostFragment"
@@ -25,4 +29,12 @@
         android:id="@+id/previewFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.main.preview.PreviewFragment"
         android:label="PreviewFragment" />
+    <activity
+        android:id="@+id/viewPostActivity"
+        android:name="com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostActivity"
+        android:label="ViewPostActivity" >
+        <argument
+            android:name="uuid"
+            app:argType="string" />
+    </activity>
 </navigation>

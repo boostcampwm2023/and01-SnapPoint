@@ -19,6 +19,7 @@ import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPoin
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
+import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -45,7 +46,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                     ?: return@registerForActivityResult
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
-                val bitmap = getBitmapFromUri(this, imageUri)
+                val bitmap = resizeBitmap(getBitmapFromUri(this, imageUri), 1280)
                 viewModel.addImageBlock(bitmap, position)
 
                 startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)

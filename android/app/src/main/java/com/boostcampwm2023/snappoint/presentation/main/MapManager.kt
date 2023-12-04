@@ -8,6 +8,7 @@ import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
+import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -60,6 +61,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     fun changeRoute(postBlocks: List<PostBlockState>) {
+        prevSelectedIndex = viewModel.markerState.value.selectedIndex
         drawnRoute?.remove()
 
         val polylineOptions = PolylineOptions().color(getColor(context, R.color.error80)).width(3.pxFloat()).pattern(listOf(
@@ -100,10 +102,10 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
+        viewModel.startLoading()
         postState.forEachIndexed { postIndex, postSummaryState ->
-            SnapPointState(
-                index = postIndex,
-                markers = postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>().mapIndexed { pointIndex, postBlockState ->
+            postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>()
+                .forEachIndexed { pointIndex, postBlockState ->
                     googleMap?.addImageMarker(
                         context = context,
                         markerOptions = MarkerOptions().position(postBlockState.position.asLatLng()),
@@ -112,9 +114,17 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                         focused = false
                     )
                 }
-            )
         }
+        viewModel.finishLoading()
     }
 
+    fun searchSnapPoints() {
+        val latLngBounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
 
+        val leftBottom = latLngBounds.southwest.latitude.untilSixAfterDecimalPoint().toString() +
+                "," + latLngBounds.southwest.longitude.untilSixAfterDecimalPoint().toString()
+        val rightTop = latLngBounds.northeast.latitude.untilSixAfterDecimalPoint().toString() +
+                "," + latLngBounds.northeast.longitude.untilSixAfterDecimalPoint().toString()
+        viewModel.loadPosts(leftBottom, rightTop)
+    }
 }

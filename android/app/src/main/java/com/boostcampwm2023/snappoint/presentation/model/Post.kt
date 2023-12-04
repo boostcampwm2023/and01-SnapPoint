@@ -4,10 +4,12 @@ import android.graphics.Bitmap
 import com.google.android.gms.maps.model.LatLng
 
 data class PostSummaryState(
-    val title: String,
-    val author: String,
-    val timeStamp: String,
-    val postBlocks: List<PostBlockState>
+    val uuid: String = "",
+    val title: String = "",
+    val author: String = "",
+    val timeStamp: String = "",
+    val summary: String = "",
+    val postBlocks: List<PostBlockState> = emptyList()
 )
 
 sealed class PostBlockState(open val content: String, open val isEditMode: Boolean, open val uuid: String) {

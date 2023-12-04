@@ -17,17 +17,18 @@ fun getBitmapFromUri(context: Context, uri: Uri): Bitmap {
     }
 }
 
-fun resizeBitmap(bitmap: Bitmap, layoutWidth: Int): Bitmap {
-    val height = bitmap.height * layoutWidth / bitmap.width
-    return Bitmap.createScaledBitmap(bitmap, layoutWidth, height, false)
+fun resizeBitmap(bitmap: Bitmap, width: Int): Bitmap {
+    if (bitmap.width < width) return bitmap
+    val height = bitmap.height * width / bitmap.width
+    return Bitmap.createScaledBitmap(bitmap, width, height, false)
 }
 
 fun Bitmap.toByteArray(): ByteArray {
     val byteArrayOutputStream = ByteArrayOutputStream()
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 99, byteArrayOutputStream)
+        compress(Bitmap.CompressFormat.WEBP_LOSSY, 80, byteArrayOutputStream)
     } else {
-        compress(Bitmap.CompressFormat.WEBP, 99, byteArrayOutputStream)
+        compress(Bitmap.CompressFormat.WEBP, 80, byteArrayOutputStream)
     }
     return byteArrayOutputStream.toByteArray()
 }

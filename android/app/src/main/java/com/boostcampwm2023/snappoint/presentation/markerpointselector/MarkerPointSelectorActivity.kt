@@ -14,6 +14,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 
 class MarkerPointSelectorActivity : BaseActivity<ActivityMapsMarkerBinding>(R.layout.activity_maps_marker),
@@ -112,10 +113,8 @@ class MarkerPointSelectorActivity : BaseActivity<ActivityMapsMarkerBinding>(R.la
         val marker: Marker = _marker ?: return ""
         val position: LatLng = marker.position
 
-        geocoder.getFromLocation(position.latitude, position.longitude, 1)?.let {
-            if(it.isEmpty()) return ""
-            return it[0].getAddressLine(0)
-        }
-        return ""
+        val address = runBlocking { geocoder.getFromLocation(position.latitude, position.longitude, 1) }
+        if (address.isNullOrEmpty()) return ""
+        return address[0].getAddressLine(0)
     }
 }

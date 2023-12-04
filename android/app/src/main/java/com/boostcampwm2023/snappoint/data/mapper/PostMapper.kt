@@ -3,7 +3,7 @@ package com.boostcampwm2023.snappoint.data.mapper
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
-import com.boostcampwm2023.snappoint.data.remote.model.response.GetAroundPostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
@@ -17,7 +17,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
             )
         }
         else -> {
-            if(this.files!![0].mimeType!!.startsWith("Image")){
+            if(this.files!![0].mimeType!!.startsWith("image")){
                 PostBlockState.IMAGE(
                     uuid = blockUuid!!,
                     description = this.content,
@@ -74,11 +74,13 @@ fun PostBlock.asPositionState(): PositionState {
     )
 }
 
-fun GetAroundPostResponse.asPostSummaryState(): PostSummaryState {
+fun GetPostResponse.asPostSummaryState(): PostSummaryState {
     return PostSummaryState(
+        uuid = this.postUuid,
         title = this.title,
         author = "",
         timeStamp = this.createdAt,
+        summary = this.summary,
         postBlocks = this.blocks.map { it.asPostBlockState() }
     )
 }
