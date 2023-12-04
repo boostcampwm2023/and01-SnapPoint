@@ -113,6 +113,7 @@ class MarkerPointSelectorActivity : BaseActivity<ActivityMapsMarkerBinding>(R.la
         val position: LatLng = marker.position
 
         geocoder.getFromLocation(position.latitude, position.longitude, 1)?.let {
+            if(it.isEmpty()) return ""
             return it[0].getAddressLine(0)
         }
         return ""

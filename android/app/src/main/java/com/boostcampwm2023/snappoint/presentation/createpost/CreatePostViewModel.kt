@@ -93,7 +93,7 @@ class CreatePostViewModel @Inject constructor(
                     if(index == idx) {
                         when(postBlock){
                             is PostBlockState.TEXT -> postBlock.copy(content = content)
-                            is PostBlockState.IMAGE -> postBlock.copy(content = content)
+                            is PostBlockState.IMAGE -> postBlock.copy(description = content)
                             is PostBlockState.VIDEO -> TODO()
                         }
                     }else{
