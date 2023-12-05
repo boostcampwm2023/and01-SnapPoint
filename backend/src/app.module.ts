@@ -36,9 +36,9 @@ import { RedisCacheModule } from './common/redis/redis-cache.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         config: {
-          host: configService.get('REDIS_HOST'),
-          port: configService.get('REDIS_PORT'),
-          password: configService.get('REDIS_PASSWORD'),
+          host: configService.getOrThrow('REDIS_HOST'),
+          port: configService.getOrThrow('REDIS_PORT'),
+          password: configService.getOrThrow('REDIS_PASSWORD'),
         },
       }),
       inject: [ConfigService],
