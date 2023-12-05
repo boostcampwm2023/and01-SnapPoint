@@ -53,13 +53,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
     }
 
     private fun saveCurrentPost() {
-        with(viewPostViewModel.post.value) {
-            postViewModel.saveCurrentPost(
-                title = title,
-                author = author,
-                timeStamp = timeStamp,
-                blocks = postBlocks
-            )
-        }
+        postViewModel.saveCurrentPost(viewPostViewModel.post.value)
     }
 }

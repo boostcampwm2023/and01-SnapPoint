@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -32,7 +33,9 @@ class PostViewModel @Inject constructor(
         _event.tryEmit(PostEvent.SavePost)
     }
 
-    fun saveCurrentPost(title: String, author: String, timeStamp: String, blocks: List<PostBlockState>) {
-
+    fun saveCurrentPost(post: PostSummaryState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.insertPosts(post)
+        }
     }
 }
