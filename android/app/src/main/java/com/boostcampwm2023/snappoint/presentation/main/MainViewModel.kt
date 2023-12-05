@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
@@ -59,6 +60,7 @@ class MainViewModel @Inject constructor(
             .onCompletion { finishLoading() }
             .onEach { response ->
                 _postState.value = response
+                Log.d("TAG", "loadPosts: $response")
                 _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
             }.launchIn(viewModelScope)
     }
