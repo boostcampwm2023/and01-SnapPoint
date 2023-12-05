@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
@@ -28,19 +28,34 @@ export class PostApiService {
   ) {}
 
   private async readPost(post: Post) {
+    const blockKey = `block:${post.uuid}`;
     const blocks = await this.redisService.smembers<Block>(
-      post.uuid,
+      blockKey,
       (s: string) => {
         return JSON.parse(s);
       },
-      async (uuid: string) => {
+      async (key: string) => {
+        // 캐싱된 값이 없는 경우
+        const uuid = key.substring('block:'.length);
         return await this.blockService.findBlocksWithCoordsByPost(uuid);
       },
     );
 
-    const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
+    if (!blocks) {
+      throw new InternalServerErrorException('게시물에 블럭이 존재하지 않습니다.');
+    }
 
-    const files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
+    const fileKey = `file:${post.uuid}`;
+    let files = await this.redisService.smembers<File>(fileKey, (s: string) => {
+      return JSON.parse(s);
+    });
+
+    if (!files) {
+      const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
+      files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
+
+      await this.redisService.sadd<File>(fileKey, files, 30, (file: File) => JSON.stringify(file));
+    }
 
     const fileDtoMap = this.transform.toMapFromArray(
       files,

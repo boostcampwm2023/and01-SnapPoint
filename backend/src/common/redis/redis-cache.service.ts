@@ -10,8 +10,8 @@ export class RedisCacheService {
     this.redisClient = redisService.getClient();
   }
 
-  async set(key: string, value: string): Promise<string> {
-    return await this.redisClient.set(key, value);
+  async set<T>(key: string, value: T, converter: (value: T) => string): Promise<string> {
+    return await this.redisClient.set(key, converter(value));
   }
 
   async get<T>(key: string, converter: (result: string) => T, finder: (key: string) => Promise<string>): Promise<T> {
@@ -27,8 +27,22 @@ export class RedisCacheService {
     return await this.redisClient.del(key);
   }
 
-  async sadd(key: string, value: string[], expiretime: number): Promise<void> {
-    await this.redisClient.sadd(key, ...value);
+  /**
+   *
+   * @param key Redis Key
+   * @param value 실제 넣으려는 값 배열로
+   * @param expiretime 만료 시간 초 단위
+   * @param converter 가져온 값을 원하는 string 형식으로 변환하는 함수
+   * @returns
+   */
+  async sadd<T>(key: string, value: T[], expiretime: number, converter: (value: T) => string): Promise<void> {
+    const convertedList = value.map((v: T) => converter(v));
+
+    if (convertedList.length <= 0) {
+      return;
+    }
+
+    await this.redisClient.sadd(key, ...convertedList);
     await this.redisClient.expire(key, expiretime);
   }
 
@@ -42,61 +56,27 @@ export class RedisCacheService {
   async smembers<T>(
     key: string,
     converter: (result: string) => T,
-    finder: (key: string) => Promise<T[]>,
-  ): Promise<T[]> {
+    finder?: (key: string) => Promise<T[]>,
+  ): Promise<T[] | null> {
     const members = await this.redisClient.smembers(key);
 
     if (members.length <= 0 || !members) {
+      if (!finder) {
+        return null;
+      }
       const finderMembers = await finder(key);
+
+      if (finderMembers.length <= 0) {
+        return finderMembers;
+      }
+
       const stringMembers = finderMembers.map((value) => JSON.stringify(value));
-      await this.sadd(key, stringMembers, 30);
+      await this.redisClient.sadd(key, ...stringMembers);
+      await this.redisClient.expire(key, 30);
+
       return finderMembers;
     }
 
     return members.map((value: string) => converter(value));
   }
-
-  // async hset(key: string, field: string, value: string): Promise<number> {
-  //   return await this.redisClient.hset(key, field, value);
-  // }
-
-  // async hget<T>(
-  //   key: string,
-  //   field: string,
-  //   converter: (result: string) => T,
-  //   finder: (key: string, field: string) => Promise<string>,
-  // ): Promise<T> {
-  //   let result: string | null = await this.redisClient.hget(key, field);
-
-  //   if (result == null || result === undefined) {
-  //     result = await finder(key, field);
-  //     await this.redisClient.hset(key, field, result);
-  //   }
-
-  //   return converter(result);
-  // }
-
-  // async hmset(key: string, object: string[]): Promise<string> {
-  //   return await this.redisClient.hmset(key, object);
-  // }
-
-  // async hmget<T>(
-  //   key: string,
-  //   field: string,
-  //   converter: (result: string) => T,
-  //   finder: (key: string, field: string) => Promise<string>,
-  // ): Promise<T[]> {
-  //   const result = await this.redisClient.hmget(key, field);
-  //   const convertedList = await Promise.all(
-  //     result.map(async (value: string) => {
-  //       let returnValue = value;
-  //       if (value == null || value === undefined) {
-  //         returnValue = await finder(key, field);
-  //         await this.redisClient.hset(key, field, returnValue);
-  //       }
-  //       return converter(returnValue);
-  //     }),
-  //   );
-  //   return convertedList;
-  // }
 }
