@@ -122,7 +122,7 @@
             android:id="@+id/fab_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/icon_popular_post"
+            app:srcCompat="@drawable/icon_favorite_border"
             app:layout_anchor="@id/bottom_app_bar"
             android:onClick="@{()->vm.onLikeButtonClick()}" />
 
