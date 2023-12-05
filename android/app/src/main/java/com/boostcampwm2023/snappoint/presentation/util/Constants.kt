@@ -6,4 +6,5 @@ object Constants {
     const val BOTTOM_SHEET_HALF_EXPANDED_RATIO: Float = 0.45f
     const val API_KEY = BuildConfig.MAPS_API_KEY
     const val EMAIL_DUPLICATE_ERROR: String = "HTTP 409 Conflict"
+    const val CLUSTER_TEXT_SIZE = 16
 }
