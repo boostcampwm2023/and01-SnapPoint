@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
@@ -7,12 +7,13 @@ import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/file-api/dto/file.dto';
-import { File, Post } from '@prisma/client';
+import { Block, File, Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
 import { WritePostDto } from './dtos/write-post.dto';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
 
 @Injectable()
 export class PostApiService {
@@ -23,13 +24,38 @@ export class PostApiService {
     private readonly postService: PostService,
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
+    private readonly redisService: RedisCacheService,
   ) {}
 
   private async readPost(post: Post) {
-    const blocks = await this.blockService.findBlocksWithCoordsByPost(post.uuid);
-    const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
+    const blockKey = `block:${post.uuid}`;
+    const blocks = await this.redisService.smembers<Block>(
+      blockKey,
+      (s: string) => {
+        return JSON.parse(s);
+      },
+      async (key: string) => {
+        // 캐싱된 값이 없는 경우
+        const uuid = key.substring('block:'.length);
+        return await this.blockService.findBlocksWithCoordsByPost(uuid);
+      },
+    );
 
-    const files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
+    if (!blocks) {
+      throw new InternalServerErrorException('게시물에 블럭이 존재하지 않습니다.');
+    }
+
+    const fileKey = `file:${post.uuid}`;
+    let files = await this.redisService.smembers<File>(fileKey, (s: string) => {
+      return JSON.parse(s);
+    });
+
+    if (!files) {
+      const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
+      files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
+
+      await this.redisService.sadd<File>(fileKey, files, 30, (file: File) => JSON.stringify(file));
+    }
 
     const fileDtoMap = this.transform.toMapFromArray(
       files,
@@ -48,6 +74,7 @@ export class PostApiService {
     const blocks = await this.blockService.findBlocksWithCoordsByArea(findNearbyPostDto);
 
     const blockWheres = blocks.map((block) => ({ uuid: block.postUuid }));
+
     const posts = await this.postService.findPosts({ where: { OR: blockWheres } });
 
     return Promise.all(
@@ -87,6 +114,8 @@ export class PostApiService {
           return this.fileService.updateFile({ where: { uuid }, data: { source, sourceUuid } });
         }),
       );
+      await this.redisService.del(`block:${postUuid}`);
+      await this.redisService.del(`file:${postUuid}`);
       return this.findPost(postUuid);
     });
   }
@@ -130,6 +159,8 @@ export class PostApiService {
       );
 
       await this.validation.validateBlocks(blocks, files);
+      await this.redisService.del(`block:${uuid}`);
+      await this.redisService.del(`file:${uuid}`);
       return this.findPost(uuid);
     });
   }

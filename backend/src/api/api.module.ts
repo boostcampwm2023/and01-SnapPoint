@@ -10,6 +10,14 @@ import { ValidationService } from './validation/validation.service';
 import { BlockService } from '@/domain/block/block.service';
 import { PostService } from '@/domain/post/post.service';
 import { TransformationService } from './transformation/transformation.service';
+import { AuthController } from '@/api/auth/auth.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from '@/common/strategies/auth.jwt.strategy';
+import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
+import { UserService } from '@/domain/user/user.service';
+import { AuthService } from './auth/auth.service';
+import { RedisCacheModule } from '@/common/redis/redis-cache.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -32,8 +40,22 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         inject: [ConfigService],
       },
     ]),
+    PassportModule.register({
+      defaultStrategy: 'jwt',
+      session: false,
+    }),
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.getOrThrow('JWT_ACCESS_SECRET'),
+        signOptions: {
+          expiresIn: configService.getOrThrow('JWT_ACCESS_EXPIRATION_TIME'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    RedisCacheModule,
   ],
-  controllers: [FileApiController, PostApiController],
+  controllers: [FileApiController, PostApiController, AuthController],
   providers: [
     PrismaService,
     PrismaProvider,
@@ -44,6 +66,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     BlockService,
     PostService,
     TransformationService,
+    ConfigService,
+    AuthService,
+    UserService,
+    JwtStrategy,
+    RefreshTokenService,
   ],
 })
 export class ApiModule {}
