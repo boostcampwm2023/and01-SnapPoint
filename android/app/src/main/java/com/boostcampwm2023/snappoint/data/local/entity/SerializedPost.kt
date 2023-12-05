@@ -10,6 +10,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SerializedPost(
     @PrimaryKey
+    @ColumnInfo(name = "uuid")
+    val uuid: String,
     @ColumnInfo(name = "post")
     val post: PostSummaryState
 )
