@@ -89,7 +89,7 @@ export class JwtAuthGuard implements CanActivate {
 
   async refresh(refreshToken: string): Promise<{ newAccessToken: string; decodedRefreshToken: { uuid: string } }> {
     const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
     });
 
     const refreshTokenEntity = await this.refreshTokenService.findRefreshTokenByUnique({
