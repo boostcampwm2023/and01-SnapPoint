@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.Flow
 interface PostDao {
 
     @Query("SELECT * FROM postTable")
-    fun getAllPosts() : Flow<List<SerializedPost>>
+    fun getAllPosts(): Flow<List<SerializedPost>>
+
+    @Query("SELECT * FROM postTable WHERE uuid == :uuid")
+    fun getPost(uuid: String): Flow<List<SerializedPost>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPost(vararg posts: SerializedPost)

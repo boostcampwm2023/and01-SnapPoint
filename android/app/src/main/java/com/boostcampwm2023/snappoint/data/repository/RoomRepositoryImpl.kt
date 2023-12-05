@@ -20,9 +20,18 @@ class RoomRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun insertPosts(post: PostSummaryState) {
+    override fun getPost(uuid: String): Flow<List<PostSummaryState>> {
+        return localPostDao.getPost(uuid)
+            .map { serializedPosts ->
+                serializedPosts.map { serializedPost ->
+                    serializedPost.post
+                }
+            }
+    }
+
+    override suspend fun insertPosts(postSummaryState: PostSummaryState) {
         localPostDao.insertPost(
-            SerializedPost(post.uuid, post)
+            SerializedPost(postSummaryState.uuid, postSummaryState)
         )
     }
 }
