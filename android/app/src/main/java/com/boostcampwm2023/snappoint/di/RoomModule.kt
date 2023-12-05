@@ -32,10 +32,4 @@ object RoomModule {
     fun providePostDao(postDatabase: PostDatabase): PostDao {
         return postDatabase.getPostDao()
     }
-
-    @Provides
-    @Singleton
-    fun provideRoomRepository(postDao: PostDao): RoomRepository {
-        return RoomRepositoryImpl(postDao)
-    }
 }
