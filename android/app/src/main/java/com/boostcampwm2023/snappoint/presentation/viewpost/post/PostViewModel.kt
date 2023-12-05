@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.viewpost.post
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -28,8 +29,10 @@ class PostViewModel @Inject constructor(
     }
 
     fun onLikeButtonClick() {
-        viewModelScope.launch(Dispatchers.IO){
-            //roomRepository.insertPosts(this)
-        }
+        _event.tryEmit(PostEvent.SavePost)
+    }
+
+    fun saveCurrentPost(title: String, author: String, timeStamp: String, blocks: List<PostBlockState>) {
+
     }
 }
