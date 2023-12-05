@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost.post
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -47,6 +48,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                     PostEvent.SavePost -> {
                         saveCurrentPost()
                     }
+
+                    PostEvent.DeletePost -> {
+                        deleteCurrentPost()
+                    }
                 }
             }
         }
@@ -54,5 +59,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
     private fun saveCurrentPost() {
         postViewModel.saveCurrentPost(viewPostViewModel.post.value)
+    }
+
+    private fun deleteCurrentPost() {
+        postViewModel.deleteCurrentPost(viewPostViewModel.post.value.uuid)
     }
 }
