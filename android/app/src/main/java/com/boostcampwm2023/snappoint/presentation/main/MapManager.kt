@@ -6,7 +6,6 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.boostcampwm2023.snappoint.presentation.util.addImageMarker
 import com.boostcampwm2023.snappoint.presentation.util.getSnapPointBitmap
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
@@ -17,8 +16,6 @@ import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.clustering.Cluster
@@ -26,7 +23,7 @@ import com.google.maps.android.clustering.ClusterManager
 
 class MapManager(private val viewModel: MainViewModel, private val context: Context):
     OnMapReadyCallback,
-    GoogleMap.OnMarkerClickListener,
+//    GoogleMap.OnMarkerClickListener,
     ClusterManager.OnClusterItemClickListener<SnapPointClusterItem>,
     ClusterManager.OnClusterClickListener<SnapPointClusterItem> {
 
@@ -35,7 +32,8 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
     private lateinit var clusterManager: ClusterManager<SnapPointClusterItem>
 
-    var prevSelectedMarker: Marker? = null
+    var prevSelectedCluster: SnapPointClusterItem? = null
+//    var prevSelectedMarker: Marker? = null
     var drawnRoute: Polyline? = null
     var prevSelectedIndex = -1
 
@@ -59,10 +57,10 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         viewModel.onMapReady()
     }
 
-    override fun onMarkerClick(marker: Marker): Boolean {
-        viewModel.onMarkerClicked(marker.tag as SnapPointTag)
-        return true
-    }
+//    override fun onMarkerClick(marker: Marker): Boolean {
+//        viewModel.onMarkerClicked(marker.tag as SnapPointTag)
+//        return true
+//    }
 
     override fun onClusterItemClick(item: SnapPointClusterItem?): Boolean {
         viewModel.onMarkerClicked(item?.getTag() ?: return false)
@@ -74,9 +72,14 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     fun removeFocus() {
-        prevSelectedMarker?.remove()
+//        prevSelectedMarker?.remove()
         drawnRoute?.remove()
         prevSelectedIndex = -1
+
+        if (prevSelectedCluster != null) {
+            clusterManager.removeItem(prevSelectedCluster)
+            clusterManager.cluster()
+        }
     }
 
     fun changeRoute(postBlocks: List<PostBlockState>) {
@@ -109,15 +112,26 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     suspend fun changeSelectedMarker(block: PostBlockState.IMAGE, snapPointTag: SnapPointTag) {
-        prevSelectedMarker?.remove()
-        prevSelectedMarker = googleMap?.addImageMarker(
-            context = context,
-            markerOptions = MarkerOptions().position(block.position.asLatLng()),
-            uri = block.content,
-            tag = snapPointTag,
-            focused = true
-        )
+//        prevSelectedMarker?.remove()
+//        prevSelectedMarker = googleMap?.addImageMarker(
+//            context = context,
+//            markerOptions = MarkerOptions().position(block.position.asLatLng()),
+//            uri = block.content,
+//            tag = snapPointTag,
+//            focused = true
+//        )
 
+        if (prevSelectedCluster != null) clusterManager.removeItem(prevSelectedCluster)
+        val selectedBitmap = getSnapPointBitmap(context, block.content, true)
+        prevSelectedCluster = SnapPointClusterItem(
+            position = block.position.asLatLng(),
+            title = "",
+            snippet = "",
+            tag = snapPointTag,
+            icon = selectedBitmap
+        )
+        clusterManager.addItem(prevSelectedCluster)
+        clusterManager.cluster()
     }
 
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
