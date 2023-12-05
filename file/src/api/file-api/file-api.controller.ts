@@ -6,6 +6,8 @@ import {
   UseGuards,
   Req,
   Inject,
+  ParseFilePipeBuilder,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,10 +24,10 @@ export class FileApiController {
     @Inject('DATA_SERVICE') private readonly client: ClientProxy,
   ) {}
 
-  @Post('/')
+  @Post('/image')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({
-    summary: '파일 업로드 API',
+    summary: '이미지 업로드 API',
     description: '파일을 서버에 업로드하고, 파일의 정보를 받는다.',
   })
   @ApiConsumes('multipart/form-data')
@@ -42,14 +44,26 @@ export class FileApiController {
     },
   })
   @UseGuards(JwtAuthGuard)
-  async upload(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({
+          maxSize: 1024 * 1024 * 2,
+        })
+        .addFileTypeValidator({ fileType: 'image/webp' })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        }),
+    )
+    file: Express.Multer.File,
+    @Req() req: any,
+  ) {
     const uploadedFileDto = await this.uploadService.uploadFile(file);
 
     this.client.emit(
       { cmd: 'create_image_data' },
       { ...uploadedFileDto, userUuid: req.user.uuid },
     );
-
     return uploadedFileDto;
   }
 }
