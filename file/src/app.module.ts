@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UploadModule } from './upload/upload.module';
 import { ApiModule } from './api/api.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -26,7 +24,7 @@ import { JwtStrategy } from '@/common/strategies/jwt.strategy';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  controllers: [],
+  providers: [JwtStrategy],
 })
 export class AppModule {}
