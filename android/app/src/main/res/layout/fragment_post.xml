@@ -119,7 +119,7 @@
             android:layout_gravity="bottom" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_save_current_post"
+            android:id="@+id/fab_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/icon_popular_post"
