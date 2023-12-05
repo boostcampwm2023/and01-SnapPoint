@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.google.android.material.card.MaterialCardView
 
@@ -30,7 +30,7 @@ sealed class BlockItemViewHolder(
         private val blockItemEvent: BlockItemEventListener,
     ) : BlockItemViewHolder(binding, blockItemEvent) {
 
-        fun bind(block: PostBlockState.TEXT, index: Int) {
+        fun bind(block: PostBlockCreationState.TEXT, index: Int) {
             with(binding) {
                 tilText.editText?.setText(block.content)
                 btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
@@ -66,7 +66,7 @@ sealed class BlockItemViewHolder(
         private val blockItemEvent: BlockItemEventListener,
     ) : BlockItemViewHolder(binding, blockItemEvent) {
 
-        fun bind(block: PostBlockState.IMAGE, index: Int) {
+        fun bind(block: PostBlockCreationState.IMAGE, index: Int) {
             with(binding) {
                 tilDescription.editText?.setText(block.content)
                 tilAddress.editText?.setText(block.address)
