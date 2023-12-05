@@ -6,17 +6,17 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 
 class CreatePostListAdapter(
     private val blockItemEvent: BlockItemEventListener
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
-    private var blocks: MutableList<PostBlockState> = mutableListOf()
+    private var blocks: MutableList<PostBlockCreationState> = mutableListOf()
 
     fun getCurrentBlocks() = blocks.toList()
 
-    fun updateBlocks(newBlocks: List<PostBlockState>) {
+    fun updateBlocks(newBlocks: List<PostBlockCreationState>) {
         blocks = newBlocks.toMutableList()
     }
 
@@ -44,9 +44,9 @@ class CreatePostListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (blocks[position]) {
-            is PostBlockState.TEXT -> PostBlockState.ViewType.TEXT.ordinal
-            is PostBlockState.IMAGE -> PostBlockState.ViewType.IMAGE.ordinal
-            is PostBlockState.VIDEO -> PostBlockState.ViewType.VIDEO.ordinal
+            is PostBlockCreationState.TEXT -> PostBlockCreationState.ViewType.TEXT.ordinal
+            is PostBlockCreationState.IMAGE -> PostBlockCreationState.ViewType.IMAGE.ordinal
+            is PostBlockCreationState.VIDEO -> PostBlockCreationState.ViewType.VIDEO.ordinal
         }
     }
 
@@ -72,14 +72,14 @@ class CreatePostListAdapter(
         }
 
         when (viewType) {
-            PostBlockState.ViewType.IMAGE.ordinal -> {
+            PostBlockCreationState.ViewType.IMAGE.ordinal -> {
                 return BlockItemViewHolder.ImageBlockViewHolder(
                     binding = ItemImageBlockBinding.inflate(inflater, parent, false),
                     blockItemEvent = itemEvent
                 )
             }
 
-            PostBlockState.ViewType.VIDEO.ordinal -> {
+            PostBlockCreationState.ViewType.VIDEO.ordinal -> {
                 TODO()
             }
         }
@@ -95,8 +95,8 @@ class CreatePostListAdapter(
 
     override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
         when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.TEXT, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.IMAGE, position)
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockCreationState.TEXT, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockCreationState.IMAGE, position)
         }
     }
 
@@ -113,7 +113,7 @@ class CreatePostListAdapter(
 
 @BindingAdapter("blocks", "blockItemEvent")
 fun RecyclerView.bindRecyclerViewAdapter(
-    blocks: List<PostBlockState>,
+    blocks: List<PostBlockCreationState>,
     blockItemEvent: BlockItemEventListener
 ) {
     if (adapter == null) adapter = CreatePostListAdapter(blockItemEvent)
@@ -140,14 +140,14 @@ fun RecyclerView.bindRecyclerViewAdapter(
                         notifyItemChanged(off)
                     }
                     when (postBlock) {
-                        is PostBlockState.IMAGE -> {
-                            if (postBlock.address != (blocks[index] as PostBlockState.IMAGE).address) {
+                        is PostBlockCreationState.IMAGE -> {
+                            if (postBlock.address != (blocks[index] as PostBlockCreationState.IMAGE).address) {
                                 notifyItemChanged(index)
                             }
                         }
 
-                        is PostBlockState.VIDEO -> {
-                            if (postBlock.address != (blocks[index] as PostBlockState.VIDEO).address) {
+                        is PostBlockCreationState.VIDEO -> {
+                            if (postBlock.address != (blocks[index] as PostBlockCreationState.VIDEO).address) {
                                 notifyItemChanged(index)
                             }
                         }

@@ -8,6 +8,8 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
+import com.boostcampwm2023.snappoint.presentation.model.PostCreationState
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -48,7 +50,7 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun postCreatePost(title: String, postBlocks: List<PostBlockState>): Flow<CreatePostResponse> {
+    override fun postCreatePost(title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse> {
 
         return flowOf(true)
             .map{
@@ -56,7 +58,7 @@ class PostRepositoryImpl @Inject constructor(
                     title = title,
                     postBlocks = postBlocks.map {
                         when (it) {
-                            is PostBlockState.IMAGE -> {
+                            is PostBlockCreationState.IMAGE -> {
                                 val requestBody = it.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
                                 val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
                                 val uploadResult = snapPointApi.postImage(multipartBody)

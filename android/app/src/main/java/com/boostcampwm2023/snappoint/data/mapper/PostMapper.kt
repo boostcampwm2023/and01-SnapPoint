@@ -5,6 +5,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
 import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 
@@ -38,15 +39,15 @@ fun PostBlock.asPostBlockState(): PostBlockState {
     }
 }
 
-fun PostBlockState.asPostBlock(): PostBlock {
+fun PostBlockCreationState.asPostBlock(): PostBlock {
     return when(this){
-        is PostBlockState.TEXT -> {
+        is PostBlockCreationState.TEXT -> {
             PostBlock(
                 type = BlockType.TEXT.type,
                 content = this.content,
             )
         }
-        is PostBlockState.IMAGE -> {
+        is PostBlockCreationState.IMAGE -> {
             PostBlock(
                 content = this.description,
                 type = BlockType.MEDIA.type,
@@ -55,7 +56,7 @@ fun PostBlockState.asPostBlock(): PostBlock {
                 files = listOf(File(fileUuid = "this is file's uuid")),
             )
         }
-        is PostBlockState.VIDEO -> {
+        is PostBlockCreationState.VIDEO -> {
             PostBlock(
                 content = this.description,
                 type = BlockType.MEDIA.type,

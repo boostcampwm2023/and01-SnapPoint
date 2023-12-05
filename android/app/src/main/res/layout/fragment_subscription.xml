@@ -23,6 +23,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <Button
+            android:id="@+id/btn_get_post_in_room"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="저장된 게시글 불러오기"
+            app:layout_constraintTop_toBottomOf="@+id/btn_create_post"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
