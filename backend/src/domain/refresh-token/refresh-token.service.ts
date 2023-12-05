@@ -65,8 +65,8 @@ export class RefreshTokenService {
       uuid: user.uuid,
     };
     return await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION_TIME'),
+      secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      expiresIn: this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRATION_TIME'),
     });
   }
 
@@ -75,15 +75,15 @@ export class RefreshTokenService {
       uuid: user.uuid,
     };
     return await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION_TIME'),
+      secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME'),
     });
   }
 
   async getCurrentRefreshTokenExp(): Promise<Date> {
     const currentDate = new Date();
 
-    const expireTime = this.configService.get<string>('JWT_REFRESH_EXPIRATION_TIME');
+    const expireTime = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME');
 
     if (!expireTime) {
       throw new InternalServerErrorException();

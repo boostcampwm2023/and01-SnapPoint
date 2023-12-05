@@ -3,7 +3,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FileApiService } from './file-api.service';
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { FileService } from '@/domain/file/file.service';
-import { BucketService } from '@/common/bucket.service';
 import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaService } from '@/common/prisma/prisma.service';
@@ -16,10 +15,8 @@ describe('FileApiService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BucketService, PrismaService, PrismaProvider, FileApiService, FileService],
+      providers: [PrismaService, PrismaProvider, FileApiService, FileService],
     })
-      .overrideProvider(BucketService)
-      .useValue(mockDeep<BucketService>())
       .overrideProvider(PrismaProvider)
       .useValue(mockPrismaProvider)
       .overrideProvider(FileService)
