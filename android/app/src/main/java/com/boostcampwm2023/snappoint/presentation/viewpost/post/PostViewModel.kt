@@ -44,11 +44,9 @@ class PostViewModel @Inject constructor(
 
     fun onLikeButtonClick() {
         if(uiState.value.isLikeEnabled) {
-            Log.d("LOG", "DELETE")
             _event.tryEmit(PostEvent.DeletePost)
             _uiState.update { it.copy(isLikeEnabled = false) }
         } else {
-            Log.d("LOG", "INSERT")
             _event.tryEmit(PostEvent.SavePost)
             _uiState.update { it.copy(isLikeEnabled = true) }
         }
@@ -74,14 +72,12 @@ class PostViewModel @Inject constructor(
 
     fun saveCurrentPost(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("LOG", "INSERT: ${post.uuid}")
             roomRepository.insertPosts(post)
         }
     }
 
     fun deleteCurrentPost(uuid: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("LOG", "DELETE: ${uuid}")
             roomRepository.deletePost(uuid)
         }
     }
