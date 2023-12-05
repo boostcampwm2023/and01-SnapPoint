@@ -7,18 +7,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.navigateUp
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.databinding.FragmentSigninBinding
+import com.boostcampwm2023.snappoint.databinding.FragmentSignInBinding
 import com.boostcampwm2023.snappoint.presentation.auth.AuthViewModel
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_signin) {
+class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sign_in) {
 
     private val activityViewModel: AuthViewModel by activityViewModels()
     private val viewModel: SignInViewModel by viewModels()
@@ -66,6 +64,6 @@ class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_sig
     }
 
     private fun navigateToSignup() {
-        findNavController().navigate(SignInFragmentDirections.actionLoginFragmentToSignupFragment())
+        findNavController().navigate(SignInFragmentDirections.actionSignInFragmentToSignUpFragment())
     }
 }

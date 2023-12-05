@@ -7,9 +7,9 @@
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.auth.signin.SignInFragment"
-        android:label="LoginFragment" >
+        android:label="SignInFragment" >
         <action
-            android:id="@+id/action_loginFragment_to_signupFragment"
+            android:id="@+id/action_signInFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
         <action
             android:id="@+id/action_loginFragment_to_mainActivity"
@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.auth.signup.SignupFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.auth.signup.SignUpFragment"
         android:label="SignupFragment" />
     <activity
         android:id="@+id/mainActivity"
