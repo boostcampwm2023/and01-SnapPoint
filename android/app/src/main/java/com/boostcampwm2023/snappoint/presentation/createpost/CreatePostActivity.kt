@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -34,7 +35,16 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
             if (map.containsValue(false).not()) {
                 launchImageSelectionLauncher()
             } else {
-                showToastMessage(R.string.message_permission_denied)
+                showToastMessage(R.string.message_image_permission_denied)
+            }
+        }
+
+    private val videoPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
+            if (map.containsValue(false).not()) {
+                launchVideoSelectionLauncher()
+            } else {
+                showToastMessage(R.string.message_video_permission_denied)
             }
         }
 
@@ -50,6 +60,22 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                 viewModel.addImageBlock(bitmap, position)
 
                 startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
+            }
+        }
+
+    private val videoSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val videoUri = result.data?.data ?: return@registerForActivityResult
+                Log.d("TAG", "videoUri: $videoUri")
+               val inputStream = this.contentResolver.openInputStream(videoUri)
+                    ?: return@registerForActivityResult
+                val position = MetadataUtil.extractLocationFromInputStream(inputStream)
+                    .getOrDefault(PositionState(0.0, 0.0))
+                //val bitmap = resizeBitmap(getBitmapFromUri(this, imageUri), 1280)
+                //viewModel.addImageBlock(bitmap, position)
+
+                //startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
             }
         }
 
@@ -117,7 +143,21 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     }
 
     private fun selectVideo() {
+        val permissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.ACCESS_MEDIA_LOCATION
+            )
 
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_MEDIA_LOCATION
+            )
+
+            else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        getVideoWithPermissionCheck(permissions)
     }
 
     private fun selectImage() {
@@ -147,6 +187,15 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         imageSelectionLauncher.launch(intent)
     }
 
+    private fun launchVideoSelectionLauncher() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.setDataAndType(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            "video/*"
+        )
+        videoSelectionLauncher.launch(intent)
+    }
+
     private fun getImageWithPermissionCheck(permissions: Array<String>) {
         val permissionCheck = permissions.filter {
             ContextCompat.checkSelfPermission(
@@ -157,10 +206,26 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
 
         if (permissionCheck.isNotEmpty()) {
             if (permissionCheck.any { shouldShowRequestPermissionRationale(it) }) {
-                showToastMessage(R.string.message_permission_required)
+                showToastMessage(R.string.message_image_permission_required)
             }
         }
         imagePermissionLauncher.launch(permissions)
+    }
+
+    private fun getVideoWithPermissionCheck(permissions: Array<String>) {
+        val permissionCheck = permissions.filter {
+            ContextCompat.checkSelfPermission(
+                this,
+                it
+            ) == PackageManager.PERMISSION_DENIED
+        }
+
+        if (permissionCheck.isNotEmpty()) {
+            if (permissionCheck.any { shouldShowRequestPermissionRationale(it) }) {
+                showToastMessage(R.string.message_video_permission_required)
+            }
+        }
+        videoPermissionLauncher.launch(permissions)
     }
 
     private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
