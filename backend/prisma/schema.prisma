@@ -68,6 +68,7 @@ model File {
   mimeType    String
   createdAt   DateTime @default(now())
   isDeleted   Boolean  @default(false)
+  isProcessed Boolean  @default(true)
   source      String?
   sourceUuid  String?
 }
