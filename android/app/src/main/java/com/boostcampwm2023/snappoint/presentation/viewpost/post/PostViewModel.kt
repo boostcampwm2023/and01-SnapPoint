@@ -55,22 +55,20 @@ class PostViewModel @Inject constructor(
     }
 
     fun initMarkState(uuid: String) {
-        var isUpdated: Boolean = false
         roomRepository.getPost(uuid)
             .flowOn(Dispatchers.IO)
-            .takeWhile {
-                isUpdated.not()
-            }
             .onEach { post ->
                 _uiState.update {
                     it.copy(
                         isLikeEnabled = post.isNotEmpty()
                     )
                 }
-                isUpdated = true
-            }.catch {
-                isUpdated = true
+            }
+            .catch {
                 Log.d("LOG", "Catch: ${it.message}")
+            }
+            .takeWhile {
+                false
             }.launchIn(viewModelScope)
     }
 
