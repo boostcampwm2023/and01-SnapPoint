@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.model
 
-import android.graphics.Bitmap
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 

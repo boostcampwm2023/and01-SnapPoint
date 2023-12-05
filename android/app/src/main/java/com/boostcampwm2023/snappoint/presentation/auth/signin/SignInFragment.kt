@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sign_in) {
 
-    private val activityViewModel: AuthViewModel by activityViewModels()
     private val viewModel: SignInViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

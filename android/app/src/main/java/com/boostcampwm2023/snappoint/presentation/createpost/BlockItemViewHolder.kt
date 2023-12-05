@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
+import com.boostcampwm2023.snappoint.databinding.ItemVideoBlockBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.google.android.material.card.MaterialCardView
@@ -87,6 +88,44 @@ sealed class BlockItemViewHolder(
                 }
                 editMode = block.isEditMode
                 bitmap = block.bitmap
+            }
+            textWatcher.updatePosition(index)
+        }
+
+        override fun attachTextWatcherToEditText() {
+            binding.tilDescription.editText?.addTextChangedListener(textWatcher)
+        }
+
+        override fun detachTextWatcherFromEditText() {
+            binding.tilDescription.editText?.removeTextChangedListener(textWatcher)
+        }
+    }
+
+    class VideoBlockViewHolder(
+        private val binding: ItemVideoBlockBinding,
+        private val blockItemEvent: BlockItemEventListener,
+    ) : BlockItemViewHolder(binding, blockItemEvent) {
+
+        fun bind(block: PostBlockCreationState.VIDEO, index: Int) {
+            with(binding) {
+                tilDescription.editText?.setText(block.content)
+                tilAddress.editText?.setText(block.address)
+                btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
+                btnEditBlock.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onEditButtonClick(index)
+                }
+                tilAddress.setEndIconOnClickListener { blockItemEvent.onAddressIconClick(index) }
+                btnEditComplete.setOnClickListener { blockItemEvent.onCheckButtonClick(index) }
+                btnUp.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onUpButtonClick(index)
+                }
+                btnDown.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onDownButtonClick(index)
+                }
+                editMode = block.isEditMode
             }
             textWatcher.updatePosition(index)
         }
