@@ -6,12 +6,14 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+import com.boostcampwm2023.snappoint.presentation.util.drawNumberOnSnapPoint
 import com.boostcampwm2023.snappoint.presentation.util.getSnapPointBitmap
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
@@ -20,6 +22,11 @@ import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MapManager(private val viewModel: MainViewModel, private val context: Context):
     OnMapReadyCallback,
@@ -31,6 +38,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         private set
 
     private lateinit var clusterManager: ClusterManager<SnapPointClusterItem>
+    private lateinit var renderer: SnapPointClusterRenderer
 
     var prevSelectedCluster: SnapPointClusterItem? = null
 //    var prevSelectedMarker: Marker? = null
@@ -49,9 +57,10 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         this.googleMap = googleMap
 
         clusterManager = ClusterManager(context, googleMap)
-        SnapPointClusterRenderer(context, googleMap, clusterManager)
+        renderer = SnapPointClusterRenderer(context, googleMap, clusterManager)
         googleMap.setOnCameraIdleListener(clusterManager)
         clusterManager.setOnClusterItemClickListener(this)
+        clusterManager.setOnClusterClickListener(this)
 //        googleMap.setOnMarkerClickListener(this)
 
         viewModel.onMapReady()
@@ -69,7 +78,15 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     override fun onClusterClick(cluster: Cluster<SnapPointClusterItem>?): Boolean {
-        TODO("Not yet implemented")
+        if (cluster == null) return false
+
+        renderer.getMarker(cluster).apply {
+            CoroutineScope(Dispatchers.IO).launch {
+                val selected = drawNumberOnSnapPoint(getSnapPointBitmap(context, cluster.items.random().getContent(), true), cluster.size)
+                withContext(Dispatchers.Main) { setIcon(BitmapDescriptorFactory.fromBitmap(selected)) }
+            }
+        }
+        return true
     }
 
     suspend fun removeFocus() {
