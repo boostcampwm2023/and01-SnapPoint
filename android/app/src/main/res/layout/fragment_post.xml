@@ -118,5 +118,13 @@
             android:layout_height="60dp"
             android:layout_gravity="bottom" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_save_current_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/icon_popular_post"
+            app:layout_anchor="@id/bottomAppBar"
+            />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
