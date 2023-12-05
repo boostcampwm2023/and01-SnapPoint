@@ -54,6 +54,26 @@ class PostViewModel @Inject constructor(
         }
     }
 
+    fun initMarkState(uuid: String) {
+        var isUpdated: Boolean = false
+        roomRepository.getPost(uuid)
+            .flowOn(Dispatchers.IO)
+            .takeWhile {
+                isUpdated.not()
+            }
+            .onEach { post ->
+                _uiState.update {
+                    it.copy(
+                        isLikeEnabled = post.isNotEmpty()
+                    )
+                }
+                isUpdated = true
+            }.catch {
+                isUpdated = true
+                Log.d("LOG", "Catch: ${it.message}")
+            }.launchIn(viewModelScope)
+    }
+
     fun saveCurrentPost(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("LOG", "INSERT: ${post.uuid}")

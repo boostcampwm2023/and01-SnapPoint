@@ -24,6 +24,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
+        initMarkState()
 
         collectViewModelData()
     }
@@ -33,6 +34,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
             vm = postViewModel
             activityVm = viewPostViewModel
         }
+    }
+
+    private fun initMarkState() {
+        postViewModel.initMarkState(viewPostViewModel.post.value.uuid)
     }
 
     private fun collectViewModelData() {
