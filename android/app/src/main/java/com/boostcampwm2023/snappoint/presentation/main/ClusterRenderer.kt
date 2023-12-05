@@ -18,6 +18,7 @@ class SnapPointClusterRenderer(
 
     init {
         clusterManager.renderer = this
+        minClusterSize = 2
     }
 
     override fun onBeforeClusterItemRendered(
