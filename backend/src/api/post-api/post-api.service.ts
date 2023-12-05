@@ -114,7 +114,8 @@ export class PostApiService {
           return this.fileService.updateFile({ where: { uuid }, data: { source, sourceUuid } });
         }),
       );
-      await this.redisService.del(postUuid);
+      await this.redisService.del(`block:${postUuid}`);
+      await this.redisService.del(`file:${postUuid}`);
       return this.findPost(postUuid);
     });
   }
@@ -158,7 +159,8 @@ export class PostApiService {
       );
 
       await this.validation.validateBlocks(blocks, files);
-      await this.redisService.del(uuid);
+      await this.redisService.del(`block:${uuid}`);
+      await this.redisService.del(`file:${uuid}`);
       return this.findPost(uuid);
     });
   }
