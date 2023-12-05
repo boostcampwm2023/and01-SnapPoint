@@ -124,7 +124,7 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/icon_popular_post"
             app:layout_anchor="@id/bottom_app_bar"
-            />
+            android:onClick="@{()->vm.onLikeButtonClick()}" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
