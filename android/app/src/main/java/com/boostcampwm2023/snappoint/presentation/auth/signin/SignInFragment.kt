@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.navigateUp
@@ -22,6 +23,7 @@ class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_sig
 
     private val activityViewModel: AuthViewModel by activityViewModels()
     private val viewModel: SignInViewModel by viewModels()
+    private val navController: NavController by lazy { findNavController() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,12 +62,15 @@ class SignInFragment : BaseFragment<FragmentSigninBinding>(R.layout.fragment_sig
     }
 
     private fun navigateToMainActivity() {
-        findNavController().navigate(SignInFragmentDirections.actionLoginFragmentToMainActivity())
+        navController.navigate(SignInFragmentDirections.actionLoginFragmentToMainActivity())
         requireActivity().finish()
-
     }
 
     private fun navigateToSignup() {
-        findNavController().navigate(SignInFragmentDirections.actionLoginFragmentToSignupFragment())
+        navController.run {
+            if (currentDestination?.id != R.id.signUpFragment) {
+                navigate(R.id.action_loginFragment_to_signupFragment)
+            }
+        }
     }
 }
