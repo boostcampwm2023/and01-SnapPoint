@@ -113,7 +113,7 @@
         </androidx.core.widget.NestedScrollView>
 
         <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
+            android:id="@+id/bottom_app_bar"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_gravity="bottom" />
@@ -123,7 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/icon_popular_post"
-            app:layout_anchor="@id/bottomAppBar"
+            app:layout_anchor="@id/bottom_app_bar"
             />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
