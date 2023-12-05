@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,11 +36,20 @@ class ViewPostViewModel @Inject constructor(
 
     fun loadPost(uuid: String) {
         postRepository.getPost(uuid)
-            .onStart {  }
-            .catch { Log.d("TAG", "loadPost: ${it.message}") }
+            .onStart {
+                _post.update {
+                    it.copy(uuid = uuid)
+                }
+            }
+            .catch {
+                Log.d("TAG", "loadPost: ${it.message}")
+            }
             .onEach { response ->
-                _post.value = response
-            }.launchIn(viewModelScope)
+                _post.update {
+                    response
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun finishPostView() {
