@@ -128,7 +128,7 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun getNicknameErrorCode(nickname: String): Int? {
-        return if (nickname.length > 1) null else R.string.signup_fragment_error_nickname
+        return if (nickname.length > 2) null else R.string.signup_fragment_error_nickname
     }
 
     fun onSignUpButtonClicked() {
