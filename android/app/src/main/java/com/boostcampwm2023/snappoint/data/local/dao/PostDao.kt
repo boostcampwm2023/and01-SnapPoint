@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,4 +19,7 @@ interface PostDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPost(vararg posts: SerializedPost)
+
+    @Query("DELETE FROM postTable WHERE uuid == :uuid")
+    fun deletePost(uuid: String)
 }

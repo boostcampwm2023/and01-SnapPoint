@@ -34,4 +34,8 @@ class RoomRepositoryImpl @Inject constructor(
             SerializedPost(postSummaryState.uuid, postSummaryState)
         )
     }
+
+    override suspend fun deletePost(uuid: String) {
+        localPostDao.deletePost(uuid)
+    }
 }
