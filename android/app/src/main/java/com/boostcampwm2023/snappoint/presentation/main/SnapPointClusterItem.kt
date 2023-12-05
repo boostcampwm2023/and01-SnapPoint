@@ -7,9 +7,8 @@ import com.google.maps.android.clustering.ClusterItem
 
 data class SnapPointClusterItem(
     private val position: LatLng,
-    private val title: String,
-    private val snippet: String,
     private val tag: SnapPointTag,
+    private val content: String,
     private val icon: Bitmap
 ) : ClusterItem {
     override fun getPosition(): LatLng {
@@ -17,15 +16,19 @@ data class SnapPointClusterItem(
     }
 
     override fun getTitle(): String {
-        return title
+        return ""
     }
 
     override fun getSnippet(): String {
-        return snippet
+        return ""
     }
 
     fun getTag(): SnapPointTag {
         return tag
+    }
+
+    fun getContent(): String {
+        return content
     }
 
     fun getIcon(): Bitmap {

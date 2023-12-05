@@ -63,6 +63,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 //    }
 
     override fun onClusterItemClick(item: SnapPointClusterItem?): Boolean {
+        clusterManager.removeItem(item)
         viewModel.onMarkerClicked(item?.getTag() ?: return false)
         return true
     }
@@ -71,15 +72,28 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         TODO("Not yet implemented")
     }
 
-    fun removeFocus() {
+    suspend fun removeFocus() {
 //        prevSelectedMarker?.remove()
         drawnRoute?.remove()
         prevSelectedIndex = -1
 
         if (prevSelectedCluster != null) {
-            clusterManager.removeItem(prevSelectedCluster)
+            val prevSelected = prevSelectedCluster ?: return
+            clusterManager.removeItem(prevSelected)
+            setItemUnfocused(prevSelected)
+            prevSelectedCluster = null
             clusterManager.cluster()
         }
+    }
+
+    private suspend fun setItemUnfocused(selected: SnapPointClusterItem) {
+        val bitmap = getSnapPointBitmap(context, selected.getContent(), false)
+        clusterManager.addItem(SnapPointClusterItem(
+            position = selected.position,
+            tag = selected.getTag(),
+            content = selected.getContent(),
+            icon = bitmap
+        ))
     }
 
     fun changeRoute(postBlocks: List<PostBlockState>) {
@@ -121,13 +135,16 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 //            focused = true
 //        )
 
-        if (prevSelectedCluster != null) clusterManager.removeItem(prevSelectedCluster)
+        if (prevSelectedCluster != null) {
+            val prevSelected = prevSelectedCluster ?: return
+            clusterManager.removeItem(prevSelected)
+            setItemUnfocused(prevSelected)
+        }
         val selectedBitmap = getSnapPointBitmap(context, block.content, true)
         prevSelectedCluster = SnapPointClusterItem(
             position = block.position.asLatLng(),
-            title = "",
-            snippet = "",
             tag = snapPointTag,
+            content = block.content,
             icon = selectedBitmap
         )
         clusterManager.addItem(prevSelectedCluster)
@@ -153,9 +170,8 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                     val snapPoint = getSnapPointBitmap(context, postBlockState.content, false)
                     val clusterItem = SnapPointClusterItem(
                         position = postBlockState.position.asLatLng(),
-                        title = "",
-                        snippet = "",
                         tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                        content = postBlockState.content,
                         icon = snapPoint
                     )
 
