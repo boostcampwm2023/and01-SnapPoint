@@ -56,8 +56,8 @@ class SubscriptionViewModel @Inject constructor(
         _event.tryEmit(SubscriptionEvent.NavigateViewPost(index))
     }
 
-    fun getSavedPost() {
-        roomRepository.getLocalPosts(signInUtil.getEmail())
+    fun getAllPosts() {
+        roomRepository.getAllLocalPost(signInUtil.getEmail())
             .onEach {
                 Log.d("LOG", it.toString())
             }.catch {

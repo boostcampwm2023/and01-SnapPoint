@@ -46,7 +46,7 @@ class SettingViewModel @Inject constructor(
     }
 
     fun getSavedPost() {
-        roomRepository.getLocalPosts(signInUtil.getEmail())
+        roomRepository.getAllLocalPost(signInUtil.getEmail())
             .onEach {
                 Log.d("LOG", it.toString())
             }.catch {

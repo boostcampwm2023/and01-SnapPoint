@@ -11,7 +11,7 @@ class RoomRepositoryImpl @Inject constructor(
     private val localPostDao: PostDao
 ) : RoomRepository {
 
-    override fun getLocalPosts(email: String): Flow<List<PostSummaryState>> {
+    override fun getAllLocalPost(email: String): Flow<List<PostSummaryState>> {
         return localPostDao.getAllPosts(email)
             .map { serializedPosts ->
                 serializedPosts.map { serializedPost ->

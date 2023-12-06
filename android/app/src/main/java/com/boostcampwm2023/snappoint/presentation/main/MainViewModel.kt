@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun loadLocalPost() {
-        roomRepository.getLocalPosts(signInUtil.getEmail())
+        roomRepository.getAllLocalPost(signInUtil.getEmail())
             .onStart {
                 startLoading()
             }
