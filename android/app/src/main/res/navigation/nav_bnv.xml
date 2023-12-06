@@ -40,5 +40,9 @@
         <argument
             android:name="uuid"
             app:argType="string" />
+        <argument
+            android:name="isLocalPost"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </activity>
 </navigation>

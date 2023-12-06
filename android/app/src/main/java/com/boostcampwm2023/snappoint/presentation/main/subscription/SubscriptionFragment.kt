@@ -81,7 +81,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
             if (currentDestination?.id != R.id.viewPostActivity) {
                 navigate(
                     R.id.action_subscriptionFragment_to_viewPostActivity,
-                    bundleOf("uuid" to uuid)
+                    bundleOf("uuid" to uuid, "isLocalPost" to true)
                 )
             }
         }
