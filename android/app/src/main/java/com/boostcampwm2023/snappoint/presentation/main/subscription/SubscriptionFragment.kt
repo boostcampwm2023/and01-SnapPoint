@@ -31,6 +31,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
         loadPostsFromLocal()
 
+        updatePostsUi()
         collectViewModelData()
     }
 
@@ -42,6 +43,16 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
     private fun loadPostsFromLocal() {
         mainViewModel.loadPostsFromLocal()
+    }
+
+    private fun updatePostsUi() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainViewModel.postState.collect { posts ->
+                    viewModel.updatePosts(posts)
+                }
+            }
+        }
     }
 
     private fun collectViewModelData() {
