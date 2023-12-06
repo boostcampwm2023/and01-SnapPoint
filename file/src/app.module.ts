@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '@/common/strategies/jwt.strategy';
+import { HealthModule } from './common/health/health.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { JwtStrategy } from '@/common/strategies/jwt.strategy';
       }),
       inject: [ConfigService],
     }),
+    HealthModule,
   ],
   controllers: [],
   providers: [JwtStrategy],
