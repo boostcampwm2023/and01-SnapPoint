@@ -199,6 +199,13 @@ class MainActivity(
                 }
 
                 launch {
+                    viewModel.uiState.collect {
+                        mapManager.setZoomGesturesEnabled(it.isPreviewFragmentShowing.not())
+                        mapManager.setScrollGesturesEnabled(it.isPreviewFragmentShowing.not())
+                    }
+                }
+
+                launch {
                     viewModel.postState.collect { postState ->
                         while (mapManager.googleMap == null) { delay(100) }
                         mapManager.updateMarkers(postState)

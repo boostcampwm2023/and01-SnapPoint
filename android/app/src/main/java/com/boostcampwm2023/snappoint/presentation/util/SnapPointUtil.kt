@@ -49,7 +49,7 @@ suspend fun getSnapPointBitmap(context: Context, uri: String, focused: Boolean):
         .transformations(CircleCropTransformation())
         .size(200.px())
         .build()
-    val result = ImageLoader(context).execute(request).drawable
+    val result = ImageLoader(context).execute(request).drawable ?: return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
 
     val userImage = (result as BitmapDrawable).bitmap.scale(width = 69.px(), height = 69.px())
     val container = BitmapFactory.decodeResource(

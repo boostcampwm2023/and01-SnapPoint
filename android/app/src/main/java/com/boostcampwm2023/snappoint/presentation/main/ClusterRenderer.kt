@@ -32,12 +32,14 @@ class SnapPointClusterRenderer(
         cluster: Cluster<SnapPointClusterItem>,
         markerOptions: MarkerOptions
     ) {
-        val snapPointWithNumber = drawNumberOnSnapPoint(cluster.items.random().getIcon(), cluster.size)
+        val bitmap = cluster.items.find { it.position == cluster.position }?.getIcon() ?: return
+        val snapPointWithNumber = drawNumberOnSnapPoint(bitmap, cluster.size)
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(snapPointWithNumber))
     }
 
     override fun onClusterUpdated(cluster: Cluster<SnapPointClusterItem>, marker: Marker) {
-        val snapPointWithNumber = drawNumberOnSnapPoint(cluster.items.random().getIcon(), cluster.size)
+        val bitmap = cluster.items.find { it.position == cluster.position }?.getIcon() ?: return
+        val snapPointWithNumber = drawNumberOnSnapPoint(bitmap, cluster.size)
         marker.setIcon(BitmapDescriptorFactory.fromBitmap(snapPointWithNumber))
     }
 }
