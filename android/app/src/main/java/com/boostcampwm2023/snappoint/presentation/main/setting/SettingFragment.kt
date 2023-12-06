@@ -40,7 +40,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
                 startActivity(intent)
             }
             binding.btnGetPostInRoom.setOnClickListener {
-                //viewModel.getSavedPost()
+                viewModel.getSavedPost()
             }
         }
     }

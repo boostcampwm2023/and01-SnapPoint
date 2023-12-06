@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.main.setting
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.data.repository.SignInRepository
 import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val signInUtil: SignInUtil,
-    private val loginRepository: SignInRepository
+    private val loginRepository: SignInRepository,
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
 
     private val _event: MutableSharedFlow<SettingEvent> = MutableSharedFlow(
@@ -41,5 +43,14 @@ class SettingViewModel @Inject constructor(
 
     fun onClearSnapPointClick() {
         _event.tryEmit(SettingEvent.RemoveSnapPoint)
+    }
+
+    fun getSavedPost() {
+        roomRepository.getLocalPosts(signInUtil.getEmail())
+            .onEach {
+                Log.d("LOG", it.toString())
+            }.catch {
+                Log.d("LOG", "Catch: ${it.message}}")
+            }.launchIn(viewModelScope)
     }
 }
