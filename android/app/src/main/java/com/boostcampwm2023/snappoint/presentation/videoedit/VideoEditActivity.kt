@@ -4,6 +4,8 @@ import android.graphics.Rect
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
+import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -17,6 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activity_video_edit) {
 
+    private val viewModel: VideoEditViewModel by viewModels()
+
     private var index = 0
     private lateinit var uri: Uri
 
@@ -24,6 +28,8 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
         super.onCreate(savedInstanceState)
 
         getIntentExtra()
+
+        initBinding()
 
 
         val mediaItem = MediaItem.fromUri(uri)
@@ -35,6 +41,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             it.setMediaItem(mediaItem)
             it.prepare()
         }
+
         binding.pv.useController = false
 
         binding.btnCancel.setOnClickListener {
@@ -44,6 +51,12 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             binding.pv.player?.seekTo(0)
         }
 
+    }
+
+    private fun initBinding() {
+        with(binding){
+            vm = viewModel
+        }
     }
 
     private fun getIntentExtra() {

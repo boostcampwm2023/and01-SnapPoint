@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.videoedit.VideoEditViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +37,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_cancel"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toTopOf="parent"/>
+
+        <com.boostcampwm2023.snappoint.presentation.videoedit.TimeLineView
+            android:id="@+id/tlv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:leftThumbMoved = "@{() -> vm.onLeftThumbMoved(Long)}"
+            app:rightThumbMoved = "@{() -> vm.onRightThumbMoved(Long)}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
