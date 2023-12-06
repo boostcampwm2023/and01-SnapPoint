@@ -55,13 +55,4 @@ class SubscriptionViewModel @Inject constructor(
     private fun viewPostButtonClicked(index: Int) {
         _event.tryEmit(SubscriptionEvent.NavigateViewPost(index))
     }
-
-    fun getAllPosts() {
-        roomRepository.getAllLocalPost(signInUtil.getEmail())
-            .onEach {
-                Log.d("LOG", it.toString())
-            }.catch {
-                Log.d("LOG", "Catch: ${it.message}}")
-            }.launchIn(viewModelScope)
-    }
 }
