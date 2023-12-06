@@ -37,4 +37,12 @@
             android:name="uuid"
             app:argType="string" />
     </activity>
+    <fragment
+        android:id="@+id/clusterListFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.clusterlist.ClusterListFragment"
+        android:label="ClusterListFragment" >
+        <argument
+            android:name="tags"
+            app:argType="com.boostcampwm2023.snappoint.presentation.model.SnapPointTag[]" />
+    </fragment>
 </navigation>

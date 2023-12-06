@@ -39,6 +39,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     private lateinit var renderer: SnapPointClusterRenderer
 
     var prevSelectedMarker: SnapPointClusterItem? = null
+    var prevSelectedCluster: Cluster<SnapPointClusterItem>? = null
     var drawnRoute: Polyline? = null
     var prevSelectedIndex = -1
 
@@ -70,6 +71,9 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     override fun onClusterClick(cluster: Cluster<SnapPointClusterItem>?): Boolean {
         if (cluster == null) return false
 
+        setClusterUnfocused(prevSelectedCluster)
+
+        prevSelectedCluster = cluster
         renderer.getMarker(cluster).apply {
             CoroutineScope(Dispatchers.IO).launch {
                 val url = cluster.items.find { it.position == cluster.position }?.getContent() ?: return@launch
@@ -77,6 +81,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                 withContext(Dispatchers.Main) { setIcon(BitmapDescriptorFactory.fromBitmap(selected)) }
             }
         }
+        viewModel.onClusterClicked(cluster.items.map { it.getTag() })
         return true
     }
 
@@ -86,17 +91,34 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
         if (prevSelectedMarker != null) {
             val prevSelected = prevSelectedMarker ?: return
-            setItemFocused(prevSelected)
+            setItemUnfocused(prevSelected)
             prevSelectedMarker = null
             clusterManager.cluster()
         }
+
+        setClusterUnfocused(prevSelectedCluster)
     }
 
-    private suspend fun setItemFocused(selected: SnapPointClusterItem) {
+    private suspend fun setItemUnfocused(selected: SnapPointClusterItem) {
         val bitmap = getSnapPointBitmap(context, selected.getContent(), false)
         clusterManager.markerCollection.markers.find { it.position == selected.position }?.setIcon(
             BitmapDescriptorFactory.fromBitmap(bitmap)
         )
+    }
+
+    private fun setClusterUnfocused(selected: Cluster<SnapPointClusterItem>?) {
+        if (selected != null) {
+            renderer.getMarker(selected).apply {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val url = selected.items.find { it.position == selected.position }?.getContent()
+                        ?: return@launch
+                    val bitmap = drawNumberOnSnapPoint(getSnapPointBitmap(context, url, false), selected.size)
+                    withContext(Dispatchers.Main) {
+                        setIcon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                    }
+                }
+            }
+        }
     }
 
     fun changeRoute(postBlocks: List<PostBlockState>) {
@@ -132,7 +154,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
         if (prevSelectedMarker != null) {
             val prevSelected = prevSelectedMarker ?: return
-            setItemFocused(prevSelected)
+            setItemUnfocused(prevSelected)
         }
         val selectedBitmap = getSnapPointBitmap(context, block.content, true)
         clusterManager.markerCollection.markers.find { it.position == block.position.asLatLng() }?.setIcon(

@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
@@ -177,6 +178,11 @@ class MainActivity(
                             is MainActivityEvent.GetAroundPostFailed -> {
                                 showToastMessage(R.string.get_around_posts_failed)
                             }
+
+                            is MainActivityEvent.NavigateCluster -> {
+                                val bundle = bundleOf("tags" to event.tags.toTypedArray())
+                                openClusterListFragment(bundle)
+                            }
                         }
                     }
                 }
@@ -202,6 +208,9 @@ class MainActivity(
                     viewModel.uiState.collect {
                         mapManager.setZoomGesturesEnabled(it.isPreviewFragmentShowing.not())
                         mapManager.setScrollGesturesEnabled(it.isPreviewFragmentShowing.not())
+                        if (!it.isPreviewFragmentShowing) {
+                            mapManager.removeFocus()
+                        }
                     }
                 }
 
@@ -289,9 +298,7 @@ class MainActivity(
         binding.bnv.setOnItemSelectedListener { menuItem ->
             navController.popBackStack()
             navController.navigate(menuItem.itemId)
-            if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            }
+            halfOpenBottomSheetWhenCollapsed()
             true
         }
     }
@@ -305,6 +312,11 @@ class MainActivity(
     private fun openPreviewFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         navController.navigate(R.id.previewFragment)
+    }
+
+    private fun openClusterListFragment(bundle: Bundle) {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        navController.navigate(R.id.clusterListFragment, bundle)
     }
 
     private fun navigateAuthActivity() {

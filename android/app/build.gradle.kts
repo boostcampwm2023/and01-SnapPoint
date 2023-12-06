@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hiltAndroid)
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("kotlin-parcelize")
 
     kotlin("plugin.serialization") version "1.9.0"
 
