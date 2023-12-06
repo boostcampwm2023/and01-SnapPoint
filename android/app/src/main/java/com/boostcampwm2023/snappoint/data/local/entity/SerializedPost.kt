@@ -12,6 +12,8 @@ data class SerializedPost(
     @PrimaryKey
     @ColumnInfo(name = "uuid")
     val uuid: String,
+    @ColumnInfo(name = "email")
+    val email: String,
     @ColumnInfo(name = "post")
     val post: PostSummaryState
 )
