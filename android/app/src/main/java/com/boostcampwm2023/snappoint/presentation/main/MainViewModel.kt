@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
@@ -31,7 +30,7 @@ class MainViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val roomRepository: RoomRepository,
     private val signInUtil: SignInUtil
-) :ViewModel(){
+) : ViewModel() {
 
     private val _postState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
     val postState: StateFlow<List<PostSummaryState>> = _postState.asStateFlow()
@@ -58,7 +57,6 @@ class MainViewModel @Inject constructor(
     var bottomSheetHeight: Int = 0
 
     fun loadPosts(leftBottom: String, rightTop: String) {
-
         postRepository.getAroundPost(leftBottom, rightTop)
             .onStart { startLoading() }
             .catch { _event.tryEmit(MainActivityEvent.GetAroundPostFailed) }
@@ -69,7 +67,7 @@ class MainViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun loadPostsFromLocal() {
+    fun loadLocalPost() {
         roomRepository.getLocalPosts(signInUtil.getEmail())
             .onStart {
                 startLoading()
@@ -119,7 +117,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateSelectedIndex(index: Int){
+    private fun updateSelectedIndex(index: Int) {
         _markerState.value = MarkerUiState(
             selectedIndex = index,
             focusedIndex = 0
@@ -153,13 +151,11 @@ class MainViewModel @Inject constructor(
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }
 
-    fun startLoading() {
-        Log.d("LOG", "HERE~")
+    private fun startLoading() {
         _uiState.update { it.copy(isLoading = true) }
     }
 
-    fun finishLoading() {
-        Log.d("LOG", "HEREHEREHERE")
+    private fun finishLoading() {
         _uiState.update { it.copy(isLoading = false) }
     }
 

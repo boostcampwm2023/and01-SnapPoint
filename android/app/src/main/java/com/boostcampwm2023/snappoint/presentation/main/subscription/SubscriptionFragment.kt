@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main.subscription
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
@@ -43,7 +44,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     }
 
     private fun loadPostsFromLocal() {
-        mainViewModel.loadPostsFromLocal()
+        mainViewModel.loadLocalPost()
     }
 
     private fun updatePostsUi() {
