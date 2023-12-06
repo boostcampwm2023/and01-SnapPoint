@@ -11,15 +11,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PostDao {
 
-    @Query("SELECT * FROM postTable")
-    fun getAllPosts(): Flow<List<SerializedPost>>
+    @Query("SELECT * FROM postTable WHERE email = :email")
+    fun getAllPosts(email: String): Flow<List<SerializedPost>>
 
-    @Query("SELECT * FROM postTable WHERE uuid == :uuid")
-    fun getPost(uuid: String): Flow<List<SerializedPost>>
+    @Query("SELECT * FROM postTable WHERE uuid == :uuid & email == :email")
+    fun getPost(uuid: String, email: String): Flow<List<SerializedPost>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPost(vararg posts: SerializedPost)
 
-    @Query("DELETE FROM postTable WHERE uuid == :uuid")
-    fun deletePost(uuid: String)
+    @Query("DELETE FROM postTable WHERE uuid == :uuid & email == :email")
+    fun deletePost(uuid: String, email: String)
 }

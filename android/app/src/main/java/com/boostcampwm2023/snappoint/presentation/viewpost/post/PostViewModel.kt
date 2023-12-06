@@ -55,7 +55,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun initMarkState(uuid: String) {
-        roomRepository.getPost(uuid)
+        roomRepository.getPost(uuid, signInUtil.getEmail())
             .flowOn(Dispatchers.IO)
             .onEach { post ->
                 _uiState.update {
@@ -80,7 +80,7 @@ class PostViewModel @Inject constructor(
 
     fun deleteCurrentPost(uuid: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.deletePost(uuid)
+            roomRepository.deletePost(uuid, signInUtil.getEmail())
         }
     }
 }

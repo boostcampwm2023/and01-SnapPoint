@@ -11,8 +11,8 @@ class RoomRepositoryImpl @Inject constructor(
     private val localPostDao: PostDao
 ) : RoomRepository {
 
-    override fun getLocalPosts(): Flow<List<PostSummaryState>> {
-        return localPostDao.getAllPosts()
+    override fun getLocalPosts(email: String): Flow<List<PostSummaryState>> {
+        return localPostDao.getAllPosts(email)
             .map { serializedPosts ->
                 serializedPosts.map { serializedPost ->
                     serializedPost.post
@@ -20,8 +20,8 @@ class RoomRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun getPost(uuid: String): Flow<List<PostSummaryState>> {
-        return localPostDao.getPost(uuid)
+    override fun getPost(uuid: String, email: String): Flow<List<PostSummaryState>> {
+        return localPostDao.getPost(uuid, email)
             .map { serializedPosts ->
                 serializedPosts.map { serializedPost ->
                     serializedPost.post
@@ -35,7 +35,7 @@ class RoomRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun deletePost(uuid: String) {
-        localPostDao.deletePost(uuid)
+    override suspend fun deletePost(uuid: String, email: String) {
+        localPostDao.deletePost(uuid, email)
     }
 }

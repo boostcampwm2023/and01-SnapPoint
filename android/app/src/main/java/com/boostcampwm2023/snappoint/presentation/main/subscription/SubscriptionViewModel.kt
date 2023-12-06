@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -12,11 +13,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SubscriptionViewModel @Inject constructor(
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val signInUtil: SignInUtil
 ) : ViewModel() {
 
     fun getSavedPost() {
-        roomRepository.getLocalPosts()
+        roomRepository.getLocalPosts(signInUtil.getEmail())
             .onEach {
                 Log.d("LOG", it.toString())
             }.catch {
