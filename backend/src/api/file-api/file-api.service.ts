@@ -1,8 +1,7 @@
 import { FileService } from '@/domain/file/file.service';
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { FileDto } from './dto/file.dto';
 import { File } from '@prisma/client';
-import { AttachFileDto } from './dto/attach-file.dto';
 import { CreateFileDataDto } from './dto/create-file-data.dto';
 import { ApplyProcessFileDto } from './dto/apply-process-file.dto';
 
@@ -43,20 +42,5 @@ export class FileApiService {
     const files = await this.fileService.findFiles({ where: { userUuid } });
 
     return files.map((file) => FileDto.of(file));
-  }
-
-  async attachFile(uuid: string, userUuid: string, attachFileDto: AttachFileDto): Promise<FileDto> {
-    const file = await this.accessFile(uuid, userUuid);
-
-    if (file.sourceUuid) {
-      throw new ConflictException('The file has been already attached with other resource.');
-    }
-
-    return this.fileService.updateFile({ where: { uuid }, data: attachFileDto });
-  }
-
-  async deleteFile(uuid: string, userUuid: string): Promise<FileDto> {
-    const file = await this.accessFile(uuid, userUuid);
-    return this.fileService.deleteFile({ uuid: file.uuid });
   }
 }
