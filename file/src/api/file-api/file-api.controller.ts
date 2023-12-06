@@ -14,7 +14,14 @@ import {
 } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { UploadService } from '@/upload/upload.service';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
@@ -78,7 +85,13 @@ export class FileApiController {
     summary: '동영상 업로드 시작 API',
     description: '업로드에 필요한 업로드 ID, key를 응답받는다.',
   })
-  @ApiBody({
+  @ApiQuery({
+    name: 'contentType',
+    type: 'string',
+    required: true,
+    description: '최종 저장할 mimeType',
+  })
+  @ApiOkResponse({
     schema: {
       type: 'object',
       properties: {
@@ -98,6 +111,9 @@ export class FileApiController {
     description: '업로드에 필요한 업로드 URL 응답받는다.',
   })
   @ApiBody({
+    type: UploadFileURLDto,
+  })
+  @ApiOkResponse({
     schema: {
       type: 'object',
       properties: {
@@ -120,6 +136,9 @@ export class FileApiController {
     description: '동영상 업로드를 종료한다.',
   })
   @ApiBody({
+    type: UploadFileEndDto,
+  })
+  @ApiOkResponse({
     schema: {
       type: 'object',
       properties: {
@@ -140,6 +159,9 @@ export class FileApiController {
   @ApiOperation({
     summary: '동영상 업로드 종료 API',
     description: '동영상 업로드를 종료한다.',
+  })
+  @ApiBody({
+    type: UploadFileAbortDto,
   })
   @UseGuards(JwtAuthGuard)
   async uploadFilePartAbort(@Body() uploadFileAbortDto: UploadFileAbortDto) {
