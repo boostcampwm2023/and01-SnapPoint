@@ -14,12 +14,12 @@ interface PostDao {
     @Query("SELECT * FROM postTable WHERE email = :email")
     fun getAllPosts(email: String): Flow<List<SerializedPost>>
 
-    @Query("SELECT * FROM postTable WHERE uuid == :uuid & email == :email")
+    @Query("SELECT * FROM postTable WHERE uuid == :uuid AND email == :email")
     fun getPost(uuid: String, email: String): Flow<List<SerializedPost>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPost(vararg posts: SerializedPost)
 
-    @Query("DELETE FROM postTable WHERE uuid == :uuid & email == :email")
+    @Query("DELETE FROM postTable WHERE uuid == :uuid AND email == :email")
     fun deletePost(uuid: String, email: String)
 }
