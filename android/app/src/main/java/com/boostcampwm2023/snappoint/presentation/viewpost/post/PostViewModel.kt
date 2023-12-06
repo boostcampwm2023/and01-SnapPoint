@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -26,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val signInUtil: SignInUtil
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState())
@@ -72,7 +74,7 @@ class PostViewModel @Inject constructor(
 
     fun saveCurrentPost(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.insertPosts(post)
+            roomRepository.insertPosts(post, signInUtil.getEmail())
         }
     }
 

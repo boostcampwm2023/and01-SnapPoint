@@ -29,9 +29,9 @@ class RoomRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun insertPosts(postSummaryState: PostSummaryState) {
+    override suspend fun insertPosts(postSummaryState: PostSummaryState, email: String) {
         localPostDao.insertPost(
-            SerializedPost(postSummaryState.uuid, postSummaryState)
+            SerializedPost(postSummaryState.uuid, email, postSummaryState)
         )
     }
 
