@@ -23,7 +23,7 @@ object RoomModule {
         return Room.databaseBuilder(
             context,
             PostDatabase::class.java,
-            "database1"
+            "database2"
         ).build()
     }
 
