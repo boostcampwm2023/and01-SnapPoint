@@ -29,6 +29,8 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
         initBinding()
 
+        loadPostsFromLocal()
+
         collectViewModelData()
     }
 
@@ -36,6 +38,10 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
         with(binding) {
             vm = viewModel
         }
+    }
+
+    private fun loadPostsFromLocal() {
+        mainViewModel.loadPostsFromLocal()
     }
 
     private fun collectViewModelData() {

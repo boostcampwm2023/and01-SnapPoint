@@ -1,11 +1,14 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,12 +22,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val roomRepository: RoomRepository,
+    private val signInUtil: SignInUtil
 ) :ViewModel(){
 
     private val _postState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
@@ -63,7 +69,25 @@ class MainViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    // TODO DataStore 확인을 위한 임시 코드
+    fun loadPostsFromLocal() {
+        roomRepository.getLocalPosts(signInUtil.getEmail())
+            .onStart {
+                startLoading()
+            }
+            .catch {
+                _event.tryEmit(MainActivityEvent.GetAroundPostFailed)
+            }
+            .onEach { posts ->
+                _postState.update { posts }
+                _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
+            }
+            .takeWhile {
+                false
+            }
+            .launchIn(viewModelScope)
+        finishLoading()
+    }
+
     fun clearPosts() {
         _postState.update {
             listOf()
@@ -130,10 +154,12 @@ class MainViewModel @Inject constructor(
     }
 
     fun startLoading() {
+        Log.d("LOG", "HERE~")
         _uiState.update { it.copy(isLoading = true) }
     }
 
     fun finishLoading() {
+        Log.d("LOG", "HEREHEREHERE")
         _uiState.update { it.copy(isLoading = false) }
     }
 
