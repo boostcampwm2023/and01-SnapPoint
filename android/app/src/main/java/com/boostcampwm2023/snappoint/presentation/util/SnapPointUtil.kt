@@ -23,25 +23,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 val clusterTextSize = CLUSTER_TEXT_SIZE.pxFloat()
 val clusterCircleRadius = (CLUSTER_TEXT_SIZE / 2 + 1).pxFloat()
 
-suspend fun GoogleMap.addImageMarker(
-    context: Context,
-    markerOptions: MarkerOptions,
-    uri: String,
-    tag: SnapPointTag,
-    focused: Boolean,
-): Marker? {
-
-    val snapPoint = getSnapPointBitmap(context, uri, focused)
-
-    return this.addMarker(markerOptions.icon(
-        BitmapDescriptorFactory.fromBitmap(
-            snapPoint
-        )
-    )).apply {
-        this?.tag = tag
-    }
-}
-
 suspend fun getSnapPointBitmap(context: Context, uri: String, focused: Boolean): Bitmap {
     val request = ImageRequest.Builder(context)
         .data(uri)

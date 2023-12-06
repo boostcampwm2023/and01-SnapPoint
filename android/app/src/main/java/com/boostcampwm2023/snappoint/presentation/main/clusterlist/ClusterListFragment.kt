@@ -3,14 +3,19 @@ package com.boostcampwm2023.snappoint.presentation.main.clusterlist
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentClusterListBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ClusterListFragment : BaseFragment<FragmentClusterListBinding>(R.layout.fragment_cluster_list) {
 
+    private val clusterListViewModel: ClusterListViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val args: ClusterListFragmentArgs by navArgs()
 
@@ -21,6 +26,9 @@ class ClusterListFragment : BaseFragment<FragmentClusterListBinding>(R.layout.fr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initBinding()
+        updatePost()
     }
 
     override fun onDestroy() {
@@ -28,5 +36,22 @@ class ClusterListFragment : BaseFragment<FragmentClusterListBinding>(R.layout.fr
         mainViewModel.onPreviewFragmentClosing()
     }
 
+    private fun initBinding() {
+        with(binding) {
+            vm = clusterListViewModel
+            root.post {
+                rcvClusterList.layoutParams.height =
+                    mainViewModel.bottomSheetHeight - glTop.top
+            }
+        }
+    }
 
+    private fun updatePost() {
+        val posts = mainViewModel.postState.value
+        val list = mutableListOf<PostBlockState>()
+        args.tags.forEach {
+            list.add(posts[it.postIndex].postBlocks[it.snapPointIndex])
+        }
+        clusterListViewModel.updatePostList(list.toList())
+    }
 }

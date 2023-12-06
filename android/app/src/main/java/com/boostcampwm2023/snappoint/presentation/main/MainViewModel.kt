@@ -6,7 +6,6 @@ import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.google.maps.android.clustering.Cluster
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

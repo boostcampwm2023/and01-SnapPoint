@@ -109,6 +109,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     private fun setClusterUnfocused(selected: Cluster<SnapPointClusterItem>?) {
         if (selected != null) {
             renderer.getMarker(selected).apply {
+                if (this == null) return
                 CoroutineScope(Dispatchers.IO).launch {
                     val url = selected.items.find { it.position == selected.position }?.getContent()
                         ?: return@launch
