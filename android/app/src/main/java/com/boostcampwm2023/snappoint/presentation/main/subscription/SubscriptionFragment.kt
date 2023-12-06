@@ -32,14 +32,13 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
         initBinding()
 
-        loadPostsFromLocal()
-
         updatePostsUi()
         collectViewModelData()
     }
 
     override fun onResume() {
         super.onResume()
+        loadPostsFromLocal()
         isViewPostOpened = false
     }
 
