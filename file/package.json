@@ -34,6 +34,7 @@
     "amqplib": "^0.10.3",
     "aws-sdk": "2.348.0",
     "axios": "^1.6.2",
+    "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
