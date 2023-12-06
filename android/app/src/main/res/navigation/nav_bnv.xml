@@ -24,7 +24,11 @@
     <fragment
         android:id="@+id/subscriptionFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.main.subscription.SubscriptionFragment"
-        android:label="SubscriptionFragment" />
+        android:label="SubscriptionFragment" >
+        <action
+            android:id="@+id/action_subscriptionFragment_to_viewPostActivity"
+            app:destination="@id/viewPostActivity" />
+    </fragment>
     <fragment
         android:id="@+id/previewFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.main.preview.PreviewFragment"

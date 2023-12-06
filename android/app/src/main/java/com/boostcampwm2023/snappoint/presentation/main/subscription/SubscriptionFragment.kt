@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.presentation.main.subscription
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -13,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSubscriptionBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
-import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -77,6 +75,6 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
     private fun navigateToViewPost(uuid: String) {
         val bundle = bundleOf("uuid" to uuid)
-        //findNavController().navigate(R.id.action_subscriptionFragment_to_viewPostActivity)
+        findNavController().navigate(R.id.action_subscriptionFragment_to_viewPostActivity, bundle)
     }
 }
