@@ -1,6 +1,12 @@
 import { ImageService } from './image.service';
 import { Controller, Inject, Logger } from '@nestjs/common';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  ClientProxy,
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 import { ResizeImageDto } from './dtos/resize-image.dto';
 
 @Controller()
@@ -11,10 +17,19 @@ export class ImageController {
   ) {}
 
   @MessagePattern({ cmd: 'process_image' })
-  async processImage(@Payload() resizeImageDto: ResizeImageDto) {
+  async processImage(
+    @Payload() resizeImageDto: ResizeImageDto,
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
     Logger.debug(`Process ${resizeImageDto.uuid}`);
     await this.imageService.resizeImage(resizeImageDto);
-    return this.client.emit(
+
+    channel.ack(originalMsg);
+
+    this.client.emit(
       { cmd: 'process_image_data' },
       { uuid: resizeImageDto.uuid },
     );

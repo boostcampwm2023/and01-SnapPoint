@@ -13,6 +13,8 @@ async function bootstrap() {
       urls: [configService.getOrThrow<string>('RMQ_HOST')],
       queue: configService.getOrThrow<string>('RMQ_QUEUE'),
       queueOptions: { durable: true },
+      noAck: false,
+      prefetchCount: 1,
     },
   });
   await app.listen();
