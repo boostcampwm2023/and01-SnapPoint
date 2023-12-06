@@ -72,13 +72,13 @@ class PostViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun saveCurrentPost(post: PostSummaryState) {
+    fun saveCurrentPostToLocal(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
             roomRepository.insertPosts(post, signInUtil.getEmail())
         }
     }
 
-    fun deleteCurrentPost(uuid: String) {
+    fun deleteCurrentPostFromLocal(uuid: String) {
         viewModelScope.launch(Dispatchers.IO) {
             roomRepository.deletePost(uuid, signInUtil.getEmail())
         }

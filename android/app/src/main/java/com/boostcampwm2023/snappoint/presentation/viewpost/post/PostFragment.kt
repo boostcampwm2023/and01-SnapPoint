@@ -51,22 +51,22 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                     }
 
                     PostEvent.SavePost -> {
-                        saveCurrentPost()
+                        saveCurrentPostToLocal()
                     }
 
                     PostEvent.DeletePost -> {
-                        deleteCurrentPost()
+                        deleteCurrentPostFromLocal()
                     }
                 }
             }
         }
     }
 
-    private fun saveCurrentPost() {
-        postViewModel.saveCurrentPost(viewPostViewModel.post.value)
+    private fun saveCurrentPostToLocal() {
+        postViewModel.saveCurrentPostToLocal(viewPostViewModel.post.value)
     }
 
-    private fun deleteCurrentPost() {
-        postViewModel.deleteCurrentPost(viewPostViewModel.post.value.uuid)
+    private fun deleteCurrentPostFromLocal() {
+        postViewModel.deleteCurrentPostFromLocal(viewPostViewModel.post.value.uuid)
     }
 }
