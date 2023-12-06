@@ -25,7 +25,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private val navController: NavController by lazy { findNavController() }
-    private var isOnResume: Boolean = false
+    private var isViewPostOpened: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,7 +40,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
     override fun onResume() {
         super.onResume()
-        isOnResume = true
+        isViewPostOpened = false
     }
 
     private fun initBinding() {
@@ -85,8 +85,8 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
     private fun navigateToViewPost(uuid: String) {
         navController.run {
-            if (currentDestination?.id != R.id.viewPostActivity && isOnResume) {
-                isOnResume = false
+            if (currentDestination?.id != R.id.viewPostActivity && isViewPostOpened.not()) {
+                isViewPostOpened = true
                 navigate(
                     R.id.action_subscriptionFragment_to_viewPostActivity,
                     bundleOf("uuid" to uuid, "isLocalPost" to true)
