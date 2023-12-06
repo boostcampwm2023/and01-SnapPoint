@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSubscriptionBinding
@@ -21,6 +22,8 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
     private val viewModel: SubscriptionViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    private val navController: NavController by lazy { findNavController() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -74,7 +77,13 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     }
 
     private fun navigateToViewPost(uuid: String) {
-        val bundle = bundleOf("uuid" to uuid)
-        findNavController().navigate(R.id.action_subscriptionFragment_to_viewPostActivity, bundle)
+        navController.run {
+            if (currentDestination?.id != R.id.viewPostActivity) {
+                navigate(
+                    R.id.action_subscriptionFragment_to_viewPostActivity,
+                    bundleOf("uuid" to uuid)
+                )
+            }
+        }
     }
 }
