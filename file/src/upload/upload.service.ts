@@ -1,8 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { BucketService } from './storages/bucket.service';
 import { randomUUID } from 'crypto';
 import { UploadedFileDto } from './dtos/uploaded-file.dto';
-import { UploadedFileFieldDto } from './dtos/uploaded-file-field.dto';
+import { UploadFileURLDto } from './dtos/upload-file-url.dto';
+import { UploadFileEndDto } from './dtos/upload-file-end.dto';
+import { UploadFileAbortDto } from './dtos/upload-file-abort.dto';
+import { UploadFileStartResponseDto } from './dtos/upload-file-start.response.dto';
+import { UploadFileEndResponsetDto } from './dtos/upload-file-end.response.dto';
 
 @Injectable()
 export class UploadService {
@@ -20,23 +28,51 @@ export class UploadService {
     });
   }
 
-  async uploadFileField(files: {
-    image: Express.Multer.File[];
-    video: Express.Multer.File[];
-  }): Promise<UploadedFileFieldDto> {
-    if (!files.image || !files.video) {
-      throw new BadRequestException('이미지 혹은 영상이 존재하지 않습니다.');
+  async uploadVideoStart(contentType: string) {
+    const fileUuid = randomUUID();
+    const filePart = await this.bucketService.createMultipartUpload(
+      fileUuid,
+      contentType,
+    );
+
+    if (!filePart.Key || !filePart.UploadId) {
+      throw new InternalServerErrorException('파일 저장 시작에 실패했습니다.');
     }
-    if (files.image.length !== 1 || files.video.length !== 1) {
-      throw new BadRequestException('파일의 개수가 1개가 아닙니다.');
+
+    return UploadFileStartResponseDto.of(filePart.Key, filePart.UploadId);
+  }
+
+  async getPresignedUrl(uploadFileURLDto: UploadFileURLDto) {
+    const presignedUrl = await this.bucketService.getPresignedUrl(
+      uploadFileURLDto.key,
+      uploadFileURLDto.uploadId,
+      uploadFileURLDto.partNumber,
+    );
+
+    return {
+      presignedUrl: presignedUrl,
+    };
+  }
+
+  async uploadFilePartComplete(uploadFilePartDto: UploadFileEndDto) {
+    const { key, uploadId, parts, mimeType } = uploadFilePartDto;
+
+    const completeUpload = await this.bucketService.completeMultipartUpload(
+      key,
+      uploadId,
+      parts,
+    );
+
+    if (!completeUpload.Location) {
+      throw new NotFoundException('파일의 경로가 존재하지 않습니다.');
     }
 
-    const image = files.image[0];
-    const video = files.video[0];
+    return UploadFileEndResponsetDto.of(key, completeUpload.Location, mimeType);
+  }
 
-    const imageDto = await this.uploadFile(image);
-    const videoDto = await this.uploadFile(video);
+  async uploadFilePartAbort(uploadFileAbortDto: UploadFileAbortDto) {
+    const { uploadId, key } = uploadFileAbortDto;
 
-    return UploadedFileFieldDto.of(imageDto, videoDto);
+    return await this.bucketService.abortMultipartUpload(key, uploadId);
   }
 }

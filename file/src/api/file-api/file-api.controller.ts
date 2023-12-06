@@ -8,17 +8,19 @@ import {
   Inject,
   ParseFilePipeBuilder,
   HttpStatus,
-  UploadedFiles,
+  Get,
+  Body,
+  Query,
 } from '@nestjs/common';
 
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ClientProxy } from '@nestjs/microservices';
 import { UploadService } from '@/upload/upload.service';
 import { JwtAuthGuard } from '@/common/guards/jwt.guard';
+import { UploadFileURLDto } from '@/upload/dtos/upload-file-url.dto';
+import { UploadFileEndDto } from '@/upload/dtos/upload-file-end.dto';
+import { UploadFileAbortDto } from '@/upload/dtos/upload-file-abort.dto';
 
 @ApiTags('files')
 @Controller('files')
@@ -71,50 +73,82 @@ export class FileApiController {
     return uploadedFileDto;
   }
 
-  @Post('/video')
+  @Get('/video-start')
   @ApiOperation({
-    summary: '동영상 업로드 API',
-    description: '파일을 서버에 업로드하고, 파일의 정보를 받는다.',
+    summary: '동영상 업로드 시작 API',
+    description: '업로드에 필요한 업로드 ID, key를 응답받는다.',
   })
-  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        image: {
+        key: { type: 'string', description: '업로드에 필요한 key' },
+        uploadId: { type: 'string', description: '업로드에 필요한 업로드 ID' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard)
+  async uploadVideo(@Query('contentType') contentType: string) {
+    return await this.uploadService.uploadVideoStart(contentType);
+  }
+
+  @Post('/video-url')
+  @ApiOperation({
+    summary: '동영상 업로드 URL 발급 API',
+    description: '업로드에 필요한 업로드 URL 응답받는다.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        presignedUrl: {
           type: 'string',
-          format: 'binary',
-          description: '업로드할 이미지의 바이너리 데이터입니다.',
-        },
-        video: {
-          type: 'string',
-          format: 'binary',
-          description: '업로드할 영상의 바이너리 데이터입니다.',
+          description:
+            '현재 순서의 binary 파일을 전송할 URL, PUT method 사용해야함, ETag는 헤더에서 가져와야함',
         },
       },
     },
   })
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'image', maxCount: 1 },
-        { name: 'video', maxCount: 1 },
-      ],
-      {
-        limits: {
-          fileSize: 1024 * 1024 * 5,
+  async getPresignedUrl(@Body() uploadFileURLDto: UploadFileURLDto) {
+    return await this.uploadService.getPresignedUrl(uploadFileURLDto);
+  }
+
+  @Post('/video-end')
+  @ApiOperation({
+    summary: '동영상 업로드 종료 API',
+    description: '동영상 업로드를 종료한다.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        presignedUrl: {
+          type: 'string',
+          description:
+            '현재 순서의 binary 파일을 전송할 URL, PUT method 사용해야함, ETag는 헤더에서 가져와야함',
         },
       },
-    ),
-  )
-  async uploadVideo(
-    @UploadedFiles()
-    files: {
-      image: Express.Multer.File[];
-      video: Express.Multer.File[];
     },
-  ) {
-    return await this.uploadService.uploadFileField(files);
+  })
+  @UseGuards(JwtAuthGuard)
+  async uploadFilePartComplete(@Body() uploadFilePartDto: UploadFileEndDto) {
+    return await this.uploadService.uploadFilePartComplete(uploadFilePartDto);
   }
+
+  @Post('/video-abort')
+  @ApiOperation({
+    summary: '동영상 업로드 종료 API',
+    description: '동영상 업로드를 종료한다.',
+  })
+  @UseGuards(JwtAuthGuard)
+  async uploadFilePartAbort(@Body() uploadFileAbortDto: UploadFileAbortDto) {
+    return await this.uploadService.uploadFilePartAbort(uploadFileAbortDto);
+  }
+
+  // @Get('/uncompleted-upload-list')
+  // @UseGuards(JwtAuthGuard)
+  // async test() {
+  //   return this.uploadService.test();
+  // }
 }
