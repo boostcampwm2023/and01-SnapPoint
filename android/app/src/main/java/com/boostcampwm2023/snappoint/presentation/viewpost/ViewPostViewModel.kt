@@ -55,8 +55,10 @@ class ViewPostViewModel @Inject constructor(
     fun loadLocalPost(uuid: String) {
         roomRepository.getPost(uuid, signInUtil.getEmail())
             .onEach { post ->
-                _post.update {
-                    post[0]
+                if (post.isNotEmpty()) {
+                    _post.update {
+                        post[0]
+                    }
                 }
             }
             .catch {
