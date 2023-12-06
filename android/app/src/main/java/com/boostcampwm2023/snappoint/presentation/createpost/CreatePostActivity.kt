@@ -24,6 +24,7 @@ import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
 import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
+import com.boostcampwm2023.snappoint.presentation.videoedit.VideoEditActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -256,7 +257,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     }
 
     private fun startVideoEditActivity(index: Int, uri: Uri) {
-        val intent = Intent(this, MarkerPointSelectorActivity::class.java)
+        val intent = Intent(this, VideoEditActivity::class.java)
         intent.putExtra("index", index)
         intent.putExtra("uri", uri.toString())
         videoEditLauncher.launch(intent)

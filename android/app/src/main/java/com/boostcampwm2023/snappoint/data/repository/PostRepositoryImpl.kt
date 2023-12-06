@@ -65,6 +65,14 @@ class PostRepositoryImpl @Inject constructor(
                                     files = listOf(File(uploadResult.uuid))
                                 )
                             }
+                            is PostBlockCreationState.VIDEO -> {
+                                val requestBody = it.address?.toByteArray()?.toRequestBody("video/webp".toMediaType())!!
+                                val multipartBody = MultipartBody.Part.createFormData("file", "video", requestBody)
+                                val uploadResult = snapPointApi.postImage(multipartBody)
+                                it.asPostBlock().copy(
+                                    files = listOf(File(uploadResult.uuid))
+                                )
+                            }
                             else -> it.asPostBlock()
                         }
                     }
