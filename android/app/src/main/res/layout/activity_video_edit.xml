@@ -37,14 +37,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_cancel"
-            app:layout_constraintBottom_toTopOf="parent"/>
+            app:layout_constraintBottom_toTopOf="@id/tlv"/>
 
         <com.boostcampwm2023.snappoint.presentation.videoedit.TimeLineView
             android:id="@+id/tlv"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:leftThumbMoved = "@{() -> vm.onLeftThumbMoved(Long)}"
-            app:rightThumbMoved = "@{() -> vm.onRightThumbMoved(Long)}"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/black"
+            app:viewModel = "@{vm}"
+            app:uri = "@{vm.uri}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />

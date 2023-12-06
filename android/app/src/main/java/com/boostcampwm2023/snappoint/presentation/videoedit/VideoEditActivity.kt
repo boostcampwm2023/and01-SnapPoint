@@ -27,7 +27,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
     private val viewModel: VideoEditViewModel by viewModels()
 
     private var index = 0
-    private lateinit var uri: Uri
 
     @OptIn(UnstableApi::class) override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +38,9 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
         collectViewModelData()
 
 
-        val mediaItem = MediaItem.fromUri(uri)
+        val mediaItem = MediaItem.fromUri(viewModel.uri.value.toUri())
         val mediaMetadataRetriever = MediaMetadataRetriever().apply {
-            setDataSource(this@VideoEditActivity, uri)
+            setDataSource(this@VideoEditActivity, viewModel.uri.value.toUri())
         }
         val videoLengthInMs = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong() * 1000
         binding.pv.player = ExoPlayer.Builder(this).build().also {
@@ -90,7 +89,8 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
     }
 
     private fun getIntentExtra() {
-        uri = intent.getStringExtra("uri")?.toUri() ?: return
+        val uri = intent.getStringExtra("uri")?:""
+        viewModel.setUri(uri)
         index = intent.getIntExtra("index",0) ?: 0
     }
 

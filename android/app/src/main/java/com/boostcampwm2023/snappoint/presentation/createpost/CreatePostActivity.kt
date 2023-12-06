@@ -78,7 +78,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
 
                 viewModel.addVideoBlock(videoUri, position)
 
-                startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
+                //startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
                 startVideoEditActivity(viewModel.uiState.value.postBlocks.lastIndex, videoUri)
             }
         }
