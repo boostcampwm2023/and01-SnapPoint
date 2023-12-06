@@ -54,7 +54,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun initMarkState(uuid: String) {
+    fun initLikeMarkState(uuid: String) {
         roomRepository.getPost(uuid, signInUtil.getEmail())
             .flowOn(Dispatchers.IO)
             .onEach { post ->
