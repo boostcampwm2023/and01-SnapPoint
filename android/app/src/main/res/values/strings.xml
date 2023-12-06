@@ -49,4 +49,5 @@
     <string name="setting_fragment_sign_out_success">로그아웃 했습니다</string>
     <string name="setting_fragment_sign_out_fail">로그아웃에 실패했습니다\n네트워크 연결을 확인하세요</string>
     <string name="get_around_posts_failed">주변 게시글 목록을 불러오는 데 실패했습니다..</string>
+    <string name="subscription_fragment_title">로컬에 저장된 게시글</string>
 </resources>

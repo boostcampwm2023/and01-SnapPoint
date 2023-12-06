@@ -19,7 +19,7 @@
             android:id="@+id/tv_subscription_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="로컬에 저장된 게시글"
+            android:text="@string/subscription_fragment_title"
             android:textSize="22sp"
             android:layout_marginStart="36dp"
             app:layout_constraintTop_toTopOf="parent" />
