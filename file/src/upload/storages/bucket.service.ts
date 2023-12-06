@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
+import { Part } from '../dtos/part.dto';
 
 @Injectable()
 export class BucketService {
@@ -15,6 +16,7 @@ export class BucketService {
         secretAccessKey:
           this.configService.getOrThrow<string>('NCP_SECRET_KEY'),
       },
+      signatureVersion: 'v4',
     });
   }
 
@@ -27,6 +29,57 @@ export class BucketService {
         ContentType: file.mimetype,
         // TODO: CDN 서비스 구현 후 ACL 권한을 private으로 수정한다.
         ACL: 'public-read',
+      })
+      .promise();
+  }
+
+  async createMultipartUpload(key: string, contentType: string) {
+    return this.bucket
+      .createMultipartUpload({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: key,
+        ContentType: contentType,
+        ACL: 'public-read',
+      })
+      .promise();
+  }
+
+  async getPresignedUrl(key: string, uploadId: string, partNumber: number) {
+    return this.bucket.getSignedUrl('uploadPart', {
+      Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+      Key: key,
+      UploadId: uploadId,
+      PartNumber: partNumber,
+    });
+  }
+
+  async completeMultipartUpload(key: string, uploadId: string, parts: Part[]) {
+    return this.bucket
+      .completeMultipartUpload({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: key,
+        UploadId: uploadId,
+        MultipartUpload: {
+          Parts: parts,
+        },
+      })
+      .promise();
+  }
+
+  async abortMultipartUpload(key: string, uploadId: string) {
+    return this.bucket
+      .abortMultipartUpload({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: key,
+        UploadId: uploadId,
+      })
+      .promise();
+  }
+
+  async listMultipartUploads() {
+    return this.bucket
+      .listMultipartUploads({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
       })
       .promise();
   }
