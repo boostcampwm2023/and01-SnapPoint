@@ -8,6 +8,9 @@ import android.os.PersistableBundle
 import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -15,6 +18,8 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityVideoEditBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activity_video_edit) {
@@ -30,6 +35,8 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
         getIntentExtra()
 
         initBinding()
+
+        collectViewModelData()
 
 
         val mediaItem = MediaItem.fromUri(uri)
@@ -51,6 +58,29 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             binding.pv.player?.seekTo(0)
         }
 
+    }
+
+    private fun collectViewModelData() {
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED){
+                launch {
+                    viewModel.leftThumbState.collect{ position ->
+                        moveSeekPositionMs(position = position)
+                    }
+                }
+                launch {
+                    viewModel.rightThumbState.collect{position ->
+                        moveSeekPositionMs(position = position)
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun moveSeekPositionMs(position: Long) {
+        binding.pv.player?.seekTo(position)
     }
 
     private fun initBinding() {
