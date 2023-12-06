@@ -22,12 +22,6 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     }
 
     private fun initBinding() {
-        binding.btnCreatePost.setOnClickListener {
-            val intent = Intent(requireContext(), CreatePostActivity::class.java)
-            startActivity(intent)
-        }
-        binding.btnGetPostInRoom.setOnClickListener {
-            viewModel.getSavedPost()
-        }
+
     }
 }
