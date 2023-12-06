@@ -8,9 +8,9 @@
     <uses-permission
         android:name="android.permission.READ_MEDIA_VIDEO"
         android:minSdkVersion="33" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
-        android:minSdkVersion="34"
-        />
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+        android:minSdkVersion="34" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -31,6 +31,9 @@
         android:theme="@style/Theme.SnapPoint"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".presentation.videoedit.VideoEditActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -44,18 +47,16 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".presentation.auth.AuthActivity"
             android:exported="true" />
-
         <activity
             android:name=".presentation.viewpost.ViewPostActivity"
             android:exported="false" />
-
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="true" />

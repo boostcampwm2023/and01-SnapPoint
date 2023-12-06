@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -10,6 +11,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -72,12 +74,15 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                     ?: return@registerForActivityResult
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
-                //val bitmap = resizeBitmap(getBitmapFromUri(this, imageUri), 1280)
+
                 viewModel.addVideoBlock(videoUri, position)
 
-                //startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
+                startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
+                startVideoEditActivity(viewModel.uiState.value.postBlocks.lastIndex, videoUri)
             }
         }
+
+
 
     private val addressSelectionLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -93,6 +98,21 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                     )
                 }
             }
+        }
+
+    private val videoEditLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let{
+                    /*val outputUri = it.getStringExtra("output") ?: return@registerForActivityResult
+                    val file = this.contentResolver.openInputStream(outputUri.toUri())
+                    viewModel.setVideo(
+                        index = it.getIntExtra("index", 0),
+                        edittedVideo = it.getBy
+                    )*/
+                }
+            }
+
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -233,5 +253,12 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         intent.putExtra("index", index)
         intent.putExtra("position", position.asDoubleArray())
         addressSelectionLauncher.launch(intent)
+    }
+
+    private fun startVideoEditActivity(index: Int, uri: Uri) {
+        val intent = Intent(this, MarkerPointSelectorActivity::class.java)
+        intent.putExtra("index", index)
+        intent.putExtra("uri", uri.toString())
+        videoEditLauncher.launch(intent)
     }
 }

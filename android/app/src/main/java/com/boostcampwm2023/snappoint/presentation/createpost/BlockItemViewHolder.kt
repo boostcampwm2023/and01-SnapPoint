@@ -5,8 +5,15 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.widget.ImageView
+import androidx.annotation.OptIn
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ViewDataBinding
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.SimpleExoPlayer
+import androidx.media3.transformer.Transformer
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
@@ -126,7 +133,14 @@ sealed class BlockItemViewHolder(
                     blockItemEvent.onDownButtonClick(index)
                 }
                 editMode = block.isEditMode
+
             }
+           /* val mediaItem = MediaItem.fromUri(block.uri)
+            val transformer = Transformer.Builder()
+            binding.pv.player = ExoPlayer.Builder(itemView.context).build().also {
+
+                it.setMediaItem(mediaItem)
+            }*/
             textWatcher.updatePosition(index)
         }
 
