@@ -44,8 +44,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     var drawnRoute: Polyline? = null
     var prevSelectedIndex = -1
 
-    private val markers: MutableList<Marker> = mutableListOf()
-
     fun moveCamera(latitude: Double, longitude: Double, zoom: Float? = null) {
         zoom?.let {
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude),zoom))
@@ -179,7 +177,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
-        viewModel.startLoading()
         clusterManager.clearItems()
         postState.forEachIndexed { postIndex, postSummaryState ->
             postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>()
@@ -197,7 +194,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                 }
         }
         clusterManager.cluster()
-        viewModel.finishLoading()
     }
 
     fun searchSnapPoints() {
