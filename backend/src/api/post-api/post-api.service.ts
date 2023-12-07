@@ -112,12 +112,16 @@ export class PostApiService {
     return this.assemblePosts(posts, entireBlocks, entireFiles);
   }
 
-  async findPost(uuid: string) {
+  async findPost(uuid: string, detail: boolean = true) {
     // 1. UUID로 게시글을 찾는다.
     const post = await this.postService.findPost({ uuid });
 
     if (!post) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
+    }
+
+    if (!detail) {
+      return PostDto.of(post);
     }
 
     // 2. 게시글과 연관된 블록들을 찾는다.

@@ -18,10 +18,10 @@ export class PostDto {
   @ApiProperty({ description: '게시글의 요약 정보입니다.' })
   readonly summary: string;
 
-  @ApiProperty({ type: BlockDto, isArray: true })
-  readonly blocks: BlockDto[];
+  @ApiProperty({ type: BlockDto, isArray: true, required: false })
+  readonly blocks?: BlockDto[];
 
-  static of(post: Post, blockDtos: BlockDto[]) {
+  static of(post: Post, blockDtos?: BlockDto[]) {
     return {
       uuid: post.uuid,
       title: post.title,

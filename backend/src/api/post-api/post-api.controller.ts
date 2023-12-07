@@ -2,9 +2,17 @@ import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/com
 import { PostApiService } from '@/api/post-api/post-api.service';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { PostDto } from '@/domain/post/dtos/post.dto';
-import { ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiCreatedResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { WritePostDto } from './dtos/write-post.dto';
+import { ReadPostQuery } from './dtos/\bread-post.query.dto';
 
 @Controller('posts')
 export class PostApiController {
@@ -13,14 +21,16 @@ export class PostApiController {
   @NoAuth()
   @Get('/:uuid')
   @ApiParam({ name: 'uuid', required: true })
+  @ApiQuery({ name: 'detail', required: false })
   @ApiOperation({
     summary: '게시글을 조회하는 API',
     description: '게시글과 연관된 블록 정보를 반환한다.',
   })
   @ApiOkResponse({ description: '성공적으로 게시글 조회가 완료되었습니다.', type: PostDto })
   @ApiNotFoundResponse({ description: '해당 UUID에 맞는 게시글을 찾을 수 없습니다.' })
-  readPost(@Param('uuid') uuid: string) {
-    return this.postApiService.findPost(uuid);
+  readPost(@Param('uuid') uuid: string, @Query() query: ReadPostQuery) {
+    const { detail } = query;
+    return this.postApiService.findPost(uuid, detail);
   }
 
   @Get('/')
