@@ -1,4 +1,10 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
@@ -14,10 +20,15 @@ import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
 import { WritePostDto } from './dtos/write-post.dto';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { catchError, firstValueFrom, of } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class PostApiService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly prisma: PrismaProvider,
     private readonly validation: ValidationService,
     private readonly transform: TransformationService,
@@ -25,10 +36,41 @@ export class PostApiService {
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
     private readonly redisService: RedisCacheService,
+    private readonly httpService: HttpService,
   ) {}
+
+  async summaryContent(title: string, content: string): Promise<string> {
+    console.log(content);
+    const { data } = await firstValueFrom(
+      this.httpService
+        .post(
+          'https://naveropenapi.apigw.ntruss.com/text-summary/v1/summarize',
+          {
+            document: { title, content },
+            option: { language: 'ko', model: 'general', tone: 3, summaryCount: 1 },
+          },
+          {
+            headers: {
+              'X-NCP-APIGW-API-KEY-ID': this.configService.getOrThrow('NCP_AI_CLIENT_ID'),
+              'X-NCP-APIGW-API-KEY': this.configService.getOrThrow('NCP_AI_CLIENT_SECRET'),
+            },
+          },
+        )
+        .pipe(
+          catchError((error: AxiosError) => {
+            Logger.error(error.response?.data);
+            // 오류 발생 시 null 반환
+            return of({ data: { summary: null } });
+          }),
+        ),
+    );
+
+    return data.summary;
+  }
 
   private async readPost(post: Post) {
     const blockKey = `block:${post.uuid}`;
+
     const blocks = await this.redisService.smembers<Block>(
       blockKey,
       (s: string) => {
@@ -37,7 +79,7 @@ export class PostApiService {
       async (key: string) => {
         // 캐싱된 값이 없는 경우
         const uuid = key.substring('block:'.length);
-        return await this.blockService.findBlocksWithCoordsByPost(uuid);
+        return this.blockService.findBlocksByPost({ postUuid: uuid });
       },
     );
 
@@ -51,15 +93,15 @@ export class PostApiService {
     });
 
     if (!files) {
-      const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
-      files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
+      const blockUuids = blocks.map((block) => ({ sourceUuid: block.uuid }));
+      files = await this.fileService.findFilesBySources('block', blockUuids);
 
       await this.redisService.sadd<File>(fileKey, files, 30, (file: File) => JSON.stringify(file));
     }
 
-    const fileDtoMap = this.transform.toMapFromArray(
+    const fileDtoMap = this.transform.toMapFromArray<File, string, FileDto>(
       files,
-      (file: File) => file.sourceUuid,
+      (file: File) => file.sourceUuid!,
       (file: File) => FileDto.of(file),
     );
 
@@ -70,24 +112,56 @@ export class PostApiService {
   async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<SummaryPostDto[]> {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
-    // TODO: 제대로 된 영역인지 평가한다. (면적, 서비스 범위?)
-    const blocks = await this.blockService.findBlocksWithCoordsByArea(findNearbyPostDto);
+    // 1. 현 위치 주변의 블록을 찾는다.
+    const blocks = await this.blockService.findBlocksByArea(findNearbyPostDto);
 
-    const blockWheres = blocks.map((block) => ({ uuid: block.postUuid }));
+    // 2. 블록과 연관된 게시글 정보를 찾는다.
+    const blockPostUuids = blocks.map((block) => ({ uuid: block.postUuid }));
+    const posts = await this.postService.findPosts({ where: { OR: blockPostUuids } });
 
-    const posts = await this.postService.findPosts({ where: { OR: blockWheres } });
+    // 3. 게시글과 연관된 모든 블록을 찾는다.
+    const postUuids = posts.map((post) => ({ postUuid: post.uuid }));
+    const entireBlocks = await this.blockService.findBlocksByPosts(postUuids);
 
-    return Promise.all(
-      posts.map(async (post) => {
-        const postDto = await this.readPost(post);
-        const textBlocks = postDto.blocks.filter((block) => block.type === 'text');
-        const mediaBlocks = postDto.blocks.filter((block) => block.type === 'media');
-        const summary = textBlocks.length > 0 ? textBlocks[0].content : mediaBlocks[0].content;
+    // 4. 블록과 연관된 모든 파일을 찾는다.
+    const blockUuids = entireBlocks.map((block) => ({ sourceUuid: block.uuid }));
+    const entireFiles = await this.fileService.findFilesBySources('block', blockUuids);
 
-        postDto.blocks = mediaBlocks;
-        return SummaryPostDto.of(postDto, mediaBlocks, summary);
-      }),
+    const blockMap = this.transform.toMapFromArray<Block, string, Block>(
+      entireBlocks,
+      (block: Block) => block.postUuid,
+      (block: Block) => block,
     );
+
+    const fileDtoMap = this.transform.toMapFromArray<File, string, FileDto>(
+      entireFiles,
+      (file: File) => file.sourceUuid!,
+      (file: File) => FileDto.of(file),
+    );
+
+    const postPromises = posts.map(async (post) => {
+      const { uuid, title } = post;
+      const blocks = blockMap.get(uuid)!;
+
+      const summaryContent = this.blockService.getSummaryContent(blocks);
+
+      let summary: string | null = null;
+
+      if (summaryContent) {
+        summary = await this.summaryContent(title, summaryContent);
+      }
+
+      if (!summary) {
+        summary = this.blockService.getBlockContent(blocks);
+      }
+
+      const mediaBlocks = this.blockService.filterMediaBlocks(blocks);
+      const blockDtos = mediaBlocks.map((block) => BlockDto.of(block, fileDtoMap.get(block.uuid)));
+
+      return SummaryPostDto.of(post, blockDtos, summary);
+    });
+
+    return Promise.all(postPromises);
   }
 
   async findPost(uuid: string) {
@@ -107,13 +181,8 @@ export class PostApiService {
     return this.prisma.beginTransaction(async () => {
       const { uuid: postUuid } = await this.postService.createPost(userUuid, post);
       await this.blockService.createBlocks(postUuid, blocks);
+      await this.fileService.attachFiles(files);
 
-      await Promise.all(
-        files.map((file) => {
-          const { uuid, source, sourceUuid } = file;
-          return this.fileService.updateFile({ where: { uuid }, data: { source, sourceUuid } });
-        }),
-      );
       await this.redisService.del(`block:${postUuid}`);
       await this.redisService.del(`file:${postUuid}`);
       return this.findPost(postUuid);
@@ -140,23 +209,8 @@ export class PostApiService {
       const blockMap = new Map<string, CreateBlockDto>();
       blocks.forEach((block) => blockMap.set(block.uuid, block));
 
-      await this.blockService.deleteBlocks({ postUuid: uuid });
-      await Promise.all(
-        blocks.map((block) =>
-          this.blockService.upsertBlock(uuid, {
-            ...block,
-            isDeleted: false,
-          }),
-        ),
-      );
-
-      const blockUuids = blocks.map((block) => ({ sourceUuid: block.uuid }));
-      await this.fileService.deleteFiles({ OR: blockUuids });
-      await Promise.all(
-        files.map((file) =>
-          this.fileService.updateFile({ where: { uuid: file.uuid }, data: { ...file, isDeleted: false } }),
-        ),
-      );
+      await this.blockService.modifyBlocks(uuid, blocks);
+      await this.fileService.modifyFiles(files);
 
       await this.validation.validateBlocks(blocks, files);
       await this.redisService.del(`block:${uuid}`);

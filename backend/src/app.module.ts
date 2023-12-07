@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BlocksModule } from './domain/block/block.module';
+import { BlockModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
 import { FileModule } from './domain/file/file.module';
 import { PrismaModule } from './common/prisma/prisma.module';
@@ -20,7 +20,7 @@ import { HealthModule } from './common/health/health.module';
 
 @Module({
   imports: [
-    BlocksModule,
+    BlockModule,
     PostModule,
     UserModule,
     FileModule,

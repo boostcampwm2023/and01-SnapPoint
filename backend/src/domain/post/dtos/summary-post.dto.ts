@@ -1,6 +1,6 @@
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { PostDto } from './post.dto';
+import { Post } from '@prisma/client';
 
 export class SummaryPostDto {
   @ApiProperty({ description: '게시글을 나타내는 고유한 식별자입니다.' })
@@ -21,7 +21,7 @@ export class SummaryPostDto {
   @ApiProperty({ type: BlockDto, isArray: true })
   readonly blocks: BlockDto[];
 
-  static of(post: PostDto, blockDtos: BlockDto[], summary: string) {
+  static of(post: Post, blockDtos: BlockDto[], summary: string) {
     return {
       uuid: post.uuid,
       title: post.title,
