@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val signInUtil: SignInUtil,
-    private val loginRepository: SignInRepository,
+    private val signInRepository: SignInRepository,
     private val roomRepository: RoomRepository
 ) : ViewModel() {
 
@@ -30,7 +30,7 @@ class SettingViewModel @Inject constructor(
     val event: SharedFlow<SettingEvent> = _event.asSharedFlow()
 
     fun onSignOutClick() {
-        loginRepository.getSignOut()
+        signInRepository.getSignOut()
             .onEach {
                 signInUtil.clearUserAuthData()
                 _event.emit(SettingEvent.SignOut)
