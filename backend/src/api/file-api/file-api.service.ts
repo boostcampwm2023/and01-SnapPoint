@@ -23,13 +23,14 @@ export class FileApiService {
     return file;
   }
 
-  async createFile(createFileDataDto: CreateFileDataDto): Promise<FileDto> {
-    const createdFile = await this.fileService.createFile(createFileDataDto);
+  async createFile(createFileDataDto: CreateFileDataDto, isProcessed: boolean = false): Promise<FileDto> {
+    const createdFile = await this.fileService.createFile({ ...createFileDataDto, isProcessed });
     return FileDto.of(createdFile);
   }
 
   async applyFile(applyFileDto: ApplyProcessFileDto) {
     const { uuid } = applyFileDto;
+
     await this.fileService.updateFile({ where: { uuid }, data: { isProcessed: true } });
   }
 

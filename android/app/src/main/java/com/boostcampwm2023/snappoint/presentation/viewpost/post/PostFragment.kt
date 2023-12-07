@@ -1,10 +1,13 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost.post
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPostBinding
@@ -24,6 +27,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
         initBinding()
 
+        updatePostState()
         collectViewModelData()
     }
 
@@ -45,14 +49,32 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                     }
 
                     PostEvent.SavePost -> {
-                        saveCurrentPost()
+                        saveCurrentPostToLocal()
+                    }
+
+                    PostEvent.DeletePost -> {
+                        deleteCurrentPostFromLocal()
                     }
                 }
             }
         }
     }
 
-    private fun saveCurrentPost() {
-        postViewModel.saveCurrentPost(viewPostViewModel.post.value)
+    private fun updatePostState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewPostViewModel.post.collect { post ->
+                    postViewModel.updateLikeMarkState(post.uuid)
+                }
+            }
+        }
+    }
+
+    private fun saveCurrentPostToLocal() {
+        postViewModel.saveCurrentPostToLocal(viewPostViewModel.post.value)
+    }
+
+    private fun deleteCurrentPostFromLocal() {
+        postViewModel.deleteCurrentPostFromLocal(viewPostViewModel.post.value.uuid)
     }
 }

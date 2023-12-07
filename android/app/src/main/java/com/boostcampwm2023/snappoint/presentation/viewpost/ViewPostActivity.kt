@@ -25,7 +25,11 @@ class ViewPostActivity : BaseActivity<ActivityViewPostBinding>(R.layout.activity
     }
 
     private fun getPostData() {
-        viewModel.loadPost(args.uuid)
+        if(args.isLocalPost) {
+            viewModel.loadLocalPost(args.uuid)
+        }else {
+            viewModel.loadPost(args.uuid)
+        }
     }
 
     private fun collectViewModelData() {

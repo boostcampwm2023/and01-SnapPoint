@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(
-    private val loginRepository: SignInRepository
+    private val signInRepository: SignInRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(
@@ -137,7 +137,7 @@ class SignupViewModel @Inject constructor(
                 return
             }
 
-            loginRepository.postSignUp(email, password, nickname)
+            signInRepository.postSignUp(email, password, nickname)
                 .onStart {
                     setProgressBarState(true)
                 }

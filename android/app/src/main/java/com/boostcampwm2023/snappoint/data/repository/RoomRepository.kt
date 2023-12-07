@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface RoomRepository {
 
-    fun getLocalPosts(): Flow<List<PostSummaryState>>
-    suspend fun insertPosts(postSummaryState: PostSummaryState)
+    fun getAllLocalPost(email: String): Flow<List<PostSummaryState>>
+    fun getPost(uuid: String, email: String): Flow<List<PostSummaryState>>
+    suspend fun insertPosts(postSummaryState: PostSummaryState, email: String)
+    suspend fun deletePost(uuid: String, email: String)
 }
