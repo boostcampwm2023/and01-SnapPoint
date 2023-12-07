@@ -5,6 +5,7 @@ import { UpdateFileDto } from './dtos/update-file.dto';
 import { ProcessFileDto } from '@/domain/file/dtos/process-file.dto';
 import { CreateFileDto } from '@/domain/file/dtos/create-file.dto';
 import { FindFilesByIdDto } from './dtos/find-files-by-id.dto';
+import { File } from '@prisma/client';
 
 @Injectable()
 export class FileService {
@@ -24,7 +25,7 @@ export class FileService {
   }
 
   async findFilesBySources(source: string, dtos: FindFilesBySourceDto[]) {
-    const conditions = dtos.map((dto) => ({ sourceUuid: dto.sourceUuid }));
+    const conditions = dtos.map((dto) => ({ sourceUuid: dto.uuid }));
     return this.repository.findFiles({ where: { OR: conditions, AND: { source } } });
   }
 
@@ -42,5 +43,9 @@ export class FileService {
     return Promise.all(
       dtos.map((dto) => this.repository.updateFile({ where: { uuid: dto.uuid }, data: { ...dto, isDeleted: false } })),
     );
+  }
+
+  filterNotProcessedFiles(files: File[]) {
+    return files.filter((file) => file.isProcessed === false);
   }
 }

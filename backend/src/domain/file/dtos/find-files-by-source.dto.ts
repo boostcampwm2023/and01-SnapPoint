@@ -1,3 +1,3 @@
 export class FindFilesBySourceDto {
-  sourceUuid: string;
+  uuid: string;
 }
