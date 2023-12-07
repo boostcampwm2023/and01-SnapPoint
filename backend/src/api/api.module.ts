@@ -21,6 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BlockModule } from '@/domain/block/block.module';
 import { HttpModule } from '@nestjs/axios';
 import { FileModule } from '@/domain/file/file.module';
+import { SummarizationService } from './summarization/summarization.service';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { FileModule } from '@/domain/file/file.module';
     UserService,
     JwtStrategy,
     RefreshTokenService,
+    SummarizationService,
   ],
 })
 export class ApiModule {}
