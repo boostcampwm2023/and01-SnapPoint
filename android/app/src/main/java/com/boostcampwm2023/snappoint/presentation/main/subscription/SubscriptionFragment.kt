@@ -15,6 +15,7 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSubscriptionBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -25,7 +26,6 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private val navController: NavController by lazy { findNavController() }
-    private var isViewPostOpened: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,7 +39,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     override fun onResume() {
         super.onResume()
         loadPostsFromLocal()
-        isViewPostOpened = false
+        setViewPostStateClosed()
     }
 
     private fun initBinding() {
@@ -50,6 +50,10 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
     private fun loadPostsFromLocal() {
         mainViewModel.loadLocalPost()
+    }
+
+    private fun setViewPostStateClosed() {
+        viewModel.setViewPostState(false)
     }
 
     private fun updatePostsUi() {
@@ -83,14 +87,17 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     }
 
     private fun navigateToViewPost(uuid: String) {
-        navController.run {
-            if (currentDestination?.id != R.id.viewPostActivity && isViewPostOpened.not()) {
-                isViewPostOpened = true
-                navigate(
-                    R.id.action_subscriptionFragment_to_viewPostActivity,
-                    bundleOf("uuid" to uuid, "isLocalPost" to true)
+        if (navController.currentDestination?.id != R.id.viewPostActivity
+            && viewModel.uiState.value.isViewPostOpened.not()
+        ) {
+            viewModel.setViewPostState(true)
+            navController.navigate(
+                R.id.action_subscriptionFragment_to_viewPostActivity,
+                bundleOf(
+                    Constants.UUID_BUNDLE_KEY to uuid,
+                    Constants.IS_LOCAL_POST_BUNDLE_KEY to true
                 )
-            }
+            )
         }
     }
 }

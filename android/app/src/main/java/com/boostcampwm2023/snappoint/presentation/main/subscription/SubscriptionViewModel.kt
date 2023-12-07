@@ -47,6 +47,14 @@ class SubscriptionViewModel @Inject constructor(
         }
     }
 
+    fun setViewPostState(isOpened: Boolean) {
+        _uiState.update {
+            it.copy(
+                isViewPostOpened = isOpened
+            )
+        }
+    }
+
     private fun previewButtonClicked(index: Int) {
         _event.tryEmit(SubscriptionEvent.ShowSnapPointAndRoute(index))
     }
