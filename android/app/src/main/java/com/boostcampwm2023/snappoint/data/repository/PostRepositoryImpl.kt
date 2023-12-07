@@ -1,7 +1,5 @@
 package com.boostcampwm2023.snappoint.data.repository
 
-import android.util.Log
-import androidx.core.net.toFile
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
@@ -13,16 +11,14 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.VideoUrlRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.util.Constants.BYTE_OF_VIDEO_PART_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Retrofit
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -91,14 +87,14 @@ class PostRepositoryImpl @Inject constructor(
         val videoStartResponse = snapPointApi.getVideoStart(contentType = videoBlock.mimeType)
         val (key, uploadId) = videoStartResponse
 
-        val file = java.io.File("/storage/emulated/0/Android/data/com.boostcampwm2023.snappoint/cache/123.mp4")
-        //val file = java.io.File(videoBlock.resultPath)
+        //val file = java.io.File("/storage/emulated/0/Android/data/com.boostcampwm2023.snappoint/cache/123.mp4")
+        val file = java.io.File(videoBlock.resultPath)
 
         val fileByteArray = file.readBytes()
+        val byteOfFileSize = fileByteArray.size
         val parts = mutableListOf<Part>()
-        val MB5 = 1024*1024*5
 
-        for(partNumber in 0 until fileByteArray.size step MB5){
+        for(partNumber in 0 until fileByteArray.size step BYTE_OF_VIDEO_PART_SIZE){
             val postVideoUrlResponse = snapPointApi.postVideoUrl(
                 videoUrlRequest = VideoUrlRequest(
                     key = key,
@@ -110,19 +106,18 @@ class PostRepositoryImpl @Inject constructor(
             val body = fileByteArray.toRequestBody(
                 contentType = videoBlock.mimeType.toMediaType(),
                 offset = partNumber,
-                byteCount = min(MB5, fileByteArray.size - partNumber)
+                byteCount = min(BYTE_OF_VIDEO_PART_SIZE, byteOfFileSize - partNumber)
             )
             val multipartBody = MultipartBody.Part.create(body)
             val response = snapPointApi.putVideo(
                 url = preSignedUrl,
                 body = multipartBody
             )
-            val eTag = response.headers().get("ETag")?: ""
-            Log.d("TAG", "eTag: $eTag")
+            val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
             parts.add(Part(parts.size + 1, eTag.trim('"')))
         }
 
-        val res = snapPointApi.postVideoEnd(
+        val videoEndResponse = snapPointApi.postVideoEnd(
             VideoEndRequest(
                 key = key,
                 uploadId = uploadId,
@@ -130,7 +125,7 @@ class PostRepositoryImpl @Inject constructor(
                 parts = parts
             )
         )
-        return res.uuid
+        return videoEndResponse.uuid
     }
 
     private suspend fun uploadImageAndGetUUid(imageBlock: PostBlockCreationState.IMAGE): String {
