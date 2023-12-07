@@ -1,5 +1,5 @@
 import { FileService } from '@/domain/file/file.service';
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { FileDto } from './dto/file.dto';
 import { File } from '@prisma/client';
 import { CreateFileDataDto } from './dto/create-file-data.dto';
@@ -24,24 +24,12 @@ export class FileApiService {
   }
 
   async createFile(createFileDataDto: CreateFileDataDto, isProcessed: boolean = false): Promise<FileDto> {
-    const file = await this.fileService.findFile({ uuid: createFileDataDto.uuid });
-
-    if (file) {
-      throw new ConflictException('이미 존재하는 이메일입니다.');
-    }
-
     const createdFile = await this.fileService.createFile({ ...createFileDataDto, isProcessed });
     return FileDto.of(createdFile);
   }
 
   async applyFile(applyFileDto: ApplyProcessFileDto) {
     const { uuid } = applyFileDto;
-
-    const file = await this.fileService.findFile({ uuid: uuid });
-
-    if (!file) {
-      throw new NotFoundException('존재하지 않는 file입니다.');
-    }
 
     await this.fileService.updateFile({ where: { uuid }, data: { isProcessed: true } });
   }
