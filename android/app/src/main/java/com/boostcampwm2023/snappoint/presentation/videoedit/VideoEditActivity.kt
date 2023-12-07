@@ -48,8 +48,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
          collectViewModelData()
 
-        initTransFormer()
-
+         initTransFormer()
 
     }
 
