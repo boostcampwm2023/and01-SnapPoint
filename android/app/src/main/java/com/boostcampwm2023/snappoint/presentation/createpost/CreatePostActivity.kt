@@ -76,6 +76,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
 
+                //val bitmap = resizeBitmap(getBitmapFromUri(this, imageUri), 1280)
                 viewModel.addVideoBlock(videoUri, position)
 
                 //startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
