@@ -120,6 +120,7 @@
             android:elevation="2dp"
             android:padding="16dp"
             android:src="@drawable/icon_video_block"
+            android:onClick="@{() -> vm.onVideoBlockButtonClicked()}"
             app:layout_constraintStart_toEndOf="@id/btn_insert_image_block"
             app:layout_constraintTop_toBottomOf="@id/til_title" />
 

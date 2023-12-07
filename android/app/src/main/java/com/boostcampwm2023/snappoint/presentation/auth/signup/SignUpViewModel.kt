@@ -23,12 +23,12 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class SignupViewModel @Inject constructor(
+class SignUpViewModel @Inject constructor(
     private val signInRepository: SignInRepository
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<SignupUiState> = MutableStateFlow(
-        SignupUiState(
+    private val _uiState: MutableStateFlow<SignUpUiState> = MutableStateFlow(
+        SignUpUiState(
             email = "email@email.com",
             password = "asdASD123!@#",
             passwordConfirm = "asdASD123!@#",
@@ -36,13 +36,13 @@ class SignupViewModel @Inject constructor(
             isButtonEnabled = true
         )
     )
-    val uiState: StateFlow<SignupUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<SignUpUiState> = _uiState.asStateFlow()
 
-    private val _event: MutableSharedFlow<SignupEvent> = MutableSharedFlow(
+    private val _event: MutableSharedFlow<SignUpEvent> = MutableSharedFlow(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val event: SharedFlow<SignupEvent> = _event.asSharedFlow()
+    val event: SharedFlow<SignUpEvent> = _event.asSharedFlow()
 
     fun updateEmail(email: String) {
         _uiState.update {
@@ -142,12 +142,12 @@ class SignupViewModel @Inject constructor(
                     setProgressBarState(true)
                 }
                 .onEach {
-                    _event.emit(SignupEvent.NavigateToSignIn)
+                    _event.emit(SignUpEvent.NavigateToSignIn)
                 }
                 .catch {
                     updateEmailErrorResId(it.message)
                     _event.emit(
-                        SignupEvent.ShowMessage(
+                        SignUpEvent.ShowMessage(
                             _uiState.value.emailErrorResId ?: R.string.signup_fragment_fail
                         )
                     )

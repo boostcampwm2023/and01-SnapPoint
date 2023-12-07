@@ -8,15 +8,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.databinding.FragmentSignupBinding
+import com.boostcampwm2023.snappoint.databinding.FragmentSignUpBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_signup) {
+class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sign_up) {
 
-    private val viewModel: SignupViewModel by viewModels()
+    private val viewModel: SignUpViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -48,11 +48,11 @@ class SignupFragment : BaseFragment<FragmentSignupBinding>(R.layout.fragment_sig
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is SignupEvent.ShowMessage -> {
+                        is SignUpEvent.ShowMessage -> {
                             showToastMessage(event.messageResId)
                         }
 
-                        is SignupEvent.NavigateToSignIn -> {
+                        is SignUpEvent.NavigateToSignIn -> {
                             showToastMessage(R.string.signup_fragment_create_account_success)
                             navigateToSignIn()
                         }

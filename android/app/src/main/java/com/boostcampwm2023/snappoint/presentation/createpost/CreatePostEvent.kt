@@ -8,4 +8,5 @@ sealed class CreatePostEvent {
 
     data object SelectImageFromLocal: CreatePostEvent()
     data object NavigatePrev : CreatePostEvent()
+    data object SelectVideoFromLocal : CreatePostEvent()
 }

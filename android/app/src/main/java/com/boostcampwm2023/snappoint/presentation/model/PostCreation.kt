@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.model
 
 import android.graphics.Bitmap
+import android.net.Uri
 
 data class PostCreationState(
     val uuid: String = "",
@@ -38,7 +39,8 @@ sealed class PostBlockCreationState {
         override val uuid: String = "",
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
-        val address: String = ""
+        val address: String = "",
+        val uri:Uri,
     ) : PostBlockCreationState()
 
     enum class ViewType {

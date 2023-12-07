@@ -125,4 +125,14 @@ dependencies {
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    //video player
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.ui)
+
+    //video upload / 편집
+    implementation(libs.media3.transformer)
+    implementation(libs.media3.common)
+    implementation(libs.media3.effect)
 }

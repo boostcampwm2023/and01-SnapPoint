@@ -1,6 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.auth.signup
 
-data class SignupUiState(
+data class SignUpUiState(
     val email: String = "",
     val password: String = "",
     val passwordConfirm: String = "",

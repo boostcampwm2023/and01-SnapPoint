@@ -78,8 +78,8 @@
                         app:titleCentered="true"
                         app:menu="@menu/preview_app_bar_menu"
                         app:navigationIcon="@drawable/icon_arrow_back"
-                        navigation_icon_click="@{vm.appbarBackIconClicked}"
-                        menu_item_click="@{vm.appbarCloseIconClicked}"/>
+                        navigation_icon_click="@{vm::appbarBackIconClicked}"
+                        menu_item_click="@{vm::appbarCloseIconClicked}"/>
 
                 </com.google.android.material.appbar.AppBarLayout>
 

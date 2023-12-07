@@ -6,10 +6,8 @@ import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
-import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
-import com.boostcampwm2023.snappoint.presentation.model.PostCreationState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -67,6 +65,14 @@ class PostRepositoryImpl @Inject constructor(
                                     files = listOf(File(uploadResult.uuid))
                                 )
                             }
+                            is PostBlockCreationState.VIDEO -> {
+                                val requestBody = it.address?.toByteArray()?.toRequestBody("video/webp".toMediaType())!!
+                                val multipartBody = MultipartBody.Part.createFormData("file", "video", requestBody)
+                                val uploadResult = snapPointApi.postImage(multipartBody)
+                                it.asPostBlock().copy(
+                                    files = listOf(File(uploadResult.uuid))
+                                )
+                            }
                             else -> it.asPostBlock()
                         }
                     }
@@ -78,17 +84,19 @@ class PostRepositoryImpl @Inject constructor(
 
     override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<PostSummaryState>> {
 
-        return flowOf(true).map {
-            snapPointApi.getAroundPost(leftBottom, rightTop).map {
-                it.asPostSummaryState()
-            }
+        return flowOf(true
+        ).map {
+            snapPointApi.getAroundPost(leftBottom, rightTop)
+        }.map{ response ->
+            response.asPostSummaryState()
         }
     }
 
     override fun getPost(uuid: String): Flow<PostSummaryState> {
 
-        return flowOf(true).map {
-            snapPointApi.getPost(uuid).asPostSummaryState()
-        }
+        return flowOf(true)
+            .map {
+                snapPointApi.getPost(uuid).asPostSummaryState()
+            }
     }
 }

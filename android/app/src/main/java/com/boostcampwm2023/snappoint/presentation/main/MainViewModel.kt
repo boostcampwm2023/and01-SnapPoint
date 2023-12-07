@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
@@ -62,6 +63,7 @@ class MainViewModel @Inject constructor(
             .onCompletion { finishLoading() }
             .onEach { response ->
                 _postState.value = response
+                Log.d("TAG", "loadPosts: $response")
                 _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
             }.launchIn(viewModelScope)
     }
@@ -166,11 +168,11 @@ class MainViewModel @Inject constructor(
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }
 
-    private fun startLoading() {
+    fun startLoading() {
         _uiState.update { it.copy(isLoading = true) }
     }
 
-    private fun finishLoading() {
+    fun finishLoading() {
         _uiState.update { it.copy(isLoading = false) }
     }
 

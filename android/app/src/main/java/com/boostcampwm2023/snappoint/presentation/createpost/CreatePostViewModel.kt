@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,8 +67,12 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addVideoBlock() {
-        TODO()
+    fun addVideoBlock(videoUri: Uri, position: PositionState) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position)
+            )
+        }
     }
 
     fun updateTitle(title: String) {
@@ -94,7 +99,7 @@ class CreatePostViewModel @Inject constructor(
                         when(postBlock){
                             is PostBlockCreationState.TEXT -> postBlock.copy(content = content)
                             is PostBlockCreationState.IMAGE -> postBlock.copy(description = content)
-                            is PostBlockCreationState.VIDEO -> TODO()
+                            is PostBlockCreationState.VIDEO -> postBlock.copy(description = content)
                         }
                     }else{
                         postBlock
@@ -240,6 +245,10 @@ class CreatePostViewModel @Inject constructor(
     fun onImageBlockButtonClicked() {
         _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
     }
+    fun onVideoBlockButtonClicked() {
+        _event.tryEmit(CreatePostEvent.SelectVideoFromLocal)
+    }
+
 
     fun onBackButtonClicked(){
         _event.tryEmit(CreatePostEvent.NavigatePrev)
@@ -267,7 +276,7 @@ class CreatePostViewModel @Inject constructor(
                     if(idx == index){
                         when(postBlock){
                             is PostBlockCreationState.IMAGE ->  PostBlockCreationState.IMAGE(content = postBlock.content, position = position, address = address, bitmap = postBlock.bitmap)
-                            is PostBlockCreationState.VIDEO -> PostBlockCreationState.VIDEO(content = postBlock.content, position = position, address = address)
+                            is PostBlockCreationState.VIDEO -> PostBlockCreationState.VIDEO(content = postBlock.content, position = position, address = address, uri = postBlock.uri)
                             is PostBlockCreationState.TEXT -> postBlock
                         }
                     }else{
