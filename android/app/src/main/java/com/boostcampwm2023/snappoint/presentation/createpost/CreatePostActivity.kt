@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -20,6 +19,7 @@ import com.boostcampwm2023.snappoint.databinding.ActivityCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
 import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
@@ -70,22 +70,18 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val videoUri = result.data?.data ?: return@registerForActivityResult
-                Log.d("TAG", "videoUri: $videoUri")
                 val mediaMetadataRetriever = MediaMetadataRetriever().apply {
                     setDataSource(this@CreatePostActivity, videoUri)
                 }
                 val mimeType = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)!!
-
                val inputStream = this.contentResolver.openInputStream(videoUri)
                     ?: return@registerForActivityResult
-                val a = this
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
 
-                //버전 11부터 파일을 가져와서 조작, 수정하는게 막힘
                 viewModel.addVideoBlock(videoUri, position, mimeType)
 
-                //startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
+                //버전 11부터 파일을 가져와서 조작, 수정하는게 막힘
                 startVideoEditActivity(viewModel.uiState.value.postBlocks.lastIndex, videoUri)
             }
         }
@@ -112,18 +108,11 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 result.data?.let{
-                    Log.d("TAG", "videoEditLauncher: ${it.getStringExtra("path")}")
                     val path = it.getStringExtra("path") ?: ""
                     viewModel.updateVideoPath(path)
-                    /*val outputUri = it.getStringExtra("output") ?: return@registerForActivityResult
-                    val file = this.contentResolver.openInputStream(outputUri.toUri())
-                    viewModel.setVideo(
-                        index = it.getIntExtra("index", 0),
-                        edittedVideo = it.getBy
-                    )*/
                 }
             }
-
+            startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, (viewModel.uiState.value.postBlocks.last() as PostBlockCreationState.VIDEO).position)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {

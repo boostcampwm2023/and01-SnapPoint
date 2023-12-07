@@ -275,8 +275,18 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
                     if(idx == index){
                         when(postBlock){
-                            is PostBlockCreationState.IMAGE ->  PostBlockCreationState.IMAGE(content = postBlock.content, position = position, address = address, bitmap = postBlock.bitmap)
-                            is PostBlockCreationState.VIDEO -> PostBlockCreationState.VIDEO(content = postBlock.content, position = position, address = address, uri = postBlock.uri)
+                            is PostBlockCreationState.IMAGE -> {
+                                postBlock.copy(
+                                    position = position,
+                                    address = address,
+                                )
+                            }
+                            is PostBlockCreationState.VIDEO -> {
+                                postBlock.copy(
+                                    position = position,
+                                    address = address,
+                                )
+                            }
                             is PostBlockCreationState.TEXT -> postBlock
                         }
                     }else{
