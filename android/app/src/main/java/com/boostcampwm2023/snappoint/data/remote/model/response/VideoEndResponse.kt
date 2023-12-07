@@ -5,6 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VideoEndResponse(
-    @SerialName("presignedUrl")
-    val preSignedUrl:String,
+    @SerialName("uuid")
+    val uuid:String,
+    @SerialName("url")
+    val url:String,
+    @SerialName("mimeType")
+    val mimeType:String,
 )

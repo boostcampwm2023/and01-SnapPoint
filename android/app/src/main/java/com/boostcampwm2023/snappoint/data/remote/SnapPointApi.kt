@@ -17,13 +17,17 @@ import com.boostcampwm2023.snappoint.data.remote.model.response.SignupResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.VideoEndResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.VideoUrlResponse
 import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface SnapPointApi {
 
@@ -91,5 +95,12 @@ interface SnapPointApi {
     suspend fun postVideoAbort(
         @Body videoAbortRequest: VideoAbortRequest
     ): Unit
+
+    @Multipart
+    @PUT
+    suspend fun putVideo(
+        @Url url: String,
+        @Part body: MultipartBody.Part,
+    ): Response<Unit>
 
 }

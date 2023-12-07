@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +12,6 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -71,13 +71,19 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
             if (result.resultCode == RESULT_OK) {
                 val videoUri = result.data?.data ?: return@registerForActivityResult
                 Log.d("TAG", "videoUri: $videoUri")
+                val mediaMetadataRetriever = MediaMetadataRetriever().apply {
+                    setDataSource(this@CreatePostActivity, videoUri)
+                }
+                val mimeType = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)!!
+
                val inputStream = this.contentResolver.openInputStream(videoUri)
                     ?: return@registerForActivityResult
+                val a = this
                 val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                     .getOrDefault(PositionState(0.0, 0.0))
 
-                //val bitmap = resizeBitmap(getBitmapFromUri(this, imageUri), 1280)
-                viewModel.addVideoBlock(videoUri, position)
+                //버전 11부터 파일을 가져와서 조작, 수정하는게 막힘
+                viewModel.addVideoBlock(videoUri, position, mimeType)
 
                 //startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, position)
                 startVideoEditActivity(viewModel.uiState.value.postBlocks.lastIndex, videoUri)
@@ -106,6 +112,9 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 result.data?.let{
+                    Log.d("TAG", "videoEditLauncher: ${it.getStringExtra("path")}")
+                    val path = it.getStringExtra("path") ?: ""
+                    viewModel.updateVideoPath(path)
                     /*val outputUri = it.getStringExtra("output") ?: return@registerForActivityResult
                     val file = this.contentResolver.openInputStream(outputUri.toUri())
                     viewModel.setVideo(
