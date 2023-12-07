@@ -7,12 +7,18 @@ import com.boostcampwm2023.snappoint.databinding.ItemClusterImageBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 class ClusterItemViewHolder(
-    private val binding: ItemClusterImageBinding
+    private val binding: ItemClusterImageBinding,
+    private val onItemClicked: (Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: PostBlockState) {
-        binding.ivImage.load(item.content) {
-            memoryCachePolicy(CachePolicy.ENABLED)
+    fun bind(item: PostBlockState, index: Int) {
+        with(binding) {
+            ivImage.load(item.content) {
+                memoryCachePolicy(CachePolicy.ENABLED)
+            }
+            root.setOnClickListener {
+                onItemClicked(index)
+            }
         }
     }
 }
