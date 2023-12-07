@@ -6,12 +6,13 @@ import androidx.room.PrimaryKey
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "postTable")
+@Entity(tableName = "postTable", primaryKeys = ["uuid", "email"])
 @Serializable
 data class SerializedPost(
-    @PrimaryKey
     @ColumnInfo(name = "uuid")
     val uuid: String,
+    @ColumnInfo(name = "email")
+    val email: String,
     @ColumnInfo(name = "post")
     val post: PostSummaryState
 )

@@ -3,9 +3,12 @@ package com.boostcampwm2023.snappoint.presentation.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
+import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,13 +22,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val postRepository: PostRepository
-) :ViewModel(){
+    private val postRepository: PostRepository,
+    private val roomRepository: RoomRepository
+) : ViewModel() {
 
     private val _postState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
     val postState: StateFlow<List<PostSummaryState>> = _postState.asStateFlow()
@@ -52,7 +57,6 @@ class MainViewModel @Inject constructor(
     var bottomSheetHeight: Int = 0
 
     fun loadPosts(leftBottom: String, rightTop: String) {
-
         postRepository.getAroundPost(leftBottom, rightTop)
             .onStart { startLoading() }
             .catch { _event.tryEmit(MainActivityEvent.GetAroundPostFailed) }
@@ -63,7 +67,25 @@ class MainViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    // TODO DataStore 확인을 위한 임시 코드
+    fun loadLocalPost() {
+        roomRepository.getAllLocalPost(UserInfo.getEmail())
+            .onStart {
+                startLoading()
+            }
+            .catch {
+                _event.tryEmit(MainActivityEvent.GetAroundPostFailed)
+            }
+            .onEach { posts ->
+                _postState.update { posts }
+                _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
+            }
+            .takeWhile {
+                false
+            }
+            .launchIn(viewModelScope)
+        finishLoading()
+    }
+
     fun clearPosts() {
         _postState.update {
             listOf()
@@ -95,7 +117,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun updateSelectedIndex(index: Int){
+    private fun updateSelectedIndex(index: Int) {
         _markerState.value = MarkerUiState(
             selectedIndex = index,
             focusedIndex = 0
@@ -133,11 +155,11 @@ class MainViewModel @Inject constructor(
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }
 
-    fun startLoading() {
+    private fun startLoading() {
         _uiState.update { it.copy(isLoading = true) }
     }
 
-    fun finishLoading() {
+    private fun finishLoading() {
         _uiState.update { it.copy(isLoading = false) }
     }
 

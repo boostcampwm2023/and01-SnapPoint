@@ -22,6 +22,7 @@ class SignInUtil @Inject constructor(@ApplicationContext context: Context) {
     }
 
     fun setUserAuthData(email: String, password: String) {
+        UserInfo.setEmail(email)
         preferences.edit().putString(emailKey, email).apply()
         preferences.edit().putString(passwordKey, password).apply()
     }
