@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -62,6 +63,13 @@ export class UploadService {
     uploadFilePartDto: UploadFileEndDto,
   ): Promise<UploadFileEndResponsetDto> {
     const { key, uploadId, parts, mimeType } = uploadFilePartDto;
+    console.log(uploadFilePartDto);
+
+    try {
+      await this.bucketService.listParts(key, uploadId);
+    } catch (e) {
+      throw new ConflictException('이미 존재하는 파일입니다.');
+    }
 
     const completeUpload = await this.bucketService.completeMultipartUpload(
       key,

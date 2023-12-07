@@ -157,6 +157,7 @@ export class FileApiController {
   ) {
     const uploadFileEndResponsetDto =
       await this.uploadService.uploadFilePartComplete(uploadFilePartDto);
+
     this.client.emit(
       { cmd: 'create_image_data' },
       { ...uploadFileEndResponsetDto, userUuid: req.user.uuid },

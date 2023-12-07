@@ -76,10 +76,29 @@ export class BucketService {
       .promise();
   }
 
+  async listParts(key: string, uploadId: string) {
+    return this.bucket
+      .listParts({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: key,
+        UploadId: uploadId,
+      })
+      .promise();
+  }
+
   async listMultipartUploads() {
     return this.bucket
       .listMultipartUploads({
         Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+      })
+      .promise();
+  }
+
+  async headObject(key: string) {
+    return this.bucket
+      .headObject({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: key,
       })
       .promise();
   }
