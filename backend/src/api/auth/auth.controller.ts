@@ -7,12 +7,12 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nest
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { Cookies } from '@/common/decorator/cookie.decorator';
 
-@ApiTags('')
-@Controller('')
+@ApiTags('auth')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
+  @Post('sign-up')
   @NoAuth()
   @ApiOperation({
     summary: '새로운 유저를 생성하는 API',
@@ -24,7 +24,7 @@ export class AuthController {
     return this.authService.signup(createAuthDto);
   }
 
-  @Post('signin')
+  @Post('sign-in')
   @NoAuth()
   @ApiOperation({
     summary: '로그인 API',
@@ -46,7 +46,7 @@ export class AuthController {
     return loginDto;
   }
 
-  @Get('logout')
+  @Get('sign-out')
   @ApiOperation({
     summary: '로그아웃 API',
     description: '로그아웃에 성공하면 201번을 반환한다.',
