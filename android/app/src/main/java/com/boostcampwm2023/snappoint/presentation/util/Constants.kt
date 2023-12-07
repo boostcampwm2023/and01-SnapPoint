@@ -7,4 +7,5 @@ object Constants {
     const val API_KEY = BuildConfig.MAPS_API_KEY
     const val EMAIL_DUPLICATE_ERROR: String = "HTTP 409 Conflict"
     const val CLUSTER_TEXT_SIZE = 16
+    const val MIN_CLUSTER_SIZE = 2
 }

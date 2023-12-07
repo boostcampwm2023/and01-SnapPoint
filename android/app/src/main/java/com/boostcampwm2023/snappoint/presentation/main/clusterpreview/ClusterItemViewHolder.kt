@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.main.clusterlist
+package com.boostcampwm2023.snappoint.presentation.main.clusterpreview
 
 import androidx.recyclerview.widget.RecyclerView
 import coil.load

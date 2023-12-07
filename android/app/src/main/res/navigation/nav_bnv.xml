@@ -38,8 +38,8 @@
             app:argType="string" />
     </activity>
     <fragment
-        android:id="@+id/clusterListFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.main.clusterlist.ClusterListFragment"
+        android:id="@+id/clusterPreviewFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.clusterpreview.ClusterPreviewFragment"
         android:label="ClusterListFragment" >
         <argument
             android:name="tags"

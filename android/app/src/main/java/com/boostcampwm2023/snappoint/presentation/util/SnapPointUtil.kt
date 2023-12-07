@@ -13,15 +13,10 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.boostcampwm2023.snappoint.R
-import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants.CLUSTER_TEXT_SIZE
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 
-val clusterTextSize = CLUSTER_TEXT_SIZE.pxFloat()
-val clusterCircleRadius = (CLUSTER_TEXT_SIZE / 2 + 1).pxFloat()
+private val clusterTextSize = CLUSTER_TEXT_SIZE.pxFloat()
+private val clusterCircleRadius = (CLUSTER_TEXT_SIZE / 2 + 1).pxFloat()
 
 suspend fun getSnapPointBitmap(context: Context, uri: String, focused: Boolean): Bitmap {
     val request = ImageRequest.Builder(context)

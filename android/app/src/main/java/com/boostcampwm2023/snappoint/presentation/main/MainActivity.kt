@@ -75,6 +75,8 @@ class MainActivity(
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
 
+    private val tagBundleKey = "tags"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -180,8 +182,7 @@ class MainActivity(
                             }
 
                             is MainActivityEvent.NavigateCluster -> {
-                                val bundle = bundleOf("tags" to event.tags.toTypedArray())
-                                openClusterListFragment(bundle)
+                                openClusterListFragment(event.tags)
                             }
                         }
                     }
@@ -206,11 +207,7 @@ class MainActivity(
 
                 launch {
                     viewModel.uiState.collect {
-                        mapManager.setZoomGesturesEnabled(it.isPreviewFragmentShowing.not())
-                        mapManager.setScrollGesturesEnabled(it.isPreviewFragmentShowing.not())
-                        if (!it.isPreviewFragmentShowing) {
-                            mapManager.removeFocus()
-                        }
+                        setMapGestureEnabled(it.isPreviewFragmentShowing)
                     }
                 }
 
@@ -221,6 +218,14 @@ class MainActivity(
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun setMapGestureEnabled(boolean: Boolean) {
+        mapManager.setZoomGesturesEnabled(boolean.not())
+        mapManager.setScrollGesturesEnabled(boolean.not())
+        if (boolean.not()) {
+            mapManager.removeFocus()
         }
     }
 
@@ -314,9 +319,10 @@ class MainActivity(
         navController.navigate(R.id.previewFragment)
     }
 
-    private fun openClusterListFragment(bundle: Bundle) {
+    private fun openClusterListFragment(tags: List<SnapPointTag>) {
+        val bundle = bundleOf(tagBundleKey to tags.toTypedArray())
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-        navController.navigate(R.id.clusterListFragment, bundle)
+        navController.navigate(R.id.clusterPreviewFragment, bundle)
     }
 
     private fun navigateAuthActivity() {

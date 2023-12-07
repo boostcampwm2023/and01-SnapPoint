@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.content.Context
+import com.boostcampwm2023.snappoint.presentation.util.Constants.MIN_CLUSTER_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.drawNumberOnSnapPoint
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -18,7 +19,7 @@ class SnapPointClusterRenderer(
 
     init {
         clusterManager.renderer = this
-        minClusterSize = 2
+        minClusterSize = MIN_CLUSTER_SIZE
     }
 
     override fun onBeforeClusterItemRendered(

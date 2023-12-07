@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.main.clusterlist
+package com.boostcampwm2023.snappoint.presentation.main.clusterpreview
 
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
