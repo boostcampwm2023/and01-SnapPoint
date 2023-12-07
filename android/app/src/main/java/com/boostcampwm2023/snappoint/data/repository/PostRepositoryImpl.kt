@@ -17,11 +17,14 @@ import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import javax.inject.Inject
+import kotlin.math.min
 
 class PostRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi,
@@ -92,7 +95,6 @@ class PostRepositoryImpl @Inject constructor(
         //val file = java.io.File(videoBlock.resultPath)
 
         val fileByteArray = file.readBytes()
-        Log.d("TAG", "fileByteArray.size : ${fileByteArray.size}")
         val parts = mutableListOf<Part>()
         val MB5 = 1024*1024*5
 
@@ -105,11 +107,10 @@ class PostRepositoryImpl @Inject constructor(
                 )
             )
             val preSignedUrl = postVideoUrlResponse.preSignedUrl
-            Log.d("TAG", "preSignedUrl: $preSignedUrl")
             val body = fileByteArray.toRequestBody(
                 contentType = videoBlock.mimeType.toMediaType(),
                 offset = partNumber,
-                byteCount = MB5
+                byteCount = min(MB5, fileByteArray.size - partNumber)
             )
             val multipartBody = MultipartBody.Part.create(body)
             val response = snapPointApi.putVideo(
@@ -117,10 +118,10 @@ class PostRepositoryImpl @Inject constructor(
                 body = multipartBody
             )
             val eTag = response.headers().get("ETag")?: ""
-            Log.d("TAG", "response.headers(): ${response.headers().joinToString(" ")}")
-            Log.d("TAG", "etag: $eTag")
-            parts.add(Part(parts.size + 1, eTag))
+            Log.d("TAG", "eTag: $eTag")
+            parts.add(Part(parts.size + 1, eTag.trim('"')))
         }
+
         val res = snapPointApi.postVideoEnd(
             VideoEndRequest(
                 key = key,
