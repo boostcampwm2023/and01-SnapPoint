@@ -8,6 +8,7 @@ import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
+import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,8 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val roomRepository: RoomRepository,
-    private val signInUtil: SignInUtil
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
 
     private val _postState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun loadLocalPost() {
-        roomRepository.getAllLocalPost(signInUtil.getEmail())
+        roomRepository.getAllLocalPost(UserInfo.getEmail())
             .onStart {
                 startLoading()
             }

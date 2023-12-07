@@ -22,8 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SubscriptionViewModel @Inject constructor(
-    private val roomRepository: RoomRepository,
-    private val signInUtil: SignInUtil
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SubscriptionUiState> = MutableStateFlow(

@@ -15,7 +15,6 @@ class PreviewViewModel @Inject constructor() : ViewModel() {
     private val _uiState: MutableStateFlow<PreviewUiState> = MutableStateFlow(PreviewUiState())
     val uiState: StateFlow<PreviewUiState> = _uiState.asStateFlow()
 
-
     fun updatePost(post: PostSummaryState) {
         _uiState.update {
             it.copy(

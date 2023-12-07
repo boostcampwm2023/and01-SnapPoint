@@ -7,6 +7,7 @@ import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
+import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -27,8 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val roomRepository: RoomRepository,
-    private val signInUtil: SignInUtil
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState())
@@ -55,7 +55,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun updateLikeMarkState(uuid: String) {
-        roomRepository.getPost(uuid, signInUtil.getEmail())
+        roomRepository.getPost(uuid, UserInfo.getEmail())
             .flowOn(Dispatchers.IO)
             .onEach { post ->
                 _uiState.update {
@@ -74,13 +74,13 @@ class PostViewModel @Inject constructor(
 
     fun saveCurrentPostToLocal(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.insertPosts(post, signInUtil.getEmail())
+            roomRepository.insertPosts(post, UserInfo.getEmail())
         }
     }
 
     fun deleteCurrentPostFromLocal(uuid: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.deletePost(uuid, signInUtil.getEmail())
+            roomRepository.deletePost(uuid, UserInfo.getEmail())
         }
     }
 }
