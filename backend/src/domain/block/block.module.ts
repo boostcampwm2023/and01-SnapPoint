@@ -1,11 +1,11 @@
-import { PrismaService } from '@/common/prisma/prisma.service';
 import { Module } from '@nestjs/common';
-import { BlockService } from './block.service';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
+import { BlockService } from '@/domain/block/block.service';
 import { PrismaModule } from '@/common/prisma/prisma.module';
+import { BlockRepository } from '@/domain/block/block.repository';
 
 @Module({
   imports: [PrismaModule],
-  providers: [BlockService, PrismaService, PrismaProvider],
+  providers: [BlockRepository, BlockService],
+  exports: [BlockService],
 })
-export class BlocksModule {}
+export class BlockModule {}

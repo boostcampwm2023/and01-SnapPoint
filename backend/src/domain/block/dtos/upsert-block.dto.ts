@@ -11,5 +11,5 @@ export class UpsertBlockDto {
 
   readonly longitude?: number;
 
-  readonly isDeleted: boolean;
+  readonly isDeleted?: boolean;
 }

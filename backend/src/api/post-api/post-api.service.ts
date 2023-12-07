@@ -10,10 +10,9 @@ import { FileDto } from '@/api/file-api/dto/file.dto';
 import { Block, File, Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
-import { SummaryPostDto } from '@/domain/post/dtos/summary-post.dto';
 import { WritePostDto } from './dtos/write-post.dto';
-import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { SummarizationService } from '../summarization/summarization.service';
 
 @Injectable()
 export class PostApiService {
@@ -25,10 +24,12 @@ export class PostApiService {
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
     private readonly redisService: RedisCacheService,
+    private readonly summaryService: SummarizationService,
   ) {}
 
   private async readPost(post: Post) {
     const blockKey = `block:${post.uuid}`;
+
     const blocks = await this.redisService.smembers<Block>(
       blockKey,
       (s: string) => {
@@ -37,7 +38,7 @@ export class PostApiService {
       async (key: string) => {
         // 캐싱된 값이 없는 경우
         const uuid = key.substring('block:'.length);
-        return await this.blockService.findBlocksWithCoordsByPost(uuid);
+        return this.blockService.findBlocksByPost({ postUuid: uuid });
       },
     );
 
@@ -51,15 +52,13 @@ export class PostApiService {
     });
 
     if (!files) {
-      const fileWheres = blocks.map((block) => ({ sourceUuid: block.uuid }));
-      files = await this.fileService.findFiles({ where: { OR: fileWheres, AND: { source: 'block' } } });
-
+      files = await this.fileService.findFilesBySources('block', blocks);
       await this.redisService.sadd<File>(fileKey, files, 30, (file: File) => JSON.stringify(file));
     }
 
-    const fileDtoMap = this.transform.toMapFromArray(
+    const fileDtoMap = this.transform.toMapFromArray<File, string, FileDto>(
       files,
-      (file: File) => file.sourceUuid,
+      (file: File) => file.sourceUuid!,
       (file: File) => FileDto.of(file),
     );
 
@@ -67,35 +66,66 @@ export class PostApiService {
     return PostDto.of(post, blockDtos);
   }
 
-  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<SummaryPostDto[]> {
+  private assemblePost(post: Post, blocks: Block[], files: File[]): PostDto {
+    const blockDtoMap = this.createBlockDtoMap(files, blocks);
+    return PostDto.of(post, blockDtoMap.get(post.uuid)!);
+  }
+
+  private assemblePosts(posts: Post[], blocks: Block[], files: File[]): PostDto[] {
+    const blockDtoMap = this.createBlockDtoMap(files, blocks);
+    return posts.map((post) => PostDto.of(post, blockDtoMap.get(post.uuid)!));
+  }
+
+  private createBlockDtoMap(files: File[], blocks: Block[]) {
+    const fileDtoMap = this.transform.toMapFromArray<File, string, FileDto>(
+      files,
+      (file: File) => file.sourceUuid!,
+      (file: File) => FileDto.of(file),
+    );
+
+    const blockDtoMap = this.transform.toMapFromArray<Block, string, BlockDto>(
+      blocks,
+      (block: Block) => block.postUuid,
+      (block: Block) => BlockDto.of(block, fileDtoMap.get(block.uuid)),
+    );
+
+    return blockDtoMap;
+  }
+
+  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
-    // TODO: 제대로 된 영역인지 평가한다. (면적, 서비스 범위?)
-    const blocks = await this.blockService.findBlocksWithCoordsByArea(findNearbyPostDto);
+    // 1. 현 위치 주변의 블록을 찾는다.
+    const blocks = await this.blockService.findBlocksByArea(findNearbyPostDto);
 
-    const blockWheres = blocks.map((block) => ({ uuid: block.postUuid }));
+    // 2. 블록과 연관된 게시글 정보를 찾는다.
+    const blockPostUuids = blocks.map((block) => ({ uuid: block.postUuid }));
+    const posts = await this.postService.findPosts({ where: { OR: blockPostUuids } });
 
-    const posts = await this.postService.findPosts({ where: { OR: blockWheres } });
+    // 3. 게시글과 연관된 모든 블록을 찾는다.
+    const postUuids = posts.map((post) => ({ postUuid: post.uuid }));
+    const entireBlocks = await this.blockService.findBlocksByPosts(postUuids);
 
-    return Promise.all(
-      posts.map(async (post) => {
-        const postDto = await this.readPost(post);
-        const textBlocks = postDto.blocks.filter((block) => block.type === 'text');
-        const mediaBlocks = postDto.blocks.filter((block) => block.type === 'media');
-        const summary = textBlocks.length > 0 ? textBlocks[0].content : mediaBlocks[0].content;
+    // 4. 블록과 연관된 모든 파일을 찾는다.
+    const entireFiles = await this.fileService.findFilesBySources('block', blocks);
 
-        postDto.blocks = mediaBlocks;
-        return SummaryPostDto.of(postDto, mediaBlocks, summary);
-      }),
-    );
+    return this.assemblePosts(posts, entireBlocks, entireFiles);
   }
 
   async findPost(uuid: string) {
+    // 1. UUID로 게시글을 찾는다.
     const post = await this.postService.findPost({ uuid });
+
     if (!post) {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
-    return this.readPost(post);
+
+    // 2. 게시글과 연관된 블록들을 찾는다.
+    const blocks = await this.blockService.findBlocksByPost({ postUuid: post.uuid });
+    // 3. 블록들과 연관된 파일들을 찾는다.
+    const files = await this.fileService.findFilesBySources('block', blocks);
+
+    return this.assemblePost(post, blocks, files);
   }
 
   async writePost(postDto: WritePostDto, userUuid: string) {
@@ -105,18 +135,19 @@ export class PostApiService {
     await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
 
     return this.prisma.beginTransaction(async () => {
-      const { uuid: postUuid } = await this.postService.createPost(userUuid, post);
-      await this.blockService.createBlocks(postUuid, blocks);
+      const summary = await this.summaryService.summarizePost(post.title, blocks);
+      const createdPost = await this.postService.createPost(userUuid, { ...post, summary });
 
-      await Promise.all(
-        files.map((file) => {
-          const { uuid, source, sourceUuid } = file;
-          return this.fileService.updateFile({ where: { uuid }, data: { source, sourceUuid } });
-        }),
-      );
+      const { uuid: postUuid } = createdPost;
+
+      const [createdBlocks, createdFiles] = await Promise.all([
+        this.blockService.createBlocks(postUuid, blocks),
+        this.fileService.attachFiles(files),
+      ]);
+
       await this.redisService.del(`block:${postUuid}`);
       await this.redisService.del(`file:${postUuid}`);
-      return this.findPost(postUuid);
+      return this.assemblePost(createdPost, createdBlocks, createdFiles);
     });
   }
 
@@ -135,33 +166,21 @@ export class PostApiService {
     }
 
     return this.prisma.beginTransaction(async () => {
-      await this.postService.updatePost({ where: { uuid }, data: post });
+      const [summary, updatedBlocks, updatedFiles] = await Promise.all([
+        this.summaryService.summarizePost(post.title, blocks),
+        this.blockService.modifyBlocks(uuid, blocks),
+        this.fileService.modifyFiles(files),
+      ]);
 
-      const blockMap = new Map<string, CreateBlockDto>();
-      blocks.forEach((block) => blockMap.set(block.uuid, block));
+      const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary } });
 
-      await this.blockService.deleteBlocks({ postUuid: uuid });
-      await Promise.all(
-        blocks.map((block) =>
-          this.blockService.upsertBlock(uuid, {
-            ...block,
-            isDeleted: false,
-          }),
-        ),
-      );
+      await Promise.all([
+        this.validation.validateBlocks(blocks, files),
+        this.redisService.del(`block:${uuid}`),
+        this.redisService.del(`file:${uuid}`),
+      ]);
 
-      const blockUuids = blocks.map((block) => ({ sourceUuid: block.uuid }));
-      await this.fileService.deleteFiles({ OR: blockUuids });
-      await Promise.all(
-        files.map((file) =>
-          this.fileService.updateFile({ where: { uuid: file.uuid }, data: { ...file, isDeleted: false } }),
-        ),
-      );
-
-      await this.validation.validateBlocks(blocks, files);
-      await this.redisService.del(`block:${uuid}`);
-      await this.redisService.del(`file:${uuid}`);
-      return this.findPost(uuid);
+      return this.assemblePost(updatedPost, updatedBlocks, updatedFiles);
     });
   }
 }

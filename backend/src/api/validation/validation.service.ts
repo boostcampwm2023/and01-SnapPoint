@@ -10,7 +10,7 @@ export class ValidationService {
 
   async validateFiles(fileDtos: ValidateFileDto[], userUuid: string) {
     const fileWhereInputs = fileDtos.map((fileDto) => ({ uuid: fileDto.uuid }));
-    const existFiles = await this.fileService.findFiles({ where: { OR: fileWhereInputs } });
+    const existFiles = await this.fileService.findFilesById(fileWhereInputs);
 
     const existFileUuidSet = new Set(existFiles.map((existFile) => existFile.uuid));
 
@@ -35,6 +35,8 @@ export class ValidationService {
 
   async validateBlocks(blockDtos: ValidateBlockDto[], blockFileDtos: ValidateFileDto[]) {
     const sourceFileMap = new Map<string, WriteBlockFileDto[]>();
+
+    // 블록이 다른 포스트에 있지 않은지 판별한다.
 
     blockFileDtos.forEach((blockFile) => {
       const { sourceUuid } = blockFile;

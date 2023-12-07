@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BlocksModule } from './domain/block/block.module';
+import { BlockModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
 import { FileModule } from './domain/file/file.module';
 import { PrismaModule } from './common/prisma/prisma.module';
@@ -20,19 +20,10 @@ import { HealthModule } from './common/health/health.module';
 
 @Module({
   imports: [
-    BlocksModule,
-    PostModule,
-    UserModule,
-    FileModule,
-    PrismaModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
     }),
-    JwtModule,
-    RefreshTokenModule,
-    ApiModule,
-    RedisCacheModule,
     RedisModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -44,6 +35,15 @@ import { HealthModule } from './common/health/health.module';
       }),
       inject: [ConfigService],
     }),
+    BlockModule,
+    PostModule,
+    UserModule,
+    FileModule,
+    PrismaModule,
+    JwtModule,
+    RefreshTokenModule,
+    ApiModule,
+    RedisCacheModule,
     HealthModule,
   ],
   controllers: [],

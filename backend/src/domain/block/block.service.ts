@@ -1,122 +1,48 @@
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
 import { Block } from '@/domain/block/entites/block.entity';
 import { UpsertBlockDto } from '@/domain/block/dtos/upsert-block.dto';
-import { FindAreaBlockDto } from '@/domain/block/dtos/find-area-block.dto';
+import { BlockRepository } from '@/domain/block/block.repository';
+import { FindBlocksByAreaDto } from '@/domain/block/dtos/find-blocks-by-area.dto';
+import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
 
 @Injectable()
 export class BlockService {
-  constructor(private readonly prisma: PrismaProvider) {}
+  constructor(private readonly repository: BlockRepository) {}
 
-  async createBlock(postUuid: string, dto: CreateBlockDto) {
-    const { uuid, content, type, order, latitude, longitude } = dto;
-
-    const coords = type === 'media' ? `ST_GeomFromText(POINT(${longitude} ${latitude}), 4326))` : null;
-    return this.prisma.get()
-      .$queryRaw`INSERT INTO "Block" ("uuid", "postUuid", "content", "type", "order", "coords") VALUES (${uuid}, ${postUuid}, ${content}, ${type}, ${order}, ${coords}`;
+  async createBlocks(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
+    await this.repository.createMany(postUuid, dtos);
+    return this.repository.findManyByIds(dtos);
   }
 
-  async createBlocks(postUuid: string, dtos: CreateBlockDto[]) {
-    // PreparedStatement를 사용하도록 변경한다.
-    const values = dtos
-      .map((dto) => {
-        const { uuid, content, type, order, latitude, longitude } = dto;
-        const coords = type === 'media' ? `ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)` : null;
-        return `('${uuid}', '${postUuid}', '${content}', '${type}', ${order}, ${coords})`;
-      })
-      .join(', ');
-
-    const query = 'INSERT INTO "Block" ("uuid", "postUuid", "content", "type", "order", "coords") VALUES ' + values;
-    return this.prisma.get().$queryRawUnsafe(query);
+  async findBlocksByArea(dto: FindBlocksByAreaDto): Promise<Block[]> {
+    return this.repository.findManyByArea(dto);
   }
 
-  async findBlock(blockWhereUniqueInput: Prisma.BlockWhereUniqueInput): Promise<Block | null> {
-    const block = await this.prisma.get().block.findUnique({
-      where: { ...blockWhereUniqueInput, isDeleted: false },
-    });
-    return block;
+  async findBlocksByPost(dto: FindBlocksByPostDto): Promise<Block[]> {
+    return this.repository.findManyByPosts([dto]);
   }
 
-  async findBlocks(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.BlockWhereUniqueInput;
-    where?: Prisma.BlockWhereInput;
-    orderBy?: Prisma.BlockOrderByWithRelationInput;
-  }): Promise<Block[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.get().block.findMany({
-      skip,
-      take,
-      cursor,
-      where: { ...where, isDeleted: false },
-      orderBy,
-    });
+  async findBlocksByPosts(dtos: FindBlocksByPostDto[]): Promise<Block[]> {
+    return this.repository.findManyByPosts(dtos);
   }
 
-  async findBlocksWithCoordsByArea(findAreaBlockDto: FindAreaBlockDto): Promise<Block[]> {
-    const { latitudeMin: latMin, longitudeMin: lonMin, latitudeMax: latMax, longitudeMax: lonMax } = findAreaBlockDto;
-    const blocks: Block[] = await this.prisma.get().$queryRaw`
-      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
-                "createdAt", "modifiedAt", "isDeleted",
-                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM      "Block"
-      WHERE     "type" = 'media' AND "coords" IS NOT NULL
-                AND ST_Intersects(coords, ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326))
-      ORDER BY  ST_Distance(coords, ST_Centroid(ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326)));
-    `;
-    return blocks;
-  }
+  async modifyBlocks(postUuid: string, dtos: UpsertBlockDto[]): Promise<Block[]> {
+    await this.repository.deleteManyByPost({ postUuid });
 
-  async findBlocksWithCoordsByPost(postUuid: string): Promise<Block[]> {
-    const blocks: Block[] = await this.prisma.get().$queryRaw`
-      SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
-              "createdAt", "modifiedAt", "isDeleted",
-              ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM    "Block"
-      WHERE   "postUuid" = ${postUuid}
-    `;
-    return blocks;
-  }
+    await Promise.all(
+      dtos.map((dto) =>
+        this.repository.upsertOne(postUuid, {
+          ...dto,
+          isDeleted: false,
+        }),
+      ),
+    );
 
-  async updateBlock(params: { where: Prisma.BlockWhereUniqueInput; data: CreateBlockDto }) {
-    const { data, where } = params;
-    return this.prisma.get().block.update({
-      data,
-      where,
-    });
-  }
-
-  async deleteBlock(where: Prisma.BlockWhereUniqueInput): Promise<Block> {
-    return this.prisma.get().block.update({
-      data: { isDeleted: true },
-      where,
-    });
-  }
-
-  async deleteBlocks(where: Prisma.BlockWhereInput) {
-    return this.prisma.get().block.updateMany({
-      data: { isDeleted: true },
-      where,
-    });
+    return this.repository.findManyByIds(dtos);
   }
 
   async upsertBlock(postUuid: string, dto: UpsertBlockDto) {
-    const { uuid, content, type, order, latitude, longitude } = dto;
-    const wktString = `POINT(${longitude} ${latitude})`;
-
-    return this.prisma.get().$queryRaw`
-        INSERT INTO "Block" ("uuid", "postUuid", "content", "type", "order", "coords")
-        VALUES (${uuid}, ${postUuid}, ${content}, ${type}, ${order}, ST_GeomFromText(${wktString}, 4326))
-        ON CONFLICT (uuid)
-        DO UPDATE SET
-          "postUuid" = ${postUuid},
-          "content" = ${content},
-          "type" = ${type},
-          "order" = ${order},
-          "coords" = ST_GeomFromText(${wktString}, 4326)
-      `;
+    return this.repository.upsertOne(postUuid, dto);
   }
 }
