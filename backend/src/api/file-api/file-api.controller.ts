@@ -1,7 +1,7 @@
 import { Controller, Inject, Logger } from '@nestjs/common';
 
 import { FileApiService } from './file-api.service';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { ClientProxy, Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CreateFileDataDto } from './dto/create-file-data.dto';
 import { ApplyProcessFileDto } from './dto/apply-process-file.dto';
 
@@ -13,15 +13,35 @@ export class FileApiController {
   ) {}
 
   @MessagePattern({ cmd: 'create_image_data' })
-  async createFileData(@Payload() createFileDataDto: CreateFileDataDto) {
-    this.client.emit({ cmd: 'process_image' }, { uuid: createFileDataDto.uuid });
-    return this.fileApiService.createFile(createFileDataDto);
+  async createFileData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    await this.fileApiService.createFile(createFileDataDto);
+    channel.ack(originalMsg);
+
+    return this.client.emit({ cmd: 'process_image' }, { uuid: createFileDataDto.uuid });
   }
 
   @MessagePattern({ cmd: 'process_image_data' })
-  async procssImageData(@Payload() applyDataDto: ApplyProcessFileDto) {
+  async procssImageData(@Payload() applyDataDto: ApplyProcessFileDto, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
     Logger.debug(`Apply ${applyDataDto.uuid}`);
-    return this.fileApiService.applyFile(applyDataDto);
+
+    await this.fileApiService.applyFile(applyDataDto);
+
+    channel.ack(originalMsg);
+  }
+
+  @MessagePattern({ cmd: 'create_video_data' })
+  async createLargeFileData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    await this.fileApiService.createFile(createFileDataDto, true);
+    channel.ack(originalMsg);
   }
 
   async deleteFileData() {}

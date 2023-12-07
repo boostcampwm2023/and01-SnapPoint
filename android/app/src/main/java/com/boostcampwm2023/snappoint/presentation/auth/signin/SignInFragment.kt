@@ -2,15 +2,14 @@ package com.boostcampwm2023.snappoint.presentation.auth.signin
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSignInBinding
-import com.boostcampwm2023.snappoint.presentation.auth.AuthViewModel
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -19,6 +18,7 @@ import kotlinx.coroutines.launch
 class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sign_in) {
 
     private val viewModel: SignInViewModel by viewModels()
+    private val navController: NavController by lazy { findNavController() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,12 +57,15 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
     }
 
     private fun navigateToMainActivity() {
-        findNavController().navigate(SignInFragmentDirections.actionLoginFragmentToMainActivity())
+        navController.navigate(SignInFragmentDirections.actionLoginFragmentToMainActivity())
         requireActivity().finish()
-
     }
 
     private fun navigateToSignup() {
-        findNavController().navigate(SignInFragmentDirections.actionSignInFragmentToSignUpFragment())
+        navController.run {
+            if (currentDestination?.id != R.id.signUpFragment) {
+                navigate(R.id.action_signInFragment_to_signUpFragment)
+            }
+        }
     }
 }

@@ -26,6 +26,7 @@ async function bootstrap() {
     options: {
       urls: [configService.getOrThrow<string>('RMQ_HOST')],
       queue: configService.getOrThrow<string>('RMQ_QUEUE'),
+      noAck: false,
       queueOptions: { durable: true },
     },
   });

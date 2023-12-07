@@ -4,7 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
+import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
+import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,11 +20,14 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class ViewPostViewModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
 
     private val _post: MutableStateFlow<PostSummaryState> = MutableStateFlow(PostSummaryState())
@@ -35,11 +41,33 @@ class ViewPostViewModel @Inject constructor(
 
     fun loadPost(uuid: String) {
         postRepository.getPost(uuid)
-            .onStart {  }
-            .catch { Log.d("TAG", "loadPost: ${it.message}") }
+            .catch {
+                Log.d("TAG", "loadPost: ${it.message}")
+            }
             .onEach { response ->
-                _post.value = response
-            }.launchIn(viewModelScope)
+                _post.update {
+                    response
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun loadLocalPost(uuid: String) {
+        roomRepository.getPost(uuid, UserInfo.getEmail())
+            .onEach { post ->
+                if (post.isNotEmpty()) {
+                    _post.update {
+                        post[0]
+                    }
+                }
+            }
+            .catch {
+                Log.d("TAG", "loadLocalPost: ${it.message}")
+            }
+            .takeWhile {
+                false
+            }
+            .launchIn(viewModelScope)
     }
 
     fun finishPostView() {

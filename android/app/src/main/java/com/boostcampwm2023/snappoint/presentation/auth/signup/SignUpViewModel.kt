@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val loginRepository: SignInRepository
+    private val signInRepository: SignInRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<SignUpUiState> = MutableStateFlow(
@@ -128,7 +128,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun getNicknameErrorCode(nickname: String): Int? {
-        return if (nickname.length > 1) null else R.string.signup_fragment_error_nickname
+        return if (nickname.length > 2) null else R.string.signup_fragment_error_nickname
     }
 
     fun onSignUpButtonClicked() {
@@ -137,7 +137,7 @@ class SignUpViewModel @Inject constructor(
                 return
             }
 
-            loginRepository.postSignUp(email, password, nickname)
+            signInRepository.postSignUp(email, password, nickname)
                 .onStart {
                     setProgressBarState(true)
                 }

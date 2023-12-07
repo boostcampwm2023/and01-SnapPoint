@@ -1,5 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
+import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
+
 sealed class MainActivityEvent {
     data object OpenDrawer: MainActivityEvent()
     data object NavigatePrev: MainActivityEvent()
@@ -10,4 +12,5 @@ sealed class MainActivityEvent {
     data object CheckPermissionAndMoveCameraToUserLocation : MainActivityEvent()
     data object HalfOpenBottomSheet: MainActivityEvent()
     data object GetAroundPostFailed: MainActivityEvent()
+    data class NavigateCluster(val tags: List<SnapPointTag>): MainActivityEvent()
 }
