@@ -45,4 +45,8 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </activity>
+    <activity
+        android:id="@+id/createPostActivity"
+        android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity"
+        android:label="CreatePostActivity" />
 </navigation>

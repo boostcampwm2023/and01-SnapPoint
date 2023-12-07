@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSettingBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
@@ -36,8 +37,9 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
             vm = viewModel
 
             btnCreatePost.setOnClickListener {
-                val intent = Intent(requireContext(), CreatePostActivity::class.java)
-                startActivity(intent)
+//                val intent = Intent(requireContext(), CreatePostActivity::class.java)
+//                startActivity(intent)
+                findNavController().navigate(R.id.createPostActivity)
             }
             binding.btnGetPostInRoom.setOnClickListener {
                 viewModel.getSavedPost()
