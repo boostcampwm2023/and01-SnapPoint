@@ -1,61 +1,46 @@
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Injectable } from '@nestjs/common';
-import { File, Prisma } from '@prisma/client';
+import { FileRepository } from '@/domain/file/file.repository';
+import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
+import { UpdateFileDto } from './dtos/update-file.dto';
+import { ProcessFileDto } from '@/domain/file/dtos/process-file.dto';
+import { CreateFileDto } from '@/domain/file/dtos/create-file.dto';
+import { FindFilesByIdDto } from './dtos/find-files-by-id.dto';
 
 @Injectable()
 export class FileService {
-  constructor(private readonly prisma: PrismaProvider) {}
+  constructor(private readonly repository: FileRepository) {}
 
-  async createFile(data: Prisma.FileCreateInput) {
-    return this.prisma.get().file.create({ data });
+  async createFile(dto: CreateFileDto) {
+    return this.repository.createFile(dto);
   }
 
-  async createFiles(data: Prisma.FileCreateManyInput) {
-    return this.prisma.get().file.createMany({ data });
+  async processFile(dto: ProcessFileDto) {
+    const { uuid } = dto;
+    return this.repository.updateFile({ where: { uuid }, data: { isProcessed: true } });
   }
 
-  async findFile(fileWhereUniqueInput: Prisma.FileWhereUniqueInput): Promise<File | null> {
-    return this.prisma.get().file.findUnique({
-      where: { ...fileWhereUniqueInput, isDeleted: false },
-    });
+  async findFilesById(dtos: FindFilesByIdDto[]) {
+    return this.repository.findFiles({ where: { OR: dtos } });
   }
 
-  async findFiles(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.FileWhereUniqueInput;
-    where?: Prisma.FileWhereInput;
-    orderBy?: Prisma.FileOrderByWithRelationInput;
-  }): Promise<File[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.get().file.findMany({
-      skip,
-      take,
-      cursor,
-      where: { ...where, isDeleted: false },
-      orderBy,
-    });
+  async findFilesBySources(source: string, dtos: FindFilesBySourceDto[]) {
+    const conditions = dtos.map((dto) => ({ sourceUuid: dto.sourceUuid }));
+    return this.repository.findFiles({ where: { OR: conditions, AND: { source } } });
   }
 
-  async updateFile(params: { where: Prisma.FileWhereUniqueInput; data: Prisma.FileUpdateInput }) {
-    const { data, where } = params;
-    return this.prisma.get().file.update({
-      data,
-      where,
-    });
+  async attachFiles(dtos: UpdateFileDto[]) {
+    return Promise.all(
+      dtos.map((file) => {
+        const { uuid, source, sourceUuid } = file;
+        return this.repository.updateFile({ where: { uuid }, data: { source, sourceUuid } });
+      }),
+    );
   }
 
-  async deleteFile(where: Prisma.FileWhereUniqueInput): Promise<File> {
-    return this.prisma.get().file.update({
-      data: { isDeleted: true },
-      where,
-    });
-  }
-
-  async deleteFiles(where: Prisma.FileWhereInput) {
-    return this.prisma.get().file.updateMany({
-      data: { isDeleted: true },
-      where,
-    });
+  async modifyFiles(dtos: UpdateFileDto[]) {
+    await this.repository.deleteFiles({ OR: dtos });
+    return Promise.all(
+      dtos.map((dto) => this.repository.updateFile({ where: { uuid: dto.uuid }, data: { ...dto, isDeleted: false } })),
+    );
   }
 }
