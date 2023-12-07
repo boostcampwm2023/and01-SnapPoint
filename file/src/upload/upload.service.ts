@@ -28,7 +28,9 @@ export class UploadService {
     });
   }
 
-  async uploadVideoStart(contentType: string) {
+  async uploadVideoStart(
+    contentType: string,
+  ): Promise<UploadFileStartResponseDto> {
     const fileUuid = randomUUID();
     const filePart = await this.bucketService.createMultipartUpload(
       fileUuid,
@@ -42,7 +44,9 @@ export class UploadService {
     return UploadFileStartResponseDto.of(filePart.Key, filePart.UploadId);
   }
 
-  async getPresignedUrl(uploadFileURLDto: UploadFileURLDto) {
+  async getPresignedUrl(
+    uploadFileURLDto: UploadFileURLDto,
+  ): Promise<{ presignedUrl: string }> {
     const presignedUrl = await this.bucketService.getPresignedUrl(
       uploadFileURLDto.key,
       uploadFileURLDto.uploadId,
@@ -54,7 +58,9 @@ export class UploadService {
     };
   }
 
-  async uploadFilePartComplete(uploadFilePartDto: UploadFileEndDto) {
+  async uploadFilePartComplete(
+    uploadFilePartDto: UploadFileEndDto,
+  ): Promise<UploadFileEndResponsetDto> {
     const { key, uploadId, parts, mimeType } = uploadFilePartDto;
 
     const completeUpload = await this.bucketService.completeMultipartUpload(

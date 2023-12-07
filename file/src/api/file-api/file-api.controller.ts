@@ -151,8 +151,18 @@ export class FileApiController {
     },
   })
   @UseGuards(JwtAuthGuard)
-  async uploadFilePartComplete(@Body() uploadFilePartDto: UploadFileEndDto) {
-    return await this.uploadService.uploadFilePartComplete(uploadFilePartDto);
+  async uploadFilePartComplete(
+    @Body() uploadFilePartDto: UploadFileEndDto,
+    @Req() req,
+  ) {
+    const uploadFileEndResponsetDto =
+      await this.uploadService.uploadFilePartComplete(uploadFilePartDto);
+    this.client.emit(
+      { cmd: 'create_image_data' },
+      { ...uploadFileEndResponsetDto, userUuid: req.user.uuid },
+    );
+
+    return uploadFileEndResponsetDto;
   }
 
   @Post('/video-abort')
@@ -167,10 +177,4 @@ export class FileApiController {
   async uploadFilePartAbort(@Body() uploadFileAbortDto: UploadFileAbortDto) {
     return await this.uploadService.uploadFilePartAbort(uploadFileAbortDto);
   }
-
-  // @Get('/uncompleted-upload-list')
-  // @UseGuards(JwtAuthGuard)
-  // async test() {
-  //   return this.uploadService.test();
-  // }
 }

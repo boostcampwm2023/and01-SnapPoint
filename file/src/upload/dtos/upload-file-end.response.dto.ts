@@ -1,7 +1,7 @@
 export class UploadFileEndResponsetDto {
   uuid: string;
 
-  location: string;
+  url: string;
 
   mimeType: string;
 
@@ -12,7 +12,7 @@ export class UploadFileEndResponsetDto {
   ): UploadFileEndResponsetDto {
     return {
       uuid: uuid,
-      location: location,
+      url: location,
       mimeType: mimeType,
     };
   }
