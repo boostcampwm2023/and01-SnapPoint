@@ -35,6 +35,7 @@ model Post {
   uuid        String   @unique @default(uuid())
   userUuid    String
   title       String
+  summary     String
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
