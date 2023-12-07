@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
@@ -73,6 +74,8 @@ class MainActivity(
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+
+    private val tagBundleKey = "tags"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -177,6 +180,10 @@ class MainActivity(
                             is MainActivityEvent.GetAroundPostFailed -> {
                                 showToastMessage(R.string.get_around_posts_failed)
                             }
+
+                            is MainActivityEvent.NavigateCluster -> {
+                                openClusterListFragment(event.tags)
+                            }
                         }
                     }
                 }
@@ -199,12 +206,26 @@ class MainActivity(
                 }
 
                 launch {
+                    viewModel.uiState.collect {
+                        setMapGestureEnabled(it.isPreviewFragmentShowing)
+                    }
+                }
+
+                launch {
                     viewModel.postState.collect { postState ->
                         while (mapManager.googleMap == null) { delay(100) }
                         mapManager.updateMarkers(postState)
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun setMapGestureEnabled(boolean: Boolean) {
+        mapManager.setZoomGesturesEnabled(boolean.not())
+        mapManager.setScrollGesturesEnabled(boolean.not())
+        if (boolean.not()) {
+            mapManager.removeFocus()
         }
     }
 
@@ -282,9 +303,7 @@ class MainActivity(
         binding.bnv.setOnItemSelectedListener { menuItem ->
             navController.popBackStack()
             navController.navigate(menuItem.itemId)
-            if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            }
+            halfOpenBottomSheetWhenCollapsed()
             true
         }
     }
@@ -298,6 +317,12 @@ class MainActivity(
     private fun openPreviewFragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         navController.navigate(R.id.previewFragment)
+    }
+
+    private fun openClusterListFragment(tags: List<SnapPointTag>) {
+        val bundle = bundleOf(tagBundleKey to tags.toTypedArray())
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        navController.navigate(R.id.clusterPreviewFragment, bundle)
     }
 
     private fun navigateAuthActivity() {

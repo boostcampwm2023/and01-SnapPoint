@@ -147,6 +147,10 @@ class MainViewModel @Inject constructor(
         _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
     }
 
+    fun onClusterClicked(cluster: List<SnapPointTag>) {
+        _event.tryEmit(MainActivityEvent.NavigateCluster(cluster))
+    }
+
     fun focusOfImageMoved(imageIndex: Int) {
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }

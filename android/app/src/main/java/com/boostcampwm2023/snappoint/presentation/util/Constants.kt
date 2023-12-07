@@ -8,4 +8,6 @@ object Constants {
     const val EMAIL_DUPLICATE_ERROR: String = "HTTP 409 Conflict"
     const val UUID_BUNDLE_KEY: String = "uuid"
     const val IS_LOCAL_POST_BUNDLE_KEY: String = "isLocalPost"
+    const val CLUSTER_TEXT_SIZE = 16
+    const val MIN_CLUSTER_SIZE = 2
 }
