@@ -9,17 +9,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemClusterImageBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
-class ClusterListAdapter : ListAdapter<PostBlockState, ClusterItemViewHolder>(diffUtil) {
+class ClusterListAdapter(private val onItemClicked: (Int) -> Unit) : ListAdapter<PostBlockState, ClusterItemViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClusterItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return ClusterItemViewHolder(
-            binding = ItemClusterImageBinding.inflate(inflater, parent, false)
+            binding = ItemClusterImageBinding.inflate(inflater, parent, false),
+            onItemClicked = onItemClicked
         )
     }
 
     override fun onBindViewHolder(holder: ClusterItemViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position)
     }
 
     companion object {
@@ -37,8 +38,8 @@ class ClusterListAdapter : ListAdapter<PostBlockState, ClusterItemViewHolder>(di
 
 }
 
-@BindingAdapter("clusters")
-fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>){
-    if (adapter == null) adapter = ClusterListAdapter()
+@BindingAdapter("clusters", "onItemClick")
+fun RecyclerView.bindRecyclerViewAdapter(blocks: List<PostBlockState>, onItemClicked: (Int) -> Unit) {
+    if (adapter == null) adapter = ClusterListAdapter(onItemClicked)
     (adapter as ClusterListAdapter).submitList(blocks)
 }

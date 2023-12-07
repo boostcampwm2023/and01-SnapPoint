@@ -149,7 +149,7 @@ class MainActivity(
                             }
 
                             MainActivityEvent.NavigateClose -> {
-                                navController.popBackStack()
+                                navController.popBackStack(R.id.aroundFragment, false)
                                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                             }
 
@@ -207,7 +207,7 @@ class MainActivity(
 
                 launch {
                     viewModel.uiState.collect {
-                        setMapGestureEnabled(it.isPreviewFragmentShowing)
+                        setMapGestureEnabled(it.isPreviewFragmentShowing || it.isClusterPreviewShowing)
                     }
                 }
 

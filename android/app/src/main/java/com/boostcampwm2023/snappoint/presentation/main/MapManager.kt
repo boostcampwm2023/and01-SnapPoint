@@ -24,6 +24,7 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -42,8 +43,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     var prevSelectedCluster: Cluster<SnapPointClusterItem>? = null
     var drawnRoute: Polyline? = null
     var prevSelectedIndex = -1
-
-    private val markers: MutableList<Marker> = mutableListOf()
 
     fun moveCamera(latitude: Double, longitude: Double, zoom: Float? = null) {
         zoom?.let {
@@ -70,6 +69,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
     override fun onClusterClick(cluster: Cluster<SnapPointClusterItem>?): Boolean {
         if (cluster == null) return false
+        if (cluster == prevSelectedCluster) return true
 
         setClusterUnfocused(prevSelectedCluster)
 
@@ -97,6 +97,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         }
 
         setClusterUnfocused(prevSelectedCluster)
+        prevSelectedCluster = null
     }
 
     private suspend fun setItemUnfocused(selected: SnapPointClusterItem) {
@@ -158,7 +159,12 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
             setItemUnfocused(prevSelected)
         }
         val selectedBitmap = getSnapPointBitmap(context, block.content, true)
-        clusterManager.markerCollection.markers.find { it.position == block.position.asLatLng() }?.setIcon(
+
+        while (clusterManager.markerCollection.markers.find { it.position == block.position.asLatLng() } == null) {
+            delay(100)
+        }
+        val marker = clusterManager.markerCollection.markers.find { it.position == block.position.asLatLng() }
+        marker?.setIcon(
             BitmapDescriptorFactory.fromBitmap(selectedBitmap)
         )
         prevSelectedMarker = SnapPointClusterItem(
@@ -171,7 +177,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
-        viewModel.startLoading()
         clusterManager.clearItems()
         postState.forEachIndexed { postIndex, postSummaryState ->
             postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>()
@@ -189,7 +194,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                 }
         }
         clusterManager.cluster()
-        viewModel.finishLoading()
     }
 
     fun searchSnapPoints() {

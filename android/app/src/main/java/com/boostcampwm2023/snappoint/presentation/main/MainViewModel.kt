@@ -7,7 +7,6 @@ import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -114,6 +113,18 @@ class MainViewModel @Inject constructor(
             it.copy(
                 isPreviewFragmentShowing = true
             )
+        }
+    }
+
+    fun onClusterPreviewShowing() {
+        _uiState.update {
+            it.copy(isClusterPreviewShowing = true)
+        }
+    }
+
+    fun onClusterPreviewClosing() {
+        _uiState.update {
+            it.copy(isClusterPreviewShowing = false)
         }
     }
 
