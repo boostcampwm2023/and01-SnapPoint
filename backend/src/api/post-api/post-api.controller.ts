@@ -12,7 +12,7 @@ import {
 } from '@nestjs/swagger';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { WritePostDto } from './dtos/write-post.dto';
-import { ReadPostQuery } from './dtos/\bread-post.query.dto';
+import { ReadPostQuery } from './dtos/read-post.query.dto';
 
 @Controller('posts')
 export class PostApiController {
