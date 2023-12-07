@@ -62,9 +62,6 @@
         <activity
             android:name=".presentation.createpost.CreatePostActivity"
             android:exported="true" />
-        <activity
-            android:name=".presentation.clusterimage.ClusterImageActivity"
-            android:exported="true" />
     </application>
 
 </manifest>

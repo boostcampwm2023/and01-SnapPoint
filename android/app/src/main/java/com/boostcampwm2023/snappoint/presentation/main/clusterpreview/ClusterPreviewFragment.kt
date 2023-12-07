@@ -2,13 +2,11 @@ package com.boostcampwm2023.snappoint.presentation.main.clusterpreview
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentClusterPreviewBinding
@@ -27,7 +25,7 @@ class ClusterPreviewFragment : BaseFragment<FragmentClusterPreviewBinding>(R.lay
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainViewModel.onPreviewFragmentShowing()
+        mainViewModel.onClusterPreviewShowing()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,7 +38,7 @@ class ClusterPreviewFragment : BaseFragment<FragmentClusterPreviewBinding>(R.lay
 
     override fun onDestroy() {
         super.onDestroy()
-        mainViewModel.onPreviewFragmentClosing()
+        mainViewModel.onClusterPreviewClosing()
     }
 
     private fun initBinding() {
@@ -59,7 +57,7 @@ class ClusterPreviewFragment : BaseFragment<FragmentClusterPreviewBinding>(R.lay
                 clusterPreviewViewModel.event.collect { event ->
                     when (event) {
                         is ClusterPreviewEvent.NavigateClusterImage -> {
-                            navigateToClusterImage(event.index)
+                            navigateToPreview(event.index)
                         }
                     }
                 }
@@ -76,8 +74,8 @@ class ClusterPreviewFragment : BaseFragment<FragmentClusterPreviewBinding>(R.lay
         clusterPreviewViewModel.updatePostList(list.toList())
     }
 
-    private fun navigateToClusterImage(index: Int) {
-        val bundle = bundleOf("tag" to args.tags[index])
-        findNavController().navigate(R.id.action_clusterPreviewFragment_to_clusterImageActivity, bundle)
+    private fun navigateToPreview(index: Int) {
+        val tag = args.tags[index]
+        mainViewModel.onMarkerClicked(tag)
     }
 }

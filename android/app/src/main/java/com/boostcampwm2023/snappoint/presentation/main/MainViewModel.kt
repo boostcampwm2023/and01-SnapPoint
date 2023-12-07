@@ -95,6 +95,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onClusterPreviewShowing() {
+        _uiState.update {
+            it.copy(isClusterPreviewShowing = true)
+        }
+    }
+
+    fun onClusterPreviewClosing() {
+        _uiState.update {
+            it.copy(isClusterPreviewShowing = false)
+        }
+    }
+
     private fun updateSelectedIndex(index: Int){
         _markerState.value = MarkerUiState(
             selectedIndex = index,
@@ -121,8 +133,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun onMarkerClicked(tag: SnapPointTag) {
-        updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
         _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
+        updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
     }
 
     fun onClusterClicked(cluster: List<SnapPointTag>) {

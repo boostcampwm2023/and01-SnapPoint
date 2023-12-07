@@ -44,16 +44,5 @@
         <argument
             android:name="tags"
             app:argType="com.boostcampwm2023.snappoint.presentation.model.SnapPointTag[]" />
-        <action
-            android:id="@+id/action_clusterPreviewFragment_to_clusterImageActivity"
-            app:destination="@id/clusterImageActivity" />
     </fragment>
-    <activity
-        android:id="@+id/clusterImageActivity"
-        android:name="com.boostcampwm2023.snappoint.presentation.clusterimage.ClusterImageActivity"
-        android:label="ClusterImageActivity" >
-        <argument
-            android:name="tag"
-            app:argType="com.boostcampwm2023.snappoint.presentation.model.SnapPointTag" />
-    </activity>
 </navigation>
