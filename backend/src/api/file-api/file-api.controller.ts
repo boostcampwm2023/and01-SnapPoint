@@ -35,6 +35,15 @@ export class FileApiController {
     channel.ack(originalMsg);
   }
 
+  @MessagePattern({ cmd: 'create_video_data' })
+  async createLargeFileData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    await this.fileApiService.createFile(createFileDataDto, true);
+    channel.ack(originalMsg);
+  }
+
   async deleteFileData() {}
 
   async accessFile() {}
