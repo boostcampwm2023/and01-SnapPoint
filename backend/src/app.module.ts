@@ -17,7 +17,6 @@ import { validationPipe } from './common/pipes/validation.pipe';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { HealthModule } from './common/health/health.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [

@@ -6,4 +6,6 @@ export class CreateFileDto {
   url: string;
 
   mimeType: string;
+
+  isProcessed: boolean;
 }
