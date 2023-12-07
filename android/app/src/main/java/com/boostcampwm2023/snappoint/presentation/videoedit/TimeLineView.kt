@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class TimeLineView(
     context: Context,
@@ -39,6 +40,7 @@ class TimeLineView(
     }
 
     private fun initListener() {
+        var before = 1000F
         setOnTouchListener { _, event ->
             Log.d("TAG", "initListener: ${event.x} ${event.y}")
             when (event.action) {
@@ -47,7 +49,10 @@ class TimeLineView(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    viewModel?.onLeftThumbMoved(event.x.toLong())
+                    if(abs(before - event.x) >= 5 ){
+                        before = event.x
+                        viewModel?.onRightThumbMoved(event.x.toLong())
+                    }
 
                 }
 
