@@ -7,7 +7,6 @@ import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -155,8 +154,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun onMarkerClicked(tag: SnapPointTag) {
-        _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
         updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
+        _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
     }
 
     fun onClusterClicked(cluster: List<SnapPointTag>) {
