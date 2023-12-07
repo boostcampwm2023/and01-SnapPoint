@@ -14,7 +14,7 @@ import { Sql } from '@prisma/client/runtime/library';
 export class BlockRepository {
   constructor(private readonly prisma: PrismaProvider) {}
 
-  async createMany(postUuid: string, dtos: CreateBlockDto[]): Promise<Block> {
+  async createMany(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
     const values = dtos.map((dto) => {
       const { uuid, content, type, order, latitude, longitude } = dto;
       const coords = type === 'media' ? `ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)` : null;
@@ -27,15 +27,15 @@ export class BlockRepository {
     )}`;
   }
 
-  async findManyById(dto: FindBlocksByIdDto): Promise<Block[]> {
-    const { uuid } = dto;
+  async findManyByIds(dtos: FindBlocksByIdDto[]): Promise<Block[]> {
+    const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"uuid" = ${dto.uuid}`);
 
     const blocks: Block[] = await this.prisma.get().$queryRaw`
       SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
               "createdAt", "modifiedAt", "isDeleted",
               ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
       FROM    "Block"
-      WHERE   "uuid" = ${uuid} AND "isDeleted" = 'false'
+      WHERE   ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
     `;
 
     return blocks;
