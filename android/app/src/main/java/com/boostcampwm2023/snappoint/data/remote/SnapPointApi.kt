@@ -3,13 +3,19 @@ package com.boostcampwm2023.snappoint.data.remote
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignInRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.SignupRequest
+import com.boostcampwm2023.snappoint.data.remote.model.request.VideoAbortRequest
+import com.boostcampwm2023.snappoint.data.remote.model.request.VideoEndRequest
+import com.boostcampwm2023.snappoint.data.remote.model.request.VideoUrlRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.VideoStartResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageUriResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignInResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignupResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.VideoEndResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.VideoUrlResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -65,4 +71,25 @@ interface SnapPointApi {
     suspend fun getPost(
         @Path("uuid") uuid: String
     ): GetPostResponse
+
+    @GET("files/video-start")
+    suspend fun getVideoStart(
+        @Query("contentType") contentType: String,
+    ): VideoStartResponse
+
+    @POST("files/video-url")
+    suspend fun postVideoUrl(
+        @Body videoUrlRequest: VideoUrlRequest,
+    ): VideoUrlResponse
+
+    @POST("files/video-end")
+    suspend fun postVideoEnd(
+        @Body videoEndRequest: VideoEndRequest,
+    ): VideoEndResponse
+
+    @POST("files/video-abort")
+    suspend fun postVideoAbort(
+        @Body videoAbortRequest: VideoAbortRequest
+    ): Unit
+
 }
