@@ -169,7 +169,7 @@ export class FileApiController {
   @Post('/video-abort')
   @ApiOperation({
     summary: '동영상 업로드 종료 API',
-    description: '동영상 업로드를 종료한다.',
+    description: '동영상 업로드를 취소한다.',
   })
   @ApiBody({
     type: UploadFileAbortDto,
