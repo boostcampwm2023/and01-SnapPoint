@@ -81,7 +81,6 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
 
                 viewModel.addVideoBlock(videoUri, position, mimeType)
 
-                //버전 11부터 파일을 가져와서 조작, 수정하는게 막힘
                 startVideoEditActivity(viewModel.uiState.value.postBlocks.lastIndex, videoUri)
             }
         }
