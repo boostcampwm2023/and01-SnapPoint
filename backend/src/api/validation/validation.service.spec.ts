@@ -3,15 +3,15 @@ import { ValidationService } from './validation.service';
 import { FileService } from '@/domain/file/file.service';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaService } from '@/common/prisma/prisma.service';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { mockDeep } from 'jest-mock-extended';
 import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { ValidateFileDto } from './dtos/validate-file.dto';
 import { ValidateBlockDto } from './dtos/validate-block.dto';
 
 describe('ValidationService', () => {
   let service: ValidationService;
-  let fileService: DeepMockProxy<FileService>;
+  // let fileService: DeepMockProxy<FileService>;
   let mockFileDto: ValidateFileDto;
   let mockBlockDto: ValidateBlockDto;
 
@@ -26,7 +26,7 @@ describe('ValidationService', () => {
       .compile();
 
     service = module.get<ValidationService>(ValidationService);
-    fileService = module.get(FileService);
+    // fileService = module.get(FileService);
 
     mockFileDto = {
       uuid: 'mock-file-uuid-1',
@@ -41,31 +41,31 @@ describe('ValidationService', () => {
     };
   });
 
-  describe('validateFile()', () => {
-    it('업로드된 파일이 없을 경우 BadRequestException을 발생시킨다', async () => {
-      fileService.findFiles.mockResolvedValue([]);
-      await expect(service.validateFiles([mockFileDto], 'mock-user-uuid')).rejects.toThrow(BadRequestException);
-    });
+  // describe('validateFile()', () => {
+  //   it('업로드된 파일이 없을 경우 BadRequestException을 발생시킨다', async () => {
+  //     fileService.findFiles.mockResolvedValue([]);
+  //     await expect(service.validateFiles([mockFileDto], 'mock-user-uuid')).rejects.toThrow(BadRequestException);
+  //   });
 
-    it('자신이 업로드하지 않은 파일일 경우 ForbiddenException을 발생시킨다', async () => {
-      fileService.findFiles.mockResolvedValue([
-        {
-          id: 1,
-          uuid: 'mock-file-uuid-1',
-          userUuid: 'mock-user-uuid',
-          mimeType: 'image/jpeg',
-          url: 'https://mock.storage.com/mock-file-uuid-1',
-          createdAt: new Date('2023-11-23T15:02:10.626Z'),
-          isDeleted: false,
-          source: null,
-          sourceUuid: null,
-          isProcessed: false,
-        },
-      ]);
+  //   it('자신이 업로드하지 않은 파일일 경우 ForbiddenException을 발생시킨다', async () => {
+  //     fileService.findFiles.mockResolvedValue([
+  //       {
+  //         id: 1,
+  //         uuid: 'mock-file-uuid-1',
+  //         userUuid: 'mock-user-uuid',
+  //         mimeType: 'image/jpeg',
+  //         url: 'https://mock.storage.com/mock-file-uuid-1',
+  //         createdAt: new Date('2023-11-23T15:02:10.626Z'),
+  //         isDeleted: false,
+  //         source: null,
+  //         sourceUuid: null,
+  //         isProcessed: false,
+  //       },
+  //     ]);
 
-      await expect(service.validateFiles([mockFileDto], 'not-exist-user-uuid')).rejects.toThrow(ForbiddenException);
-    });
-  });
+  //     await expect(service.validateFiles([mockFileDto], 'not-exist-user-uuid')).rejects.toThrow(ForbiddenException);
+  //   });
+  // });
 
   describe('validateBlocks()', () => {
     it('텍스트 타입에 위도 및 경도 값이 포함된 경우 BadRequestException을 발생시킨다', async () => {

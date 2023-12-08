@@ -5,6 +5,7 @@ import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { FileService } from '@/domain/file/file.service';
 import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
 
 // 모의 Microservice Client
 class MockMicroserviceClient {
@@ -25,6 +26,7 @@ describe('FileApiController', () => {
           provide: 'MEDIA_SERVICE',
           useValue: new MockMicroserviceClient(), // 모의 클라이언트 사용
         },
+        RedisCacheService,
       ],
     })
       .overrideProvider(PrismaProvider)

@@ -24,7 +24,7 @@ describe('RedisCacheService', () => {
     it('캐싱된 값이 있는 경우 OK를 반환한다.', async () => {
       redisService.getClient().set.mockResolvedValueOnce('OK');
 
-      expect(await cacheService.set<string>('key', 'value', (s: string) => s)).toEqual('OK');
+      expect(await cacheService.set<string>('key', 'value', 30, (s: string) => s)).toEqual('OK');
     });
   });
 

@@ -13,6 +13,7 @@ import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { WritePostDto } from './dtos/write-post.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { SummarizationService } from '../summarization/summarization.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
@@ -32,6 +33,7 @@ describe('PostApiService', () => {
         BlockService,
         FileService,
         RedisCacheService,
+        SummarizationService,
       ],
     })
       .overrideProvider(PrismaProvider)
@@ -65,6 +67,7 @@ describe('PostApiService', () => {
       uuid: 'mock-post-uuid',
       userUuid: 'mock-user-uuid',
       title: 'Test Post',
+      summary: '',
       createdAt: new Date('2023-11-23T15:02:10.626Z'),
       modifiedAt: new Date('2023-11-23T15:02:10.626Z'),
       isDeleted: false,
