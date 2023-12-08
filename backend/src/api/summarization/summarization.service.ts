@@ -46,7 +46,7 @@ export class SummarizationService {
   private prepareContent(blocks: { content: string; type: string }[]): string {
     return blocks
       .map((block) => block.content)
-      .join('\n')
+      .join('. ')
       .substring(0, this.maxContentLength);
   }
 

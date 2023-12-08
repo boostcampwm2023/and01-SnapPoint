@@ -177,11 +177,12 @@ export class PostApiService {
     }
 
     return this.prisma.beginTransaction(async () => {
-      const [summary, updatedBlocks, updatedFiles] = await Promise.all([
-        this.summaryService.summarizePost(post.title, blocks),
+      const [updatedBlocks, updatedFiles] = await Promise.all([
         this.blockService.modifyBlocks(uuid, blocks),
         this.fileService.modifyFiles(files),
       ]);
+
+      const summary = await this.summaryService.summarizePost(post.title, blocks);
 
       const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary } });
 
