@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
@@ -8,11 +8,13 @@ import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/file-api/dto/file.dto';
 import { Block, File, Post } from '@prisma/client';
-import { TransformationService } from '../transformation/transformation.service';
+import { TransformationService } from '@/api/transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { WritePostDto } from './dtos/write-post.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
-import { SummarizationService } from '../summarization/summarization.service';
+import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
+import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
+import { SummarizationService } from '@/api/summarization/summarization.service';
 
 @Injectable()
 export class PostApiService {
@@ -26,45 +28,6 @@ export class PostApiService {
     private readonly redisService: RedisCacheService,
     private readonly summaryService: SummarizationService,
   ) {}
-
-  private async readPost(post: Post) {
-    const blockKey = `block:${post.uuid}`;
-
-    const blocks = await this.redisService.smembers<Block>(
-      blockKey,
-      (s: string) => {
-        return JSON.parse(s);
-      },
-      async (key: string) => {
-        // 캐싱된 값이 없는 경우
-        const uuid = key.substring('block:'.length);
-        return this.blockService.findBlocksByPost({ postUuid: uuid });
-      },
-    );
-
-    if (!blocks) {
-      throw new InternalServerErrorException('게시물에 블럭이 존재하지 않습니다.');
-    }
-
-    const fileKey = `file:${post.uuid}`;
-    let files = await this.redisService.smembers<File>(fileKey, (s: string) => {
-      return JSON.parse(s);
-    });
-
-    if (!files) {
-      files = await this.fileService.findFilesBySources('block', blocks);
-      await this.redisService.sadd<File>(fileKey, files, 30, (file: File) => JSON.stringify(file));
-    }
-
-    const fileDtoMap = this.transform.toMapFromArray<File, string, FileDto>(
-      files,
-      (file: File) => file.sourceUuid!,
-      (file: File) => FileDto.of(file),
-    );
-
-    const blockDtos = blocks.map((block) => BlockDto.of(block, fileDtoMap.get(block.uuid)));
-    return PostDto.of(post, blockDtos);
-  }
 
   private assemblePost(post: Post, blocks: Block[], files: File[]): PostDto {
     const blockDtoMap = this.createBlockDtoMap(files, blocks);
@@ -92,6 +55,49 @@ export class PostApiService {
     return blockDtoMap;
   }
 
+  async findEntireBlocksWithPost(posts: Post[]) {
+    const keys = posts.map((post) => `block:${post.uuid}`);
+    const entireBlocks = await this.redisService.mget<Block>(
+      keys,
+      (value) => JSON.parse(value),
+      async (keys) => {
+        const dtos: FindBlocksByPostDto[] = keys.map((key) => {
+          const uuid = key.substring('block:'.length);
+          return { postUuid: uuid };
+        });
+        return await this.blockService.findBlocksByPosts(dtos);
+      },
+    );
+
+    if (!entireBlocks) {
+      throw new NotFoundException('존재하는 데이터가 없습니다.');
+    }
+
+    return entireBlocks;
+  }
+
+  async findEntireFilesWithBlocks(blocks: Block[]) {
+    const keys = blocks.map((block) => `file:${block.uuid}`);
+    const entireFiles = await this.redisService.mget<File>(
+      keys,
+      (value) => JSON.parse(value),
+      async (keys) => {
+        const dtos: FindFilesBySourceDto[] = keys.map((key) => {
+          const uuid = key.substring('file:'.length);
+          return { uuid: uuid };
+        });
+
+        return await this.fileService.findFilesBySources('block', dtos);
+      },
+    );
+
+    if (!entireFiles) {
+      throw new NotFoundException('존재하는 데이터가 없습니다.');
+    }
+
+    return entireFiles;
+  }
+
   async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
@@ -103,11 +109,10 @@ export class PostApiService {
     const posts = await this.postService.findPosts({ where: { OR: blockPostUuids } });
 
     // 3. 게시글과 연관된 모든 블록을 찾는다.
-    const postUuids = posts.map((post) => ({ postUuid: post.uuid }));
-    const entireBlocks = await this.blockService.findBlocksByPosts(postUuids);
-
+    const entireBlocks = await this.findEntireBlocksWithPost(posts);
     // 4. 블록과 연관된 모든 파일을 찾는다.
-    const entireFiles = await this.fileService.findFilesBySources('block', blocks);
+
+    const entireFiles = await this.findEntireFilesWithBlocks(entireBlocks);
 
     return this.assemblePosts(posts, entireBlocks, entireFiles);
   }
@@ -150,7 +155,9 @@ export class PostApiService {
       ]);
 
       await this.redisService.del(`block:${postUuid}`);
-      await this.redisService.del(`file:${postUuid}`);
+      const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
+      await this.redisService.del(deleteCacheKeys);
+
       return this.assemblePost(createdPost, createdBlocks, createdFiles);
     });
   }
@@ -178,11 +185,12 @@ export class PostApiService {
 
       const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary } });
 
-      await Promise.all([
-        this.validation.validateBlocks(blocks, files),
-        this.redisService.del(`block:${uuid}`),
-        this.redisService.del(`file:${uuid}`),
-      ]);
+      await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
+
+      await this.redisService.del(`block:${uuid}`);
+
+      const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
+      await this.redisService.del(deleteCacheKeys);
 
       return this.assemblePost(updatedPost, updatedBlocks, updatedFiles);
     });
