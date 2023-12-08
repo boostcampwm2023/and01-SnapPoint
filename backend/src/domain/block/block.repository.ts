@@ -31,11 +31,12 @@ export class BlockRepository {
     const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"uuid" = ${dto.uuid}`);
 
     const blocks: Block[] = await this.prisma.get().$queryRaw`
-      SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
-              "createdAt", "modifiedAt", "isDeleted",
-              ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM    "Block"
-      WHERE   ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
+      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
+                "createdAt", "modifiedAt", "isDeleted",
+                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
+      FROM      "Block"
+      WHERE     ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
+      ORDER BY  "order" 
     `;
 
     return blocks;
@@ -50,6 +51,7 @@ export class BlockRepository {
               ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
       FROM    "Block"
       WHERE   "postUuid" = ${postUuid} AND "isDeleted" = 'false'
+      ORDER BY  "order" 
     `;
   }
 
@@ -57,11 +59,12 @@ export class BlockRepository {
     const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"postUuid" = ${dto.postUuid}`);
 
     return this.prisma.get().$queryRaw`
-      SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
-              "createdAt", "modifiedAt", "isDeleted",
-              ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM    "Block"
-      WHERE   ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
+      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
+                "createdAt", "modifiedAt", "isDeleted",
+                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
+      FROM      "Block"
+      WHERE     ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
+      ORDER BY  "order" 
     `;
   }
 
