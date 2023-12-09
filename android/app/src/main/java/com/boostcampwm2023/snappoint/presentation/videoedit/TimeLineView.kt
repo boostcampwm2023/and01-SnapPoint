@@ -46,25 +46,10 @@ class TimeLineView(
         initListener()
     }
 
-  /*  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        // 비율만큼 left, right 변경
-        if(w != oldw){
-            viewWidth = w.toFloat()
-        }
-        getBitMap()
-    }*/
-
     private fun getBitMap() {
-        //viewmodel 데이터 기준, 왼쪽 오른쪽 비율만큰 thumb 놓기
         secDivideTenX =  viewWidth * 100 / videoLengthInMs
         leftMoved(timeToPosition(viewModel?.leftThumbState?.value!!))
-        Log.d("TAG", "collectViewModelData: ${viewModel?.rightThumbState?.value!!}")
         rightMoved(timeToPosition(viewModel?.rightThumbState?.value!!))
-        Log.d("TAG", " viewWidth $viewWidth leftPosX $leftPosX rightPosX $rightPosX videoLengthInMs $videoLengthInMs secDivideTenX $secDivideTenX viewModel?.recentState?.value ${viewModel?.recentState?.value}")
-
-
-        invalidate()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -76,7 +61,7 @@ class TimeLineView(
             val x = event.x
             if(x < 0 || x > viewWidth) {
                 before = ""
-                true
+                return@setOnTouchListener true
             }
             Log.d("TAG", "before  $before x $x viewWidth $viewWidth leftPosX $leftPosX rightPosX $rightPosX videoLengthInMs $videoLengthInMs secDivideTenX $secDivideTenX viewModel?.recentState?.value ${viewModel?.recentState?.value}")
             when (event.action) {
@@ -94,6 +79,12 @@ class TimeLineView(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
+                    if(rightRect.intersect(leftRect)) {
+                        when{
+                            before == "L" && x > recent -> return@setOnTouchListener true
+                            before == "R" && x < recent -> return@setOnTouchListener true
+                        }
+                    }
                     when(before){
                         "L" ->{
                             leftMoved(x)
@@ -122,7 +113,7 @@ class TimeLineView(
 
                 }
             }
-            true
+            return@setOnTouchListener true
         }
     }
 
@@ -174,10 +165,6 @@ class TimeLineView(
 
     fun setUri(uri: String){
         this.uri = uri.toUri()
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onDraw(canvas: Canvas) {
