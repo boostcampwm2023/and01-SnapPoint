@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/post_edit"
-        android:icon="@drawable/icon_edit"
+        android:icon="@drawable/icon_edit_circle"
         app:showAsAction="withText"
         android:title="@string/post_app_bar_edit" />
     <item
@@ -19,7 +19,7 @@
         android:title="@string/post_app_bar_report" />
     <item
         android:id="@+id/post_ignore"
-        android:icon="@drawable/icon_cancel"
+        android:icon="@drawable/icon_cancel_circle"
         app:showAsAction="withText"
         android:title="@string/post_app_bar_ignore" />
 </menu>
