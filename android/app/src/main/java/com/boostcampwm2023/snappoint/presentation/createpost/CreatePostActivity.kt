@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.location.Geocoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -35,12 +36,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.net.URL
+import java.util.Locale
 
 @AndroidEntryPoint
 class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.activity_create_post) {
 
     private val viewModel: CreatePostViewModel by viewModels()
     private val args: CreatePostActivityArgs by navArgs()
+
+    private val geocoder: Geocoder by lazy { Geocoder(applicationContext, Locale.KOREA) }
 
     private val imagePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
@@ -180,13 +184,13 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         }
 
         val prevPost: PostSummaryState = Json.decodeFromString<PostSummaryState>(args.post)
-        with(viewModel) {
-            updateUuid(prevPost.uuid)
-            updateTitle(prevPost.title)
+        lifecycleScope.launch {
+            viewModel.updateUuid(prevPost.uuid)
+            viewModel.updateTitle(prevPost.title)
             prevPost.postBlocks.forEach { block ->
                 when (block) {
                     is PostBlockState.TEXT -> {
-                        addTextBlock(block.content)
+                        addTextBlock(block)
                     }
 
                     is PostBlockState.IMAGE -> {
@@ -199,6 +203,32 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                 }
             }
         }
+    }
+
+    private fun addTextBlock(block: PostBlockState.TEXT) {
+        viewModel.addTextBlock(block.content)
+    }
+
+    private suspend fun addImageBlock(block: PostBlockState.IMAGE) {
+        val bitmap = withContext(Dispatchers.IO) {
+            BitmapFactory.decodeStream(
+                URL(block.content).openConnection().getInputStream()
+            )
+        }
+
+        val addresses = geocoder.getFromLocation(
+            block.position.latitude,
+            block.position.longitude,
+            1
+        )
+        val address =
+            if (addresses.isNullOrEmpty()) "" else addresses[0].getAddressLine(0)
+
+        viewModel.addImageBlock(bitmap, address, block)
+    }
+
+    private fun addVideoBlock(block: PostBlockState.VIDEO) {
+        //viewModel.addVideoBlock(block)
     }
 
     private fun selectVideo() {

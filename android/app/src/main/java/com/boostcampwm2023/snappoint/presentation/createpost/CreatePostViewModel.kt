@@ -81,24 +81,20 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addImageBlock(block: PostBlockState.IMAGE) {
-        viewModelScope.launch {
-            val bitmap = withContext(Dispatchers.IO) {
-                BitmapFactory.decodeStream(URL(block.content).openConnection().getInputStream())
-            }
-            _uiState.update {
-                it.copy(
-                    postBlocks = it.postBlocks.plus(
-                        PostBlockCreationState.IMAGE(
-                            content = block.content,
-                            uuid = block.uuid,
-                            description = block.description,
-                            position = block.position.copy(),
-                            bitmap = bitmap
-                        )
+    fun addImageBlock(bitmap: Bitmap, address: String, block: PostBlockState.IMAGE) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.plus(
+                    PostBlockCreationState.IMAGE(
+                        content = block.content,
+                        uuid = block.uuid,
+                        description = block.description,
+                        position = block.position.copy(),
+                        address = address,
+                        bitmap = bitmap
                     )
                 )
-            }
+            )
         }
     }
 
