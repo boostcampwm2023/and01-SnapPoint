@@ -268,32 +268,7 @@ class CreatePostViewModel @Inject constructor(
     }
 
     private fun postNewPost() {
-        _uiState.update {
-            it.copy(isLoading = true)
-        }
         postRepository.postCreatePost(
-            title = _uiState.value.title,
-            postBlocks = _uiState.value.postBlocks
-        )
-            .onStart {}
-            .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
-            .onCompletion {
-                _uiState.update {
-                    it.copy(isLoading = false)
-                }
-            }
-            .onEach {
-                Log.d("TAG", "onCheckButtonClicked: api request success")
-                Log.d("TAG", "onCheckButtonClicked: ${it}")
-                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
-                _event.tryEmit(CreatePostEvent.NavigatePrev)
-            }
-            .launchIn(viewModelScope)
-    }
-
-    private fun putEditedPost() {
-        postRepository.putModifiedPost(
-            uuid = _uiState.value.uuid,
             title = _uiState.value.title,
             postBlocks = _uiState.value.postBlocks
         )
@@ -311,8 +286,36 @@ class CreatePostViewModel @Inject constructor(
                 }
             }
             .onEach {
+                Log.d("TAG", "onCheckButtonClicked: api request success")
+                Log.d("TAG", "onCheckButtonClicked: ${it}")
+                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
+                _event.tryEmit(CreatePostEvent.NavigatePrev)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun putEditedPost() {
+        postRepository.putModifiedPost(
+            uuid = uiState.value.uuid,
+            title = uiState.value.title,
+            postBlocks = uiState.value.postBlocks
+        )
+            .onStart {
+                _uiState.update {
+                    it.copy(isLoading = true)
+                }
+            }
+            .catch {
+                Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}")
+            }
+            .onEach {
                 _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_modification_success))
                 _event.tryEmit(CreatePostEvent.NavigatePrev)
+            }
+            .onCompletion {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -328,7 +331,6 @@ class CreatePostViewModel @Inject constructor(
     fun onBackButtonClicked(){
         _event.tryEmit(CreatePostEvent.NavigatePrev)
     }
-
 
     private fun findAddress(index: Int) {
 
