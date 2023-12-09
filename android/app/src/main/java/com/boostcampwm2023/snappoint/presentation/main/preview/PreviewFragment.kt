@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.boostcampwm2023.snappoint.R
@@ -38,6 +39,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         initViewSize()
 
         collectViewModelData()
+        collectViewModelEvent()
 
         setScrollEvent()
     }
@@ -76,6 +78,20 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         }
     }
 
+    private fun collectViewModelEvent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                previewViewModel.event.collect { event ->
+                    when(event) {
+                        is PreviewEvent.NavigateViewPost -> {
+                            navigateViewPost()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun moveScroll(focusedSnapPointIndex: Int) {
         if (binding.rcvPreview.scrollState == RecyclerView.SCROLL_STATE_IDLE)
             layoutManager.scrollToPosition(focusedSnapPointIndex)
@@ -96,5 +112,9 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
                 mainViewModel.focusOfImageMoved(currentFocusImageIndex)
             }
         }
+    }
+
+    private fun navigateViewPost() {
+        findNavController().navigate(R.id.viewPostActivity)
     }
 }

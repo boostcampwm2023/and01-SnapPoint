@@ -60,7 +60,9 @@ class PostRepositoryImpl @Inject constructor(
             .map {
                 val request = buildCreatePostRequest(title, postBlocks)
                 Log.d("LOG", "REQUEST: ${request}")
-                snapPointApi.createPost(request)
+                val response = snapPointApi.createPost(request)
+                Log.d("LOG", "RESPONSE: ${response}")
+                response.body()!!
             }
     }
 
