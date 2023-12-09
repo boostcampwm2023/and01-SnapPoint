@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.core.content.ContextCompat.getColor
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
@@ -180,17 +181,33 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
         clusterManager.clearItems()
         postState.forEachIndexed { postIndex, postSummaryState ->
-            postSummaryState.postBlocks.filterIsInstance<PostBlockState.IMAGE>()
+            postSummaryState.postBlocks.filter { it !is PostBlockState.TEXT }
                 .forEachIndexed { pointIndex, postBlockState ->
                     // cluster
-                    val snapPoint = getSnapPointBitmap(context, postBlockState.content, false)
-                    val clusterItem = SnapPointClusterItem(
-                        position = postBlockState.position.asLatLng(),
-                        tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
-                        content = postBlockState.content,
-                        icon = snapPoint
-                    )
+                    lateinit var snapPoint: Bitmap
+                    lateinit var clusterItem: SnapPointClusterItem
+                    when(postBlockState){
+                        is PostBlockState.IMAGE -> {
+                            snapPoint = getSnapPointBitmap(context, postBlockState.url144P, false)
+                            clusterItem = SnapPointClusterItem(
+                                position = postBlockState.position.asLatLng(),
+                                tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                content = postBlockState.url144P,
+                                icon = snapPoint
+                            )
 
+                        }
+                        is PostBlockState.VIDEO -> {
+                            snapPoint = getSnapPointBitmap(context, postBlockState.thumbnail144P, false)
+                            clusterItem = SnapPointClusterItem(
+                                position = postBlockState.position.asLatLng(),
+                                tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                content = postBlockState.thumbnail144P,
+                                icon = snapPoint
+                            )
+                        }
+                        else -> { }
+                    }
                     clusterManager.addItem(clusterItem)
                 }
         }

@@ -26,6 +26,8 @@ sealed class PostBlockState {
     data class IMAGE(
         override val content: String = "",
         override val uuid: String = "",
+        val url480P: String = "",
+        val url144P: String = "",
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
     ) : PostBlockState()
@@ -34,6 +36,10 @@ sealed class PostBlockState {
         override val content: String = "",
         override val uuid: String = "",
         val description: String = "",
+        val thumbnail720P: String = "",
+        val thumbnail480P: String = "",
+        val thumbnail144P: String = "",
+        val thumbnailUuid: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
     ) : PostBlockState()
     @Serializable
