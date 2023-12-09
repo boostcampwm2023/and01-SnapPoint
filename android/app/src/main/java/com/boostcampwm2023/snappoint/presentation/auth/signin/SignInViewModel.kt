@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.SignInRepository
-import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
+import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val loginUtil: SignInUtil,
+    private val userInfoPreference: UserInfoPreference,
     private val loginRepository: SignInRepository
 ) : ViewModel() {
 
@@ -72,7 +72,7 @@ class SignInViewModel @Inject constructor(
                 setProgressBarState(true)
             }
             .onEach {
-                loginUtil.setUserAuthData(email, password)
+                userInfoPreference.setUserAuthData(email, password)
                 _event.emit(SignInEvent.NavigateToMainActivity)
             }
             .catch {

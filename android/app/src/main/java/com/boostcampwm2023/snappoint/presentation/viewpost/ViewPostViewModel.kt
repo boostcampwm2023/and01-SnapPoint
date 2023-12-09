@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject

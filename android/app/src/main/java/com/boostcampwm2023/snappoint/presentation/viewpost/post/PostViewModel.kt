@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
 import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
