@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.UserInfo
 import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -78,13 +77,13 @@ class PostViewModel @Inject constructor(
 
     fun saveCurrentPostToLocal(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.insertPosts(post, UserInfo.getEmail())
+            roomRepository.insertPosts(post, userInfoPreference.getEmail())
         }
     }
 
     fun deleteCurrentPostFromLocal(uuid: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.deletePost(uuid, UserInfo.getEmail())
+            roomRepository.deletePost(uuid, userInfoPreference.getEmail())
         }
     }
 }
