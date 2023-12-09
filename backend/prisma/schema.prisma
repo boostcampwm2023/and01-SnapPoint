@@ -72,4 +72,5 @@ model File {
   isProcessed Boolean  @default(false)
   source      String?
   sourceUuid  String?
+  thumbnailUuid String?
 }
