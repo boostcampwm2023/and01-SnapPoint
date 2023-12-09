@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.data.repository
 
+import android.util.Log
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
@@ -22,6 +23,7 @@ class PostRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi,
 ): PostRepository {
     override fun getImage(uri: String): Flow<ByteArray> {
+
         return flowOf(true)
             .map{
             byteArrayOf()
@@ -29,6 +31,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun getImageUri(image: ByteArray): Flow<Unit> {
+
         return flowOf(true)
             .map{
 
@@ -36,6 +39,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun getVideo(uri: String): Flow<ByteArray> {
+
         return flowOf(true)
             .map{
                 byteArrayOf()
@@ -43,6 +47,7 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override fun getVideoUri(video: ByteArray): Flow<Unit> {
+
         return flowOf(true)
             .map{
 
@@ -54,6 +59,7 @@ class PostRepositoryImpl @Inject constructor(
         return flowOf(true)
             .map {
                 val request = buildCreatePostRequest(title, postBlocks)
+                Log.d("LOG", "REQUEST: ${request}")
                 snapPointApi.createPost(request)
             }
     }
@@ -63,25 +69,28 @@ class PostRepositoryImpl @Inject constructor(
         return flowOf(true)
             .map {
                 val request = buildCreatePostRequest(title, postBlocks)
+                Log.d("LOG", "REQUEST: ${request}")
                 snapPointApi.modifyPost(uuid, request)
             }
     }
 
     override fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<PostSummaryState>> {
 
-        return flowOf(true
-        ).map {
-            snapPointApi.getAroundPost(leftBottom, rightTop)
-        }.map{ response ->
-            response.asPostSummaryState()
-        }
+        return flowOf(true)
+            .map {
+                snapPointApi.getAroundPost(leftBottom, rightTop)
+            }.map { response ->
+                response.asPostSummaryState()
+            }
     }
 
     override fun getPost(uuid: String): Flow<PostSummaryState> {
 
         return flowOf(true)
             .map {
-                snapPointApi.getPost(uuid).asPostSummaryState()
+                val response = snapPointApi.getPost(uuid)
+                Log.d("LOG", "GETPOST: ${response}")
+                response.asPostSummaryState()
             }
     }
 
@@ -90,9 +99,15 @@ class PostRepositoryImpl @Inject constructor(
         val postBlocks: List<PostBlock> = postBlockStates.map {
             when (it) {
                 is PostBlockCreationState.IMAGE -> {
-                    it.asPostBlock().copy(
-                        files = listOf(File(getImageUuid(it)))
-                    )
+                    if (it.uuid.isBlank()) {
+                        it.asPostBlock().copy(
+                            files = listOf(File(getImageUuid(it)))
+                        )
+                    } else {
+                        it.asPostBlock().copy(
+                            files = listOf(File(it.fileUuid))
+                        )
+                    }
                 }
 
                 else -> it.asPostBlock()
