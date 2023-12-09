@@ -25,7 +25,7 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/toolbar_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -33,7 +33,9 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:title="게시글 보기"
                 app:titleCentered="true"
-                onNavigationClick="@{() -> vm.navigateToPrevious()}"/>
+                app:menu="@menu/post_app_bar_menu"
+                onMenuItemClick="@{(id) -> vm.onMenuItemClick(id)}"
+                onNavigationClick="@{() -> vm.navigateToPrevious()}" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
