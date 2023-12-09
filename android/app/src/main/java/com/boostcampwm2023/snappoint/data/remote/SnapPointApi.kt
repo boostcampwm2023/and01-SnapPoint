@@ -36,15 +36,15 @@ interface SnapPointApi {
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse
 
-    @POST("signin")
+    @POST("auth/sign-in")
     suspend fun postSignIn(
         @Body loginRequest: SignInRequest
     ): SignInResponse
 
-    @GET("logout")
+    @GET("auth/sign-out")
     suspend fun getSignOut()
 
-    @POST("signup")
+    @POST("auth/sign-up")
     suspend fun postSignUp(
         @Body signupRequest: SignupRequest
     ): SignupResponse

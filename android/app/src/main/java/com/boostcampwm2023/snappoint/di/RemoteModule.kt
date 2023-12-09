@@ -31,7 +31,7 @@ object RemoteModule {
     @Singleton
     fun provideSnapPointApi(client: OkHttpClient): SnapPointApi{
         return Retrofit.Builder()
-            .baseUrl("http://175.45.195.153:3000/")
+            .baseUrl("https://snap-point.tatine.kr/")
             .client(client)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
