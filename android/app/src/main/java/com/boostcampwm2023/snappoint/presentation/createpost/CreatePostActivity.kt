@@ -182,6 +182,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         val prevPost: PostSummaryState = Json.decodeFromString<PostSummaryState>(args.post)
         with(viewModel) {
             updateUuid(prevPost.uuid)
+            updateTitle(prevPost.title)
             prevPost.postBlocks.forEach { block ->
                 when (block) {
                     is PostBlockState.TEXT -> {
