@@ -21,6 +21,9 @@ class VideoEditViewModel @Inject constructor(
     private val _rightThumbState: MutableStateFlow<Long> = MutableStateFlow(0L)
     val rightThumbState: StateFlow<Long> = _rightThumbState.asStateFlow()
 
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     fun onLeftThumbMoved(position: Long){
         _leftThumbState.update { position }
 
@@ -32,6 +35,17 @@ class VideoEditViewModel @Inject constructor(
     fun setUri(uri: String) {
         _uri.update {
             uri
+        }
+    }
+
+    fun startLoading(){
+        _isLoading.update {
+            true
+        }
+    }
+    fun finishLoading(){
+        _isLoading.update {
+            false
         }
     }
 }

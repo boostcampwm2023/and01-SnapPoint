@@ -135,12 +135,16 @@ sealed class BlockItemViewHolder(
                 editMode = block.isEditMode
 
             }
-           /* val mediaItem = MediaItem.fromUri(block.uri)
-            val transformer = Transformer.Builder()
+
+            val mediaItem = MediaItem.fromUri(block.uri)
+
             binding.pv.player = ExoPlayer.Builder(itemView.context).build().also {
 
                 it.setMediaItem(mediaItem)
-            }*/
+                it.prepare()
+
+            }
+
             textWatcher.updatePosition(index)
         }
 
