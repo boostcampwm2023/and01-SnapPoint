@@ -59,10 +59,8 @@ class PostRepositoryImpl @Inject constructor(
         return flowOf(true)
             .map {
                 val request = buildCreatePostRequest(title, postBlocks)
-                Log.d("LOG", "REQUEST: ${request}")
                 val response = snapPointApi.createPost(request)
-                Log.d("LOG", "RESPONSE: ${response}")
-                response.body()!!
+                response
             }
     }
 
@@ -71,8 +69,8 @@ class PostRepositoryImpl @Inject constructor(
         return flowOf(true)
             .map {
                 val request = buildCreatePostRequest(title, postBlocks)
-                Log.d("LOG", "REQUEST: ${request}")
-                snapPointApi.modifyPost(uuid, request)
+                val response = snapPointApi.modifyPost(uuid, request)
+                response
             }
     }
 
@@ -91,7 +89,6 @@ class PostRepositoryImpl @Inject constructor(
         return flowOf(true)
             .map {
                 val response = snapPointApi.getPost(uuid)
-                Log.d("LOG", "GETPOST: ${response}")
                 response.asPostSummaryState()
             }
     }

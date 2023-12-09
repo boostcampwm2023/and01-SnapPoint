@@ -44,24 +44,21 @@ interface SnapPointApi {
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse
 
-    //@POST("auth/sign-in")
-    @POST("signin")
+    @POST("auth/sign-in")
     suspend fun postSignIn(
         @Body signInRequest: SignInRequest
     ): SignInResponse
 
-    //@GET("auth/sign-out")
-    @GET("logout")
+    @GET("auth/sign-out")
     suspend fun getSignOut()
 
-    //@POST("auth/sign-up")
-    @POST("signup")
+    @POST("auth/sign-up")
     suspend fun postSignUp(
         @Body signupRequest: SignupRequest
     ): SignupResponse
 
     @Multipart
-    @POST("files")
+    @POST("files/image")
     suspend fun postImage(
         @Part bitmap: MultipartBody.Part
     ): PostImageResponse
