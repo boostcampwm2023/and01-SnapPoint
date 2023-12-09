@@ -11,6 +11,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.response.PostImageRespons
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignInResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.SignupResponse
 import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -43,15 +44,18 @@ interface SnapPointApi {
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse
 
-    @POST("auth/sign-in")
+    //@POST("auth/sign-in")
+    @POST("signin")
     suspend fun postSignIn(
-        @Body loginRequest: SignInRequest
+        @Body signInRequest: SignInRequest
     ): SignInResponse
 
-    @GET("auth/sign-out")
+    //@GET("auth/sign-out")
+    @GET("logout")
     suspend fun getSignOut()
 
-    @POST("auth/sign-up")
+    //@POST("auth/sign-up")
+    @POST("signup")
     suspend fun postSignUp(
         @Body signupRequest: SignupRequest
     ): SignupResponse

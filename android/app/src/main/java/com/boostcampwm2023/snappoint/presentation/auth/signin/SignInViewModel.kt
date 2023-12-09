@@ -30,8 +30,8 @@ class SignInViewModel @Inject constructor(
 
     private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(
         SignInFormState(
-        email = "string@string.com",
-        password = "asdASD123!@#",
+        email = "aaaa@aaaa.aaa",
+        password = "aaaAAA111!!!",
         isEmailValid = true,
         isPasswordValid = true
     )
