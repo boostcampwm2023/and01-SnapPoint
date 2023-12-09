@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { BucketService } from '@/storage/cloud/bucket.service';
 import { UploadFileDto } from '@/storage/dtos/upload-file.dto';
 import { DownloadFileDto } from '@/storage/dtos/download-file.dto';
 import { Readable } from 'stream';
+import { UploadTempFileDto } from './dtos/upload-temp-file.dto';
+import * as fs from 'fs';
 
 @Injectable()
 export class StorageService {
@@ -11,6 +13,16 @@ export class StorageService {
   async upload(uploadFileDto: UploadFileDto) {
     const { name, format, stream } = uploadFileDto;
     this.bucketService.uploadFile(name, format, stream);
+  }
+
+  async uploadTempFile(uploadFileDto: UploadTempFileDto) {
+    const { name, format, path } = uploadFileDto;
+
+    const stream = fs.createReadStream(path);
+    await this.bucketService.uploadFile(name, format, stream);
+    fs.unlink(path, () => {
+      Logger.debug(`deleted: ${path}`);
+    });
   }
 
   download(downloadFileDto: DownloadFileDto): Readable {
@@ -22,5 +34,9 @@ export class StorageService {
       }
     });
     return imageStream;
+  }
+
+  getFileUrl(dto: { name: string }): string {
+    return this.bucketService.getSignedUrl(dto.name);
   }
 }

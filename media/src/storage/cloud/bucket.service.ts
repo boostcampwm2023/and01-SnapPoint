@@ -19,11 +19,7 @@ export class BucketService {
     });
   }
 
-  async uploadFile(
-    name: string,
-    format: string,
-    stream: NodeJS.WritableStream,
-  ) {
+  async uploadFile(name: string, format: string, stream: Readable) {
     return this.bucket
       .upload({
         Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
@@ -42,5 +38,13 @@ export class BucketService {
         Key: name,
       })
       .createReadStream();
+  }
+
+  getSignedUrl(name: string): string {
+    return this.bucket.getSignedUrl('getObject', {
+      Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+      Key: name,
+      Expires: 300,
+    });
   }
 }
