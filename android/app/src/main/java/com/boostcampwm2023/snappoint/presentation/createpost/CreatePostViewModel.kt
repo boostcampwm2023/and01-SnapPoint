@@ -54,7 +54,7 @@ class CreatePostViewModel @Inject constructor(
     fun addTextBlock() {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.plus(PostBlockCreationState.TEXT())
+                postBlocks = it.postBlocks + PostBlockCreationState.TEXT()
             )
         }
     }
