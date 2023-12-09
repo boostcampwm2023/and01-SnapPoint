@@ -93,6 +93,8 @@ class MainActivity(
         setBottomNavigationEvent()
 
         initLocationData()
+
+        cachingBottomSheetSize()
     }
 
     private fun initPlacesClient() {
@@ -108,8 +110,6 @@ class MainActivity(
                 super.onLocationResult(p0)
             }
         }
-
-        cachingBottomSheetSize()
     }
 
     override fun onStop() {
@@ -155,6 +155,7 @@ class MainActivity(
 
                             is MainActivityEvent.NavigatePreview -> {
                                 if (navController.currentDestination?.id != R.id.previewFragment) {
+                                    cachingBottomSheetSize()
                                     openPreviewFragment()
                                 }
                                 moveCameraToFitScreen()
