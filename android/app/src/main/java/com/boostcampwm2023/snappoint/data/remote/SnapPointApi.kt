@@ -21,7 +21,6 @@ import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -47,15 +46,15 @@ interface SnapPointApi {
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse
 
-    @POST("signin")
+    @POST("auth/sign-in")
     suspend fun postSignIn(
-        @Body loginRequest: SignInRequest
+        @Body signInRequest: SignInRequest
     ): SignInResponse
 
-    @GET("logout")
+    @GET("auth/sign-out")
     suspend fun getSignOut()
 
-    @POST("signup")
+    @POST("auth/sign-up")
     suspend fun postSignUp(
         @Body signupRequest: SignupRequest
     ): SignupResponse

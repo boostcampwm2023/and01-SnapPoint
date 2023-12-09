@@ -58,11 +58,14 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             setDataSource(this@VideoEditActivity, viewModel.uri.value.toUri())
         }
         mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
+
         val videoLengthInMs = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong() * 1000
     }
 
     private fun initTransFormer() {
+
         trans = Transformer.Builder(this@VideoEditActivity).setVideoMimeType(MimeTypes.VIDEO_H265).setAudioMimeType(MimeTypes.AUDIO_AAC).build()
+
         trans.addListener(object : Listener{
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                 super.onCompleted(composition, exportResult)
