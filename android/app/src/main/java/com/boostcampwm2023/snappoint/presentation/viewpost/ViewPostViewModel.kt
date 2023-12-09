@@ -44,6 +44,7 @@ class ViewPostViewModel @Inject constructor(
                 Log.d("TAG", "loadPost: ${it.message}")
             }
             .onEach { response ->
+                Log.d("LOG", "RESPONSE: ${response}")
                 _post.update {
                     response
                 }
