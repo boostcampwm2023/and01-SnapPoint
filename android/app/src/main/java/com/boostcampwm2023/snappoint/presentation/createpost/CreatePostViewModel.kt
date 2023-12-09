@@ -262,7 +262,7 @@ class CreatePostViewModel @Inject constructor(
             if (uiState.value.uuid.isBlank()) {
                 postNewPost()
             } else {
-                putEditedPost()
+                putModifiedPost()
             }
         }
     }
@@ -294,7 +294,7 @@ class CreatePostViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun putEditedPost() {
+    private fun putModifiedPost() {
         postRepository.putModifiedPost(
             uuid = uiState.value.uuid,
             title = uiState.value.title,
