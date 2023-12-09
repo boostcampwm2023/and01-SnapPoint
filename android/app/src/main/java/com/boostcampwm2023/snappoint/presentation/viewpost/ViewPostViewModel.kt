@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.UserInfo
+import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewPostViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val userInfoPreference: UserInfoPreference
 ) : ViewModel() {
 
     private val _post: MutableStateFlow<PostSummaryState> = MutableStateFlow(PostSummaryState())
@@ -51,7 +52,7 @@ class ViewPostViewModel @Inject constructor(
     }
 
     fun loadLocalPost(uuid: String) {
-        roomRepository.getPost(uuid, UserInfo.getEmail())
+        roomRepository.getPost(uuid, userInfoPreference.getEmail())
             .onEach { post ->
                 if (post.isNotEmpty()) {
                     _post.update {

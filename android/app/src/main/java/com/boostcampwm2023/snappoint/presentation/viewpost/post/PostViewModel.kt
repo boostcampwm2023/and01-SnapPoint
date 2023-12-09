@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.UserInfo
+import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -26,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val userInfoPreference: UserInfoPreference
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState())
@@ -53,7 +55,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun updateLikeMarkState(uuid: String) {
-        roomRepository.getPost(uuid, UserInfo.getEmail())
+        roomRepository.getPost(uuid, userInfoPreference.getEmail())
             .flowOn(Dispatchers.IO)
             .onEach { post ->
                 _uiState.update {

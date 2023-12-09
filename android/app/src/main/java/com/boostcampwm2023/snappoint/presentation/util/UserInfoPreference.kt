@@ -18,7 +18,6 @@ class UserInfoPreference @Inject constructor(@ApplicationContext context: Contex
     }
 
     fun setUserAuthData(email: String, password: String) {
-        UserInfo.setEmail(email)
         preferences.edit().putString(EMAIL_KEY, email).apply()
         preferences.edit().putString(PASSWORD_KEY, password).apply()
     }
