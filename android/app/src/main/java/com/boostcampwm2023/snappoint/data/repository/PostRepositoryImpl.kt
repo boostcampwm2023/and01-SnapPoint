@@ -4,6 +4,7 @@ import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
 import com.boostcampwm2023.snappoint.data.remote.model.File
+import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
 import com.boostcampwm2023.snappoint.data.remote.model.request.CreatePostRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
@@ -84,24 +85,28 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    private suspend fun buildCreatePostRequest(title: String, postBlocks: List<PostBlockCreationState>): CreatePostRequest {
+    private suspend fun buildCreatePostRequest(title: String, postBlockStates: List<PostBlockCreationState>): CreatePostRequest {
 
-        return CreatePostRequest(
-            title = title,
-            postBlocks = postBlocks.map {
-                when (it) {
-                    is PostBlockCreationState.IMAGE -> {
-                        val requestBody = it.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
-                        val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
-                        val uploadResult = snapPointApi.postImage(multipartBody)
-                        it.asPostBlock().copy(
-                            files = listOf(File(uploadResult.uuid))
-                        )
-                    }
-
-                    else -> it.asPostBlock()
+        val postBlocks: List<PostBlock> = postBlockStates.map {
+            when (it) {
+                is PostBlockCreationState.IMAGE -> {
+                    it.asPostBlock().copy(
+                        files = listOf(File(getImageUuid(it)))
+                    )
                 }
+
+                else -> it.asPostBlock()
             }
-        )
+        }
+
+        return CreatePostRequest(title = title, postBlocks = postBlocks)
+    }
+
+    private suspend fun getImageUuid(block: PostBlockCreationState.IMAGE): String {
+        val requestBody = block.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
+        val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
+        val uploadResult = snapPointApi.postImage(multipartBody)
+
+        return uploadResult.uuid
     }
 }
