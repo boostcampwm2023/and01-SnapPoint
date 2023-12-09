@@ -55,4 +55,9 @@
     <string name="item_video_block_til_description_hint">동영상 설명</string>
     <string name="subscription_fragment_title">로컬에 저장된 게시글</string>
     <string name="cluster_preview_title">등록된 스냅 포인트</string>
+    <string name="preview_app_bar_close">close</string>
+    <string name="post_app_bar_edit">게시글 수정</string>
+    <string name="post_app_bar_delete">게시글 삭제</string>
+    <string name="post_app_bar_report">신고하기</string>
+    <string name="post_app_bar_ignore">작성자 차단하기</string>
 </resources>
