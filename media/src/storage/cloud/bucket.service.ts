@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
+import { Readable } from 'stream';
 
 @Injectable()
 export class BucketService {
@@ -34,7 +35,7 @@ export class BucketService {
       .promise();
   }
 
-  downloadFile(name: string): NodeJS.ReadableStream {
+  downloadFile(name: string): Readable {
     return this.bucket
       .getObject({
         Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),

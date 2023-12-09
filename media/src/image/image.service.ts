@@ -34,7 +34,7 @@ export class ImageService {
   async resizeImage(resizeImageDto: ResizeImageDto) {
     const { uuid } = resizeImageDto;
 
-    const imageStream = this.storageService.downloadImage({ uuid });
+    const imageStream = this.storageService.download({ uuid });
 
     const uploadDtos: UploadFileDto[] = [
       this.getUploadDto(uuid, imageStream, 144),
@@ -43,7 +43,7 @@ export class ImageService {
     ];
 
     const uploadPromises = uploadDtos.map(async (dto) =>
-      this.storageService.uploadImage(dto),
+      this.storageService.upload(dto),
     );
 
     return Promise.all(uploadPromises);
