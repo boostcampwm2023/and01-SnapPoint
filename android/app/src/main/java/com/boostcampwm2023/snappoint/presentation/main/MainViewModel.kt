@@ -168,11 +168,11 @@ class MainViewModel @Inject constructor(
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }
 
-    fun startLoading() {
+    private fun startLoading() {
         _uiState.update { it.copy(isLoading = true) }
     }
 
-    fun finishLoading() {
+    private fun finishLoading() {
         _uiState.update { it.copy(isLoading = false) }
     }
 
