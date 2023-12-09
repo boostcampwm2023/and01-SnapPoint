@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.viewpost.post
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,12 +16,16 @@ import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 
 @AndroidEntryPoint
 class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
     private val postViewModel: PostViewModel by viewModels()
     private val viewPostViewModel: ViewPostViewModel by activityViewModels()
+
+    private val postBundleKey: String = "post"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -100,6 +105,11 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
     }
 
     private fun navigateEditPost() {
-        findNavController().navigate(R.id.action_postFragment_to_createPostActivity2)
+        findNavController().navigate(
+            R.id.action_postFragment_to_createPostActivity2,
+            bundleOf(
+                postBundleKey to Json.encodeToString(viewPostViewModel.post.value)
+            )
+        )
     }
 }
