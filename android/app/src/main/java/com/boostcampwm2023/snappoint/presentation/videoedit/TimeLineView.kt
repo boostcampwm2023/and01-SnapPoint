@@ -79,12 +79,21 @@ class TimeLineView(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if(rightRect.intersect(leftRect)) {
-                        when{
-                            before == "L" && x > recent -> return@setOnTouchListener true
-                            before == "R" && x < recent -> return@setOnTouchListener true
+                    when{
+                        before == "L"-> {
+                            if(x+60 > rightPosX) {
+                                leftMoved(rightPosX - 60)
+                                return@setOnTouchListener true
+                            }
+                        }
+                        before == "R"-> {
+                            if(leftPosX+60 > x) {
+                                rightMoved(leftPosX+60)
+                                return@setOnTouchListener true
+                            }
                         }
                     }
+
                     when(before){
                         "L" ->{
                             leftMoved(x)
