@@ -60,7 +60,7 @@ interface SnapPointApi {
     ): SignupResponse
 
     @Multipart
-    @POST("files")
+    @POST("files/image")
     suspend fun postImage(
         @Part bitmap: MultipartBody.Part
     ): PostImageResponse

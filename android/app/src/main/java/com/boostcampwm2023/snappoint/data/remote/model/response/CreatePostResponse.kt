@@ -11,6 +11,8 @@ data class CreatePostResponse(
     val postUuid: String,
     @SerialName("title")
     val title: String,
+    @SerialName("summary")
+    val summary: String,
     @SerialName("createdAt")
     val createdAt: String,
     @SerialName("modifiedAt")

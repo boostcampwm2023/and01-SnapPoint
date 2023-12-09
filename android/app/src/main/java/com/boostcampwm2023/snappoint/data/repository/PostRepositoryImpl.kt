@@ -67,6 +67,7 @@ class PostRepositoryImpl @Inject constructor(
                         when (it) {
                             is PostBlockCreationState.IMAGE -> {
                                 val uuid = uploadImageAndGetUUid(it)
+                                Log.d("TAG", "postCreatePost: $uuid")
                                 it.asPostBlock().copy(
                                     files = listOf(File(uuid))
                                 )
