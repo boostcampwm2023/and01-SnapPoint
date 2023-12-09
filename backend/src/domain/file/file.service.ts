@@ -32,8 +32,8 @@ export class FileService {
   async attachFiles(dtos: UpdateFileDto[]) {
     return Promise.all(
       dtos.map((file) => {
-        const { uuid, source, sourceUuid } = file;
-        return this.repository.updateFile({ where: { uuid }, data: { source, sourceUuid } });
+        const { uuid, source, sourceUuid, thumbnailUuid } = file;
+        return this.repository.updateFile({ where: { uuid }, data: { source, sourceUuid, thumbnailUuid } });
       }),
     );
   }
