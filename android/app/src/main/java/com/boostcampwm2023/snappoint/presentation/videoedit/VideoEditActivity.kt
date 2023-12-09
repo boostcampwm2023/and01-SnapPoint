@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.core.net.toUri
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,12 +36,14 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
     private lateinit var trans: Transformer
     private lateinit var mediaItem: MediaItem
 
+
+
      override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
          getIntentExtra()
 
-         initMediaItem()
+         initMediaItem(savedInstanceState)
 
          createExternalCacheFile()
 
@@ -52,14 +55,17 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
     }
 
-    private fun initMediaItem() {
+    private fun initMediaItem(savedInstanceState: Bundle?) {
         mediaItem = MediaItem.fromUri(viewModel.uri.value.toUri())
+
         val mediaMetadataRetriever = MediaMetadataRetriever().apply {
             setDataSource(this@VideoEditActivity, viewModel.uri.value.toUri())
         }
-        mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
+        val videoLengthInMs = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
+        if(savedInstanceState == null) {
+            viewModel.updateVideoLengthWithRightThumb(videoLengthInMs)
+        }
 
-        val videoLengthInMs = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong() * 1000
     }
 
     private fun initTransFormer() {
@@ -109,13 +115,8 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 launch {
-                    viewModel.leftThumbState.collect{ position ->
-                        moveSeekPositionMs(position = position)
-                    }
-                }
-                launch {
-                    viewModel.rightThumbState.collect{position ->
-                        moveSeekPositionMs(position = position)
+                    viewModel.recentState.collect{
+                        moveSeekPositionMs(position = it )
                     }
                 }
 
@@ -143,6 +144,10 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             btnConfirm.setOnClickListener {
                 viewModel.startLoading()
                 trans.start(mediaItem, file.path)
+            }
+
+            tlv.doOnLayout {
+                viewModel.updateTLVWidth(it.width)
             }
         }
     }

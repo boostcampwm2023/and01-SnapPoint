@@ -20,16 +20,27 @@ class VideoEditViewModel @Inject constructor(
     val leftThumbState: StateFlow<Long> = _leftThumbState.asStateFlow()
     private val _rightThumbState: MutableStateFlow<Long> = MutableStateFlow(0L)
     val rightThumbState: StateFlow<Long> = _rightThumbState.asStateFlow()
+    private val _recentState: MutableStateFlow<Long> = MutableStateFlow(0L)
+    val recentState: StateFlow<Long> = _recentState.asStateFlow()
+    private val _TLVWidth: MutableStateFlow<Float> = MutableStateFlow(0F)
+    val TLVWidth: StateFlow<Float> = _TLVWidth.asStateFlow()
+    private val _videoLengthInMs: MutableStateFlow<Float> = MutableStateFlow(0F)
+    val videoLengthInMs: StateFlow<Float> = _videoLengthInMs.asStateFlow()
 
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    fun onLeftThumbMoved(position: Long){
-        _leftThumbState.update { position }
-
+    fun onLeftThumbMoved(secDivideTen: Long){
+        _leftThumbState.update {
+            secDivideTen
+        }
+        updateRecent(_leftThumbState.value)
     }
-    fun onRightThumbMoved(position: Long){
-        _rightThumbState.update { position }
+    fun onRightThumbMoved(secDivideTen: Long){
+        _rightThumbState.update {
+            secDivideTen
+        }
+        updateRecent(_rightThumbState.value)
     }
 
     fun setUri(uri: String) {
@@ -46,6 +57,25 @@ class VideoEditViewModel @Inject constructor(
     fun finishLoading(){
         _isLoading.update {
             false
+        }
+    }
+
+    fun updateRecent(time: Long) {
+        _recentState.update {
+            time
+        }
+    }
+
+    fun updateTLVWidth(width: Int) {
+        _TLVWidth.update {
+            width.toFloat()
+        }
+    }
+
+    fun updateVideoLengthWithRightThumb(videoLengthInMs: Long) {
+        _rightThumbState.value = videoLengthInMs
+        _videoLengthInMs.update {
+            videoLengthInMs.toFloat()
         }
     }
 }

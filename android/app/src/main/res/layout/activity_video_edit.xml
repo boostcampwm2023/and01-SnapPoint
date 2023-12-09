@@ -43,6 +43,7 @@
         <com.boostcampwm2023.snappoint.presentation.videoedit.TimeLineView
             android:id="@+id/tlv"
             android:layout_width="0dp"
+            app:layout_constraintWidth_percent="0.8"
             android:layout_height="50dp"
             android:backgroundTint="@color/black"
             app:viewModel = "@{vm}"
