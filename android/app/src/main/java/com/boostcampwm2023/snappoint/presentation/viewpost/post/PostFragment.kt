@@ -40,8 +40,8 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
     private fun collectViewModelData() {
         lifecycleScope.launch {
-            postViewModel.event.collect {
-                when (it) {
+            postViewModel.event.collect { event ->
+                when (event) {
                     PostEvent.NavigatePrev -> {
                         if (!findNavController().popBackStack()) {
                             viewPostViewModel.finishPostView()
@@ -54,6 +54,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
                     PostEvent.DeletePost -> {
                         deleteCurrentPostFromLocal()
+                    }
+
+                    is PostEvent.MenuItemClicked -> {
+                        invokeMenuClickEvent(event.itemId)
                     }
                 }
             }
@@ -76,5 +80,26 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
     private fun deleteCurrentPostFromLocal() {
         postViewModel.deleteCurrentPostFromLocal(viewPostViewModel.post.value.uuid)
+    }
+
+    private fun invokeMenuClickEvent(itemId: Int) {
+        when(itemId) {
+            R.id.post_edit -> {
+                navigateEditPost()
+            }
+            R.id.post_delete -> {
+
+            }
+            R.id.post_report -> {
+
+            }
+            R.id.post_ignore -> {
+
+            }
+        }
+    }
+
+    private fun navigateEditPost() {
+        findNavController().navigate(R.id.action_postFragment_to_createPostActivity2)
     }
 }

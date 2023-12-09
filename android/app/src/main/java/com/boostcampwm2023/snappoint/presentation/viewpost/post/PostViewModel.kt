@@ -44,6 +44,10 @@ class PostViewModel @Inject constructor(
         _event.tryEmit(PostEvent.NavigatePrev)
     }
 
+    fun onMenuItemClick(menuItemId: Any) {
+        _event.tryEmit(PostEvent.MenuItemClicked(menuItemId.toString().toInt()))
+    }
+
     fun onLikeButtonClick() {
         if(uiState.value.isLikeEnabled) {
             _event.tryEmit(PostEvent.DeletePost)

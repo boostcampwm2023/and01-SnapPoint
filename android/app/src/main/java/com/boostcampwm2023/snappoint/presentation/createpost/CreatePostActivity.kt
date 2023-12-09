@@ -15,6 +15,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.navArgs
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.activity_create_post) {
 
     private val viewModel: CreatePostViewModel by viewModels()
+    private val args: CreatePostActivityArgs by navArgs()
 
     private val imagePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
