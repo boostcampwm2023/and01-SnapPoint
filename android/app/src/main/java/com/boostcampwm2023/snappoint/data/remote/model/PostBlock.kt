@@ -23,10 +23,18 @@ data class PostBlock(
 data class File(
     @SerialName("uuid")
     val fileUuid: String,
-    @SerialName("url")
-    val url: String? = null,
     @SerialName("mimeType")
     val mimeType: String? = null,
+    @SerialName("url")
+    val url: String? = null,
+    @SerialName("url_144p")
+    val url144P: String? = null,
+    @SerialName("url_480p")
+    val url480P: String? = null,
+    @SerialName("url_720p")
+    val url720P: String? = null,
+    @SerialName("thumbnailUrl")
+    val thumbnailUrl: String? = null,
 )
 
 enum class BlockType(val type: String) {

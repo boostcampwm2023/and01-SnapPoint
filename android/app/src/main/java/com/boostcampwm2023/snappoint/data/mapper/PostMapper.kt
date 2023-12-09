@@ -22,14 +22,14 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                 PostBlockState.IMAGE(
                     uuid = blockUuid!!,
                     description = this.content,
-                    content = this.files[0].url!!,
+                    content = this.files[0].url720P!!,
                     position = this.asPositionState(),
                 )
             } else {
                 PostBlockState.VIDEO(
                     uuid = blockUuid!!,
                     description = this.content,
-                    content = this.files[0].url!!,
+                    content = this.files[0].url720P!!,
                     position = this.asPositionState(),
                 )
             }
