@@ -28,6 +28,7 @@ sealed class PostBlockState {
         override val uuid: String = "",
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
+        val fileUuid: String = ""
     ) : PostBlockState()
     @Serializable
     data class VIDEO(
@@ -35,6 +36,7 @@ sealed class PostBlockState {
         override val uuid: String = "",
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
+        val fileUuid: String = ""
     ) : PostBlockState()
     @Serializable
     enum class ViewType {

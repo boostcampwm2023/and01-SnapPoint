@@ -65,10 +65,15 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addTextBlock(content: String) {
+    fun addTextBlock(block: PostBlockState.TEXT) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.plus(PostBlockCreationState.TEXT(content = content))
+                postBlocks = it.postBlocks.plus(
+                    PostBlockCreationState.TEXT(
+                        uuid = block.uuid,
+                        content = block.content
+                    )
+                )
             )
         }
     }
@@ -91,7 +96,8 @@ class CreatePostViewModel @Inject constructor(
                         description = block.description,
                         position = block.position.copy(),
                         address = address,
-                        bitmap = bitmap
+                        bitmap = bitmap,
+                        fileUuid = block.fileUuid
                     )
                 )
             )

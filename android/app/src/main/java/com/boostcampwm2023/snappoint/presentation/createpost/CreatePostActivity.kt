@@ -187,6 +187,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         lifecycleScope.launch {
             viewModel.updateUuid(prevPost.uuid)
             viewModel.updateTitle(prevPost.title)
+            binding.tilTitle.editText?.setText(prevPost.title)
             prevPost.postBlocks.forEach { block ->
                 when (block) {
                     is PostBlockState.TEXT -> {
@@ -206,7 +207,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     }
 
     private fun addTextBlock(block: PostBlockState.TEXT) {
-        viewModel.addTextBlock(block.content)
+        viewModel.addTextBlock(block)
     }
 
     private suspend fun addImageBlock(block: PostBlockState.IMAGE) {

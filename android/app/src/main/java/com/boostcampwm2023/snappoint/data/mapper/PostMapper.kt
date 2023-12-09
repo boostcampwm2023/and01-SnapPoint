@@ -10,59 +10,65 @@ import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 
 fun PostBlock.asPostBlockState(): PostBlockState {
-    return when(type){
-        BlockType.TEXT.type -> {
+    return when {
+        this.files.isNullOrEmpty() -> {
             PostBlockState.TEXT(
                 uuid = blockUuid!!,
                 content = this.content,
             )
         }
-        else -> {
-            if(this.files!![0].mimeType!!.startsWith("image")){
-                PostBlockState.IMAGE(
-                    uuid = blockUuid!!,
-                    description = this.content,
-                    content = this.files[0].url!!,
-                    position = this.asPositionState(),
-                )
-            } else {
-                PostBlockState.VIDEO(
-                    uuid = blockUuid!!,
-                    description = this.content,
-                    content = this.files[0].url!!,
-                    position = this.asPositionState(),
-                )
-            }
 
+        this.files[0].mimeType!!.startsWith("image") -> {
+            PostBlockState.IMAGE(
+                uuid = blockUuid!!,
+                description = this.content,
+                content = this.files[0].url!!,
+                position = this.asPositionState(),
+                fileUuid = this.files[0].fileUuid
+            )
         }
 
+        else -> {
+            PostBlockState.VIDEO(
+                uuid = blockUuid!!,
+                description = this.content,
+                content = this.files[0].url!!,
+                position = this.asPositionState(),
+                fileUuid = this.files[0].fileUuid
+            )
+        }
     }
 }
 
 fun PostBlockCreationState.asPostBlock(): PostBlock {
-    return when(this){
+    return when (this) {
         is PostBlockCreationState.TEXT -> {
             PostBlock(
+                blockUuid = this.uuid,
                 type = BlockType.TEXT.type,
                 content = this.content,
             )
         }
+
         is PostBlockCreationState.IMAGE -> {
             PostBlock(
+                blockUuid = this.uuid,
                 content = this.description,
                 type = BlockType.MEDIA.type,
                 latitude = this.position.latitude,
                 longitude = this.position.longitude,
-                files = listOf(File(fileUuid = "this is file's uuid")),
+                files = listOf(File(fileUuid = this.fileUuid)),
             )
         }
+
         is PostBlockCreationState.VIDEO -> {
             PostBlock(
+                blockUuid = this.uuid,
                 content = this.description,
                 type = BlockType.MEDIA.type,
                 latitude = this.position.latitude,
                 longitude = this.position.longitude,
-                files = listOf(File(fileUuid = "this is file's uuid")),
+                files = listOf(File(fileUuid = this.fileUuid)),
             )
         }
     }
