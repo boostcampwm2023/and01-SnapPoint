@@ -25,8 +25,16 @@ data class File(
     val fileUuid: String,
     @SerialName("url")
     val url: String? = null,
+    @SerialName("url_720p")
+    val url720p: String? = null,
+    @SerialName("url_480p")
+    val url480p: String? = null,
+    @SerialName("url_144p")
+    val url144p: String? = null,
     @SerialName("mimeType")
     val mimeType: String? = null,
+    @SerialName("thumbnailUuid")
+    val thumbnailUuid: String? = null
 )
 
 enum class BlockType(val type: String) {
