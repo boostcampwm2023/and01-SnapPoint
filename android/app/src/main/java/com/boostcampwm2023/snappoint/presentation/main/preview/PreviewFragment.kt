@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main.preview
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +15,7 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPreviewBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.google.android.material.carousel.CarouselSnapHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -115,6 +117,9 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
     }
 
     private fun navigateViewPost() {
-        findNavController().navigate(R.id.viewPostActivity)
+        findNavController().navigate(
+            R.id.action_previewFragment_to_viewPostActivity,
+            bundleOf(Constants.UUID_BUNDLE_KEY to previewViewModel.uiState.value.uuid)
+        )
     }
 }

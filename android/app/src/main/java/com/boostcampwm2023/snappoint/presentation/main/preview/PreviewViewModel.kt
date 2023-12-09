@@ -28,6 +28,7 @@ class PreviewViewModel @Inject constructor() : ViewModel() {
     fun updatePost(post: PostSummaryState) {
         _uiState.update {
             it.copy(
+                uuid = post.uuid,
                 title = post.title,
                 timeStamp = post.timeStamp,
                 blocks = post.postBlocks
