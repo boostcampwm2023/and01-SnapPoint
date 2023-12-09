@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { BucketService } from '@/storage/cloud/bucket.service';
 import { UploadFileDto } from '@/storage/dtos/upload-file.dto';
 import { DownloadFileDto } from '@/storage/dtos/download-file.dto';
