@@ -93,6 +93,8 @@ class TimeLineView(
                         }
                     }
 
+                    if(abs(recent - x) < 15F) return@setOnTouchListener true
+
                     when(before){
                         "L" ->{
                             leftMoved(x)
