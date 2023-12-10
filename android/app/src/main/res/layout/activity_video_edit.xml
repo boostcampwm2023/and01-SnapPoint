@@ -40,6 +40,17 @@
             app:layout_constraintTop_toBottomOf="@id/btn_cancel"
             app:layout_constraintBottom_toTopOf="@id/tlv"/>
 
+        <com.boostcampwm2023.snappoint.presentation.videoedit.ThumbnailView
+            android:id="@+id/thumbnail_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="@id/tlv"
+            app:layout_constraintEnd_toEndOf="@id/tlv"
+            app:layout_constraintTop_toTopOf="@id/tlv"
+            app:layout_constraintBottom_toBottomOf="@id/tlv"
+            app:viewModel = "@{vm}"
+            app:uri = "@{vm.uri}"/>
+
         <com.boostcampwm2023.snappoint.presentation.videoedit.TimeLineView
             android:id="@+id/tlv"
             android:layout_width="0dp"

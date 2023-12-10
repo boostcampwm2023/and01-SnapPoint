@@ -29,7 +29,6 @@ class TimeLineView(
     private lateinit var uri: Uri
 
     private var viewModel : VideoEditViewModel? = null
-    private var videoUri: Uri? = null
     private var viewWidth = 0F
     private var leftRect = RectF()
     private var leftPosX = 0F
@@ -63,7 +62,6 @@ class TimeLineView(
                 before = ""
                 return@setOnTouchListener true
             }
-            Log.d("TAG", "before  $before x $x viewWidth $viewWidth leftPosX $leftPosX rightPosX $rightPosX videoLengthInMs $videoLengthInMs secDivideTenX $secDivideTenX viewModel?.recentState?.value ${viewModel?.recentState?.value}")
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     recent = x
