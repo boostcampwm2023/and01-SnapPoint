@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.data.repository
 
-import android.util.Base64
 import android.util.Log
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
@@ -14,18 +13,14 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.VideoUrlRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.Constants.BYTE_OF_VIDEO_PART_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
-import kotlin.math.min
 
 class PostRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi,
@@ -87,30 +82,25 @@ class PostRepositoryImpl @Inject constructor(
         val postBlocks: List<PostBlock> = postBlockStates.map { block ->
             when (block) {
                 is PostBlockCreationState.IMAGE -> {
-                    if (block.uuid.isBlank()) {
-                        block.asPostBlock().copy(
-                            files = listOf(File(uploadImageAndGetUUid(block)))
-                        )
-                    } else {
-                        block.asPostBlock().copy(
-                            files = listOf(File(block.fileUuid))
-                        )
-                    }
+                    val fileUuid = if (block.uuid.isBlank()) uploadImageAndGetUUid(block) else block.fileUuid
+                    block.asPostBlock().copy(
+                        files = listOf(File(fileUuid))
+                    )
                 }
 
                 is PostBlockCreationState.VIDEO -> {
-                    if (block.uuid.isBlank()) {
+                    val fileUuid = if (block.uuid.isBlank()) {
                         val requestBody = block.address.toByteArray().toRequestBody("video/webp".toMediaType())
-                        val multipartBody =  MultipartBody.Part.createFormData("file", "video", requestBody)
+                        val multipartBody = MultipartBody.Part.createFormData("file", "video", requestBody)
                         val uploadResult = snapPointApi.postImage(multipartBody)
-                        block.asPostBlock().copy(
-                            files = listOf(File(uploadResult.uuid))
-                        )
+                        uploadResult.uuid
                     } else {
-                        block.asPostBlock().copy(
-                            files = listOf(File(block.fileUuid))
-                        )
+                        block.fileUuid
                     }
+
+                    block.asPostBlock().copy(
+                        files = listOf(File(fileUuid))
+                    )
                 }
 
                 else -> block.asPostBlock()
