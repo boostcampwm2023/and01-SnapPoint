@@ -96,34 +96,10 @@ class PostRepositoryImpl @Inject constructor(
 
         val fileByteArray = file.readBytes()
 
-        for(i in 1 .. 10){
-            Log.d("TAG", "uploadVideoAndGetUUid: ${fileByteArray[i]}")
-        }
         val byteOfFileSize = fileByteArray.size
         val parts = mutableListOf<Part>()
 
-            val postVideoUrlResponse = snapPointApi.postVideoUrl(
-                videoUrlRequest = VideoUrlRequest(
-                    key = key,
-                    uploadId = uploadId,
-                    partNumber = parts.size + 1
-                )
-            )
-            val preSignedUrl = postVideoUrlResponse.preSignedUrl
-            val body = fileByteArray.toRequestBody(
-                contentType = videoBlock.mimeType.toMediaType(),
-                offset = 0,
-                byteCount = byteOfFileSize
-            )
-            val response = snapPointApi.putVideo(
-                url = preSignedUrl,
-                body = body
-            )
-        Log.d("TAG", "uploadVideoAndGetUUid: $response")
-            val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
-            parts.add(Part(parts.size + 1, eTag.trim('"')))
-
-        /*for(partNumber in 0 until fileByteArray.size step BYTE_OF_VIDEO_PART_SIZE){
+        for(partNumber in 0 until fileByteArray.size step BYTE_OF_VIDEO_PART_SIZE){
             val postVideoUrlResponse = snapPointApi.postVideoUrl(
                 videoUrlRequest = VideoUrlRequest(
                     key = key,
@@ -137,14 +113,13 @@ class PostRepositoryImpl @Inject constructor(
                 offset = partNumber,
                 byteCount = min(BYTE_OF_VIDEO_PART_SIZE, byteOfFileSize - partNumber)
             )
-            val multipartBody = MultipartBody.Part.create(body)
             val response = snapPointApi.putVideo(
                 url = preSignedUrl,
-                body = multipartBody
+                body = body
             )
             val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
             parts.add(Part(parts.size + 1, eTag.trim('"')))
-        }*/
+        }
 
         val videoEndResponse = snapPointApi.postVideoEnd(
             VideoEndRequest(

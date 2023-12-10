@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VideoUrlResponse(
-    @SerialName("preSignedUrl")
+    @SerialName("presignedUrl")
     val preSignedUrl: String,
 )
