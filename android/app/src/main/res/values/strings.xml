@@ -55,4 +55,5 @@
     <string name="item_video_block_til_description_hint">동영상 설명</string>
     <string name="subscription_fragment_title">로컬에 저장된 게시글</string>
     <string name="cluster_preview_title">등록된 스냅 포인트</string>
+    <string name="post_not_exist">주변에 등록된 게시글이 없습니다.</string>
 </resources>

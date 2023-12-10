@@ -68,7 +68,13 @@ class MainViewModel @Inject constructor(
             .onEach { response ->
                 _postState.value = response
                 Log.d("TAG", "loadPosts: $response")
-                _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
+                _event.tryEmit(MainActivityEvent.NavigateAround)
+                if (response.isEmpty()) {
+                    _event.tryEmit(MainActivityEvent.AroundPostNotExist)
+                    _event.tryEmit(MainActivityEvent.CollapseBottomSheet)
+                } else {
+                    _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
+                }
             }.launchIn(viewModelScope)
     }
 

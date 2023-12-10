@@ -13,4 +13,7 @@ sealed class MainActivityEvent {
     data object HalfOpenBottomSheet: MainActivityEvent()
     data object GetAroundPostFailed: MainActivityEvent()
     data class NavigateCluster(val tags: List<SnapPointTag>): MainActivityEvent()
+    data object AroundPostNotExist: MainActivityEvent()
+    data object CollapseBottomSheet: MainActivityEvent()
+    data object NavigateAround: MainActivityEvent()
 }
