@@ -147,7 +147,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             }
 
             tlv.doOnLayout {
-                viewModel.updateTLVWidth(it.width)
+                viewModel.updateTLVSize(it.width, it.height)
             }
         }
     }

@@ -24,6 +24,8 @@ class VideoEditViewModel @Inject constructor(
     val recentState: StateFlow<Long> = _recentState.asStateFlow()
     private val _TLVWidth: MutableStateFlow<Float> = MutableStateFlow(0F)
     val TLVWidth: StateFlow<Float> = _TLVWidth.asStateFlow()
+    private val _TLVHeight: MutableStateFlow<Float> = MutableStateFlow(0F)
+    val TLVHeight: StateFlow<Float> = _TLVHeight.asStateFlow()
     private val _videoLengthInMs: MutableStateFlow<Float> = MutableStateFlow(0F)
     val videoLengthInMs: StateFlow<Float> = _videoLengthInMs.asStateFlow()
 
@@ -66,9 +68,12 @@ class VideoEditViewModel @Inject constructor(
         }
     }
 
-    fun updateTLVWidth(width: Int) {
+    fun updateTLVSize(width: Int, height: Int) {
         _TLVWidth.update {
             width.toFloat()
+        }
+        _TLVHeight.update {
+            height.toFloat()
         }
     }
 
