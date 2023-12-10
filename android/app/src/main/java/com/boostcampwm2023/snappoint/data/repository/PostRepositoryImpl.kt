@@ -65,34 +65,10 @@ class PostRepositoryImpl @Inject constructor(
     override fun postCreatePost(title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse> {
 
         return flowOf(true)
-            .map{
-                CreatePostRequest(
-                    title = title,
-                    postBlocks = postBlocks.map {
-                        when (it) {
-                            is PostBlockCreationState.IMAGE -> {
-                                val requestBody = it.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
-                                val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
-                                val uploadResult = snapPointApi.postImage(multipartBody)
-                                // TODO - 하나의 이미지 블럭에 사진이 여러개 들어갈 때 대응
-                                it.asPostBlock().copy(
-                                    files = listOf(File(uploadResult.uuid))
-                                )
-                            }
-                            is PostBlockCreationState.VIDEO -> {
-                                val requestBody = it.address?.toByteArray()?.toRequestBody("video/webp".toMediaType())!!
-                                val multipartBody = MultipartBody.Part.createFormData("file", "video", requestBody)
-                                val uploadResult = snapPointApi.postImage(multipartBody)
-                                it.asPostBlock().copy(
-                                    files = listOf(File(uploadResult.uuid))
-                                )
-                            }
-                            else -> it.asPostBlock()
-                        }
-                    }
-                )
-            }.map{request ->
-                snapPointApi.createPost(request)
+            .map {
+                val request = buildCreatePostRequest(title, postBlocks)
+                val response = snapPointApi.createPost(request)
+                response
             }
     }
 
@@ -104,6 +80,44 @@ class PostRepositoryImpl @Inject constructor(
                 val response = snapPointApi.modifyPost(uuid, request)
                 response
             }
+    }
+
+    private suspend fun buildCreatePostRequest(title: String, postBlockStates: List<PostBlockCreationState>): CreatePostRequest {
+
+        val postBlocks: List<PostBlock> = postBlockStates.map { block ->
+            when (block) {
+                is PostBlockCreationState.IMAGE -> {
+                    if (block.uuid.isBlank()) {
+                        block.asPostBlock().copy(
+                            files = listOf(File(uploadImageAndGetUUid(block)))
+                        )
+                    } else {
+                        block.asPostBlock().copy(
+                            files = listOf(File(block.fileUuid))
+                        )
+                    }
+                }
+
+                is PostBlockCreationState.VIDEO -> {
+                    if (block.uuid.isBlank()) {
+                        val requestBody = block.address.toByteArray().toRequestBody("video/webp".toMediaType())
+                        val multipartBody =  MultipartBody.Part.createFormData("file", "video", requestBody)
+                        val uploadResult = snapPointApi.postImage(multipartBody)
+                        block.asPostBlock().copy(
+                            files = listOf(File(uploadResult.uuid))
+                        )
+                    } else {
+                        block.asPostBlock().copy(
+                            files = listOf(File(block.fileUuid))
+                        )
+                    }
+                }
+
+                else -> block.asPostBlock()
+            }
+        }
+
+        return CreatePostRequest(title = title, postBlocks = postBlocks)
     }
 
     private suspend fun uploadVideoAndGetUUid(videoBlock: PostBlockCreationState.VIDEO): String {
@@ -202,36 +216,5 @@ class PostRepositoryImpl @Inject constructor(
                 val response = snapPointApi.getPost(uuid)
                 response.asPostSummaryState()
             }
-    }
-
-    private suspend fun buildCreatePostRequest(title: String, postBlockStates: List<PostBlockCreationState>): CreatePostRequest {
-
-        val postBlocks: List<PostBlock> = postBlockStates.map {
-            when (it) {
-                is PostBlockCreationState.IMAGE -> {
-                    if (it.uuid.isBlank()) {
-                        it.asPostBlock().copy(
-                            files = listOf(File(getImageUuid(it)))
-                        )
-                    } else {
-                        it.asPostBlock().copy(
-                            files = listOf(File(it.fileUuid))
-                        )
-                    }
-                }
-
-                else -> it.asPostBlock()
-            }
-        }
-
-        return CreatePostRequest(title = title, postBlocks = postBlocks)
-    }
-
-    private suspend fun getImageUuid(block: PostBlockCreationState.IMAGE): String {
-        val requestBody = block.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
-        val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
-        val uploadResult = snapPointApi.postImage(multipartBody)
-
-        return uploadResult.uuid
     }
 }
