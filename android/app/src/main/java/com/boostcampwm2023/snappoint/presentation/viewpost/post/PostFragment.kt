@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -24,8 +25,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
 
     private val postViewModel: PostViewModel by viewModels()
     private val viewPostViewModel: ViewPostViewModel by activityViewModels()
-
-    private val postBundleKey: String = "post"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -108,7 +107,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         findNavController().navigate(
             R.id.action_postFragment_to_createPostActivity2,
             bundleOf(
-                postBundleKey to Json.encodeToString(viewPostViewModel.post.value)
+                Constants.UUID_BUNDLE_KEY to Json.encodeToString(viewPostViewModel.post.value)
             )
         )
     }
