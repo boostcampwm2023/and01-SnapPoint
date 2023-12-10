@@ -17,8 +17,6 @@ data class CreatePostResponse(
     val createdAt: String,
     @SerialName("modifiedAt")
     val modifiedAt: String,
-    @SerialName("summary")
-    val summary: String,
     @SerialName("isPublished")
     val isPublished: Boolean = true,
     @SerialName("blocks")
