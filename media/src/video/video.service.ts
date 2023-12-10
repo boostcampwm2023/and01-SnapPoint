@@ -119,8 +119,9 @@ export class VideoService {
           );
         }
 
+        const { format_name: format } = data.format;
+
         const {
-          format_name: format,
           r_frame_rate: rFrameRate,
           codec_name: codec,
           width,
