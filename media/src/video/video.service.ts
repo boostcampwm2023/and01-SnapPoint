@@ -320,5 +320,10 @@ export class VideoService {
       format: 'application/vnd.apple.mpegurl',
       path: outputPath,
     });
+
+    const deletePromises = qualities.map((quality) =>
+      this.storageService.delete({ uuid: `${uuid}_${quality}` }),
+    );
+    await Promise.all(deletePromises);
   }
 }

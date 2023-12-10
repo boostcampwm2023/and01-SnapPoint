@@ -5,6 +5,7 @@ import { DownloadFileDto } from '@/storage/dtos/download-file.dto';
 import { Readable } from 'stream';
 import { UploadTempFileDto } from './dtos/upload-temp-file.dto';
 import * as fs from 'fs';
+import { DeleteFileDto } from './dtos/delete-file.dto';
 
 @Injectable()
 export class StorageService {
@@ -35,6 +36,11 @@ export class StorageService {
       }
     });
     return imageStream;
+  }
+
+  delete(deleteFileDto: DeleteFileDto) {
+    const { uuid } = deleteFileDto;
+    return this.bucketService.deleteFile(uuid);
   }
 
   getFileUrl(dto: { name: string }): string {

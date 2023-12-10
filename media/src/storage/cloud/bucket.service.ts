@@ -40,6 +40,15 @@ export class BucketService {
       .createReadStream();
   }
 
+  deleteFile(name: string) {
+    return this.bucket
+      .deleteObject({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: name,
+      })
+      .promise();
+  }
+
   getSignedUrl(name: string): string {
     return this.bucket.getSignedUrl('getObject', {
       Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
