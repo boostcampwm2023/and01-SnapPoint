@@ -156,6 +156,8 @@ fun RecyclerView.bindRecyclerViewAdapter(
                         is PostBlockCreationState.VIDEO -> {
                             if (postBlock.address != (blocks[index] as PostBlockCreationState.VIDEO).address) {
                                 notifyItemChanged(index)
+                            }else if((postBlock.uri != (blocks[index] as PostBlockCreationState.VIDEO).uri)){
+                                notifyItemChanged(index)
                             }
                         }
 

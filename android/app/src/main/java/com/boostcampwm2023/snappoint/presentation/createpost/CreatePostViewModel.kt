@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
@@ -304,7 +305,7 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { index, block ->
                     if(index == lastIndex){
                         (block as PostBlockCreationState.VIDEO).copy(
-                            resultPath = path
+                            uri = path.toUri()
                         )
                     }else{
                         block

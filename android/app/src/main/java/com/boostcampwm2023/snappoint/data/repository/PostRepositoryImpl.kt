@@ -92,8 +92,7 @@ class PostRepositoryImpl @Inject constructor(
         val videoStartResponse = snapPointApi.getVideoStart(contentType = videoBlock.mimeType)
         val (key, uploadId) = videoStartResponse
 
-        //val file = java.io.File("/storage/emulated/0/Android/data/com.boostcampwm2023.snappoint/cache/123.mp4")
-        val file = java.io.File(videoBlock.resultPath)
+        val file = java.io.File(videoBlock.uri.toString())
 
         val fileByteArray = file.readBytes()
 

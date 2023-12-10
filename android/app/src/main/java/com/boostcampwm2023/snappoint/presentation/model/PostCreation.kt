@@ -42,7 +42,6 @@ sealed class PostBlockCreationState {
         val address: String = "",
         val mimeType: String = "",
         val uri:Uri,
-        val resultPath: String = "",
     ) : PostBlockCreationState()
 
     enum class ViewType {
