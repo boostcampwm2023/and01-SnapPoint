@@ -1,6 +1,4 @@
 export class MetadataDto {
-  uuid: string;
-
   fps: number;
 
   width: number;

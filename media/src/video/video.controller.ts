@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller, Inject, Logger } from '@nestjs/common';
 import { VideoService } from './video.service';
 import {
   ClientProxy,
@@ -7,6 +7,8 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { TargetdataDto } from './dtos/targetdata.dto';
+import { ProcessVideoDto } from './dtos/process-video.dto';
 
 @Controller('video')
 export class VideoController {
@@ -20,27 +22,35 @@ export class VideoController {
    * @param dto
    * @returns
    */
-  @MessagePattern({ cmd: 'video.preprocess' })
-  async preprocess(
-    @Payload() dto: { uuid: string },
+  @MessagePattern({ cmd: 'video.process' })
+  async process(@Payload() dto: { uuid: string }, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    const { targets, processData } = await this.videoService.parseMetadata(dto);
+
+    channel.ack(originalMsg);
+
+    targets.forEach((targetData) => {
+      this.client.emit({ cmd: 'video.transcode' }, { targetData, processData });
+    });
+  }
+
+  @MessagePattern({ cmd: 'video.transcode' })
+  async transcode(
+    @Payload()
+    payload: { targetData: TargetdataDto; processData: ProcessVideoDto },
     @Ctx() context: RmqContext,
   ) {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
-    const { shouldResize480P, shouldResize720P } =
-      await this.videoService.preprocess(dto);
+    const { targetData, processData } = payload;
+
+    Logger.debug(`transcode: ${processData.uuid} to ${targetData.quality}`);
+
+    this.videoService.transcode(targetData, processData);
 
     channel.ack(originalMsg);
-    // const { uuid } = dto;
-
-    // 아닌 경우 트랜스코딩을 진행한다.
-    // if (shouldResize480P) {
-    //   this.client.emit('video.transcode', { uuid, quality: 480 });
-    // }
-
-    // if (shouldResize720P) {
-    //   this.client.emit('video.transcode', { uuid, quality: 720 });
-    // }
   }
 }
