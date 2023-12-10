@@ -31,10 +31,8 @@
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
             android:gravity="bottom"
-            android:shadowColor="@color/black"
             android:shadowRadius="12.0"
             android:textAlignment="gravity"
-            android:textColor="@color/white"
             android:textSize="18sp" />
     </com.google.android.material.carousel.MaskableFrameLayout>
 </layout>
