@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -65,12 +66,15 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
         if(savedInstanceState == null) {
             viewModel.updateVideoLengthWithRightThumb(videoLengthInMs)
         }
-
+        mediaMetadataRetriever.release()
     }
 
     private fun initTransFormer() {
 
-        trans = Transformer.Builder(this@VideoEditActivity).setVideoMimeType(MimeTypes.VIDEO_H265).setAudioMimeType(MimeTypes.AUDIO_AAC).build()
+        trans = Transformer.Builder(this@VideoEditActivity)
+            .setVideoMimeType(MimeTypes.VIDEO_H264)
+            .setAudioMimeType(MimeTypes.AUDIO_AAC)
+            .build()
 
         trans.addListener(object : Listener{
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
@@ -119,7 +123,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                         moveSeekPositionMs(position = it )
                     }
                 }
-
             }
         }
     }
@@ -135,7 +138,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                 it.setMediaItem(mediaItem)
                 it.prepare()
             }
-
             pv.useController = false
 
             btnCancel.setOnClickListener {
@@ -143,13 +145,27 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             }
             btnConfirm.setOnClickListener {
                 viewModel.startLoading()
-                trans.start(mediaItem, file.path)
+                startTransformation()
             }
 
             tlv.doOnLayout {
                 viewModel.updateTLVSize(it.width, it.height)
             }
         }
+    }
+
+    private fun startTransformation() {
+        val result = MediaItem.Builder()
+            .setUri(viewModel.uri.value.toUri())
+            .setClippingConfiguration(
+                ClippingConfiguration.Builder()
+                    .setStartPositionMs(viewModel.leftThumbState.value)
+                    .setEndPositionMs(viewModel.rightThumbState.value)
+                    .build()
+            )
+            .build()
+
+        trans.start(result, file.path)
     }
 
     private fun getIntentExtra() {
