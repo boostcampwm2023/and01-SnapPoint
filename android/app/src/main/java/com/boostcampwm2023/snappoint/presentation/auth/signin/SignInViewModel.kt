@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.auth.signin
 
+import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,6 +77,7 @@ class SignInViewModel @Inject constructor(
                 _event.emit(SignInEvent.NavigateToMainActivity)
             }
             .catch {
+                Log.d("TAG", "onLoginButtonClick: ${it.message}")
                 _event.emit(SignInEvent.ShowMessage(R.string.login_activity_fail))
             }
             .onCompletion {

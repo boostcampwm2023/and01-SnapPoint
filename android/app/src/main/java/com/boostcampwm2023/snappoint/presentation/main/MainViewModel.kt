@@ -60,7 +60,11 @@ class MainViewModel @Inject constructor(
     fun loadPosts(leftBottom: String, rightTop: String) {
         postRepository.getAroundPost(leftBottom, rightTop)
             .onStart { startLoading() }
-            .catch { _event.tryEmit(MainActivityEvent.GetAroundPostFailed) }
+            .catch {
+                Log.d("TAG", "loadPosts: $it")
+                _event.tryEmit(MainActivityEvent.GetAroundPostFailed)
+
+            }
             .onCompletion { finishLoading() }
             .onEach { response ->
                 _postState.value = response

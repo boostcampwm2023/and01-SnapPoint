@@ -60,7 +60,7 @@ class CreatePostViewModel @Inject constructor(
     fun addTextBlock() {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks.plus(PostBlockCreationState.TEXT())
+                postBlocks = it.postBlocks + PostBlockCreationState.TEXT()
             )
         }
     }
@@ -104,10 +104,10 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addVideoBlock(videoUri: Uri, position: PositionState) {
+    fun addVideoBlock(videoUri: Uri, position: PositionState, mimeType: String) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position)
+                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position, mimeType = mimeType)
             )
         }
     }
@@ -354,8 +354,18 @@ class CreatePostViewModel @Inject constructor(
                 postBlocks = it.postBlocks.mapIndexed { idx, postBlock ->
                     if(idx == index){
                         when(postBlock){
-                            is PostBlockCreationState.IMAGE ->  PostBlockCreationState.IMAGE(content = postBlock.content, position = position, address = address, bitmap = postBlock.bitmap)
-                            is PostBlockCreationState.VIDEO -> PostBlockCreationState.VIDEO(content = postBlock.content, position = position, address = address, uri = postBlock.uri)
+                            is PostBlockCreationState.IMAGE -> {
+                                postBlock.copy(
+                                    position = position,
+                                    address = address,
+                                )
+                            }
+                            is PostBlockCreationState.VIDEO -> {
+                                postBlock.copy(
+                                    position = position,
+                                    address = address,
+                                )
+                            }
                             is PostBlockCreationState.TEXT -> postBlock
                         }
                     }else{
@@ -364,5 +374,23 @@ class CreatePostViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun updateVideoPath(path: String) {
+        val lastIndex = _uiState.value.postBlocks.lastIndex
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks.mapIndexed { index, block ->
+                    if(index == lastIndex){
+                        (block as PostBlockCreationState.VIDEO).copy(
+                            resultPath = path
+                        )
+                    }else{
+                        block
+                    }
+                }
+            )
+        }
+
     }
 }
