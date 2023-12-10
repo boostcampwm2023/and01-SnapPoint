@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
@@ -44,13 +45,16 @@ class ThumbnailView(
         val frameWidth = ((initialBitmap?.width?.toFloat()!! / initialBitmap?.height?.toFloat()!!) * frameHeight).toInt()
         val numThumbs = ceil(viewWidth / frameWidth).toInt()
         val interval = videoLengthInMs.toLong() / numThumbs
+        Log.d("TAG", "getBitMap: $interval")
         for(i in 0 until numThumbs){
-            var bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+            var bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
             if(bitmap != null){
                 bitmap = Bitmap.createScaledBitmap(bitmap, frameWidth, frameHeight, false)
+                bitmap = Bitmap.createBitmap(bitmap,0, 0, bitmap.width, bitmap.height)
                 thumbnails.add(bitmap)
             }
         }
+        mediaMetadataRetriever.release()
         invalidate()
     }
 

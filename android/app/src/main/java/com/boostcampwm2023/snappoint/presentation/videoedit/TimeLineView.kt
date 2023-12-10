@@ -30,6 +30,7 @@ class TimeLineView(
 
     private var viewModel : VideoEditViewModel? = null
     private var viewWidth = 0F
+    private var viewHeight = 0F
     private var leftRect = RectF()
     private var leftPosX = 0F
     private var rightRect = RectF()
@@ -148,6 +149,12 @@ class TimeLineView(
                         getBitMap()
                     }
                 }
+                launch{
+                    viewModel?.TLVHeight?.collect {
+                        viewHeight = it
+                        getBitMap()
+                    }
+                }
                 launch {
                     viewModel?.videoLengthInMs?.collect {
                         videoLengthInMs = it
@@ -160,13 +167,13 @@ class TimeLineView(
 
     private fun leftMoved(posX: Float) {
         leftPosX = posX
-        leftRect = RectF(posX,0F,posX+30F,100F)
+        leftRect = RectF(posX,0F,posX+30F,viewHeight)
         invalidate()
     }
 
     private fun rightMoved(posX: Float) {
         rightPosX = posX
-        rightRect = RectF(posX-30F,0F,posX,100F)
+        rightRect = RectF(posX-30F,0F,posX,viewHeight)
         invalidate()
     }
 
