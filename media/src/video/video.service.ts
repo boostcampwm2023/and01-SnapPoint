@@ -4,10 +4,12 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import * as fs from 'fs';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { MetadataDto } from './dtos/metadata.dto';
 import { ProcessVideoDto } from './dtos/process-video.dto';
-import { TargetdataDto } from './dtos/targetdata.dto';
+import * as path from 'path';
+import * as mime from 'mime-types';
 
 @Injectable()
 export class VideoService {
@@ -21,26 +23,6 @@ export class VideoService {
   private getFramePerSecond(rFrameRate: string): number {
     const [fps, baseSec] = rFrameRate.split('/').map((e) => parseInt(e));
     return fps / baseSec;
-  }
-
-  /**
-   * 비디오가 720p 이상인지 확인합니다.
-   * @param width - 비디오의 가로 길이.
-   * @param height - 비디오의 세로 길이.
-   * @returns 720p 이상 여부.
-   */
-  private isHigherThan720p(width: number, height: number) {
-    return width >= 1280 && height >= 720;
-  }
-
-  /**
-   * 비디오가 480p 이상인지 확인합니다.
-   * @param width - 비디오의 가로 길이.
-   * @param height - 비디오의 세로 길이.
-   * @returns 480p 이상 여부.
-   */
-  private isHigherThan480p(width: number, height: number) {
-    return width >= 640 && height >= 480;
   }
 
   /**
@@ -81,29 +63,23 @@ export class VideoService {
       this.storageService.getFileUrl({ name: uuid }),
     );
 
-    const longer = Math.max(metadata.width, metadata.height);
-    const shorter = Math.min(metadata.width, metadata.height);
-
-    const targets = this.getTargets(longer, shorter);
+    const targets = this.getTargets(metadata.height);
     const processData = this.getProcessData(metadata, uuid);
 
-    return {
-      targets: this.getResizeOptions(targets, longer, metadata.width),
-      processData,
-    };
+    return { targets, processData };
   }
 
   /**
    * 주어진 조건에 따라 대상 해상도 목록을 생성합니다.
-   * @param longer - 비디오의 긴 쪽 길이.
-   * @param shorter - 비디오의 짧은 쪽 길이.
+   * @param height - 비디오의 세로 크기
    * @returns 대상 해상도 목록.
    */
-  private getTargets(longer: number, shorter: number): number[] {
+  private getTargets(height: number): number[] {
     const targets: number[] = [];
-    if (this.isHigherThan720p(longer, shorter)) targets.push(720);
-    if (this.isHigherThan480p(longer, shorter)) targets.push(480);
-    if (!targets.length) targets.push(longer);
+    if (height >= 1080) targets.push(1080);
+    if (height >= 720) targets.push(720);
+    if (height >= 480) targets.push(480);
+    if (!targets.length) targets.push(height);
     return targets;
   }
 
@@ -120,24 +96,6 @@ export class VideoService {
       shouldConvertFormat: !this.hasProperFormat(metadata.format),
       shouldReduceFPS: !this.isLowerthan30Fps(metadata.fps),
     };
-  }
-
-  /**
-   * 리사이즈 옵션을 생성합니다.
-   * @param targets - 대상 해상도 목록.
-   * @param longer - 비디오의 긴 쪽 길이.
-   * @param width - 비디오의 가로 길이.
-   * @returns 리사이즈 옵션 목록.
-   */
-  private getResizeOptions(
-    targets: number[],
-    longer: number,
-    width: number,
-  ): TargetdataDto[] {
-    return targets.map((t) => ({
-      quality: t,
-      option: longer === width ? `${t}x?` : `?x${t}`,
-    }));
   }
 
   /**
@@ -161,8 +119,9 @@ export class VideoService {
           );
         }
 
+        const { format_name: format } = data.format;
+
         const {
-          format_name: format,
           r_frame_rate: rFrameRate,
           codec_name: codec,
           width,
@@ -190,35 +149,176 @@ export class VideoService {
 
   /**
    * 비디오를 트랜스코딩하고, 결과를 저장합니다.
-   * @param targetDto - 트랜스코딩 대상 정보.
+   * @param quality - 트랜스코딩 대상 화질.
    * @param processDto - 트랜스코딩 처리 정보.
    */
-  transcode(targetDto: TargetdataDto, processDto: ProcessVideoDto) {
-    const { quality, option } = targetDto;
-    const { uuid, shouldChangeCodec, shouldConvertFormat, shouldReduceFPS } =
-      processDto;
+  async transcode(quality: number, processDto: ProcessVideoDto): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const { uuid, shouldChangeCodec, shouldConvertFormat, shouldReduceFPS } =
+        processDto;
 
-    let processStream = ffmpeg(this.storageService.getFileUrl({ name: uuid }));
+      let processStream = ffmpeg(
+        this.storageService.getFileUrl({ name: uuid }),
+      );
 
-    if (shouldChangeCodec) {
-      processStream = processStream.videoCodec('libx264');
-    }
+      if (shouldChangeCodec) {
+        processStream = processStream.videoCodec('libx264');
+      }
+      if (shouldReduceFPS) {
+        processStream = processStream.outputOptions('-r 30');
+      }
+      if (shouldConvertFormat) {
+        processStream = processStream.toFormat('mp4');
+      }
 
-    if (shouldReduceFPS) {
-      processStream = processStream.outputOptions('-r 30');
-    }
+      const outputName = `${uuid}_${quality}`;
+      const outputFormat = 'mp4';
+      const outputPath = `temp/transcode/${outputName}`;
 
-    if (shouldConvertFormat) {
-      processStream = processStream.toFormat('mp4');
-    }
+      const width = Math.ceil(quality * (16 / 9));
 
-    processStream
-      .addOption('-crf', '23')
-      .size(option)
-      .outputFormat('mp4')
-      .output(`temp/${uuid}_${quality}`)
-      .on('end', () => Logger.debug(`transcoded: ${uuid} ${quality}`))
-      .on('error', (err) => Logger.error(`transcode error: ${err}`))
-      .run();
+      processStream
+        .addOption('-crf', '23')
+        .videoFilters([
+          {
+            filter: 'scale',
+            options: `${width}x${quality}:force_original_aspect_ratio=decrease`,
+          },
+          {
+            filter: 'pad',
+            options: `${width}:${quality}:(ow-iw)/2:(oh-ih)/2:black`,
+          },
+        ])
+        .outputFormat(outputFormat)
+        .output(outputPath)
+        .on('end', async () => {
+          Logger.debug(`transcoded: ${uuid} ${quality}`);
+          await this.storageService.uploadTempFile({
+            name: outputName,
+            format: `video/${outputFormat}`,
+            path: outputPath,
+          });
+          resolve();
+        })
+        .on('error', (err, err2, err3) =>
+          reject(
+            new InternalServerErrorException(
+              `transcode error: ${err} ${err2} ${err3}`,
+            ),
+          ),
+        )
+        .run();
+    });
+  }
+
+  async package(dto: { uuid: string; quality: number }): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const { uuid, quality } = dto;
+
+      const processStream = ffmpeg(
+        this.storageService.getFileUrl({ name: `${uuid}_${quality}` }),
+      );
+
+      const outputDir = `temp/package/${uuid}_${quality}`;
+      const outputName = `${uuid}_${quality}.m3u8`;
+      const outputPath = `${outputDir}/${outputName}`;
+
+      fs.mkdirSync(outputDir);
+
+      processStream
+        .addOptions([
+          '-profile:v baseline',
+          '-level 3.0',
+          '-start_number 0',
+          '-hls_time 10',
+          '-hls_list_size 0',
+          '-f hls',
+        ])
+        .inputFormat('mp4')
+        .output(outputPath)
+        .on('end', async () => {
+          Logger.debug(`packaged: ${uuid}`);
+
+          fs.readdir(outputDir, async (err, files) => {
+            if (err) {
+              return reject(err);
+            }
+
+            const uploadPromises = files.map((fileName) => {
+              const filePath = path.join(outputDir, fileName);
+              const format = mime.lookup(filePath);
+
+              if (!format) {
+                return reject(
+                  new InternalServerErrorException(
+                    `${fileName} type check failed`,
+                  ),
+                );
+              }
+
+              return this.storageService.uploadTempFile({
+                name: fileName,
+                format,
+                path: filePath,
+              });
+            });
+
+            await Promise.all(uploadPromises);
+
+            fs.rmdir(outputDir, () => {
+              Logger.debug(`${outputDir} deleted`);
+            });
+          });
+
+          resolve();
+        })
+        .on('error', (err, err2, err3) =>
+          reject(
+            new InternalServerErrorException(
+              `package error: ${err} ${err2} ${err3}`,
+            ),
+          ),
+        )
+        .run();
+    });
+  }
+
+  async end(dto: { uuid: string; qualities: number[] }) {
+    const { uuid, qualities } = dto;
+
+    const BANDWIDTH: { [quailty: number]: number } = {
+      480: 2000000,
+      720: 4000000,
+      1080: 6000000,
+    } as const;
+
+    let content = '#EXTM3U';
+
+    qualities.forEach((height) => {
+      const width = Math.ceil(height * (16 / 9));
+
+      // 480P 이하인 경우, 500kbps 대역폭
+      let bandwidth = BANDWIDTH[height];
+
+      if (!bandwidth) {
+        bandwidth = 800000;
+      }
+
+      content += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${width}x${height},NAME="${height}p"\n`;
+      content += `${uuid}_${height}.m3u8\n`;
+    });
+
+    const outputDir = 'temp/playlist';
+    const outputName = `${uuid}.m3u8`;
+
+    const outputPath = path.join(outputDir, outputName);
+
+    fs.writeFileSync(outputPath, content);
+
+    await this.storageService.uploadTempFile({
+      name: outputName,
+      format: 'application/vnd.apple.mpegurl',
+      path: outputPath,
+    });
   }
 }

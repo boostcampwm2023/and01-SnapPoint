@@ -20,6 +20,7 @@ export class StorageService {
 
     const stream = fs.createReadStream(path);
     await this.bucketService.uploadFile(name, format, stream);
+    stream.destroy();
     fs.unlink(path, () => {
       Logger.debug(`deleted: ${path}`);
     });

@@ -4,6 +4,7 @@ import { VideoController } from './video.controller';
 import { StorageModule } from '@/storage/storage.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { VideoManagerService } from './video-manager.service';
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [VideoController],
-  providers: [VideoService],
+  providers: [VideoService, VideoManagerService],
 })
 export class VideoModule {}

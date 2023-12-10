@@ -7,13 +7,14 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { TargetdataDto } from './dtos/targetdata.dto';
 import { ProcessVideoDto } from './dtos/process-video.dto';
+import { VideoManagerService } from './video-manager.service';
 
 @Controller('video')
 export class VideoController {
   constructor(
     private readonly videoService: VideoService,
+    private readonly videoManager: VideoManagerService,
     @Inject('RMQ_SERVICE') private readonly client: ClientProxy,
   ) {}
 
@@ -27,30 +28,68 @@ export class VideoController {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
+    channel.ack(originalMsg);
     const { targets, processData } = await this.videoService.parseMetadata(dto);
 
-    channel.ack(originalMsg);
-
-    targets.forEach((targetData) => {
-      this.client.emit({ cmd: 'video.transcode' }, { targetData, processData });
-    });
+    this.videoManager.emitProcessVideo(dto.uuid, targets, processData);
   }
 
   @MessagePattern({ cmd: 'video.transcode' })
   async transcode(
     @Payload()
-    payload: { targetData: TargetdataDto; processData: ProcessVideoDto },
+    payload: { quality: number; processData: ProcessVideoDto },
     @Ctx() context: RmqContext,
   ) {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
-    const { targetData, processData } = payload;
+    const { quality, processData } = payload;
 
-    Logger.debug(`transcode: ${processData.uuid} to ${targetData.quality}`);
+    const { uuid } = processData;
 
-    this.videoService.transcode(targetData, processData);
+    Logger.debug(`transcode: ${uuid} to ${quality}`);
+    channel.ack(originalMsg);
+    await this.videoService.transcode(quality, processData);
+
+    this.client.emit({ cmd: 'video.package' }, { uuid, quality });
+  }
+
+  @MessagePattern({ cmd: 'video.package' })
+  async package(
+    @Payload() dto: { uuid: string; quality: number },
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    Logger.debug(`package: ${dto.uuid}`);
+    channel.ack(originalMsg);
+    await this.videoService.package(dto);
+
+    this.client.emit({ cmd: 'video.packaged' }, dto);
+  }
+  @MessagePattern({ cmd: 'video.packaged' })
+  async handleVideoProcess(
+    @Payload() dto: { uuid: string; quality: number },
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    this.videoManager.handleVideoProcess(dto);
+    channel.ack(originalMsg);
+  }
+
+  @MessagePattern({ cmd: 'video.end' })
+  async end(
+    @Payload() dto: { uuid: string; qualities: number[] },
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+    Logger.debug(`package: ${dto.uuid}`);
 
     channel.ack(originalMsg);
+    await this.videoService.end(dto);
   }
 }
