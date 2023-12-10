@@ -66,6 +66,10 @@ export class RedisCacheService {
     converter: (result: string) => T,
     finder?: (keys: string[]) => Promise<T[]>,
   ): Promise<T[] | null> {
+    if (keys.length <= 0) {
+      return [];
+    }
+
     const redisResults = await this.redisClient.mget(...keys);
     const nonCachedKeys: string[] = [];
     const results: T[] = [];
