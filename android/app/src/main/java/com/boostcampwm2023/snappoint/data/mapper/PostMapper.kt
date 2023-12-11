@@ -26,6 +26,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     url480P = this.files[0].url480P!!,
                     url144P = this.files[0].url144P!!,
                     position = this.asPositionState(),
+                    fileUuid = this.files[0].fileUuid
                 )
             } else {
                 val (thumbnail, video) = this.files.partition { it.url.isNullOrEmpty() }
@@ -38,6 +39,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     thumbnail480P = thumbnail[0].url480P!!,
                     thumbnail720P = thumbnail[0].url720P!!,
                     thumbnailUuid = thumbnail[0].fileUuid,
+                    fileUuid = this.files[0].fileUuid
                 )
             }
 
