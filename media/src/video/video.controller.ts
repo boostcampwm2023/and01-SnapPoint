@@ -16,6 +16,7 @@ export class VideoController {
     private readonly videoService: VideoService,
     private readonly videoManager: VideoManagerService,
     @Inject('RMQ_SERVICE') private readonly client: ClientProxy,
+    @Inject('DATA_SERVICE') private readonly dataClient: ClientProxy,
   ) {}
 
   /**
@@ -91,5 +92,6 @@ export class VideoController {
 
     channel.ack(originalMsg);
     await this.videoService.end(dto);
+    this.dataClient.emit({ cmd: 'media.processed' }, { uuid: dto.uuid });
   }
 }

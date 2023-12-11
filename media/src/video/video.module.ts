@@ -11,6 +11,23 @@ import { VideoManagerService } from './video-manager.service';
     StorageModule,
     ClientsModule.registerAsync([
       {
+        name: 'DATA_SERVICE',
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RMQ_HOST')],
+            queue: configService.getOrThrow<string>('RMQ_DATA_QUEUE'),
+            queueOptions: {
+              durable: true,
+            },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+    ClientsModule.registerAsync([
+      {
         name: 'RMQ_SERVICE',
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => ({

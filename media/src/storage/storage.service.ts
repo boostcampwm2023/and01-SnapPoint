@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BucketService } from '@/storage/cloud/bucket.service';
 import { UploadFileDto } from '@/storage/dtos/upload-file.dto';
 import { DownloadFileDto } from '@/storage/dtos/download-file.dto';
@@ -22,9 +22,7 @@ export class StorageService {
     const stream = fs.createReadStream(path);
     await this.bucketService.uploadFile(name, format, stream);
     stream.destroy();
-    fs.unlink(path, () => {
-      Logger.debug(`deleted: ${path}`);
-    });
+    fs.unlink(path, () => {});
   }
 
   download(downloadFileDto: DownloadFileDto): Readable {

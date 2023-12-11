@@ -265,9 +265,7 @@ export class VideoService {
 
             await Promise.all(uploadPromises);
 
-            fs.rmdir(outputDir, () => {
-              Logger.debug(`${outputDir} deleted`);
-            });
+            fs.rmdir(outputDir, () => {});
           });
 
           resolve();
