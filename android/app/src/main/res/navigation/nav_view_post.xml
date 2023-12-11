@@ -7,5 +7,18 @@
     <fragment
         android:id="@+id/postFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.viewpost.post.PostFragment"
-        android:label="PostFragment" />
+        android:label="PostFragment" >
+        <action
+            android:id="@+id/action_postFragment_to_createPostActivity2"
+            app:destination="@id/createPostActivity2" />
+    </fragment>
+    <activity
+        android:id="@+id/createPostActivity2"
+        android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity"
+        android:label="CreatePostActivity" >
+        <argument
+            android:name="post"
+            android:defaultValue=""
+            app:argType="string" />
+    </activity>
 </navigation>

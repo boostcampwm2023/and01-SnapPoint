@@ -6,6 +6,6 @@
 
     <path
         android:fillColor="@color/md_theme_inverseSurface"
-        android:pathData="M17.77,3.77l-1.77,-1.77l-10,10l10,10l1.77,-1.77l-8.23,-8.23z" />
+        android:pathData="M12,2C6.48,2 2,6.48 2,12c0,5.52 4.48,10 10,10s10,-4.48 10,-10C22,6.48 17.52,2 12,2zM18,15h-5l-1,-2H9.5v5H8V7h6l1,2h3V15z" />
 
 </vector>

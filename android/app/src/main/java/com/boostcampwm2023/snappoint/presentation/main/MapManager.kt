@@ -129,7 +129,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         prevSelectedIndex = viewModel.markerState.value.selectedIndex
         drawnRoute?.remove()
 
-        val polylineOptions = PolylineOptions().color(getColor(context, R.color.error80)).width(3.pxFloat()).pattern(listOf(
+        val polylineOptions = PolylineOptions().color(getColor(context, R.color.md_theme_error)).width(3.pxFloat()).pattern(listOf(
             Dash(20f), Gap(20f)
         ))
         val positionList = postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->

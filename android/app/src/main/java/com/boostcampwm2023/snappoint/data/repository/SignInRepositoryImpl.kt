@@ -21,9 +21,10 @@ class SignInRepositoryImpl @Inject constructor(
             password = password
         )
 
-        return flowOf(true).map {
-            snapPointApi.postSignIn(request)
-        }
+        return flowOf(true)
+            .map {
+                snapPointApi.postSignIn(request)
+            }
     }
 
     override fun getSignOut(): Flow<Unit> {

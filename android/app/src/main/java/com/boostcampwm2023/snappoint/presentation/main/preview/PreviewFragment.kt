@@ -2,17 +2,20 @@ package com.boostcampwm2023.snappoint.presentation.main.preview
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentPreviewBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
+import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.google.android.material.carousel.CarouselSnapHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -38,6 +41,7 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
         initViewSize()
 
         collectViewModelData()
+        collectViewModelEvent()
 
         setScrollEvent()
     }
@@ -68,9 +72,23 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 mainViewModel.markerState.collect{
                     if (it.selectedIndex > -1) {
-                        previewViewModel.updatePost(mainViewModel.postState.value[it.selectedIndex])
+                        previewViewModel.updatePost(mainViewModel.getPosts()[it.selectedIndex])
                     }
                     moveScroll(it.focusedIndex)
+                }
+            }
+        }
+    }
+
+    private fun collectViewModelEvent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                previewViewModel.event.collect { event ->
+                    when(event) {
+                        is PreviewEvent.NavigateViewPost -> {
+                            navigateViewPost()
+                        }
+                    }
                 }
             }
         }
@@ -96,5 +114,12 @@ class PreviewFragment : BaseFragment<FragmentPreviewBinding>(R.layout.fragment_p
                 mainViewModel.focusOfImageMoved(currentFocusImageIndex)
             }
         }
+    }
+
+    private fun navigateViewPost() {
+        findNavController().navigate(
+            R.id.action_previewFragment_to_viewPostActivity,
+            bundleOf(Constants.UUID_BUNDLE_KEY to previewViewModel.uiState.value.uuid)
+        )
     }
 }

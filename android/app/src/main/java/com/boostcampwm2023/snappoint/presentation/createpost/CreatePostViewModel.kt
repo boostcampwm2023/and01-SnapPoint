@@ -1,6 +1,8 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,7 +11,10 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +28,10 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.net.URL
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
@@ -50,6 +59,24 @@ class CreatePostViewModel @Inject constructor(
     )
     val event: SharedFlow<CreatePostEvent> = _event.asSharedFlow()
 
+    fun loadPrevPost(prevPost: PostSummaryState, geocoder: Geocoder) {
+        _uiState.update {
+            it.copy(
+                uuid = prevPost.uuid,
+                title = prevPost.title
+            )
+        }
+
+        viewModelScope.launch {
+            prevPost.postBlocks.forEach { block ->
+                when (block) {
+                    is PostBlockState.TEXT -> addTextBlock(block)
+                    is PostBlockState.IMAGE -> addImageBlock(block, geocoder)
+                    is PostBlockState.VIDEO -> TODO()
+                }
+            }
+        }
+    }
 
     fun addTextBlock() {
         _uiState.update {
@@ -59,10 +86,51 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    private fun addTextBlock(block: PostBlockState.TEXT) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlockCreationState.TEXT(
+                    uuid = block.uuid,
+                    content = block.content
+                )
+            )
+        }
+    }
+
     fun addImageBlock(bitmap: Bitmap, position: PositionState) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlockCreationState.IMAGE(bitmap = bitmap, position = position)
+                postBlocks = it.postBlocks + PostBlockCreationState.IMAGE(
+                    bitmap = bitmap,
+                    position = position
+                )
+            )
+        }
+    }
+
+    private suspend fun addImageBlock(block: PostBlockState.IMAGE, geocoder: Geocoder) {
+        val bitmap = withContext(Dispatchers.IO) {
+            BitmapFactory.decodeStream(URL(block.content).openConnection().getInputStream())
+        }
+
+        val addresses = geocoder.getFromLocation(
+            block.position.latitude,
+            block.position.longitude,
+            1
+        )
+        val address = if (addresses.isNullOrEmpty()) "" else addresses[0].getAddressLine(0)
+
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlockCreationState.IMAGE(
+                    content = block.content,
+                    uuid = block.uuid,
+                    description = block.description,
+                    position = block.position.copy(),
+                    address = address,
+                    bitmap = bitmap,
+                    fileUuid = block.fileUuid
+                )
             )
         }
     }
@@ -199,61 +267,96 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun onCheckButtonClicked() {
-        if(isValidTitle().not()){
+        if (isValidTitle().not()) {
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
         }
-        if(isValidBlocks().not()){
+        if (isValidBlocks().not()) {
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_blocks))
             return
         }
-        if(isValidTextBlock().not()){
+        if (isValidTextBlock().not()) {
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
             return
         }
-
-      /*  if(isValidMediaBlock().not()){
-            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
-            return
-        }*/
+//        if (isValidMediaBlock().not()) {
+//            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
+//            return
+//        }
 
         thread {
-            _uiState.update {
-                it.copy(isLoading = true)
+            if (uiState.value.uuid.isBlank()) {
+                postNewPost()
+            } else {
+                putModifiedPost()
             }
-            postRepository.postCreatePost(
-                title = _uiState.value.title,
-                postBlocks = _uiState.value.postBlocks
-            )
-                .onStart {}
-                .catch { Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}") }
-                .onCompletion {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                }
-                .onEach {
-                    Log.d("TAG", "onCheckButtonClicked: api request success")
-                    Log.d("TAG", "onCheckButtonClicked: ${it}")
-                    _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
-                    _event.tryEmit(CreatePostEvent.NavigatePrev)
-                }
-                .launchIn(viewModelScope)
         }
+    }
+
+    private fun postNewPost() {
+        postRepository.postCreatePost(
+            title = _uiState.value.title,
+            postBlocks = _uiState.value.postBlocks
+        )
+            .onStart {
+                _uiState.update {
+                    it.copy(isLoading = true)
+                }
+            }
+            .catch {
+                Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}")
+            }
+            .onCompletion {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
+            .onEach {
+                Log.d("TAG", "onCheckButtonClicked: api request success")
+                Log.d("TAG", "onCheckButtonClicked: ${it}")
+                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_creation_success))
+                _event.tryEmit(CreatePostEvent.NavigatePrev)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun putModifiedPost() {
+        postRepository.putModifiedPost(
+            uuid = uiState.value.uuid,
+            title = uiState.value.title,
+            postBlocks = uiState.value.postBlocks
+        )
+            .onStart {
+                _uiState.update {
+                    it.copy(isLoading = true)
+                }
+            }
+            .catch {
+                Log.d("TAG", "onCheckButtonClicked: error occurred, ${it.message}")
+            }
+            .onEach {
+                _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_activity_post_modification_success))
+                _event.tryEmit(CreatePostEvent.NavigatePrev)
+            }
+            .onCompletion {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onImageBlockButtonClicked() {
         _event.tryEmit(CreatePostEvent.SelectImageFromLocal)
     }
+
     fun onVideoBlockButtonClicked() {
         _event.tryEmit(CreatePostEvent.SelectVideoFromLocal)
     }
 
-
     fun onBackButtonClicked(){
         _event.tryEmit(CreatePostEvent.NavigatePrev)
     }
-
 
     private fun findAddress(index: Int) {
 

@@ -26,7 +26,6 @@
             android:id="@+id/cv_around_post"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:cardBackgroundColor="@color/surfaceColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

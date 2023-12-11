@@ -30,6 +30,7 @@ sealed class PostBlockState {
         val url144P: String = "",
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
+        val fileUuid: String = ""
     ) : PostBlockState()
     @Serializable
     data class VIDEO(
@@ -41,6 +42,7 @@ sealed class PostBlockState {
         val thumbnail144P: String = "",
         val thumbnailUuid: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
+        val fileUuid: String = ""
     ) : PostBlockState()
     @Serializable
     enum class ViewType {

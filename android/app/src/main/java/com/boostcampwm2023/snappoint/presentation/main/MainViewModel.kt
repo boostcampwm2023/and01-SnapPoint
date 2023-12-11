@@ -8,7 +8,7 @@ import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.boostcampwm2023.snappoint.presentation.util.UserInfo
+import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,11 +29,15 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val userInfoPreference: UserInfoPreference
 ) : ViewModel() {
 
     private val _postState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
     val postState: StateFlow<List<PostSummaryState>> = _postState.asStateFlow()
+
+    private val _localPostState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
+    val localPostState: StateFlow<List<PostSummaryState>> = _localPostState.asStateFlow()
 
     private val _uiState: MutableStateFlow<MainUiState> = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -73,15 +77,15 @@ class MainViewModel @Inject constructor(
     }
 
     fun loadLocalPost() {
-        roomRepository.getAllLocalPost(UserInfo.getEmail())
+        roomRepository.getAllLocalPost(userInfoPreference.getEmail())
             .onStart {
                 startLoading()
             }
             .catch {
                 _event.tryEmit(MainActivityEvent.GetAroundPostFailed)
             }
-            .onEach { posts ->
-                _postState.update { posts }
+            .onEach { localPosts ->
+                _localPostState.update { localPosts }
                 _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
             }
             .takeWhile {
@@ -89,6 +93,16 @@ class MainViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
         finishLoading()
+    }
+
+    fun displayLocalSnapPoints() {
+        _uiState.update { it.copy(isSubscriptionFragmentShowing = true) }
+        _event.tryEmit(MainActivityEvent.DisplaySnapPoints)
+    }
+
+    fun displayRemoteSnapPoints() {
+        _uiState.update { it.copy(isSubscriptionFragmentShowing = false) }
+        _event.tryEmit(MainActivityEvent.DisplaySnapPoints)
     }
 
     fun clearPosts() {
@@ -172,11 +186,19 @@ class MainViewModel @Inject constructor(
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
     }
 
-    fun startLoading() {
+    fun getPosts(): List<PostSummaryState> {
+        return if (uiState.value.isSubscriptionFragmentShowing) {
+            localPostState.value
+        } else {
+            postState.value
+        }
+    }
+
+    private fun startLoading() {
         _uiState.update { it.copy(isLoading = true) }
     }
 
-    fun finishLoading() {
+    private fun finishLoading() {
         _uiState.update { it.copy(isLoading = false) }
     }
 

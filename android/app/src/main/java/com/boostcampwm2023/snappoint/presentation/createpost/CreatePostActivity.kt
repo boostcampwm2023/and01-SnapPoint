@@ -3,22 +3,28 @@ package com.boostcampwm2023.snappoint.presentation.createpost
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.location.Geocoder
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.navArgs
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
@@ -26,12 +32,20 @@ import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
 import com.boostcampwm2023.snappoint.presentation.videoedit.VideoEditActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import java.net.URL
+import java.util.Locale
 
 @AndroidEntryPoint
 class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.activity_create_post) {
 
     private val viewModel: CreatePostViewModel by viewModels()
+    private val args: CreatePostActivityArgs by navArgs()
+
+    private val geocoder: Geocoder by lazy { Geocoder(applicationContext, Locale.KOREA) }
 
     private val imagePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
@@ -118,6 +132,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         super.onCreate(savedInstanceState)
         initBinding()
         collectViewModelData()
+        loadPrevPost()
     }
 
     private fun initBinding() {
@@ -159,6 +174,16 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                 }
             }
         }
+    }
+
+    private fun loadPrevPost() {
+        if (args.post.isBlank()) {
+            return
+        }
+
+        val prevPost: PostSummaryState = Json.decodeFromString<PostSummaryState>(args.post)
+        viewModel.loadPrevPost(prevPost, geocoder)
+        binding.tilTitle.editText?.setText(prevPost.title)
     }
 
     private fun selectVideo() {
