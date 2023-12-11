@@ -53,11 +53,11 @@ export class ValidationService {
       const { uuid, type, latitude, longitude } = blockDto;
       const sourceFiles = sourceFileMap.get(uuid);
 
-      if (type === 'text' && (latitude || longitude)) {
+      if (type === 'text' && (latitude !== undefined || longitude !== undefined)) {
         throw new BadRequestException('Latitude and longitude should not be provided for text type');
       }
 
-      if (type === 'media' && (!latitude || !longitude)) {
+      if (type === 'media' && (latitude === undefined || longitude === undefined)) {
         throw new BadRequestException('Latitude and longitude should be provided for media type');
       }
 
