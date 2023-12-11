@@ -298,21 +298,4 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun updateVideoPath(path: String) {
-        val lastIndex = _uiState.value.postBlocks.lastIndex
-        _uiState.update {
-            it.copy(
-                postBlocks = it.postBlocks.mapIndexed { index, block ->
-                    if(index == lastIndex){
-                        (block as PostBlockCreationState.VIDEO).copy(
-                            uri = path.toUri()
-                        )
-                    }else{
-                        block
-                    }
-                }
-            )
-        }
-
-    }
 }

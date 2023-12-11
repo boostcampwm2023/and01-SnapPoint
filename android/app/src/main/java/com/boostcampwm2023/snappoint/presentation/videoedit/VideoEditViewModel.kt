@@ -98,7 +98,7 @@ class VideoEditViewModel @Inject constructor(
         }
     }
 
-    fun onPlayButtonClicked(){
+    fun onPlayButtonClicked() {
         _event.tryEmit(VideoEditEvent.OnPlayButtonClicked)
     }
 
@@ -107,4 +107,16 @@ class VideoEditViewModel @Inject constructor(
             isPlaying
         }
     }
+
+    fun onBackButtonClicked() {
+        _event.tryEmit(VideoEditEvent.OnBackButtonClicked)
+    }
+
+    fun onUploadWithoutEditButtonClicked() {
+        _event.tryEmit(VideoEditEvent.OnUploadWithoutEditButtonClicked)
+    }
+    fun onCheckButtonClicked() {
+        _event.tryEmit(VideoEditEvent.OnCheckButtonClicked)
+    }
+
 }

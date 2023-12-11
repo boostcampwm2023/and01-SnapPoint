@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -70,18 +71,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val videoUri = result.data?.data ?: return@registerForActivityResult
-                val mediaMetadataRetriever = MediaMetadataRetriever().apply {
-                    setDataSource(this@CreatePostActivity, videoUri)
-                }
-                val mimeType = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)!!
-               val inputStream = this.contentResolver.openInputStream(videoUri)
-                    ?: return@registerForActivityResult
-                val position = MetadataUtil.extractLocationFromInputStream(inputStream)
-                    .getOrDefault(PositionState(0.0, 0.0))
-
-                viewModel.addVideoBlock(videoUri, position, mimeType)
-
-                startVideoEditActivity(viewModel.uiState.value.postBlocks.lastIndex, videoUri)
+                startVideoEditActivity(videoUri)
             }
         }
 
@@ -108,10 +98,23 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
             if (result.resultCode == RESULT_OK) {
                 result.data?.let{
                     val path = it.getStringExtra("path") ?: ""
-                    viewModel.updateVideoPath(path)
+                    val original = it.getStringExtra("original") ?: ""
+                    val originalUri = original.toUri()
+                    val videoUri = path.toUri()
+                    val mediaMetadataRetriever = MediaMetadataRetriever().apply {
+                        setDataSource(this@CreatePostActivity, originalUri)
+                    }
+                    val mimeType = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)!!
+                    val inputStream = this.contentResolver.openInputStream(originalUri)
+                        ?: return@registerForActivityResult
+                    val position = MetadataUtil.extractLocationFromInputStream(inputStream)
+                        .getOrDefault(PositionState(0.0, 0.0))
+
+                    viewModel.addVideoBlock(videoUri, position, mimeType)
+                    mediaMetadataRetriever.release()
                 }
+                startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, (viewModel.uiState.value.postBlocks.last() as PostBlockCreationState.VIDEO).position)
             }
-            startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, (viewModel.uiState.value.postBlocks.last() as PostBlockCreationState.VIDEO).position)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -254,9 +257,8 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         addressSelectionLauncher.launch(intent)
     }
 
-    private fun startVideoEditActivity(index: Int, uri: Uri) {
+    private fun startVideoEditActivity(uri: Uri) {
         val intent = Intent(this, VideoEditActivity::class.java)
-        intent.putExtra("index", index)
         intent.putExtra("uri", uri.toString())
         videoEditLauncher.launch(intent)
     }

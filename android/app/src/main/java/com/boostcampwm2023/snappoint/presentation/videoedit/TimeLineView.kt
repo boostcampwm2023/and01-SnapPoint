@@ -2,7 +2,9 @@ package com.boostcampwm2023.snappoint.presentation.videoedit
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.media.MediaMetadataRetriever
@@ -17,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.boostcampwm2023.snappoint.R
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -43,6 +46,7 @@ class TimeLineView(
 
     private val paint = Paint().apply {
         style = Paint.Style.FILL
+        color = resources.getColor(R.color.primaryColor)
     }
 
     init{

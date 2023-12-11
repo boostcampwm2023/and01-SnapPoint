@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.videoedit
 
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
@@ -23,6 +24,7 @@ import androidx.media3.transformer.Transformer.Listener
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityVideoEditBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import com.boostcampwm2023.snappoint.presentation.util.CacheFileNameMaker.getRandomName
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,8 +34,6 @@ import java.io.File
 class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activity_video_edit) {
 
     private val viewModel: VideoEditViewModel by viewModels()
-
-    private var postIndex = 0
 
     private lateinit var file: File
     private lateinit var trans: Transformer
@@ -83,6 +83,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                 super.onCompleted(composition, exportResult)
                 viewModel.finishLoading()
                 intent.putExtra("path", file.path)
+                intent.putExtra("original", viewModel.uri.value)
                 setResult(RESULT_OK, intent)
                 finish()
 
@@ -101,7 +102,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
     private fun createExternalCacheFile() {
 
-        file = File(externalCacheDir, "video_edited.mp4")
+        file = File(cacheDir, "${getRandomName()}.mp4")
 
         try{
             if (file.exists() && !file.delete()) {
@@ -141,12 +142,29 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                             VideoEditEvent.StopPlayer -> {
                                 stopPlayer()
                             }
+
+                            VideoEditEvent.OnBackButtonClicked -> {
+                                finish()
+                            }
+                            VideoEditEvent.OnUploadWithoutEditButtonClicked -> {
+                                viewModel.startLoading()
+                                startTransformationWithoutEdit()
+                            }
+
+                            VideoEditEvent.OnCheckButtonClicked -> {
+                                viewModel.startLoading()
+                                startTransformation()
+                            }
                         }
 
                     }
                 }
             }
         }
+    }
+
+    private fun startTransformationWithoutEdit() {
+        trans.start(mediaItem, file.path)
     }
 
     private fun startPlayer() {
@@ -191,14 +209,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             }
             pv.useController = false
 
-            btnCancel.setOnClickListener {
-                finish()
-            }
-            btnConfirm.setOnClickListener {
-                viewModel.startLoading()
-                startTransformation()
-            }
-
             tlv.doOnLayout {
                 viewModel.updateTLVSize(it.width, it.height)
             }
@@ -223,7 +233,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
     private fun getIntentExtra() {
         val uri = intent.getStringExtra("uri")?:""
         viewModel.setUri(uri)
-        postIndex = intent.getIntExtra("index",0) ?: 0
     }
 
 }
