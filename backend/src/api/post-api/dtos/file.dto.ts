@@ -31,7 +31,7 @@ export class FileDto {
       return {
         uuid,
         url: isProcessed ? `${url}.m3u8` : url,
-        mimeType,
+        mimeType: isProcessed ? 'application/x-mpegURL' : mimeType,
         url_144p: null,
         url_480p: null,
         url_720p: null,

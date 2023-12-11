@@ -105,9 +105,16 @@ export class VideoService {
    */
   private async getMetadata(url: string): Promise<MetadataDto> {
     return new Promise((resolve, reject) => {
+      Logger.debug(url);
       ffmpeg.ffprobe(url, (error, data) => {
         if (error || !data) {
           reject(error);
+        }
+
+        if (!data) {
+          return reject(
+            new InternalServerErrorException('비디오 데이터가 없습니다.'),
+          );
         }
 
         const video = data.streams.find(
@@ -237,7 +244,7 @@ export class VideoService {
         .inputFormat('mp4')
         .output(outputPath)
         .on('end', async () => {
-          Logger.debug(`packaged: ${uuid}`);
+          Logger.debug(`packaged: ${uuid} ${quality}`);
 
           fs.readdir(outputDir, async (err, files) => {
             if (err) {
@@ -246,7 +253,11 @@ export class VideoService {
 
             const uploadPromises = files.map((fileName) => {
               const filePath = path.join(outputDir, fileName);
-              const format = mime.lookup(filePath);
+              let format = mime.lookup(filePath);
+
+              if (format === 'application/vnd.apple.mpegurl') {
+                format = 'application/x-mpegURL';
+              }
 
               if (!format) {
                 return reject(
@@ -290,7 +301,7 @@ export class VideoService {
       1080: 6000000,
     } as const;
 
-    let content = '#EXTM3U';
+    let content = '#EXTM3U\n';
 
     qualities.forEach((height) => {
       const width = Math.ceil(height * (16 / 9));
@@ -315,7 +326,7 @@ export class VideoService {
 
     await this.storageService.uploadTempFile({
       name: outputName,
-      format: 'application/vnd.apple.mpegurl',
+      format: 'application/x-mpegURL',
       path: outputPath,
     });
 
