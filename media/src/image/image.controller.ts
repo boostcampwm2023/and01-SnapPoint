@@ -29,9 +29,6 @@ export class ImageController {
 
     channel.ack(originalMsg);
 
-    this.client.emit(
-      { cmd: 'process_image_data' },
-      { uuid: resizeImageDto.uuid },
-    );
+    this.client.emit({ cmd: 'media.processed' }, { uuid: resizeImageDto.uuid });
   }
 }

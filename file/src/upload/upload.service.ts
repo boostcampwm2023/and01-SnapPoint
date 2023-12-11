@@ -81,6 +81,13 @@ export class UploadService {
       throw new NotFoundException('파일의 경로가 존재하지 않습니다.');
     }
 
+    if (completeUpload.Location.startsWith('http://')) {
+      completeUpload.Location = completeUpload.Location.replace(
+        'http://',
+        'https://',
+      );
+    }
+
     return UploadFileEndResponsetDto.of(key, completeUpload.Location, mimeType);
   }
 
