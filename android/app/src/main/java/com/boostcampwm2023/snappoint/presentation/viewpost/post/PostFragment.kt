@@ -107,7 +107,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         findNavController().navigate(
             R.id.action_postFragment_to_createPostActivity2,
             bundleOf(
-                Constants.UUID_BUNDLE_KEY to Json.encodeToString(viewPostViewModel.post.value)
+                Constants.POST_BUNDLE_KEY to Json.encodeToString(viewPostViewModel.post.value)
             )
         )
     }
