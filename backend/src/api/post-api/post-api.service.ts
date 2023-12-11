@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
@@ -55,9 +55,9 @@ export class PostApiService {
     return blockDtoMap;
   }
 
-  async findEntireBlocksWithPost(posts: Post[]) {
+  async findEntireBlocksWithPost(posts: Post[]): Promise<Block[][]> {
     const keys = posts.map((post) => `block:${post.uuid}`);
-    const entireBlocks = await this.redisService.mget<Block>(
+    const entireBlocks = await this.redisService.mget<Block[]>(
       keys,
       (value) => JSON.parse(value),
       async (keys) => {
@@ -65,7 +65,29 @@ export class PostApiService {
           const uuid = key.substring('block:'.length);
           return { postUuid: uuid };
         });
-        return await this.blockService.findBlocksByPosts(dtos);
+        const entireBlocks = await this.blockService.findBlocksByPosts(dtos);
+
+        const blockByUuid = {};
+
+        entireBlocks.forEach((block) => {
+          const { postUuid } = block;
+          if (!postUuid) {
+            throw new InternalServerErrorException();
+          }
+          if (!blockByUuid[postUuid]) {
+            blockByUuid[postUuid] = [];
+          }
+          blockByUuid[postUuid].push(block);
+        });
+
+        const resultArray = dtos.map((dto) => {
+          if (!blockByUuid[dto.postUuid]) {
+            return [];
+          }
+          return blockByUuid[dto.postUuid];
+        });
+
+        return resultArray;
       },
     );
 
@@ -87,7 +109,29 @@ export class PostApiService {
           return { uuid: uuid };
         });
 
-        return await this.fileService.findFilesBySources('block', dtos);
+        const findFiles = await this.fileService.findFilesBySources('block', dtos);
+
+        const fileByUuid = {};
+
+        findFiles.forEach((file) => {
+          const { sourceUuid } = file;
+          if (!sourceUuid) {
+            throw new InternalServerErrorException();
+          }
+          if (!fileByUuid[sourceUuid]) {
+            fileByUuid[sourceUuid] = [];
+          }
+          fileByUuid[sourceUuid].push(file);
+        });
+
+        const resultArray = dtos.map((dto) => {
+          if (!fileByUuid[dto.uuid]) {
+            return [];
+          }
+          return fileByUuid[dto.uuid];
+        });
+
+        return resultArray;
       },
     );
 
@@ -109,10 +153,9 @@ export class PostApiService {
     const posts = await this.postService.findPosts({ where: { OR: blockPostUuids } });
 
     // 3. 게시글과 연관된 모든 블록을 찾는다.
-    const entireBlocks = await this.findEntireBlocksWithPost(posts);
+    const entireBlocks = ([] as Block[]).concat(...(await this.findEntireBlocksWithPost(posts)));
     // 4. 블록과 연관된 모든 파일을 찾는다.
-
-    const entireFiles = await this.findEntireFilesWithBlocks(entireBlocks);
+    const entireFiles = ([] as File[]).concat(...(await this.findEntireFilesWithBlocks(entireBlocks)));
 
     return this.assemblePosts(posts, entireBlocks, entireFiles);
   }
