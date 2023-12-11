@@ -2,8 +2,12 @@ package com.boostcampwm2023.snappoint.presentation.videoedit
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -28,20 +32,30 @@ class VideoEditViewModel @Inject constructor(
     val TLVHeight: StateFlow<Float> = _TLVHeight.asStateFlow()
     private val _videoLengthInMs: MutableStateFlow<Float> = MutableStateFlow(0F)
     val videoLengthInMs: StateFlow<Float> = _videoLengthInMs.asStateFlow()
+    private val _isPlaying: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _event: MutableSharedFlow<VideoEditEvent> = MutableSharedFlow(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val event: SharedFlow<VideoEditEvent> = _event.asSharedFlow()
 
     fun onLeftThumbMoved(secDivideTen: Long){
         _leftThumbState.update {
             secDivideTen
         }
+        _event.tryEmit(VideoEditEvent.StopPlayer)
         updateRecent(_leftThumbState.value)
     }
     fun onRightThumbMoved(secDivideTen: Long){
         _rightThumbState.update {
             secDivideTen
         }
+        _event.tryEmit(VideoEditEvent.StopPlayer)
         updateRecent(_rightThumbState.value)
     }
 
@@ -81,6 +95,16 @@ class VideoEditViewModel @Inject constructor(
         _rightThumbState.value = videoLengthInMs
         _videoLengthInMs.update {
             videoLengthInMs.toFloat()
+        }
+    }
+
+    fun onPlayButtonClicked(){
+        _event.tryEmit(VideoEditEvent.OnPlayButtonClicked)
+    }
+
+    fun playerIsPlaying(isPlaying: Boolean) {
+        _isPlaying.update {
+            isPlaying
         }
     }
 }

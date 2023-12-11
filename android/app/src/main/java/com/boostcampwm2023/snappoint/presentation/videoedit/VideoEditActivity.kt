@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.transformer.Composition
@@ -23,6 +24,7 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityVideoEditBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -120,15 +122,64 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 launch {
                     viewModel.recentState.collect{
-                        moveSeekPositionMs(position = it )
+                        if(!isPlaying()) {
+                            moveSeekPositionMs(position = it )
+                        }
+                    }
+                }
+                launch {
+                    viewModel.event.collect{event ->
+                        when(event){
+                            VideoEditEvent.OnPlayButtonClicked -> {
+                                if(!isPlaying()) {
+                                    startPlayer()
+                                }else{
+                                    stopPlayer()
+                                }
+                            }
+
+                            VideoEditEvent.StopPlayer -> {
+                                stopPlayer()
+                            }
+                        }
+
                     }
                 }
             }
         }
     }
 
+    private fun startPlayer() {
+        val player = binding.pv.player?: return
+        if(viewModel.recentState.value < viewModel.rightThumbState.value){
+            player.play()
+            viewModel.playerIsPlaying(player.isPlaying)
+            lifecycleScope.launch {
+                while(isPlaying()){
+                    if(viewModel.recentState.value >= viewModel.rightThumbState.value){
+                        stopPlayer()
+                        break
+                    }
+                    delay(100)
+                    viewModel.updateRecent(binding.pv.player!!.currentPosition)
+                }
+            }
+        }
+
+    }
+
+    private fun stopPlayer() {
+        val player = binding.pv.player?: return
+        player.pause()
+        viewModel.playerIsPlaying(player.isPlaying)
+    }
+
     private fun moveSeekPositionMs(position: Long) {
         binding.pv.player?.seekTo(position)
+    }
+    private fun isPlaying(): Boolean {
+        val player = binding.pv.player?: return false
+        return player.isPlaying
     }
 
     private fun initBinding() {
@@ -152,6 +203,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                 viewModel.updateTLVSize(it.width, it.height)
             }
         }
+
     }
 
     private fun startTransformation() {
