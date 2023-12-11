@@ -44,7 +44,6 @@ class AroundViewModel @Inject constructor(
         _event.tryEmit(AroundEvent.ShowSnapPointAndRoute(index))
     }
 
-    // TODO - uuid 전달하여 ViewPostActivity에서 uuid를 통해 게시글 정보 받아오도록 수정
     private fun viewPostButtonClicked(index: Int) {
         _event.tryEmit(AroundEvent.NavigateViewPost(index))
     }

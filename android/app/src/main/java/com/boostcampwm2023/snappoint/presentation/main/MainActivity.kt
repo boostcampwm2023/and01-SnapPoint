@@ -124,6 +124,7 @@ class MainActivity(
             supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         mapManager = MapManager(viewModel, this)
         map.getMapAsync(mapManager)
+        mapManager.searchSnapPoints()
     }
 
     private fun cachingBottomSheetSize() {
@@ -151,7 +152,8 @@ class MainActivity(
                             }
 
                             MainActivityEvent.NavigateClose -> {
-                                navController.popBackStack(R.id.aroundFragment, false)
+                                navController.popBackStack(R.id.previewFragment, true)
+                                navController.popBackStack(R.id.clusterPreviewFragment, true)
                                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                             }
 
@@ -188,8 +190,25 @@ class MainActivity(
                                 openClusterListFragment(event.tags)
                             }
 
+                            is MainActivityEvent.AroundPostNotExist -> {
+                                showToastMessage(R.string.post_not_exist)
+                            }
+
+                            is MainActivityEvent.CollapseBottomSheet -> {
+                                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
+
+                            is MainActivityEvent.NavigateAround -> {
+                                while (true) {
+                                    if (navController.popBackStack().not()) {
+                                        break
+                                    }
+                                }
+                                navController.navigate(R.id.aroundFragment)
+
                             is MainActivityEvent.DisplaySnapPoints -> {
                                 updateMarkers(viewModel.getPosts())
+
                             }
                         }
                     }
@@ -199,12 +218,13 @@ class MainActivity(
 
                     viewModel.markerState.collect { markerState ->
                         if (markerState.selectedIndex < 0 || markerState.focusedIndex < 0) {
-                            mapManager.removeFocus()
+                            if(mapManager.googleMap != null) mapManager.removeMarkerFocus()
                             return@collect
                         }
-                        val block = viewModel.getPosts()[markerState.selectedIndex].postBlocks
-                            .filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
-                        mapManager.changeSelectedMarker(block, SnapPointTag(markerState.selectedIndex, markerState.focusedIndex))
+
+                        val post = viewModel.getPosts()[markerState.selectedIndex]
+                        val block = post.postBlocks.filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
+                        mapManager.changeSelectedMarker(block, SnapPointTag(post.uuid, block.uuid))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
                             mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks)
@@ -215,6 +235,10 @@ class MainActivity(
                 launch {
                     viewModel.uiState.collect {
                         setMapGestureEnabled(it.isPreviewFragmentShowing || it.isClusterPreviewShowing)
+                        mapManager.setClusteringEnabled(it.isPreviewFragmentShowing)
+                        if (it.isClusterPreviewShowing.not() && mapManager.googleMap != null) {
+                            mapManager.removeClusterFocus()
+                        }
                     }
                 }
 
@@ -242,12 +266,9 @@ class MainActivity(
         mapManager.updateMarkers(postState)
     }
 
-    private suspend fun setMapGestureEnabled(boolean: Boolean) {
+    private fun setMapGestureEnabled(boolean: Boolean) {
         mapManager.setZoomGesturesEnabled(boolean.not())
         mapManager.setScrollGesturesEnabled(boolean.not())
-        if (boolean.not()) {
-            mapManager.removeFocus()
-        }
     }
 
     private fun getMediaPositions(): List<PositionState> {
@@ -355,7 +376,10 @@ class MainActivity(
 
     private fun setBottomNavigationEvent() {
         binding.bnv.setOnItemSelectedListener { menuItem ->
-            navController.popBackStack()
+            lifecycleScope.launch { mapManager.removeMarkerFocus() }
+            while (true) {
+                if (navController.popBackStack().not()) break
+            }
             navController.navigate(menuItem.itemId)
             halfOpenBottomSheetWhenCollapsed()
             true

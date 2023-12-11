@@ -7,7 +7,6 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
-import com.boostcampwm2023.snappoint.presentation.util.drawNumberOnSnapPoint
 import com.boostcampwm2023.snappoint.presentation.util.getSnapPointBitmap
 import com.boostcampwm2023.snappoint.presentation.util.pxFloat
 import com.boostcampwm2023.snappoint.presentation.util.untilSixAfterDecimalPoint
@@ -19,7 +18,6 @@ import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.clustering.Cluster
@@ -41,9 +39,9 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     private lateinit var clusterManager: ClusterManager<SnapPointClusterItem>
     private lateinit var renderer: SnapPointClusterRenderer
 
-    var prevSelectedMarker: SnapPointClusterItem? = null
-    var prevSelectedCluster: Cluster<SnapPointClusterItem>? = null
-    var drawnRoute: Polyline? = null
+    private var prevSelectedMarker: SnapPointClusterItem? = null
+    private var prevSelectedCluster: Cluster<SnapPointClusterItem>? = null
+    private var drawnRoute: Polyline? = null
     var prevSelectedIndex = -1
 
     fun moveCamera(latitude: Double, longitude: Double, zoom: Float? = null) {
@@ -53,14 +51,14 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap = googleMap
 
         clusterManager = ClusterManager(context, googleMap)
-        renderer = SnapPointClusterRenderer(context, googleMap, clusterManager)
+        renderer = SnapPointClusterRenderer(context, googleMap, clusterManager, this)
         googleMap.setOnCameraIdleListener(clusterManager)
         clusterManager.setOnClusterItemClickListener(this)
         clusterManager.setOnClusterClickListener(this)
 
+        this.googleMap = googleMap
         viewModel.onMapReady()
     }
 
@@ -76,51 +74,42 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         setClusterUnfocused(prevSelectedCluster)
 
         prevSelectedCluster = cluster
-        renderer.getMarker(cluster).apply {
-            CoroutineScope(Dispatchers.IO).launch {
-                val url = cluster.items.find { it.position == cluster.position }?.getContent() ?: return@launch
-                val selected = drawNumberOnSnapPoint(getSnapPointBitmap(context, url, true), cluster.size)
-                withContext(Dispatchers.Main) { setIcon(BitmapDescriptorFactory.fromBitmap(selected)) }
-            }
-        }
+        renderer.setPrevSelected(cluster)
         viewModel.onClusterClicked(cluster.items.map { it.getTag() })
         return true
     }
 
-    suspend fun removeFocus() {
+    suspend fun removeMarkerFocus() {
         drawnRoute?.remove()
         prevSelectedIndex = -1
 
         if (prevSelectedMarker != null) {
-            val prevSelected = prevSelectedMarker ?: return
-            setItemUnfocused(prevSelected)
+            setItemUnfocused(prevSelectedMarker)
             prevSelectedMarker = null
             clusterManager.cluster()
         }
+    }
 
+    fun removeClusterFocus() {
+        renderer.setPrevSelected(null)
         setClusterUnfocused(prevSelectedCluster)
         prevSelectedCluster = null
     }
 
-    private suspend fun setItemUnfocused(selected: SnapPointClusterItem) {
+    private suspend fun setItemUnfocused(selected: SnapPointClusterItem?) {
+        if (selected == null) return
         val bitmap = getSnapPointBitmap(context, selected.getContent(), false)
-        clusterManager.markerCollection.markers.find { it.position == selected.position }?.setIcon(
-            BitmapDescriptorFactory.fromBitmap(bitmap)
-        )
+        renderer.getMarker(selected).apply {
+            setIcon(BitmapDescriptorFactory.fromBitmap(bitmap))
+            zIndex = 0.0f
+        }
     }
 
     private fun setClusterUnfocused(selected: Cluster<SnapPointClusterItem>?) {
         if (selected != null) {
             renderer.getMarker(selected).apply {
                 if (this == null) return
-                CoroutineScope(Dispatchers.IO).launch {
-                    val url = selected.items.find { it.position == selected.position }?.getContent()
-                        ?: return@launch
-                    val bitmap = drawNumberOnSnapPoint(getSnapPointBitmap(context, url, false), selected.size)
-                    withContext(Dispatchers.Main) {
-                        setIcon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                    }
-                }
+                renderer.setPrevSelected(null)
             }
         }
     }
@@ -156,33 +145,24 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
     suspend fun changeSelectedMarker(block: PostBlockState.IMAGE, snapPointTag: SnapPointTag) {
 
-        if (prevSelectedMarker != null) {
-            val prevSelected = prevSelectedMarker ?: return
-            setItemUnfocused(prevSelected)
-        }
+        setItemUnfocused(prevSelectedMarker)
+
         val selectedBitmap = getSnapPointBitmap(context, block.content, true)
 
-        while (clusterManager.markerCollection.markers.find { it.position == block.position.asLatLng() } == null) {
-            delay(100)
+        val item = clusterManager.algorithm.items.find { it.getTag() == snapPointTag }
+        while (renderer.getMarker(item) == null) { delay(100) }
+        renderer.getMarker(item).apply {
+            zIndex = 1.0f
+            setIcon(BitmapDescriptorFactory.fromBitmap(selectedBitmap))
         }
-        val marker = clusterManager.markerCollection.markers.find { it.position == block.position.asLatLng() }
-        marker?.setIcon(
-            BitmapDescriptorFactory.fromBitmap(selectedBitmap)
-        )
-        prevSelectedMarker = SnapPointClusterItem(
-            position = block.position.asLatLng(),
-            tag = snapPointTag,
-            content = block.content,
-            icon = selectedBitmap
-        )
-        clusterManager.cluster()
+        prevSelectedMarker = item
     }
 
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
         clusterManager.clearItems()
-        postState.forEachIndexed { postIndex, postSummaryState ->
+        postState.forEach { postSummaryState ->
             postSummaryState.postBlocks.filter { it !is PostBlockState.TEXT }
-                .forEachIndexed { pointIndex, postBlockState ->
+                .forEach { postBlockState ->
                     // cluster
                     lateinit var snapPoint: Bitmap
                     lateinit var clusterItem: SnapPointClusterItem
@@ -191,7 +171,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                             snapPoint = getSnapPointBitmap(context, postBlockState.url144P, false)
                             clusterItem = SnapPointClusterItem(
                                 position = postBlockState.position.asLatLng(),
-                                tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                tag = SnapPointTag(postUuid = postSummaryState.uuid, blockUuid = postBlockState.uuid),
                                 content = postBlockState.url144P,
                                 icon = snapPoint
                             )
@@ -201,7 +181,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                             snapPoint = getSnapPointBitmap(context, postBlockState.thumbnail144P, false)
                             clusterItem = SnapPointClusterItem(
                                 position = postBlockState.position.asLatLng(),
-                                tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                tag = SnapPointTag(postUuid = postSummaryState.uuid, blockUuid = postBlockState.uuid),
                                 content = postBlockState.thumbnail144P,
                                 icon = snapPoint
                             )
@@ -215,13 +195,18 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     }
 
     fun searchSnapPoints() {
-        val latLngBounds = googleMap?.projection?.visibleRegion?.latLngBounds ?: return
+        CoroutineScope(Dispatchers.IO).launch {
+            val latLngBounds = withContext(Dispatchers.Main) {
+                while (googleMap?.projection == null) { delay(100) }
+                googleMap?.projection?.visibleRegion?.latLngBounds
+            } ?: return@launch
 
-        val leftBottom = latLngBounds.southwest.latitude.untilSixAfterDecimalPoint().toString() +
-                "," + latLngBounds.southwest.longitude.untilSixAfterDecimalPoint().toString()
-        val rightTop = latLngBounds.northeast.latitude.untilSixAfterDecimalPoint().toString() +
-                "," + latLngBounds.northeast.longitude.untilSixAfterDecimalPoint().toString()
-        viewModel.loadPosts(leftBottom, rightTop)
+            val leftBottom = latLngBounds.southwest.latitude.untilSixAfterDecimalPoint().toString() +
+                    "," + latLngBounds.southwest.longitude.untilSixAfterDecimalPoint().toString()
+            val rightTop = latLngBounds.northeast.latitude.untilSixAfterDecimalPoint().toString() +
+                    "," + latLngBounds.northeast.longitude.untilSixAfterDecimalPoint().toString()
+            viewModel.loadPosts(leftBottom, rightTop)
+        }
     }
 
     fun setZoomGesturesEnabled(boolean: Boolean) {
@@ -230,5 +215,15 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
     fun setScrollGesturesEnabled(boolean: Boolean) {
         googleMap?.uiSettings?.isScrollGesturesEnabled = boolean
+    }
+
+    fun setClusteringEnabled(boolean: Boolean) {
+        if (googleMap == null) return
+        renderer.minClusterSize = if (boolean) Int.MAX_VALUE else 2
+        clusterManager.cluster()
+    }
+
+    fun setPrevSelectedCluster(prev: Cluster<SnapPointClusterItem>) {
+        prevSelectedCluster = prev
     }
 }
