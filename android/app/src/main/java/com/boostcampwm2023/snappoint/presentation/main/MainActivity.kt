@@ -79,8 +79,6 @@ class MainActivity(
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
 
-    private val tagBundleKey = "tags"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -376,7 +374,7 @@ class MainActivity(
     }
 
     private fun openClusterListFragment(tags: List<SnapPointTag>) {
-        val bundle = bundleOf(tagBundleKey to tags.toTypedArray())
+        val bundle = bundleOf(Constants.TAG_BUNDLE_KEY to tags.toTypedArray())
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         navController.navigate(R.id.clusterPreviewFragment, bundle)
     }
