@@ -28,6 +28,9 @@ class TimeLineView(
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
     companion object{
+        enum class Indicator{
+            L, R, NoHandle
+        }
         const val indicatorWidth = 30
     }
 
@@ -61,7 +64,7 @@ class TimeLineView(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initListener() {
-        var before = ""
+        var before = Indicator.NoHandle
         var recent = 0F
 
         setOnTouchListener { _, event ->
@@ -73,11 +76,11 @@ class TimeLineView(
                 MotionEvent.ACTION_DOWN -> {
                     recent = x
                     before = if(leftPosX - indicatorWidth <= x && leftPosX + indicatorWidth >= x){
-                        "L"
+                        Indicator.L
                     }else if(rightPosX - indicatorWidth <= x && rightPosX + indicatorWidth >= x){
-                        "R"
+                        Indicator.R
                     }else{
-                        ""
+                        Indicator.NoHandle
                     }
 
                     if(x > leftPosX && x < rightPosX){
@@ -88,13 +91,13 @@ class TimeLineView(
 
                 MotionEvent.ACTION_MOVE -> {
                     when{
-                        before == "L"-> {
+                        before == Indicator.L-> {
                             if(x + indicatorWidth > rightPosX) {
                                 leftMoved(rightPosX - indicatorWidth)
                                 return@setOnTouchListener true
                             }
                         }
-                        before == "R"-> {
+                        before == Indicator.R -> {
                             if(leftPosX + 30 > x) {
                                 rightMoved(leftPosX + indicatorWidth)
                                 return@setOnTouchListener true
@@ -105,7 +108,7 @@ class TimeLineView(
                     if(abs(recent - x) < indicatorWidth / 2) return@setOnTouchListener true
 
                     when(before){
-                        "L" ->{
+                        Indicator.L ->{
                             if(x < 0) x = 0F
                             leftMoved(x)
                             if(x - recent > 0 && abs(x - recent) > secDivideTenX){
@@ -116,7 +119,7 @@ class TimeLineView(
                                 viewModel?.onLeftThumbMoved(positionToTime(x))
                             }
                         }
-                        "R" ->{
+                        Indicator.R ->{
                             if(x > viewWidth) x = viewWidth
                             rightMoved(x)
                             if(x - recent > 0 && abs(x - recent) > secDivideTenX){
