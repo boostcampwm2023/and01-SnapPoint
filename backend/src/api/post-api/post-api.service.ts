@@ -6,7 +6,7 @@ import { FileService } from '@/domain/file/file.service';
 import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
-import { FileDto } from '@/api/file-api/dto/file.dto';
+import { FileDto } from '@/api/post-api/dtos/file.dto';
 import { Block, File, Post } from '@prisma/client';
 import { TransformationService } from '@/api/transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
