@@ -160,9 +160,9 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
     suspend fun updateMarkers(postState: List<PostSummaryState>) {
         clusterManager.clearItems()
-        postState.forEachIndexed { postIndex, postSummaryState ->
+        postState.forEach { postSummaryState ->
             postSummaryState.postBlocks.filter { it !is PostBlockState.TEXT }
-                .forEachIndexed { pointIndex, postBlockState ->
+                .forEach { postBlockState ->
                     // cluster
                     lateinit var snapPoint: Bitmap
                     lateinit var clusterItem: SnapPointClusterItem
@@ -171,7 +171,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                             snapPoint = getSnapPointBitmap(context, postBlockState.url144P, false)
                             clusterItem = SnapPointClusterItem(
                                 position = postBlockState.position.asLatLng(),
-                                tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                tag = SnapPointTag(postUuid = postSummaryState.uuid, blockUuid = postBlockState.uuid),
                                 content = postBlockState.url144P,
                                 icon = snapPoint
                             )
@@ -181,7 +181,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
                             snapPoint = getSnapPointBitmap(context, postBlockState.thumbnail144P, false)
                             clusterItem = SnapPointClusterItem(
                                 position = postBlockState.position.asLatLng(),
-                                tag = SnapPointTag(postIndex = postIndex, snapPointIndex = pointIndex),
+                                tag = SnapPointTag(postUuid = postSummaryState.uuid, blockUuid = postBlockState.uuid),
                                 content = postBlockState.thumbnail144P,
                                 icon = snapPoint
                             )

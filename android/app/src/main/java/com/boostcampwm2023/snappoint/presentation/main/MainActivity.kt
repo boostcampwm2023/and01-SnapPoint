@@ -214,9 +214,9 @@ class MainActivity(
                             if(mapManager.googleMap != null) mapManager.removeMarkerFocus()
                             return@collect
                         }
-                        val block = viewModel.postState.value[markerState.selectedIndex].postBlocks
-                            .filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
-                        mapManager.changeSelectedMarker(block, SnapPointTag(markerState.selectedIndex, markerState.focusedIndex))
+                        val post = viewModel.postState.value[markerState.selectedIndex]
+                        val block = post.postBlocks.filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
+                        mapManager.changeSelectedMarker(block, SnapPointTag(post.uuid, block.uuid))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
                             mapManager.changeRoute(viewModel.postState.value[markerState.selectedIndex].postBlocks)

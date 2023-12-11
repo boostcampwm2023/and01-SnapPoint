@@ -60,7 +60,7 @@ class MainViewModel @Inject constructor(
         postRepository.getAroundPost(leftBottom, rightTop)
             .onStart { startLoading() }
             .catch {
-                Log.d("TAG", "loadPosts: $it")
+                it.printStackTrace()
                 _event.tryEmit(MainActivityEvent.GetAroundPostFailed)
 
             }
@@ -117,7 +117,7 @@ class MainViewModel @Inject constructor(
 
     fun previewButtonClicked(index: Int) {
         updateSelectedIndex(index = index)
-        _event.tryEmit(MainActivityEvent.NavigatePreview(index))
+        _event.tryEmit(MainActivityEvent.NavigatePreview)
     }
 
     fun onPreviewFragmentShowing() {
@@ -166,8 +166,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun onMarkerClicked(tag: SnapPointTag) {
-        updateClickedSnapPoint(tag.postIndex, tag.snapPointIndex)
-        _event.tryEmit(MainActivityEvent.NavigatePreview(tag.postIndex))
+        val postIndex = _postState.value.indexOfFirst { it.uuid == tag.postUuid }
+        val blockIndex = _postState.value[postIndex].postBlocks.indexOfFirst { it.uuid == tag.blockUuid }
+        updateClickedSnapPoint(postIndex, blockIndex)
+        _event.tryEmit(MainActivityEvent.NavigatePreview)
     }
 
     fun onClusterClicked(cluster: List<SnapPointTag>) {

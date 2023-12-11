@@ -68,8 +68,9 @@ class ClusterPreviewFragment : BaseFragment<FragmentClusterPreviewBinding>(R.lay
     private fun updatePost() {
         val posts = mainViewModel.postState.value
         val list = mutableListOf<PostBlockState>()
-        args.tags.forEach {
-            list.add(posts[it.postIndex].postBlocks[it.snapPointIndex])
+        args.tags.forEach { tag ->
+            posts.find { it.uuid == tag.postUuid}?.postBlocks?.find { it.uuid == tag.blockUuid }
+                ?.let { list.add(it) }
         }
         clusterPreviewViewModel.updatePostList(list.toList())
     }
