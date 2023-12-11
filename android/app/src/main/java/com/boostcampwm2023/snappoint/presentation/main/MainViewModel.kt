@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
@@ -180,8 +181,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun onMarkerClicked(tag: SnapPointTag) {
-        val postIndex = _postState.value.indexOfFirst { it.uuid == tag.postUuid }
-        val blockIndex = _postState.value[postIndex].postBlocks.indexOfFirst { it.uuid == tag.blockUuid }
+        val postIndex = getPosts().indexOfFirst { it.uuid == tag.postUuid }
+        val blockIndex = getPosts()[postIndex]
+            .postBlocks
+            .filterIsInstance<PostBlockState.IMAGE>()
+            .indexOfFirst { it.uuid == tag.blockUuid }
         updateClickedSnapPoint(postIndex, blockIndex)
         _event.tryEmit(MainActivityEvent.NavigatePreview)
     }

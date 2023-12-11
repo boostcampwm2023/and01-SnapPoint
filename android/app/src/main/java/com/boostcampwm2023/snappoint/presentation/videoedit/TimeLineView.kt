@@ -46,7 +46,7 @@ class TimeLineView(
 
     private val paint = Paint().apply {
         style = Paint.Style.FILL
-        color = resources.getColor(R.color.primaryColor)
+        color = resources.getColor(R.color.md_theme_primary)
     }
 
     init{

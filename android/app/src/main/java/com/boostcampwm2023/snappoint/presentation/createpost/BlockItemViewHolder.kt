@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.util.TypedValue
 import android.widget.ImageView
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ViewDataBinding
 import androidx.media3.common.MediaItem
@@ -136,12 +137,11 @@ sealed class BlockItemViewHolder(
 
             }
 
-            val mediaItem = MediaItem.fromUri(block.uri)
+            val mediaItem = MediaItem.fromUri(block.uri?:block.content.toUri())
 
             binding.pv.player = ExoPlayer.Builder(itemView.context).build().also {
                 it.setMediaItem(mediaItem)
                 it.prepare()
-
             }
 
             textWatcher.updatePosition(index)

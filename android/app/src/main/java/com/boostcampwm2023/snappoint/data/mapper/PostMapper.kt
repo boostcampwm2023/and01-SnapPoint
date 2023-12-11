@@ -29,7 +29,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     fileUuid = this.files[0].fileUuid
                 )
             } else {
-                val (thumbnail, video) = this.files.partition { it.url.isNullOrEmpty() }
+                val (thumbnail, video) = this.files.partition { it.mimeType!!.startsWith("image") }
                 PostBlockState.VIDEO(
                     uuid = blockUuid!!,
                     description = this.content,
@@ -39,7 +39,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     thumbnail480P = thumbnail[0].url480P!!,
                     thumbnail720P = thumbnail[0].url720P!!,
                     thumbnailUuid = thumbnail[0].fileUuid,
-                    fileUuid = this.files[0].fileUuid
+                    fileUuid = video[0].fileUuid
                 )
             }
 

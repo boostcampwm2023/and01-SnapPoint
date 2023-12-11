@@ -73,7 +73,7 @@ class CreatePostViewModel @Inject constructor(
                 when (block) {
                     is PostBlockState.TEXT -> addTextBlock(block)
                     is PostBlockState.IMAGE -> addImageBlock(block, geocoder)
-                    is PostBlockState.VIDEO -> TODO()
+                    is PostBlockState.VIDEO -> addVideoBlock(block)
                 }
             }
         }
@@ -143,6 +143,21 @@ class CreatePostViewModel @Inject constructor(
             )
         }
     }
+    fun addVideoBlock(block: PostBlockState.VIDEO) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(
+                    content = block.description,
+                    uuid = block.uuid,
+                    fileUuid = block.fileUuid,
+                    description = block.description,
+                    position = block.position,
+                    thumbnailUuid = block.thumbnailUuid,
+                )
+            )
+        }
+    }
+
 
     fun updateTitle(title: String) {
         _uiState.update {
