@@ -132,7 +132,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         super.onCreate(savedInstanceState)
         initBinding()
         collectViewModelData()
-        loadPost()
+        loadPrevPost()
     }
 
     private fun initBinding() {
@@ -176,58 +176,14 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
         }
     }
 
-    private fun loadPost() {
+    private fun loadPrevPost() {
         if (args.post.isBlank()) {
             return
         }
 
         val prevPost: PostSummaryState = Json.decodeFromString<PostSummaryState>(args.post)
-        lifecycleScope.launch {
-            viewModel.updateUuid(prevPost.uuid)
-            viewModel.updateTitle(prevPost.title)
-            binding.tilTitle.editText?.setText(prevPost.title)
-            prevPost.postBlocks.forEach { block ->
-                when (block) {
-                    is PostBlockState.TEXT -> {
-                        addTextBlock(block)
-                    }
-
-                    is PostBlockState.IMAGE -> {
-                        addImageBlock(block)
-                    }
-
-                    is PostBlockState.VIDEO -> {
-                        TODO()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun addTextBlock(block: PostBlockState.TEXT) {
-        viewModel.addTextBlock(block)
-    }
-
-    private suspend fun addImageBlock(block: PostBlockState.IMAGE) {
-        val bitmap = withContext(Dispatchers.IO) {
-            BitmapFactory.decodeStream(
-                URL(block.content).openConnection().getInputStream()
-            )
-        }
-
-        val addresses = geocoder.getFromLocation(
-            block.position.latitude,
-            block.position.longitude,
-            1
-        )
-        val address =
-            if (addresses.isNullOrEmpty()) "" else addresses[0].getAddressLine(0)
-
-        viewModel.addImageBlock(bitmap, address, block)
-    }
-
-    private fun addVideoBlock(block: PostBlockState.VIDEO) {
-        //viewModel.addVideoBlock(block)
+        viewModel.loadPrevPost(prevPost, geocoder)
+        binding.tilTitle.editText?.setText(prevPost.title)
     }
 
     private fun selectVideo() {
