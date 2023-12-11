@@ -76,7 +76,7 @@ sealed class BlockItemViewHolder(
 
         fun bind(block: PostBlockCreationState.IMAGE, index: Int) {
             with(binding) {
-                tilDescription.editText?.setText(block.content)
+                tilDescription.editText?.setText(block.description)
                 tilAddress.editText?.setText(block.address)
                 btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
                 btnEditBlock.setOnClickListener {

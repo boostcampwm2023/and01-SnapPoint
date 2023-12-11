@@ -49,9 +49,24 @@ export class TransformationService {
 
       if (files) {
         fileDtos.push(
-          ...files.map((file) =>
-            plainToInstance(UpdateFileDto, { uuid: file.uuid, source: 'block', sourceUuid: blockUuid }),
-          ),
+          ...files.flatMap((file) => {
+            if (file.thumbnailUuid) {
+              return [
+                plainToInstance(UpdateFileDto, {
+                  uuid: file.uuid,
+                  source: 'block',
+                  sourceUuid: blockUuid,
+                  thumbnailUuid: file.thumbnailUuid,
+                }),
+                plainToInstance(UpdateFileDto, {
+                  uuid: file.thumbnailUuid,
+                  source: 'block',
+                  sourceUuid: blockUuid,
+                }),
+              ];
+            }
+            return plainToInstance(UpdateFileDto, { uuid: file.uuid, source: 'block', sourceUuid: blockUuid });
+          }),
         );
       }
 

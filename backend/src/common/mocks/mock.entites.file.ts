@@ -12,6 +12,7 @@ export const mockFileEntities: File[] = [
     isProcessed: false,
     source: null,
     sourceUuid: null,
+    thumbnailUuid: null,
   },
   {
     id: 2,
@@ -24,5 +25,6 @@ export const mockFileEntities: File[] = [
     isProcessed: false,
     source: null,
     sourceUuid: null,
+    thumbnailUuid: null,
   },
 ];

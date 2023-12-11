@@ -4,4 +4,6 @@ export class UpdateFileDto {
   readonly source: string;
 
   readonly sourceUuid: string;
+
+  readonly thumbnailUuid?: string;
 }

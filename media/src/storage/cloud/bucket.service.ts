@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
+import { Readable } from 'stream';
 
 @Injectable()
 export class BucketService {
@@ -18,11 +19,7 @@ export class BucketService {
     });
   }
 
-  async uploadFile(
-    name: string,
-    format: string,
-    stream: NodeJS.WritableStream,
-  ) {
+  async uploadFile(name: string, format: string, stream: Readable) {
     return this.bucket
       .upload({
         Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
@@ -34,12 +31,29 @@ export class BucketService {
       .promise();
   }
 
-  downloadFile(name: string): NodeJS.ReadableStream {
+  downloadFile(name: string): Readable {
     return this.bucket
       .getObject({
         Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
         Key: name,
       })
       .createReadStream();
+  }
+
+  deleteFile(name: string) {
+    return this.bucket
+      .deleteObject({
+        Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+        Key: name,
+      })
+      .promise();
+  }
+
+  getSignedUrl(name: string): string {
+    return this.bucket.getSignedUrl('getObject', {
+      Bucket: this.configService.getOrThrow<string>('NCP_BUCKET_NAME'),
+      Key: name,
+      Expires: 300,
+    });
   }
 }

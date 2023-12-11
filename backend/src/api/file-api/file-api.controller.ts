@@ -13,7 +13,7 @@ export class FileApiController {
   ) {}
 
   @MessagePattern({ cmd: 'create_image_data' })
-  async createFileData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
+  async createImageData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
@@ -23,7 +23,19 @@ export class FileApiController {
     return this.client.emit({ cmd: 'process_image' }, { uuid: createFileDataDto.uuid });
   }
 
-  @MessagePattern({ cmd: 'process_image_data' })
+  @MessagePattern({ cmd: 'video.create' })
+  async createVideoData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
+    Logger.debug(`create ${createFileDataDto.uuid}`);
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+
+    await this.fileApiService.createFile(createFileDataDto);
+    channel.ack(originalMsg);
+
+    return this.client.emit({ cmd: 'video.process' }, { uuid: createFileDataDto.uuid });
+  }
+
+  @MessagePattern({ cmd: 'media.processed' })
   async procssImageData(@Payload() applyDataDto: ApplyProcessFileDto, @Ctx() context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
@@ -34,17 +46,4 @@ export class FileApiController {
 
     channel.ack(originalMsg);
   }
-
-  @MessagePattern({ cmd: 'create_video_data' })
-  async createLargeFileData(@Payload() createFileDataDto: CreateFileDataDto, @Ctx() context: RmqContext) {
-    const channel = context.getChannelRef();
-    const originalMsg = context.getMessage();
-
-    await this.fileApiService.createFile(createFileDataDto, true);
-    channel.ack(originalMsg);
-  }
-
-  async deleteFileData() {}
-
-  async accessFile() {}
 }

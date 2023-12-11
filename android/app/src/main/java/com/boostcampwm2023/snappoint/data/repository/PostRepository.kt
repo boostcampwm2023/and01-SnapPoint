@@ -12,6 +12,7 @@ interface PostRepository {
     fun getVideo(uri: String): Flow<ByteArray>
     fun getVideoUri(video: ByteArray): Flow<Unit>
     fun postCreatePost(title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse>
+    fun putModifiedPost(uuid: String, title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse>
     fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<PostSummaryState>>
     fun getPost(uuid: String): Flow<PostSummaryState>
 }

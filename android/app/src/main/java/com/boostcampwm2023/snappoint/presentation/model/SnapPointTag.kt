@@ -5,6 +5,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SnapPointTag(
-    val postIndex: Int,
-    val snapPointIndex: Int
+    val postUuid: String,
+    val blockUuid: String
 ) : Parcelable

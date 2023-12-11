@@ -26,6 +26,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     url480P = this.files[0].url480P!!,
                     url144P = this.files[0].url144P!!,
                     position = this.asPositionState(),
+                    fileUuid = this.files[0].fileUuid
                 )
             } else {
                 val (thumbnail, video) = this.files.partition { it.url.isNullOrEmpty() }
@@ -38,38 +39,43 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     thumbnail480P = thumbnail[0].url480P!!,
                     thumbnail720P = thumbnail[0].url720P!!,
                     thumbnailUuid = thumbnail[0].fileUuid,
+                    fileUuid = this.files[0].fileUuid
                 )
             }
 
         }
-
     }
 }
 
 fun PostBlockCreationState.asPostBlock(): PostBlock {
-    return when(this){
+    return when (this) {
         is PostBlockCreationState.TEXT -> {
             PostBlock(
+                blockUuid = this.uuid,
                 type = BlockType.TEXT.type,
                 content = this.content,
             )
         }
+
         is PostBlockCreationState.IMAGE -> {
             PostBlock(
+                blockUuid = this.uuid,
                 content = this.description,
                 type = BlockType.MEDIA.type,
                 latitude = this.position.latitude,
                 longitude = this.position.longitude,
-                files = listOf(File(fileUuid = "this is file's uuid")),
+                files = listOf(File(fileUuid = this.fileUuid)),
             )
         }
+
         is PostBlockCreationState.VIDEO -> {
             PostBlock(
+                blockUuid = this.uuid,
                 content = this.description,
                 type = BlockType.MEDIA.type,
                 latitude = this.position.latitude,
                 longitude = this.position.longitude,
-                files = listOf(File(fileUuid = "this is file's uuid")),
+                files = listOf(File(fileUuid = this.fileUuid)),
             )
         }
     }
