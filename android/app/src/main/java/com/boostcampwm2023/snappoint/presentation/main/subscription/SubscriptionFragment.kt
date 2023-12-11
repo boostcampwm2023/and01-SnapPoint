@@ -32,6 +32,8 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
 
         initBinding()
 
+        displayLocalSnapPoints()
+
         updatePostsUi()
         collectViewModelData()
     }
@@ -42,10 +44,23 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
         setViewPostStateClosed()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        displayRemoteSnapPoints()
+    }
+
     private fun initBinding() {
         with(binding) {
             vm = viewModel
         }
+    }
+
+    private fun displayLocalSnapPoints() {
+        mainViewModel.displayLocalSnapPoints()
+    }
+
+    private fun displayRemoteSnapPoints() {
+        mainViewModel.displayRemoteSnapPoints()
     }
 
     private fun loadPostsFromLocal() {
@@ -59,7 +74,7 @@ class SubscriptionFragment : BaseFragment<FragmentSubscriptionBinding>(R.layout.
     private fun updatePostsUi() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mainViewModel.postState.collect { posts ->
+                mainViewModel.localPostState.collect { posts ->
                     viewModel.updatePosts(posts)
                 }
             }

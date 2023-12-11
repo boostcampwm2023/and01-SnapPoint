@@ -36,6 +36,9 @@ class MainViewModel @Inject constructor(
     private val _postState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
     val postState: StateFlow<List<PostSummaryState>> = _postState.asStateFlow()
 
+    private val _localPostState: MutableStateFlow<List<PostSummaryState>> = MutableStateFlow(emptyList())
+    val localPostState: StateFlow<List<PostSummaryState>> = _localPostState.asStateFlow()
+
     private val _uiState: MutableStateFlow<MainUiState> = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
@@ -81,8 +84,8 @@ class MainViewModel @Inject constructor(
             .catch {
                 _event.tryEmit(MainActivityEvent.GetAroundPostFailed)
             }
-            .onEach { posts ->
-                _postState.update { posts }
+            .onEach { localPosts ->
+                _localPostState.update { localPosts }
                 _event.tryEmit(MainActivityEvent.HalfOpenBottomSheet)
             }
             .takeWhile {
@@ -90,6 +93,16 @@ class MainViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
         finishLoading()
+    }
+
+    fun displayLocalSnapPoints() {
+        _uiState.update { it.copy(isSubscriptionFragmentShowing = true) }
+        _event.tryEmit(MainActivityEvent.DisplaySnapPoints)
+    }
+
+    fun displayRemoteSnapPoints() {
+        _uiState.update { it.copy(isSubscriptionFragmentShowing = false) }
+        _event.tryEmit(MainActivityEvent.DisplaySnapPoints)
     }
 
     fun clearPosts() {
@@ -171,6 +184,14 @@ class MainViewModel @Inject constructor(
 
     fun focusOfImageMoved(imageIndex: Int) {
         updateClickedSnapPoint(_markerState.value.selectedIndex, imageIndex)
+    }
+
+    fun getPosts(): List<PostSummaryState> {
+        return if (uiState.value.isSubscriptionFragmentShowing) {
+            localPostState.value
+        } else {
+            postState.value
+        }
     }
 
     private fun startLoading() {

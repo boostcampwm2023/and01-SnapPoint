@@ -5,4 +5,5 @@ data class MainUiState(
     val isPreviewFragmentShowing: Boolean = false,
     val isBottomSheetExpanded: Boolean = false,
     val isLoading: Boolean = false,
+    val isSubscriptionFragmentShowing: Boolean = false,
 )

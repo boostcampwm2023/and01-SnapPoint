@@ -27,6 +27,7 @@ import com.boostcampwm2023.snappoint.presentation.auth.AuthActivity
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.Constants.API_KEY
@@ -188,6 +189,10 @@ class MainActivity(
                             is MainActivityEvent.NavigateCluster -> {
                                 openClusterListFragment(event.tags)
                             }
+
+                            is MainActivityEvent.DisplaySnapPoints -> {
+                                updateMarkers(viewModel.getPosts())
+                            }
                         }
                     }
                 }
@@ -199,12 +204,12 @@ class MainActivity(
                             mapManager.removeFocus()
                             return@collect
                         }
-                        val block = viewModel.postState.value[markerState.selectedIndex].postBlocks
+                        val block = viewModel.getPosts()[markerState.selectedIndex].postBlocks
                             .filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
                         mapManager.changeSelectedMarker(block, SnapPointTag(markerState.selectedIndex, markerState.focusedIndex))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
-                            mapManager.changeRoute(viewModel.postState.value[markerState.selectedIndex].postBlocks)
+                            mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks)
                         }
                     }
                 }
@@ -217,12 +222,26 @@ class MainActivity(
 
                 launch {
                     viewModel.postState.collect { postState ->
-                        while (mapManager.googleMap == null) { delay(100) }
-                        mapManager.updateMarkers(postState)
+                        if(viewModel.uiState.value.isSubscriptionFragmentShowing.not()) {
+                            updateMarkers(postState)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.localPostState.collect { localPostState ->
+                        if(viewModel.uiState.value.isSubscriptionFragmentShowing) {
+                            updateMarkers(localPostState)
+                        }
                     }
                 }
             }
         }
+    }
+
+    private suspend fun updateMarkers(postState: List<PostSummaryState>) {
+        while (mapManager.googleMap == null) { delay(100) }
+        mapManager.updateMarkers(postState)
     }
 
     private suspend fun setMapGestureEnabled(boolean: Boolean) {
@@ -235,7 +254,7 @@ class MainActivity(
 
     private fun getMediaPositions(): List<PositionState> {
         val postIndex = viewModel.markerState.value.selectedIndex
-        val snapPoints = viewModel.postState.value[postIndex].postBlocks.filterNot { block ->
+        val snapPoints = viewModel.getPosts()[postIndex].postBlocks.filterNot { block ->
             block is PostBlockState.TEXT
         }
         val positions: List<PositionState> = snapPoints.map { block ->
