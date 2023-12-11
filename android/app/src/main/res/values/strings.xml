@@ -3,6 +3,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_post_fragment_appbar_title">게시글 작성하기</string>
+    <string name="create_post_fragment_appbar_title_modify">게시글 수정하기</string>
     <string name="create_post_fragment_til_title_hint">제목</string>
     <string name="item_text_block_til_hint">본문 내용</string>
     <string name="item_image_block_til_address_hint">이미지 주소</string>
@@ -28,6 +29,7 @@
     <string name="btn_preview_text">미리보기</string>
     <string name="btn_view_post_text">게시글 보기</string>
     <string name="create_post_activity_post_creation_success">게시글 작성 성공했습니다 !</string>
+    <string name="create_post_activity_post_modification_success">게시글 수정 성공했습니다 !</string>
     <string name="signup_fragment_create_account_success">계정을 생성했습니다.</string>
     <string name="signup_fragment_error_email_form">이메일 형식으로 입력해주세요.</string>
     <string name="signup_fragment_error_email_duplicate">이미 사용중인 이메일입니다.</string>
@@ -56,4 +58,10 @@
     <string name="subscription_fragment_title">로컬에 저장된 게시글</string>
     <string name="cluster_preview_title">등록된 스냅 포인트</string>
     <string name="post_not_exist">주변에 등록된 게시글이 없습니다.</string>
+    <string name="preview_app_bar_close">close</string>
+    <string name="post_app_bar_edit">게시글 수정</string>
+    <string name="post_app_bar_delete">게시글 삭제</string>
+    <string name="post_app_bar_report">신고하기</string>
+    <string name="post_app_bar_ignore">작성자 차단하기</string>
+    <string name="post_app_bar_more">more</string>
 </resources>

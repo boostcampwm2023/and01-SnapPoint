@@ -32,7 +32,11 @@
     <fragment
         android:id="@+id/previewFragment"
         android:name="com.boostcampwm2023.snappoint.presentation.main.preview.PreviewFragment"
-        android:label="PreviewFragment" />
+        android:label="PreviewFragment" >
+        <action
+            android:id="@+id/action_previewFragment_to_viewPostActivity"
+            app:destination="@id/viewPostActivity" />
+    </fragment>
     <activity
         android:id="@+id/viewPostActivity"
         android:name="com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostActivity"

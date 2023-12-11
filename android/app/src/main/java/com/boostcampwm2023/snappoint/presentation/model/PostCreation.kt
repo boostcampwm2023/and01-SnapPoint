@@ -30,7 +30,8 @@ sealed class PostBlockCreationState {
         val description: String = "",
         val position: PositionState = PositionState(0.0, 0.0),
         val address: String = "",
-        val bitmap: Bitmap? = null
+        val bitmap: Bitmap? = null,
+        val fileUuid: String = ""
     ) : PostBlockCreationState()
 
     data class VIDEO(
@@ -43,6 +44,7 @@ sealed class PostBlockCreationState {
         val mimeType: String = "",
         val uri:Uri,
         val resultPath: String = "",
+        val fileUuid: String = ""
     ) : PostBlockCreationState()
 
     enum class ViewType {

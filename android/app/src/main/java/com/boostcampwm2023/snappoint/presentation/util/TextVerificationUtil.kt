@@ -15,10 +15,6 @@ object TextVerificationUtil {
     }
 
     fun isPasswordValid(password: String): Boolean {
-        if (passwordLength.matches(password)) Log.d("LOG", "R1 pass")
-        if (passwordCharacter.matches(password)) Log.d("LOG", "R2 pass")
-        if (passwordSpecial.matches(password)) Log.d("LOG", "R3 pass")
-        if (passwordNumber.matches(password)) Log.d("LOG", "R4 pass")
         return (passwordLength.matches(password)
                 && passwordCharacter.matches(password)
                 && passwordSpecial.matches(password)

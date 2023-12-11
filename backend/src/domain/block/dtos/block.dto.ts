@@ -1,4 +1,4 @@
-import { FileDto } from '@/api/file-api/dto/file.dto';
+import { FileDto } from '@/api/post-api/dtos/file.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Block } from '../entites/block.entity';
 

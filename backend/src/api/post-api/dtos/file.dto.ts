@@ -25,18 +25,28 @@ export class FileDto {
 
   static of(file: File): FileDto {
     const { uuid, url, mimeType, isProcessed, thumbnailUuid } = file;
-    if (!isProcessed) {
-      return { uuid, url, mimeType, url_144p: null, url_480p: null, url_720p: null, thumbnailUuid: thumbnailUuid };
+
+    // 비디오인 경우 별도로 처리한다.
+    if (mimeType.startsWith('video')) {
+      return {
+        uuid,
+        url: isProcessed ? `${url}.m3u8` : url,
+        mimeType,
+        url_144p: null,
+        url_480p: null,
+        url_720p: null,
+        thumbnailUuid: thumbnailUuid,
+      };
     }
 
     return {
       uuid,
       url,
       mimeType,
-      url_144p: `${url}_144p`,
-      url_480p: `${url}_480p`,
-      url_720p: `${url}_720p`,
-      thumbnailUuid: thumbnailUuid,
+      url_144p: isProcessed ? `${url}_144p` : null,
+      url_480p: isProcessed ? `${url}_480p` : null,
+      url_720p: isProcessed ? `${url}_720p` : null,
+      thumbnailUuid,
     };
   }
 }

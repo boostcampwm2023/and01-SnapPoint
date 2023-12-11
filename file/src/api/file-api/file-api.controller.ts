@@ -11,6 +11,7 @@ import {
   Get,
   Body,
   Query,
+  Logger,
 } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -158,8 +159,10 @@ export class FileApiController {
     const uploadFileEndResponsetDto =
       await this.uploadService.uploadFilePartComplete(uploadFilePartDto);
 
+    Logger.debug(`${uploadFilePartDto.key} ended`);
+
     this.client.emit(
-      { cmd: 'create_image_data' },
+      { cmd: 'video.create' },
       { ...uploadFileEndResponsetDto, userUuid: req.user.uuid },
     );
 

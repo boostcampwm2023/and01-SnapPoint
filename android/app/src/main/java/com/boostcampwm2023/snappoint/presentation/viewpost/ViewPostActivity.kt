@@ -19,9 +19,13 @@ class ViewPostActivity : BaseActivity<ActivityViewPostBinding>(R.layout.activity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        getPostData()
-
         collectViewModelData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        getPostData()
     }
 
     private fun getPostData() {

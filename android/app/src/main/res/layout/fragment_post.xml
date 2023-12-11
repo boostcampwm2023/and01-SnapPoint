@@ -25,15 +25,16 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/toolbar_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
                 app:navigationIcon="@drawable/icon_arrow_back"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:title="게시글 보기"
                 app:titleCentered="true"
-                onNavigationClick="@{() -> vm.navigateToPrevious()}"/>
+                app:menu="@menu/post_app_bar_menu"
+                onMenuItemClick="@{(id) -> vm.onMenuItemClick(id)}"
+                onNavigationClick="@{() -> vm.navigateToPrevious()}" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -73,7 +74,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{activityVm.post.author}"
-                    android:textColor="@color/onSurfaceColor"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toTopOf="@id/tv_timestamp"
                     app:layout_constraintStart_toEndOf="@id/iv_profile"
@@ -85,7 +85,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{activityVm.post.timeStamp}"
-                    android:textColor="@color/onSurfaceVariant"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@id/iv_profile"
                     app:layout_constraintStart_toStartOf="@id/tv_author"

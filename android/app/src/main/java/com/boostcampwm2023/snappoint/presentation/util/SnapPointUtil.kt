@@ -18,6 +18,9 @@ import com.boostcampwm2023.snappoint.presentation.util.Constants.CLUSTER_TEXT_SI
 private val clusterTextSize = CLUSTER_TEXT_SIZE.pxFloat()
 private val clusterCircleRadius = (CLUSTER_TEXT_SIZE / 2 + 1).pxFloat()
 
+val snapPointHeight = 100.px()
+val snapPointWidth = 85.px()
+
 suspend fun getSnapPointBitmap(context: Context, uri: String, focused: Boolean): Bitmap {
     val request = ImageRequest.Builder(context)
         .data(uri)
@@ -39,7 +42,7 @@ suspend fun getSnapPointBitmap(context: Context, uri: String, focused: Boolean):
         } else {
             R.drawable.icon_snap_point_unfocused
         }
-    ).scale(width = 85.px(), height = 100.px())
+    ).scale(width = snapPointWidth, height = snapPointHeight)
 
     return mergeToSnapPointBitmap(listOf(snapPointUnFocused, container, userImage))
 }

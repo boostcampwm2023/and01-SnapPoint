@@ -1,7 +1,7 @@
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { FileService } from '@/domain/file/file.service';
 import { Injectable } from '@nestjs/common';
-import { FileDto } from './dto/file.dto';
+import { FileDto } from '../post-api/dtos/file.dto';
 import { CreateFileDataDto } from './dto/create-file-data.dto';
 import { ApplyProcessFileDto } from './dto/apply-process-file.dto';
 

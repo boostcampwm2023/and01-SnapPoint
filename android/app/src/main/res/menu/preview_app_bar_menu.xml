@@ -6,5 +6,5 @@
         android:id="@+id/preview_close"
         android:icon="@drawable/icon_cancel"
         app:showAsAction="ifRoom"
-        android:title="close" />
+        android:title="@string/preview_app_bar_close" />
 </menu>

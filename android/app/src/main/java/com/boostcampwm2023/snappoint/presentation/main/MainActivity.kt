@@ -25,7 +25,9 @@ import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityMainBinding
 import com.boostcampwm2023.snappoint.presentation.auth.AuthActivity
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
 import com.boostcampwm2023.snappoint.presentation.util.Constants
 import com.boostcampwm2023.snappoint.presentation.util.Constants.API_KEY
@@ -33,6 +35,8 @@ import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.LOCATION_P
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isPermissionGranted
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.locationPermissionRequest
+import com.boostcampwm2023.snappoint.presentation.util.snapPointHeight
+import com.boostcampwm2023.snappoint.presentation.util.snapPointWidth
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -75,8 +79,6 @@ class MainActivity(
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
 
-    private val tagBundleKey = "tags"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -93,6 +95,8 @@ class MainActivity(
         setBottomNavigationEvent()
 
         initLocationData()
+
+        cachingBottomSheetSize()
     }
 
     private fun initPlacesClient() {
@@ -108,8 +112,6 @@ class MainActivity(
                 super.onLocationResult(p0)
             }
         }
-
-        cachingBottomSheetSize()
     }
 
     override fun onStop() {
@@ -157,6 +159,7 @@ class MainActivity(
 
                             is MainActivityEvent.NavigatePreview -> {
                                 if (navController.currentDestination?.id != R.id.previewFragment) {
+                                    cachingBottomSheetSize()
                                     openPreviewFragment()
                                 }
                                 moveCameraToFitScreen()
@@ -202,6 +205,10 @@ class MainActivity(
                                     }
                                 }
                                 navController.navigate(R.id.aroundFragment)
+
+                            is MainActivityEvent.DisplaySnapPoints -> {
+                                updateMarkers(viewModel.getPosts())
+
                             }
                         }
                     }
@@ -214,12 +221,13 @@ class MainActivity(
                             if(mapManager.googleMap != null) mapManager.removeMarkerFocus()
                             return@collect
                         }
-                        val post = viewModel.postState.value[markerState.selectedIndex]
+
+                        val post = viewModel.getPosts()[markerState.selectedIndex]
                         val block = post.postBlocks.filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
                         mapManager.changeSelectedMarker(block, SnapPointTag(post.uuid, block.uuid))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
-                            mapManager.changeRoute(viewModel.postState.value[markerState.selectedIndex].postBlocks)
+                            mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks)
                         }
                     }
                 }
@@ -236,12 +244,26 @@ class MainActivity(
 
                 launch {
                     viewModel.postState.collect { postState ->
-                        while (mapManager.googleMap == null) { delay(100) }
-                        mapManager.updateMarkers(postState)
+                        if(viewModel.uiState.value.isSubscriptionFragmentShowing.not()) {
+                            updateMarkers(postState)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.localPostState.collect { localPostState ->
+                        if(viewModel.uiState.value.isSubscriptionFragmentShowing) {
+                            updateMarkers(localPostState)
+                        }
                     }
                 }
             }
         }
+    }
+
+    private suspend fun updateMarkers(postState: List<PostSummaryState>) {
+        while (mapManager.googleMap == null) { delay(100) }
+        mapManager.updateMarkers(postState)
     }
 
     private fun setMapGestureEnabled(boolean: Boolean) {
@@ -249,12 +271,40 @@ class MainActivity(
         mapManager.setScrollGesturesEnabled(boolean.not())
     }
 
-    private fun moveCameraToFitScreen() {
+    private fun getMediaPositions(): List<PositionState> {
         val postIndex = viewModel.markerState.value.selectedIndex
-        val snapPoints = viewModel.postState.value[postIndex].postBlocks.filterIsInstance<PostBlockState.IMAGE>()
-        val positions = snapPoints.map { it.position }
+        val snapPoints = viewModel.getPosts()[postIndex].postBlocks.filterNot { block ->
+            block is PostBlockState.TEXT
+        }
+        val positions: List<PositionState> = snapPoints.map { block ->
+            when (block) {
+                is PostBlockState.IMAGE -> block.position
+                is PostBlockState.VIDEO -> block.position
+                else -> PositionState(0.0, 0.0)
+            }
+        }
 
-        // 아프리카 적도기니를 기준
+        return positions
+    }
+
+    private fun moveCameraToFitScreen() {
+        val positions: List<PositionState> = getMediaPositions()
+
+        // 화면의 보이는 부분의 가로-세로 비율 계산
+        // 단위: Pixel
+        val widthOfMap: Double = binding.fcvMainMap.width.toDouble()
+        val heightOfMap: Double = binding.fcvMainMap.height.toDouble()
+        val heightOfLayout: Double = binding.cl.height.toDouble()
+        val heightOfSearchBar: Int = maxOf(binding.topAppBar.height, binding.sb.height)
+
+        val topSideRatio: Double = (heightOfSearchBar + snapPointHeight) / heightOfMap
+        val bottomSideRatio: Double = (binding.bnv.height + Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO * heightOfLayout) / heightOfMap
+
+        val visibleHeightRatio: Double = 1.0 - (topSideRatio + bottomSideRatio)
+        val visibleWidthRatio: Double = (widthOfMap - snapPointWidth) / heightOfMap
+
+
+        // 경로의 가로-세로 비율 계산
         // latitude: 북반구(+) 남반구(-)
         // longitude: 서쪽(-) 동쪽(+)
         val topOfBound: Double = positions.maxOf { it.latitude }
@@ -262,30 +312,35 @@ class MainActivity(
         val leftOfBound: Double = positions.minOf { it.longitude }
         val rightOfBound: Double = positions.maxOf { it.longitude }
 
-        // 단위: Pixel
-        val padding: Int = maxOf(binding.topAppBar.height, binding.sb.height)
-
-        val heightOfMap: Double = binding.fcvMainMap.height.toDouble()
-        val heightOfLayout: Double = binding.cl.height.toDouble()
-
-        val topAppBarRatio: Double = padding / heightOfMap
-        val bottomNavViewRatio: Double = binding.bnv.height / heightOfMap
-        val bottomSheetRatio: Double = (Constants.BOTTOM_SHEET_HALF_EXPANDED_RATIO * heightOfLayout
-                + binding.dragHandle.height) / heightOfMap
-        val visibleRatio: Double = 1.0 - (topAppBarRatio + bottomNavViewRatio + bottomSheetRatio)
-
-
         val heightOfBound: Double = topOfBound - bottomOfBound
+        val widthOfBound: Double = rightOfBound - leftOfBound
 
-        val newTopOfBound: Double = topOfBound + heightOfBound * topAppBarRatio / visibleRatio
-        val newBottomOfBound: Double = bottomOfBound - heightOfBound * (bottomNavViewRatio + bottomSheetRatio) / visibleRatio
+        // 경로가 가져야 하는 최소 높이 // 0으로 나누기 방지 최소값 적용
+        var normalHeightOfBound: Double = maxOf(visibleHeightRatio * widthOfBound / visibleWidthRatio, 0.00001)
+
+        var normalTopOfBound: Double = topOfBound
+        var normalBottomOfBound: Double = bottomOfBound
+
+        // 최소 높이보다 작으면 위 아래로 늘려주기
+        if (heightOfBound < normalHeightOfBound) {
+            normalTopOfBound += (normalHeightOfBound - heightOfBound) / 2
+            normalBottomOfBound -= (normalHeightOfBound - heightOfBound) / 2
+        }
+
+        normalHeightOfBound = normalTopOfBound - normalBottomOfBound
+
+        //
+        val newTopOfBound: Double =
+            normalTopOfBound + normalHeightOfBound * topSideRatio / visibleHeightRatio
+        val newBottomOfBound: Double =
+            normalBottomOfBound - normalHeightOfBound * bottomSideRatio / visibleHeightRatio
 
         val bound = LatLngBounds(
             LatLng(newBottomOfBound, leftOfBound),
             LatLng(newTopOfBound, rightOfBound)
         )
 
-        mapManager.moveCamera(bound, padding)
+        mapManager.moveCamera(bound, 0)
     }
 
     private fun initBottomSheetWithNavigation() {
@@ -343,7 +398,7 @@ class MainActivity(
     }
 
     private fun openClusterListFragment(tags: List<SnapPointTag>) {
-        val bundle = bundleOf(tagBundleKey to tags.toTypedArray())
+        val bundle = bundleOf(Constants.TAG_BUNDLE_KEY to tags.toTypedArray())
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         navController.navigate(R.id.clusterPreviewFragment, bundle)
     }

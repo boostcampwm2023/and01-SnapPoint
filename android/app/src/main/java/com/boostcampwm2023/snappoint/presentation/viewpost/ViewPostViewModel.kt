@@ -6,8 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.SignInUtil
-import com.boostcampwm2023.snappoint.presentation.util.UserInfo
+import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -27,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewPostViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val userInfoPreference: UserInfoPreference
 ) : ViewModel() {
 
     private val _post: MutableStateFlow<PostSummaryState> = MutableStateFlow(PostSummaryState())
@@ -45,6 +44,7 @@ class ViewPostViewModel @Inject constructor(
                 Log.d("TAG", "loadPost: ${it.message}")
             }
             .onEach { response ->
+                Log.d("LOG", "RESPONSE: ${response}")
                 _post.update {
                     response
                 }
@@ -53,7 +53,7 @@ class ViewPostViewModel @Inject constructor(
     }
 
     fun loadLocalPost(uuid: String) {
-        roomRepository.getPost(uuid, UserInfo.getEmail())
+        roomRepository.getPost(uuid, userInfoPreference.getEmail())
             .onEach { post ->
                 if (post.isNotEmpty()) {
                     _post.update {

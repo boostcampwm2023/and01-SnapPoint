@@ -46,6 +46,12 @@ interface SnapPointApi {
         @Body createPostRequest: CreatePostRequest,
     ): CreatePostResponse
 
+    @PUT("posts/{uuid}")
+    suspend fun modifyPost(
+        @Path("uuid") uuid: String,
+        @Body createPostRequest: CreatePostRequest,
+    ): CreatePostResponse
+
     @POST("auth/sign-in")
     suspend fun postSignIn(
         @Body signInRequest: SignInRequest
