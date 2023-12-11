@@ -3,6 +3,7 @@
     android:height="18dp"
     android:viewportWidth="18"
     android:viewportHeight="18">
+
     <path
         android:fillColor="@color/md_theme_inverseSurface"
         android:fillType="evenOdd"

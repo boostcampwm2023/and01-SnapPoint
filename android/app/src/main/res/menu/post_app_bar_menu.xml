@@ -3,23 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/post_edit"
-        android:icon="@drawable/icon_edit_circle"
-        app:showAsAction="withText"
-        android:title="@string/post_app_bar_edit" />
-    <item
-        android:id="@+id/post_delete"
-        android:icon="@drawable/icon_delete"
-        app:showAsAction="withText"
-        android:title="@string/post_app_bar_delete" />
-    <item
-        android:id="@+id/post_report"
-        android:icon="@drawable/icon_flag"
-        app:showAsAction="withText"
-        android:title="@string/post_app_bar_report" />
-    <item
-        android:id="@+id/post_ignore"
-        android:icon="@drawable/icon_cancel_circle"
-        app:showAsAction="withText"
-        android:title="@string/post_app_bar_ignore" />
+        android:id="@+id/post_more"
+        android:icon="@drawable/icon_three_dots"
+        android:title="@string/post_app_bar_more"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/post_edit"
+                android:icon="@drawable/icon_edit_circle"
+                android:title="@string/post_app_bar_edit"
+                app:showAsAction="withText" />
+            <item
+                android:id="@+id/post_delete"
+                android:icon="@drawable/icon_delete"
+                android:title="@string/post_app_bar_delete"
+                app:showAsAction="withText" />
+            <item
+                android:id="@+id/post_report"
+                android:icon="@drawable/icon_flag"
+                android:title="@string/post_app_bar_report"
+                app:showAsAction="withText" />
+            <item
+                android:id="@+id/post_ignore"
+                android:icon="@drawable/icon_cancel_circle"
+                android:title="@string/post_app_bar_ignore"
+                app:showAsAction="withText" />
+        </menu>
+    </item>
 </menu>

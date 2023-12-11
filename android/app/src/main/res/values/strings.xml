@@ -62,4 +62,5 @@
     <string name="post_app_bar_delete">게시글 삭제</string>
     <string name="post_app_bar_report">신고하기</string>
     <string name="post_app_bar_ignore">작성자 차단하기</string>
+    <string name="post_app_bar_more">more</string>
 </resources>
