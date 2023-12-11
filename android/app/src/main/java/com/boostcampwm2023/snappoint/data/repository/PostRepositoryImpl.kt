@@ -193,8 +193,7 @@ class PostRepositoryImpl @Inject constructor(
 
         return flowOf(true)
             .map {
-                snapPointApi.getAroundPost(leftBottom, rightTop)
-            }.map { response ->
+                val response = snapPointApi.getAroundPost(leftBottom, rightTop)
                 response.asPostSummaryState()
             }
     }

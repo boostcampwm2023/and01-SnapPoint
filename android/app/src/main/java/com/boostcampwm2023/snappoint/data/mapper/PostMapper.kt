@@ -22,9 +22,9 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                 PostBlockState.IMAGE(
                     uuid = blockUuid!!,
                     description = this.content,
-                    content = this.files[0].url720P!!,
-                    url480P = this.files[0].url480P!!,
-                    url144P = this.files[0].url144P!!,
+                    content = this.files[0].url!!,
+                    url480P = this.files[0].url!!,
+                    url144P = this.files[0].url!!,
                     position = this.asPositionState(),
                     fileUuid = this.files[0].fileUuid
                 )
