@@ -74,8 +74,13 @@ class PostRepositoryImpl @Inject constructor(
                             }
                             is PostBlockCreationState.VIDEO -> {
                                 val uuid = uploadVideoAndGetUUid(it)
+                                val thumbnailUuid = uploadImageAndGetUUid(
+                                    PostBlockCreationState.IMAGE(
+                                        bitmap = it.thumbnail
+                                    )
+                                )
                                 it.asPostBlock().copy(
-                                    files = listOf(File(uuid))
+                                    files = listOf(File(fileUuid = uuid, thumbnailUuid = thumbnailUuid))
                                 )
                             }
                             else -> it.asPostBlock()
@@ -129,7 +134,6 @@ class PostRepositoryImpl @Inject constructor(
                 parts = parts
             )
         )
-        Log.d("TAG", "uploadVideoAndGetUUid: ${videoEndResponse}")
         return videoEndResponse.uuid
     }
 

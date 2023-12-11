@@ -104,13 +104,15 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                     val mediaMetadataRetriever = MediaMetadataRetriever().apply {
                         setDataSource(this@CreatePostActivity, originalUri)
                     }
+                    val thumbnail = mediaMetadataRetriever.getFrameAtTime(0)!!
+                    val resizeBitmap = resizeBitmap(thumbnail, 1280)
                     val mimeType = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)!!
                     val inputStream = this.contentResolver.openInputStream(originalUri)
                         ?: return@registerForActivityResult
                     val position = MetadataUtil.extractLocationFromInputStream(inputStream)
                         .getOrDefault(PositionState(0.0, 0.0))
 
-                    viewModel.addVideoBlock(videoUri, position, mimeType)
+                    viewModel.addVideoBlock(videoUri, position, mimeType, resizeBitmap)
                     mediaMetadataRetriever.release()
                 }
                 startMapActivityAndFindAddress(viewModel.uiState.value.postBlocks.lastIndex, (viewModel.uiState.value.postBlocks.last() as PostBlockCreationState.VIDEO).position)

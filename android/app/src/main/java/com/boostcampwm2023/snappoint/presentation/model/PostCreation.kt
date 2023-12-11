@@ -41,6 +41,7 @@ sealed class PostBlockCreationState {
         val position: PositionState = PositionState(0.0, 0.0),
         val address: String = "",
         val mimeType: String = "",
+        val thumbnail: Bitmap? = null,
         val uri:Uri,
     ) : PostBlockCreationState()
 

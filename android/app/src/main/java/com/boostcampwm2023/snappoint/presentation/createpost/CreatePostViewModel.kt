@@ -68,10 +68,10 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addVideoBlock(videoUri: Uri, position: PositionState, mimeType: String) {
+    fun addVideoBlock(videoUri: Uri, position: PositionState, mimeType: String, thumbnail: Bitmap) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position, mimeType = mimeType)
+                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position, mimeType = mimeType, thumbnail = thumbnail)
             )
         }
     }
