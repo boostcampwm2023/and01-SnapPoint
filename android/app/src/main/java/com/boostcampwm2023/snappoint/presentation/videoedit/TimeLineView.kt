@@ -24,6 +24,9 @@ class TimeLineView(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
+    companion object{
+        const val indicatorWidth = 30
+    }
 
 
     private lateinit var uri: Uri
@@ -58,45 +61,48 @@ class TimeLineView(
         var recent = 0F
 
         setOnTouchListener { _, event ->
-            val x = event.x
-            if(x < 0 || x > viewWidth) {
-                before = ""
+            var x = event.x
+            if(x < - indicatorWidth || x > viewWidth + indicatorWidth) {
                 return@setOnTouchListener true
             }
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     recent = x
-                    before = if(leftPosX <= x && leftPosX+30 >= x){
+                    before = if(leftPosX - indicatorWidth <= x && leftPosX + indicatorWidth >= x){
                         "L"
-                    }else if(rightPosX-30 <= x && rightPosX >= x){
+                    }else if(rightPosX - indicatorWidth <= x && rightPosX + indicatorWidth >= x){
                         "R"
                     }else{
                         ""
                     }
-                    val time = positionToTime(x)
-                    viewModel?.updateRecent(time)
+
+                    if(x > leftPosX && x < rightPosX){
+                        val time = positionToTime(x)
+                        viewModel?.updateRecent(time)
+                    }
                 }
 
                 MotionEvent.ACTION_MOVE -> {
                     when{
                         before == "L"-> {
-                            if(x+60 > rightPosX) {
-                                leftMoved(rightPosX - 60)
+                            if(x + indicatorWidth > rightPosX) {
+                                leftMoved(rightPosX - indicatorWidth)
                                 return@setOnTouchListener true
                             }
                         }
                         before == "R"-> {
-                            if(leftPosX+60 > x) {
-                                rightMoved(leftPosX+60)
+                            if(leftPosX + 30 > x) {
+                                rightMoved(leftPosX + indicatorWidth)
                                 return@setOnTouchListener true
                             }
                         }
                     }
 
-                    if(abs(recent - x) < 15F) return@setOnTouchListener true
+                    if(abs(recent - x) < indicatorWidth / 2) return@setOnTouchListener true
 
                     when(before){
                         "L" ->{
+                            if(x < 0) x = 0F
                             leftMoved(x)
                             if(x - recent > 0 && abs(x - recent) > secDivideTenX){
                                 recent = x
@@ -107,6 +113,7 @@ class TimeLineView(
                             }
                         }
                         "R" ->{
+                            if(x > viewWidth) x = viewWidth
                             rightMoved(x)
                             if(x - recent > 0 && abs(x - recent) > secDivideTenX){
                                 recent = x
@@ -117,6 +124,7 @@ class TimeLineView(
                             }
                         }
                         else ->{
+
 
                         }
                     }
@@ -169,13 +177,13 @@ class TimeLineView(
 
     private fun leftMoved(posX: Float) {
         leftPosX = posX
-        leftRect = RectF(posX,0F,posX+30F,viewHeight)
+        leftRect = RectF(posX,0F,posX + indicatorWidth / 2,viewHeight)
         invalidate()
     }
 
     private fun rightMoved(posX: Float) {
         rightPosX = posX
-        rightRect = RectF(posX-30F,0F,posX,viewHeight)
+        rightRect = RectF(posX - indicatorWidth / 2,0F,posX,viewHeight)
         invalidate()
     }
 

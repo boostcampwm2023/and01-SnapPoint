@@ -33,10 +33,14 @@ class ThumbnailView(
     private var viewHeight = 0F
     private var videoLengthInMs = 0F
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        viewHeight = h.toFloat()
+    }
 
     private fun getBitMap() {
         if (videoLengthInMs == 0F || viewWidth == 0F || viewHeight == 0F) return
-        if(thumbnails.isNotEmpty()) return
+        if(thumbnails.isNotEmpty()) thumbnails.clear()
 
         val mediaMetadataRetriever: MediaMetadataRetriever = MediaMetadataRetriever()
         mediaMetadataRetriever.setDataSource(context, videoUri)
@@ -72,12 +76,6 @@ class ThumbnailView(
                 launch{
                     viewModel?.TLVWidth?.collect {
                         viewWidth = it
-                        getBitMap()
-                    }
-                }
-                launch{
-                    viewModel?.TLVHeight?.collect {
-                        viewHeight = it
                         getBitMap()
                     }
                 }

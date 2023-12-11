@@ -38,12 +38,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btn_cancel"
-            app:layout_constraintBottom_toTopOf="@id/tlv"/>
+            app:layout_constraintBottom_toTopOf="@id/iv_player"
+            android:layout_marginBottom="20dp"/>
+
+        <ImageView
+            android:id="@+id/iv_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_player_play"
+            app:layout_constraintBottom_toTopOf="@id/tlv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:id="@+id/tv_player_cut_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:startTime = "@{vm.leftThumbState}"
+            app:endTime = "@{vm.rightThumbState}"
+            app:recentTime = "@{vm.recentState}"
+            app:layout_constraintTop_toTopOf="@id/iv_player"
+            app:layout_constraintBottom_toBottomOf="@id/iv_player"
+            app:layout_constraintStart_toEndOf="@id/iv_player"/>
+
 
         <com.boostcampwm2023.snappoint.presentation.videoedit.ThumbnailView
             android:id="@+id/thumbnail_view"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="80dp"
             app:layout_constraintStart_toStartOf="@id/tlv"
             app:layout_constraintEnd_toEndOf="@id/tlv"
             app:layout_constraintTop_toTopOf="@id/tlv"
@@ -55,7 +76,7 @@
             android:id="@+id/tlv"
             android:layout_width="0dp"
             app:layout_constraintWidth_percent="0.8"
-            android:layout_height="50dp"
+            android:layout_height="120dp"
             android:backgroundTint="@color/black"
             app:viewModel = "@{vm}"
             app:uri = "@{vm.uri}"
