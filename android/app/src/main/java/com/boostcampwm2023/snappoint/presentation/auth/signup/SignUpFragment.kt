@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.auth.signup
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -9,6 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSignUpBinding
+import com.boostcampwm2023.snappoint.presentation.auth.AuthViewModel
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -16,13 +18,13 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sign_up) {
 
+    private val authViewModel: AuthViewModel by activityViewModels()
     private val viewModel: SignUpViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
-        loadText()
 
         collectViewModelData()
     }
@@ -30,16 +32,9 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     private fun initBinding() {
         with(binding) {
             vm = viewModel
-        }
-    }
-
-    // TODO(임시데이터!!)
-    private fun loadText() {
-        with(binding) {
-            tilSignUpEmail.editText?.setText(viewModel.uiState.value.email)
-            tilSignUpPassword.editText?.setText(viewModel.uiState.value.password)
-            tilSignUpPasswordConfirm.editText?.setText(viewModel.uiState.value.passwordConfirm)
-            tilSignUpNickname.editText?.setText(viewModel.uiState.value.nickname)
+            root.post {
+                authViewModel.updateBottomSheetHeight(layoutSignUp.measuredHeight)
+            }
         }
     }
 
@@ -63,6 +58,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
     }
 
     private fun navigateToSignIn() {
-        findNavController().popBackStack()
+        findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
     }
 }

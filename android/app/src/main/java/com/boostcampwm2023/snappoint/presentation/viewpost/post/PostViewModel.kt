@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
+import com.boostcampwm2023.snappoint.data.repository.UserInfoRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
-import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -27,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PostViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
-    private val userInfoPreference: UserInfoPreference
+    private val userInfoRepository: UserInfoRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState())
@@ -58,7 +58,7 @@ class PostViewModel @Inject constructor(
     }
 
     fun updateLikeMarkState(uuid: String) {
-        roomRepository.getPost(uuid, userInfoPreference.getEmail())
+        roomRepository.getPost(uuid, userInfoRepository.getEmail())
             .flowOn(Dispatchers.IO)
             .onEach { post ->
                 _uiState.update {
@@ -77,13 +77,13 @@ class PostViewModel @Inject constructor(
 
     fun saveCurrentPostToLocal(post: PostSummaryState) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.insertPosts(post, userInfoPreference.getEmail())
+            roomRepository.insertPosts(post, userInfoRepository.getEmail())
         }
     }
 
     fun deleteCurrentPostFromLocal(uuid: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            roomRepository.deletePost(uuid, userInfoPreference.getEmail())
+            roomRepository.deletePost(uuid, userInfoRepository.getEmail())
         }
     }
 }

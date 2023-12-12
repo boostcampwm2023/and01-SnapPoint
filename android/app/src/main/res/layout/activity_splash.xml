@@ -12,6 +12,15 @@
         android:layout_height="match_parent"
         tools:context=".presentation.splash.SplashActivity">
 
+        <ImageView
+            android:layout_width="160dp"
+            android:layout_height="190dp"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/logo_snappoint_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ProgressBar
             android:id="@+id/pb_sign_up_loading"
             android:layout_width="wrap_content"
