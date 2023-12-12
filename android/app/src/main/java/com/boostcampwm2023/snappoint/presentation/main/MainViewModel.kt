@@ -235,6 +235,10 @@ class MainViewModel @Inject constructor(
         _event.tryEmit(MainActivityEvent.NavigateSignIn)
     }
 
+    fun onSearchAroundButtonClicked() {
+        _event.tryEmit(MainActivityEvent.SearchAroundPosts)
+    }
+
     fun onMapReady() {
         _event.tryEmit(MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation)
     }

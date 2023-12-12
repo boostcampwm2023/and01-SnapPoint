@@ -124,7 +124,6 @@ class MainActivity(
             supportFragmentManager.findFragmentById(R.id.fcv_main_map) as SupportMapFragment
         mapManager = MapManager(viewModel, this)
         map.getMapAsync(mapManager)
-        mapManager.searchSnapPoints()
     }
 
     private fun cachingBottomSheetSize() {
@@ -175,7 +174,7 @@ class MainActivity(
                             }
 
                             MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation -> {
-                                checkPermissionAndMoveCameraToUserLocation()
+                                checkPermissionAndMoveCameraToUserLocation(true)
                             }
 
                             is MainActivityEvent.HalfOpenBottomSheet -> {
@@ -209,6 +208,10 @@ class MainActivity(
 
                             is MainActivityEvent.DisplaySnapPoints -> {
                                 updateMarkers(viewModel.getPosts())
+                            }
+
+                            is MainActivityEvent.SearchAroundPosts -> {
+                                mapManager.searchSnapPoints()
                             }
                         }
                     }
@@ -421,7 +424,7 @@ class MainActivity(
             vm = viewModel
 
             fab.setOnClickListener {
-                checkPermissionAndMoveCameraToUserLocation()
+                checkPermissionAndMoveCameraToUserLocation(false)
             }
 
             sv.editText.setOnEditorActionListener { v, _, _ ->
@@ -433,10 +436,6 @@ class MainActivity(
                 if (afterState == SearchView.TransitionState.HIDDEN) {
                     viewModel.updateAutoCompleteTexts(emptyList())
                 }
-            }
-
-            btnSearchHere.setOnClickListener {
-                mapManager.searchSnapPoints()
             }
         }
     }
@@ -492,13 +491,13 @@ class MainActivity(
     }
 
     @SuppressLint("MissingPermission")
-    private fun checkPermissionAndMoveCameraToUserLocation() {
+    private fun checkPermissionAndMoveCameraToUserLocation(boolean: Boolean) {
         if(this.isMyLocationGranted()){
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location ->
                     location ?: return@addOnSuccessListener
                     mapManager.moveCamera(latitude = location.latitude, longitude = location.longitude, zoom = 17.5f)
-
+                    if (boolean) mapManager.searchSnapPoints()
                 }
         }else{
             locationPermissionRequest()

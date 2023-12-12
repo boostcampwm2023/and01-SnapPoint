@@ -197,7 +197,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     fun searchSnapPoints() {
         CoroutineScope(Dispatchers.IO).launch {
             val latLngBounds = withContext(Dispatchers.Main) {
-                while (googleMap?.projection == null) { delay(100) }
                 googleMap?.projection?.visibleRegion?.latLngBounds
             } ?: return@launch
 
