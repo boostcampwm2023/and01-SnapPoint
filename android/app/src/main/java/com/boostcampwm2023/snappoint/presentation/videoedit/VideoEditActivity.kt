@@ -74,7 +74,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
     private fun initTransFormer() {
 
         trans = Transformer.Builder(this@VideoEditActivity)
-            .setVideoMimeType(MimeTypes.VIDEO_H264)
+            .setVideoMimeType(MimeTypes.VIDEO_H265)
             .setAudioMimeType(MimeTypes.AUDIO_AAC)
             .build()
 
