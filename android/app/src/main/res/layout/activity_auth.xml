@@ -82,6 +82,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 app:behavior_fitToContents="false"
+                app:behavior_peekHeight="0dp"
                 android:backgroundTint="@color/md_theme_onPrimary"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
