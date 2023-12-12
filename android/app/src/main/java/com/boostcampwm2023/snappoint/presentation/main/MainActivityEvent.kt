@@ -17,4 +17,5 @@ sealed class MainActivityEvent {
     data object CollapseBottomSheet: MainActivityEvent()
     data object NavigateAround: MainActivityEvent()
     data object DisplaySnapPoints: MainActivityEvent()
+    data object SearchAroundPosts: MainActivityEvent()
 }

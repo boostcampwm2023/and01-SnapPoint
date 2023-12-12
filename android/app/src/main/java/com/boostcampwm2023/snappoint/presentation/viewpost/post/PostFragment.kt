@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.viewpost.post
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels

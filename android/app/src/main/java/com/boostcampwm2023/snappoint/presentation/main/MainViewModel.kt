@@ -184,7 +184,7 @@ class MainViewModel @Inject constructor(
         val postIndex = getPosts().indexOfFirst { it.uuid == tag.postUuid }
         val blockIndex = getPosts()[postIndex]
             .postBlocks
-            .filterIsInstance<PostBlockState.IMAGE>()
+            .filter { it is PostBlockState.IMAGE || it is PostBlockState.VIDEO}
             .indexOfFirst { it.uuid == tag.blockUuid }
         updateClickedSnapPoint(postIndex, blockIndex)
         _event.tryEmit(MainActivityEvent.NavigatePreview)
@@ -233,6 +233,10 @@ class MainViewModel @Inject constructor(
 
     fun navigateSignIn() {
         _event.tryEmit(MainActivityEvent.NavigateSignIn)
+    }
+
+    fun onSearchAroundButtonClicked() {
+        _event.tryEmit(MainActivityEvent.SearchAroundPosts)
     }
 
     fun onMapReady() {
