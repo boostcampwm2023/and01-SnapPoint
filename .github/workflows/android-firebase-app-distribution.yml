@@ -2,7 +2,7 @@ name: Android Build & upload to Firebase App Distribution
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 defaults:
   run:
