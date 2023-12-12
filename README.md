@@ -65,6 +65,11 @@
 ## 인프라 구성도
 ![image](https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/700ff9b8-1ef7-4dd0-ab54-394774d18d7c)
 
+## 기술적 도전을 확인하려면?
+[Android](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Android)
+
+[Backend](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Backend)
+
 ## 📚문서📚
 
 - [그라운드 룰](https://www.notion.so/2c85275c12b349f9ac7697372e4ac41b?pvs=21)
