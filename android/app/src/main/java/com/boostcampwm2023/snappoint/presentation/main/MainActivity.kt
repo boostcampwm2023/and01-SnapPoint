@@ -205,10 +205,10 @@ class MainActivity(
                                     }
                                 }
                                 navController.navigate(R.id.aroundFragment)
+                            }
 
                             is MainActivityEvent.DisplaySnapPoints -> {
                                 updateMarkers(viewModel.getPosts())
-
                             }
                         }
                     }

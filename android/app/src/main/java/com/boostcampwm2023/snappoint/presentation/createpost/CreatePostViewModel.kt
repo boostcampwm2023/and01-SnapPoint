@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
@@ -72,7 +73,7 @@ class CreatePostViewModel @Inject constructor(
                 when (block) {
                     is PostBlockState.TEXT -> addTextBlock(block)
                     is PostBlockState.IMAGE -> addImageBlock(block, geocoder)
-                    is PostBlockState.VIDEO -> TODO()
+                    is PostBlockState.VIDEO -> addVideoBlock(block)
                 }
             }
         }
@@ -135,13 +136,28 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun addVideoBlock(videoUri: Uri, position: PositionState, mimeType: String) {
+    fun addVideoBlock(videoUri: Uri, position: PositionState, mimeType: String, thumbnail: Bitmap) {
         _uiState.update {
             it.copy(
-                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position, mimeType = mimeType)
+                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(uri = videoUri, position = position, mimeType = mimeType, thumbnail = thumbnail)
             )
         }
     }
+    fun addVideoBlock(block: PostBlockState.VIDEO) {
+        _uiState.update {
+            it.copy(
+                postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(
+                    content = block.description,
+                    uuid = block.uuid,
+                    fileUuid = block.fileUuid,
+                    description = block.description,
+                    position = block.position,
+                    thumbnailUuid = block.thumbnailUuid,
+                )
+            )
+        }
+    }
+
 
     fun updateTitle(title: String) {
         _uiState.update {
@@ -400,21 +416,4 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
-    fun updateVideoPath(path: String) {
-        val lastIndex = _uiState.value.postBlocks.lastIndex
-        _uiState.update {
-            it.copy(
-                postBlocks = it.postBlocks.mapIndexed { index, block ->
-                    if(index == lastIndex){
-                        (block as PostBlockCreationState.VIDEO).copy(
-                            resultPath = path
-                        )
-                    }else{
-                        block
-                    }
-                }
-            )
-        }
-
-    }
 }

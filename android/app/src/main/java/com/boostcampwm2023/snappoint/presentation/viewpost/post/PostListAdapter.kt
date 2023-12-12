@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImagePostBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextPostBinding
+import com.boostcampwm2023.snappoint.databinding.ItemVideoPostBinding
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 
 class PostListAdapter : ListAdapter<PostBlockState, RecyclerView.ViewHolder>(diffUtil) {
@@ -19,7 +20,7 @@ class PostListAdapter : ListAdapter<PostBlockState, RecyclerView.ViewHolder>(dif
                 return ImageBlockViewHolder(ItemImagePostBinding.inflate(inflater, parent, false))
             }
             PostBlockState.ViewType.VIDEO.ordinal -> {
-                TODO()
+                return VideoBlockViewHolder(ItemVideoPostBinding.inflate(inflater, parent, false))
             }
         }
         return TextBlockViewHolder(ItemTextPostBinding.inflate(inflater, parent, false))
@@ -40,6 +41,9 @@ class PostListAdapter : ListAdapter<PostBlockState, RecyclerView.ViewHolder>(dif
             }
             is ImageBlockViewHolder -> {
                 holder.bind(getItem(position) as PostBlockState.IMAGE)
+            }
+            is VideoBlockViewHolder -> {
+                holder.bind(getItem(position) as PostBlockState.VIDEO)
             }
         }
     }

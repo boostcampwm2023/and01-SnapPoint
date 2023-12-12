@@ -1,15 +1,19 @@
 package com.boostcampwm2023.snappoint.presentation.videoedit
 
 import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.core.net.toUri
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.transformer.Composition
@@ -20,7 +24,9 @@ import androidx.media3.transformer.Transformer.Listener
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityVideoEditBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
+import com.boostcampwm2023.snappoint.presentation.util.CacheFileNameMaker.getRandomName
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -29,18 +35,18 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
     private val viewModel: VideoEditViewModel by viewModels()
 
-    private var postIndex = 0
-
     private lateinit var file: File
     private lateinit var trans: Transformer
     private lateinit var mediaItem: MediaItem
+
+
 
      override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
          getIntentExtra()
 
-         initMediaItem()
+         initMediaItem(savedInstanceState)
 
          createExternalCacheFile()
 
@@ -52,25 +58,32 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
     }
 
-    private fun initMediaItem() {
+    private fun initMediaItem(savedInstanceState: Bundle?) {
         mediaItem = MediaItem.fromUri(viewModel.uri.value.toUri())
+
         val mediaMetadataRetriever = MediaMetadataRetriever().apply {
             setDataSource(this@VideoEditActivity, viewModel.uri.value.toUri())
         }
-        mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER)
-
-        val videoLengthInMs = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong() * 1000
+        val videoLengthInMs = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
+        if(savedInstanceState == null) {
+            viewModel.updateVideoLengthWithRightThumb(videoLengthInMs)
+        }
+        mediaMetadataRetriever.release()
     }
 
     private fun initTransFormer() {
 
-        trans = Transformer.Builder(this@VideoEditActivity).setVideoMimeType(MimeTypes.VIDEO_H265).setAudioMimeType(MimeTypes.AUDIO_AAC).build()
+        trans = Transformer.Builder(this@VideoEditActivity)
+            .setVideoMimeType(MimeTypes.VIDEO_H264)
+            .setAudioMimeType(MimeTypes.AUDIO_AAC)
+            .build()
 
         trans.addListener(object : Listener{
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                 super.onCompleted(composition, exportResult)
                 viewModel.finishLoading()
                 intent.putExtra("path", file.path)
+                intent.putExtra("original", viewModel.uri.value)
                 setResult(RESULT_OK, intent)
                 finish()
 
@@ -89,7 +102,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
     private fun createExternalCacheFile() {
 
-        file = File(externalCacheDir, "video_edited.mp4")
+        file = File(cacheDir, "${getRandomName()}.mp4")
 
         try{
             if (file.exists() && !file.delete()) {
@@ -109,22 +122,82 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 launch {
-                    viewModel.leftThumbState.collect{ position ->
-                        moveSeekPositionMs(position = position)
+                    viewModel.recentState.collect{
+                        if(!isPlaying()) {
+                            moveSeekPositionMs(position = it )
+                        }
                     }
                 }
                 launch {
-                    viewModel.rightThumbState.collect{position ->
-                        moveSeekPositionMs(position = position)
+                    viewModel.event.collect{event ->
+                        when(event){
+                            VideoEditEvent.OnPlayButtonClicked -> {
+                                if(!isPlaying()) {
+                                    startPlayer()
+                                }else{
+                                    stopPlayer()
+                                }
+                            }
+
+                            VideoEditEvent.StopPlayer -> {
+                                stopPlayer()
+                            }
+
+                            VideoEditEvent.OnBackButtonClicked -> {
+                                finish()
+                            }
+                            VideoEditEvent.OnUploadWithoutEditButtonClicked -> {
+                                viewModel.startLoading()
+                                startTransformationWithoutEdit()
+                            }
+
+                            VideoEditEvent.OnCheckButtonClicked -> {
+                                viewModel.startLoading()
+                                startTransformation()
+                            }
+                        }
+
                     }
                 }
-
             }
         }
     }
 
+    private fun startTransformationWithoutEdit() {
+        trans.start(mediaItem, file.path)
+    }
+
+    private fun startPlayer() {
+        val player = binding.pv.player?: return
+        if(viewModel.recentState.value < viewModel.rightThumbState.value){
+            player.play()
+            viewModel.playerIsPlaying(player.isPlaying)
+            lifecycleScope.launch {
+                while(isPlaying()){
+                    if(viewModel.recentState.value >= viewModel.rightThumbState.value){
+                        stopPlayer()
+                        break
+                    }
+                    delay(100)
+                    viewModel.updateRecent(binding.pv.player!!.currentPosition)
+                }
+            }
+        }
+
+    }
+
+    private fun stopPlayer() {
+        val player = binding.pv.player?: return
+        player.pause()
+        viewModel.playerIsPlaying(player.isPlaying)
+    }
+
     private fun moveSeekPositionMs(position: Long) {
         binding.pv.player?.seekTo(position)
+    }
+    private fun isPlaying(): Boolean {
+        val player = binding.pv.player?: return false
+        return player.isPlaying
     }
 
     private fun initBinding() {
@@ -134,23 +207,32 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                 it.setMediaItem(mediaItem)
                 it.prepare()
             }
-
             pv.useController = false
 
-            btnCancel.setOnClickListener {
-                finish()
-            }
-            btnConfirm.setOnClickListener {
-                viewModel.startLoading()
-                trans.start(mediaItem, file.path)
+            tlv.doOnLayout {
+                viewModel.updateTLVSize(it.width, it.height)
             }
         }
+
+    }
+
+    private fun startTransformation() {
+        val result = MediaItem.Builder()
+            .setUri(viewModel.uri.value.toUri())
+            .setClippingConfiguration(
+                ClippingConfiguration.Builder()
+                    .setStartPositionMs(viewModel.leftThumbState.value)
+                    .setEndPositionMs(viewModel.rightThumbState.value)
+                    .build()
+            )
+            .build()
+
+        trans.start(result, file.path)
     }
 
     private fun getIntentExtra() {
         val uri = intent.getStringExtra("uri")?:""
         viewModel.setUri(uri)
-        postIndex = intent.getIntExtra("index",0) ?: 0
     }
 
 }

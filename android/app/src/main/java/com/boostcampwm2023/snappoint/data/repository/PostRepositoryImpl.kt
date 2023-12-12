@@ -1,6 +1,5 @@
 package com.boostcampwm2023.snappoint.data.repository
 
-import android.util.Log
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
@@ -13,6 +12,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.VideoUrlRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.util.Constants.BYTE_OF_VIDEO_PART_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -21,6 +21,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
+import kotlin.math.min
 
 class PostRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi,
@@ -87,19 +88,23 @@ class PostRepositoryImpl @Inject constructor(
                         files = listOf(File(fileUuid))
                     )
                 }
-
                 is PostBlockCreationState.VIDEO -> {
                     val fileUuid = if (block.uuid.isBlank()) {
-                        val requestBody = block.address.toByteArray().toRequestBody("video/webp".toMediaType())
-                        val multipartBody = MultipartBody.Part.createFormData("file", "video", requestBody)
-                        val uploadResult = snapPointApi.postImage(multipartBody)
-                        uploadResult.uuid
+                        uploadVideoAndGetUUid(block)
                     } else {
                         block.fileUuid
                     }
-
+                    val thumbnailUuid = if(block.thumbnailUuid.isBlank()){
+                        uploadImageAndGetUUid(
+                            PostBlockCreationState.IMAGE(
+                                bitmap = block.thumbnail
+                            )
+                        )
+                    }else{
+                        block.thumbnailUuid
+                    }
                     block.asPostBlock().copy(
-                        files = listOf(File(fileUuid))
+                        files = listOf(File(fileUuid = fileUuid, thumbnailUuid = thumbnailUuid))
                     )
                 }
 
@@ -115,39 +120,14 @@ class PostRepositoryImpl @Inject constructor(
         val videoStartResponse = snapPointApi.getVideoStart(contentType = videoBlock.mimeType)
         val (key, uploadId) = videoStartResponse
 
-        //val file = java.io.File("/storage/emulated/0/Android/data/com.boostcampwm2023.snappoint/cache/123.mp4")
-        val file = java.io.File(videoBlock.resultPath)
+        val file = java.io.File(videoBlock.uri.toString())
 
         val fileByteArray = file.readBytes()
 
-        for(i in 1 .. 10){
-            Log.d("TAG", "uploadVideoAndGetUUid: ${fileByteArray[i]}")
-        }
         val byteOfFileSize = fileByteArray.size
         val parts = mutableListOf<Part>()
 
-            val postVideoUrlResponse = snapPointApi.postVideoUrl(
-                videoUrlRequest = VideoUrlRequest(
-                    key = key,
-                    uploadId = uploadId,
-                    partNumber = parts.size + 1
-                )
-            )
-            val preSignedUrl = postVideoUrlResponse.preSignedUrl
-            val body = fileByteArray.toRequestBody(
-                contentType = videoBlock.mimeType.toMediaType(),
-                offset = 0,
-                byteCount = byteOfFileSize
-            )
-            val response = snapPointApi.putVideo(
-                url = preSignedUrl,
-                body = body
-            )
-        Log.d("TAG", "uploadVideoAndGetUUid: $response")
-            val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
-            parts.add(Part(parts.size + 1, eTag.trim('"')))
-
-        /*for(partNumber in 0 until fileByteArray.size step BYTE_OF_VIDEO_PART_SIZE){
+        for(partNumber in 0 until fileByteArray.size step BYTE_OF_VIDEO_PART_SIZE){
             val postVideoUrlResponse = snapPointApi.postVideoUrl(
                 videoUrlRequest = VideoUrlRequest(
                     key = key,
@@ -161,14 +141,13 @@ class PostRepositoryImpl @Inject constructor(
                 offset = partNumber,
                 byteCount = min(BYTE_OF_VIDEO_PART_SIZE, byteOfFileSize - partNumber)
             )
-            val multipartBody = MultipartBody.Part.create(body)
             val response = snapPointApi.putVideo(
                 url = preSignedUrl,
-                body = multipartBody
+                body = body
             )
             val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
             parts.add(Part(parts.size + 1, eTag.trim('"')))
-        }*/
+        }
 
         val videoEndResponse = snapPointApi.postVideoEnd(
             VideoEndRequest(
@@ -178,7 +157,6 @@ class PostRepositoryImpl @Inject constructor(
                 parts = parts
             )
         )
-        Log.d("TAG", "uploadVideoAndGetUUid: ${videoEndResponse}")
         return videoEndResponse.uuid
     }
 

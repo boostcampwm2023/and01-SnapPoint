@@ -42,9 +42,10 @@ sealed class PostBlockCreationState {
         val position: PositionState = PositionState(0.0, 0.0),
         val address: String = "",
         val mimeType: String = "",
-        val uri:Uri,
-        val resultPath: String = "",
-        val fileUuid: String = ""
+        val thumbnail: Bitmap? = null,
+        val uri:Uri? = null,
+        val fileUuid: String = "",
+        val thumbnailUuid: String = "",
     ) : PostBlockCreationState()
 
     enum class ViewType {
