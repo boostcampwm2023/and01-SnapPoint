@@ -26,6 +26,7 @@ import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPoin
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.util.CacheManager.clearVideoCache
 import com.boostcampwm2023.snappoint.presentation.util.MetadataUtil
 import com.boostcampwm2023.snappoint.presentation.util.PermissionUtil.isMyLocationGranted
 import com.boostcampwm2023.snappoint.presentation.util.getBitmapFromUri
@@ -202,6 +203,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                             }
 
                             is CreatePostEvent.NavigatePrev -> {
+                                clearVideoCache(this@CreatePostActivity)
                                 finish()
                             }
 
