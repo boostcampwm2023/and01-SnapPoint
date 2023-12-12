@@ -100,6 +100,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         if (selected == null) return
         val bitmap = getSnapPointBitmap(context, selected.getContent(), false)
         renderer.getMarker(selected).apply {
+            if (this == null) return
             setIcon(BitmapDescriptorFactory.fromBitmap(bitmap))
             zIndex = 0.0f
         }
@@ -143,12 +144,15 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bound, padding))
     }
 
-    suspend fun changeSelectedMarker(block: PostBlockState.IMAGE, snapPointTag: SnapPointTag) {
+    suspend fun changeSelectedMarker(block: PostBlockState, snapPointTag: SnapPointTag) {
 
         setItemUnfocused(prevSelectedMarker)
 
         val selectedBitmap = getSnapPointBitmap(context, block.content, true)
 
+        while (clusterManager.algorithm.items.find { it.getTag() == snapPointTag } == null) {
+            delay(100)
+        }
         val item = clusterManager.algorithm.items.find { it.getTag() == snapPointTag }
         while (renderer.getMarker(item) == null) { delay(100) }
         renderer.getMarker(item).apply {

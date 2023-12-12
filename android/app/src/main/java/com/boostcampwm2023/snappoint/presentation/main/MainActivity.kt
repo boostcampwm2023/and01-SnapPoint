@@ -226,8 +226,8 @@ class MainActivity(
                         }
 
                         val post = viewModel.getPosts()[markerState.selectedIndex]
-                        val block = post.postBlocks.filterIsInstance<PostBlockState.IMAGE>()[markerState.focusedIndex]
-                        mapManager.changeSelectedMarker(block, SnapPointTag(post.uuid, block.uuid))
+                        val blocks = post.postBlocks.filter { it is PostBlockState.IMAGE || it is PostBlockState.VIDEO }[markerState.focusedIndex]
+                        mapManager.changeSelectedMarker(blocks, SnapPointTag(post.uuid, blocks.uuid))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
                             mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks)
