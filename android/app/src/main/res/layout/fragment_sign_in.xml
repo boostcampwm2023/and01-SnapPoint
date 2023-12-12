@@ -60,8 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:afterTextChanged="@{(s)->vm.updateEmail(s.toString())}"
-                android:inputType="textEmailAddress"
-                android:text="aaaa@aaaa.aaa" />
+                android:inputType="textEmailAddress" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -84,8 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:afterTextChanged="@{(s)->vm.updatePassword(s.toString())}"
-                android:inputType="textPassword"
-                android:text="aaaAAA111!!!" />
+                android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

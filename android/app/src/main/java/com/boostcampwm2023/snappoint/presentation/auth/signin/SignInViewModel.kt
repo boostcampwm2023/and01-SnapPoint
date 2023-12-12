@@ -29,14 +29,7 @@ class SignInViewModel @Inject constructor(
     private val loginRepository: SignInRepository
 ) : ViewModel() {
 
-    private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(
-        SignInFormState(
-            email = "aaaa@aaaa.aaa",
-            password = "aaaAAA111!!!",
-            isEmailValid = true,
-            isPasswordValid = true
-        )
-    )
+    private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(SignInFormState())
     val signInFormUiState: StateFlow<SignInFormState> = _signInFormUiState.asStateFlow()
 
     private val _event: MutableSharedFlow<SignInEvent> = MutableSharedFlow(
