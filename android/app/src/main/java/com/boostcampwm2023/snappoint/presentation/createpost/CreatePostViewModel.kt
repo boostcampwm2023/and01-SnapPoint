@@ -283,6 +283,7 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun onCheckButtonClicked() {
+        Log.d("LOG", "CLICKED!!")
         if (isValidTitle().not()) {
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return
@@ -295,10 +296,10 @@ class CreatePostViewModel @Inject constructor(
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_text))
             return
         }
-//        if (isValidMediaBlock().not()) {
-//            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
-//            return
-//        }
+        if (isValidMediaBlock().not()) {
+            _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_media))
+            return
+        }
 
         thread {
             if (uiState.value.uuid.isBlank()) {
