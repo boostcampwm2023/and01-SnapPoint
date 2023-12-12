@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="28dp"
             android:layout_marginTop="8dp"
-            android:text="회원 로그인"
+            android:text="@string/signin_fragment_title"
             android:textSize="28sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="28dp"
             android:layout_marginTop="4dp"
-            android:text="스냅포인트를 찾아 주셔서 감사합니다"
+            android:text="@string/signin_fragment_description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_sign_in_title" />
 
@@ -96,12 +96,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/md_theme_onPrimary"
-            android:text="이메일로 로그인"
+            android:text="@string/signin_fragment_sign_in_with_email"
             android:textColor="@color/md_theme_onBackground"
             app:icon="@drawable/icon_mail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/til_login_password"
+            android:enabled="@{vm.signInFormUiState.emailValid &amp;&amp; vm.signInFormUiState.passwordValid}"
             android:onClick="@{()->vm.onLoginButtonClick()}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
