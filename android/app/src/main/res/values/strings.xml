@@ -79,4 +79,6 @@
     <string name="auth_activity_sign_in_google_button">Google로 계속하기</string>
     <string name="auth_activity_sign_in_email_button_text">이메일로 로그인</string>
     <string name="auth_activity_sign_up_button_text">회원가입</string>
+    <string name="create_post_button_text">게시물 작성</string>
+    <string name="fragment_being_prepared">페이지 준비중입니다.</string>
 </resources>
