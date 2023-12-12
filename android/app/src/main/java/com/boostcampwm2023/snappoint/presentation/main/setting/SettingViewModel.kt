@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.data.repository.SignInRepository
-import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
+import com.boostcampwm2023.snappoint.data.repository.UserInfoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val userInfoPreference: UserInfoPreference,
+    private val userInfoRepository: UserInfoRepository,
     private val signInRepository: SignInRepository,
     private val roomRepository: RoomRepository
 ) : ViewModel() {
@@ -32,7 +32,7 @@ class SettingViewModel @Inject constructor(
     fun onSignOutClick() {
         signInRepository.getSignOut()
             .onEach {
-                userInfoPreference.clearUserAuthData()
+                userInfoRepository.clearUserAuthData()
                 _event.emit(SettingEvent.SignOut)
             }
             .catch {
@@ -46,7 +46,7 @@ class SettingViewModel @Inject constructor(
     }
 
     fun getSavedPost() {
-        roomRepository.getAllLocalPost(userInfoPreference.getEmail())
+        roomRepository.getAllLocalPost(userInfoRepository.getEmail())
             .onEach {
                 Log.d("LOG", it.toString())
             }.catch {
