@@ -513,7 +513,8 @@ class MainActivity(
 
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
-        fusedLocationClient.requestLocationUpdates(LocationRequest.Builder(1000L).build(),
+        fusedLocationClient.requestLocationUpdates(
+            LocationRequest.Builder(1000L).build(),
             locationCallback,
             Looper.getMainLooper()
         )
