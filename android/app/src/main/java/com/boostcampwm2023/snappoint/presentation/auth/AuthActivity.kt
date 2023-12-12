@@ -49,6 +49,8 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
             bsAuth.bringToFront()
 
             btnAuthSignInEmail.setOnClickListener {
+                viewModel.activateBottomSheet()
+
                 if(navController.currentDestination?.id != R.id.signInFragment) {
                     navController.navigate(R.id.action_signUpFragment_to_signInFragment)
                 } else {
@@ -57,6 +59,8 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
             }
 
             tvAuthSignUp.setOnClickListener {
+                viewModel.activateBottomSheet()
+
                 if(navController.currentDestination?.id != R.id.signUpFragment) {
                     navController.navigate(R.id.action_signInFragment_to_signUpFragment)
                 } else {
@@ -78,8 +82,10 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
     private fun expandBottomSheetHalf() {
         with(viewModel.uiState.value) {
-            bottomSheetBehavior.halfExpandedRatio = bottomSheetHeight / fragmentHeight.toFloat()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            if(isBottomSheetActivated) {
+                bottomSheetBehavior.halfExpandedRatio = bottomSheetHeight / fragmentHeight.toFloat()
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
         }
     }
 }

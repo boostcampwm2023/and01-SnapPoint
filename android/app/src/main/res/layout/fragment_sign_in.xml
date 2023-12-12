@@ -101,7 +101,8 @@
             app:icon="@drawable/icon_mail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_login_password" />
+            app:layout_constraintTop_toBottomOf="@+id/til_login_password"
+            android:onClick="@{()->vm.onLoginButtonClick()}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

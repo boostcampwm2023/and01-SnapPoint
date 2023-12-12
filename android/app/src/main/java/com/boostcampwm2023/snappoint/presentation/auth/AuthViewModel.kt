@@ -25,4 +25,12 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             it.copy(fragmentHeight = height)
         }
     }
+
+    fun activateBottomSheet() {
+        if (uiState.value.isBottomSheetActivated.not()) {
+            _uiState.update {
+                it.copy(isBottomSheetActivated = true)
+            }
+        }
+    }
 }

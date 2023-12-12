@@ -31,11 +31,11 @@ class SignInViewModel @Inject constructor(
 
     private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(
         SignInFormState(
-        email = "aaaa@aaaa.aaa",
-        password = "aaaAAA111!!!",
-        isEmailValid = true,
-        isPasswordValid = true
-    )
+            email = "aaaa@aaaa.aaa",
+            password = "aaaAAA111!!!",
+            isEmailValid = true,
+            isPasswordValid = true
+        )
     )
     val signInFormUiState: StateFlow<SignInFormState> = _signInFormUiState.asStateFlow()
 
@@ -84,10 +84,6 @@ class SignInViewModel @Inject constructor(
                 setProgressBarState(false)
             }
             .launchIn(viewModelScope)
-    }
-
-    fun onSignUpButtonClick() {
-        _event.tryEmit(SignInEvent.NavigateToSignup)
     }
 
     private fun setProgressBarState(isInProgress: Boolean) {
