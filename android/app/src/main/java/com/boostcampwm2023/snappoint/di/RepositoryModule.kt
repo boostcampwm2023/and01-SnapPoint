@@ -7,13 +7,14 @@ import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.PostRepositoryImpl
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepositoryImpl
+import com.boostcampwm2023.snappoint.data.repository.UserInfoRepository
+import com.boostcampwm2023.snappoint.data.repository.UserInfoRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,4 +36,7 @@ abstract class RepositoryImplModule{
 
     @Binds
     abstract fun bindLoginRepository(impl: SignInRepositoryImpl): SignInRepository
+
+    @Binds
+    abstract fun bindUserInfoRepository(impl: UserInfoRepositoryImpl): UserInfoRepository
 }

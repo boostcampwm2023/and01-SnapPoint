@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.data.repository.SignInRepository
-import com.boostcampwm2023.snappoint.presentation.util.UserInfoPreference
+import com.boostcampwm2023.snappoint.data.repository.UserInfoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,18 +25,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val userInfoPreference: UserInfoPreference,
+    private val userInfoRepository: UserInfoRepository,
     private val loginRepository: SignInRepository
 ) : ViewModel() {
 
-    private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(
-        SignInFormState(
-        email = "aaaa@aaaa.aaa",
-        password = "aaaAAA111!!!",
-        isEmailValid = true,
-        isPasswordValid = true
-    )
-    )
+    private val _signInFormUiState: MutableStateFlow<SignInFormState> = MutableStateFlow(SignInFormState())
     val signInFormUiState: StateFlow<SignInFormState> = _signInFormUiState.asStateFlow()
 
     private val _event: MutableSharedFlow<SignInEvent> = MutableSharedFlow(
@@ -63,17 +56,25 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onLoginButtonClick() {
+    fun onSignInButtonClick() {
         val email = signInFormUiState.value.email
         // TODO 암호화
         val password = signInFormUiState.value.password
 
+        if(isEmailValid(email) && isPasswordValid(password)) {
+            signIn(email, password)
+        } else {
+            _event.tryEmit(SignInEvent.ShowMessage(R.string.login_activity_fail))
+        }
+    }
+
+    private fun signIn(email: String, password: String) {
         loginRepository.postSignIn(email, password)
             .onStart {
                 setProgressBarState(true)
             }
             .onEach {
-                userInfoPreference.setUserAuthData(email, password)
+                userInfoRepository.setUserAuthData(email, password)
                 _event.emit(SignInEvent.NavigateToMainActivity)
             }
             .catch {
@@ -84,10 +85,6 @@ class SignInViewModel @Inject constructor(
                 setProgressBarState(false)
             }
             .launchIn(viewModelScope)
-    }
-
-    fun onSignUpButtonClick() {
-        _event.tryEmit(SignInEvent.NavigateToSignup)
     }
 
     private fun setProgressBarState(isInProgress: Boolean) {
