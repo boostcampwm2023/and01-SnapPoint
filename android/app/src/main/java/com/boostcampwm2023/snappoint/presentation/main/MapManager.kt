@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.core.content.ContextCompat.getColor
 import com.boostcampwm2023.snappoint.R
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.clustering.Cluster
@@ -50,8 +52,12 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         } ?: googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)))
     }
 
+    private fun isDarkMode() =
+        context.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
     override fun onMapReady(googleMap: GoogleMap) {
 
+        if (isDarkMode()) googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
         clusterManager = ClusterManager(context, googleMap)
         renderer = SnapPointClusterRenderer(context, googleMap, clusterManager, this)
         googleMap.setOnCameraIdleListener(clusterManager)
