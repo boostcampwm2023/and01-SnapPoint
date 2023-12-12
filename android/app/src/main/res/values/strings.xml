@@ -74,4 +74,7 @@
     <string name="signup_fragment_password_confirm_hint">PASSWORD CONFIRM</string>
     <string name="signup_fragment_nickname_hint">NICKNAME</string>
     <string name="signup_fragment_sign_up_with_email">이메일로 회원가입</string>
+    <string name="auth_activity_sign_in_google_button">Google로 계속하기</string>
+    <string name="auth_activity_sign_in_email_button_text">이메일로 로그인</string>
+    <string name="auth_activity_sign_up_button_text">회원가입</string>
 </resources>
