@@ -33,7 +33,7 @@
     <string name="signup_fragment_create_account_success">계정을 생성했습니다.</string>
     <string name="signup_fragment_error_email_form">이메일 형식으로 입력해주세요.</string>
     <string name="signup_fragment_error_email_duplicate">이미 사용중인 이메일입니다.</string>
-    <string name="signup_fragment_error_password_length">8~16자 영문, 숫자, 특수문자를 사용하세요.</string>
+    <string name="signup_fragment_error_password_length">8~16자 영문 대•소문자, 숫자, 특수문자를 사용하세요.</string>
     <string name="signup_fragment_error_password_confirm_mismatch">비밀번호가 일치하지 않습니다.</string>
     <string name="signup_fragment_error_nickname">별명은 3글자 이상 입력해주세요.</string>
     <string name="signup_fragment_fail_duplicate">이미 존재하는 이메일입니다.</string>
