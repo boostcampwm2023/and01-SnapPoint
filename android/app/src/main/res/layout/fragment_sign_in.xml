@@ -68,7 +68,7 @@
             android:id="@+id/til_login_password"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="16dp"
             android:autofillHints="password"
             android:hint="@string/login_activity_password"
             android:imeActionLabel="DONE"
@@ -100,8 +100,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/til_login_password"
-            android:enabled="@{vm.signInFormUiState.emailValid &amp;&amp; vm.signInFormUiState.passwordValid}"
-            android:onClick="@{()->vm.onLoginButtonClick()}"/>
+            android:onClick="@{()->vm.onSignInButtonClick()}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

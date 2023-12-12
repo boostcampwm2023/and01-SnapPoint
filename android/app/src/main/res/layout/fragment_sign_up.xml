@@ -15,7 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_sign_up"
         android:layout_width="match_parent"
-        android:layout_height="550dp"
+        android:layout_height="560dp"
         android:paddingLeft="16dp"
         android:paddingTop="16dp"
         android:paddingRight="16dp"
@@ -48,14 +48,14 @@
             setErrorMessage="@{vm.uiState.emailErrorResId}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="96dp"
+            android:layout_marginTop="36dp"
             android:autofillHints="emailAddress"
             android:hint="@string/signup_fragment_email_hint"
             android:inputType="textEmailAddress"
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_description">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -70,7 +70,7 @@
             setErrorMessage="@{vm.uiState.passwordErrorResId}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:autofillHints="password"
             android:hint="@string/signup_fragment_password_hint"
             android:inputType="textPassword"
@@ -94,7 +94,7 @@
             setErrorMessage="@{vm.uiState.passwordConfirmErrorResId}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:autofillHints="password"
             android:hint="@string/signup_fragment_password_confirm_hint"
             android:inputType="textPassword"

@@ -56,11 +56,19 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onLoginButtonClick() {
+    fun onSignInButtonClick() {
         val email = signInFormUiState.value.email
         // TODO 암호화
         val password = signInFormUiState.value.password
 
+        if(isEmailValid(email) && isPasswordValid(password)) {
+            signIn(email, password)
+        } else {
+            _event.tryEmit(SignInEvent.ShowMessage(R.string.login_activity_fail))
+        }
+    }
+
+    private fun signIn(email: String, password: String) {
         loginRepository.postSignIn(email, password)
             .onStart {
                 setProgressBarState(true)
