@@ -18,7 +18,7 @@ fun PostBlock.asPostBlockState(): PostBlockState {
             )
         }
         else -> {
-            if(files!!.size  == 1 && this.files!![0].mimeType!!.startsWith("image")){
+            if(files!!.size == 1 && this.files[0].mimeType!!.startsWith("image")){
                 PostBlockState.IMAGE(
                     uuid = blockUuid!!,
                     description = this.content,

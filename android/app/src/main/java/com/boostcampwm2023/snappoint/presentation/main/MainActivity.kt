@@ -90,7 +90,7 @@ class MainActivity(
 
         initMapFragment()
 
-        collectViewModelData()
+        collectViewModelData(savedInstanceState)
 
         setBottomNavigationEvent()
 
@@ -135,7 +135,7 @@ class MainActivity(
         }
     }
 
-    private fun collectViewModelData() {
+    private fun collectViewModelData(savedInstanceState: Bundle?) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
 
@@ -174,7 +174,9 @@ class MainActivity(
                             }
 
                             MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation -> {
-                                checkPermissionAndMoveCameraToUserLocation(true)
+                                if (savedInstanceState == null) {
+                                    checkPermissionAndMoveCameraToUserLocation(true)
+                                }
                             }
 
                             is MainActivityEvent.HalfOpenBottomSheet -> {
