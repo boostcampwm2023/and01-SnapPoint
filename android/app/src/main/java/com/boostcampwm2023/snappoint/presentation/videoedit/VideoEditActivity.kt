@@ -1,7 +1,6 @@
 package com.boostcampwm2023.snappoint.presentation.videoedit
 
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
@@ -13,7 +12,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaItem.ClippingConfiguration
 import androidx.media3.common.MimeTypes
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.transformer.Composition
@@ -24,7 +22,7 @@ import androidx.media3.transformer.Transformer.Listener
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityVideoEditBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.util.CacheFileNameMaker.getRandomName
+import com.boostcampwm2023.snappoint.presentation.util.CacheManager.createExternalCacheFile
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,7 +46,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
          initMediaItem(savedInstanceState)
 
-         createExternalCacheFile()
 
          initBinding()
 
@@ -60,6 +57,7 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
 
     private fun initMediaItem(savedInstanceState: Bundle?) {
         mediaItem = MediaItem.fromUri(viewModel.uri.value.toUri())
+        file = createExternalCacheFile(this)
 
         val mediaMetadataRetriever = MediaMetadataRetriever().apply {
             setDataSource(this@VideoEditActivity, viewModel.uri.value.toUri())
@@ -74,11 +72,11 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
     private fun initTransFormer() {
 
         trans = Transformer.Builder(this@VideoEditActivity)
-            .setVideoMimeType(MimeTypes.VIDEO_H264)
+            .setVideoMimeType(MimeTypes.VIDEO_H265)
             .setAudioMimeType(MimeTypes.AUDIO_AAC)
             .build()
 
-        trans.addListener(object : Listener{
+        trans.addListener(object : Listener {
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                 super.onCompleted(composition, exportResult)
                 viewModel.finishLoading()
@@ -98,23 +96,6 @@ class VideoEditActivity : BaseActivity<ActivityVideoEditBinding>(R.layout.activi
                 showToastMessage(exportException.message?:"error")
             }
         })
-    }
-
-    private fun createExternalCacheFile() {
-
-        file = File(cacheDir, "${getRandomName()}.mp4")
-
-        try{
-            if (file.exists() && !file.delete()) {
-                throw IllegalStateException("Could not delete the previous export output file")
-            }
-            if (!file.createNewFile()) {
-                throw IllegalStateException("Could not create the export output file")
-            }
-        } catch (e:Exception){
-            Log.d("TAG", "createExternalCacheFile: ${e.message}")
-        }
-
     }
 
     private fun collectViewModelData() {

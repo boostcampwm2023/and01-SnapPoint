@@ -17,44 +17,25 @@
         tools:context=".presentation.main.setting.SettingFragment">
 
         <Button
-            android:id="@+id/btn_setting_remove_marker"
+            android:id="@+id/btn_create_post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="16dp"
+            android:text="@string/create_post_button_text"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:onClickListener="@{()->vm.onClearSnapPointClick()}"
-            android:text="@string/setting_fragment_remove_all_marker" />
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
             android:id="@+id/btn_setting_sign_out"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/btn_setting_remove_marker"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/btn_create_post"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:onClickListener="@{()->vm.onSignOutClick()}"
             android:text="@string/setting_fragment_sign_out" />
-
-        <Button
-            android:id="@+id/btn_create_post"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="게시물 작성"
-            app:layout_constraintTop_toBottomOf="@+id/btn_setting_sign_out"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <Button
-            android:id="@+id/btn_get_post_in_room"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="저장된 게시글 불러오기"
-            app:layout_constraintTop_toBottomOf="@+id/btn_create_post"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

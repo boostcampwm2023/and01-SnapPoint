@@ -17,8 +17,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <Button
             android:id="@+id/btn_confirm_position"
             android:layout_width="wrap_content"
@@ -27,8 +27,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginBottom="30dp"
-            android:text="이 위치로 설정"
-            />
+            android:text="@string/maps_marker_activity_confirm_position" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_google_marker"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
