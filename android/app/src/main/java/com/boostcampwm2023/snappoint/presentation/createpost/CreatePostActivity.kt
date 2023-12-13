@@ -95,8 +95,6 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
             }
         }
 
-
-
     private val addressSelectionLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -105,8 +103,8 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
                         index = it.getIntExtra("index", 0),
                         address = it.getStringExtra("address") ?: "",
                         position = PositionState(
-                            it.getDoubleExtra("latitude", 0.0).untilSixAfterDecimalPoint(),
-                            it.getDoubleExtra("longitude", 0.0).untilSixAfterDecimalPoint()
+                            it.getDoubleExtra("latitude", userPosition.latitude).untilSixAfterDecimalPoint(),
+                            it.getDoubleExtra("longitude", userPosition.longitude).untilSixAfterDecimalPoint()
                         )
                     )
                 }
