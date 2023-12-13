@@ -38,6 +38,7 @@
             android:text="@string/auth_activity_sign_in_google_button"
             android:textColor="@color/md_theme_onBackground"
             app:icon="@drawable/icon_google_logo"
+            android:clickable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

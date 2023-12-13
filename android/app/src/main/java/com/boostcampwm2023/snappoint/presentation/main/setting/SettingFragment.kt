@@ -37,12 +37,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
             vm = viewModel
 
             btnCreatePost.setOnClickListener {
-//                val intent = Intent(requireContext(), CreatePostActivity::class.java)
-//                startActivity(intent)
                 findNavController().navigate(R.id.createPostActivity)
-            }
-            binding.btnGetPostInRoom.setOnClickListener {
-                viewModel.getSavedPost()
             }
         }
     }

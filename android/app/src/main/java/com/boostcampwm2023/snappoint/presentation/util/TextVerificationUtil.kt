@@ -6,7 +6,8 @@ import android.util.Patterns
 object TextVerificationUtil {
 
     private val passwordLength: Regex = Regex(".{8,16}")
-    private val passwordCharacter: Regex = Regex(".*[a-zA-Z]+.*")
+    private val passwordLowerCase: Regex = Regex(".*[A-Z]+.*")
+    private val passwordUpperCase: Regex = Regex(".*[a-z]+.*")
     private val passwordSpecial: Regex = Regex(".*[!@#$%^&*()_-]+.*")
     private val passwordNumber: Regex = Regex(".*[0-9]+.*")
 
@@ -16,7 +17,8 @@ object TextVerificationUtil {
 
     fun isPasswordValid(password: String): Boolean {
         return (passwordLength.matches(password)
-                && passwordCharacter.matches(password)
+                && passwordLowerCase.matches(password)
+                && passwordUpperCase.matches(password)
                 && passwordSpecial.matches(password)
                 && passwordNumber.matches(password))
     }
