@@ -95,9 +95,14 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
     private fun expandBottomSheetHalf() {
         with(viewModel.uiState.value) {
-            if(isBottomSheetActivated) {
-                bottomSheetBehavior.halfExpandedRatio = bottomSheetHeight / fragmentHeight.toFloat()
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            if (isBottomSheetActivated) {
+                val ratio = (bottomSheetHeight / fragmentHeight.toFloat())
+                if (ratio >= 1F) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else if (ratio > 0F) {
+                    bottomSheetBehavior.halfExpandedRatio = ratio
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                }
             }
         }
     }

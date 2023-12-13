@@ -12,143 +12,149 @@
             type="com.boostcampwm2023.snappoint.presentation.auth.signup.SignUpViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_sign_up"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view_sign_up"
         android:layout_width="match_parent"
-        android:layout_height="560dp"
-        android:paddingLeft="16dp"
-        android:paddingTop="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="16dp">
+        android:layout_height="560dp">
 
-
-        <TextView
-            android:id="@+id/tv_sign_up_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/signup_fragment_title"
-            android:textSize="28sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_sign_up_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="4dp"
-            android:text="@string/signup_fragment_description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_title" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_sign_up_email"
-            setErrorMessage="@{vm.uiState.emailErrorResId}"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:autofillHints="emailAddress"
-            android:hint="@string/signup_fragment_email_hint"
-            android:inputType="textEmailAddress"
-            android:selectAllOnFocus="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_description">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:afterTextChanged="@{(s)->vm.updateEmail(s.toString())}"
-                android:inputType="textEmailAddress" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_sign_up_password"
-            setErrorMessage="@{vm.uiState.passwordErrorResId}"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:autofillHints="password"
-            android:hint="@string/signup_fragment_password_hint"
-            android:inputType="textPassword"
-            android:selectAllOnFocus="true"
-            app:endIconMode="password_toggle"
-            app:errorIconDrawable="@{null}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_email">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:afterTextChanged="@{(s)->vm.updatePassword(s.toString())}"
-                android:inputType="textPassword" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_sign_up_password_confirm"
-            setErrorMessage="@{vm.uiState.passwordConfirmErrorResId}"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:autofillHints="password"
-            android:hint="@string/signup_fragment_password_confirm_hint"
-            android:inputType="textPassword"
-            android:selectAllOnFocus="true"
-            app:endIconMode="password_toggle"
-            app:errorIconDrawable="@{null}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:afterTextChanged="@{(s)->vm.updatePasswordConfirm(s.toString())}"
-                android:inputType="textPassword" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_sign_up_nickname"
-            setErrorMessage="@{vm.uiState.nicknameErrorResId}"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:autofillHints="username"
-            android:hint="@string/signup_fragment_nickname_hint"
-            android:inputType="textPersonName"
-            android:selectAllOnFocus="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password_confirm">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:afterTextChanged="@{(s)->vm.updateNickname(s.toString())}"
-                android:inputType="textPersonName" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/btn_sign_up_enter"
-            style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_sign_up"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/md_theme_onPrimary"
-            android:enabled="@{vm.uiState.buttonEnabled}"
-            android:onClick="@{()->vm.onSignUpButtonClicked()}"
-            android:text="@string/signup_fragment_sign_up_with_email"
-            android:textColor="@color/md_theme_onBackground"
-            app:icon="@drawable/icon_mail"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/til_sign_up_nickname" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="560dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp">
+
+
+            <TextView
+                android:id="@+id/tv_sign_up_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/signup_fragment_title"
+                android:textSize="28sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_sign_up_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/signup_fragment_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_title" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_sign_up_email"
+                setErrorMessage="@{vm.uiState.emailErrorResId}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:autofillHints="emailAddress"
+                android:hint="@string/signup_fragment_email_hint"
+                android:inputType="textEmailAddress"
+                android:selectAllOnFocus="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_description">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:afterTextChanged="@{(s)->vm.updateEmail(s.toString())}"
+                    android:inputType="textEmailAddress" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_sign_up_password"
+                setErrorMessage="@{vm.uiState.passwordErrorResId}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:autofillHints="password"
+                android:hint="@string/signup_fragment_password_hint"
+                android:inputType="textPassword"
+                android:selectAllOnFocus="true"
+                app:endIconMode="password_toggle"
+                app:errorIconDrawable="@{null}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/til_sign_up_email">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:afterTextChanged="@{(s)->vm.updatePassword(s.toString())}"
+                    android:inputType="textPassword" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_sign_up_password_confirm"
+                setErrorMessage="@{vm.uiState.passwordConfirmErrorResId}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:autofillHints="password"
+                android:hint="@string/signup_fragment_password_confirm_hint"
+                android:inputType="textPassword"
+                android:selectAllOnFocus="true"
+                app:endIconMode="password_toggle"
+                app:errorIconDrawable="@{null}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:afterTextChanged="@{(s)->vm.updatePasswordConfirm(s.toString())}"
+                    android:inputType="textPassword" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_sign_up_nickname"
+                setErrorMessage="@{vm.uiState.nicknameErrorResId}"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:autofillHints="username"
+                android:hint="@string/signup_fragment_nickname_hint"
+                android:inputType="textPersonName"
+                android:selectAllOnFocus="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/til_sign_up_password_confirm">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:afterTextChanged="@{(s)->vm.updateNickname(s.toString())}"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_sign_up_enter"
+                style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/md_theme_onPrimary"
+                android:enabled="@{vm.uiState.buttonEnabled}"
+                android:onClick="@{()->vm.onSignUpButtonClicked()}"
+                android:text="@string/signup_fragment_sign_up_with_email"
+                android:textColor="@color/md_theme_onBackground"
+                app:icon="@drawable/icon_mail"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/til_sign_up_nickname" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>
