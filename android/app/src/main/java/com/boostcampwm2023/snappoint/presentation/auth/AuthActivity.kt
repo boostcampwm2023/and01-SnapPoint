@@ -45,6 +45,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
         initBinding()
 
+        collectViewModelEvent()
         collectViewModelData()
     }
 
@@ -78,6 +79,20 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
                     navController.navigate(R.id.action_signInFragment_to_signUpFragment)
                 } else {
                     expandBottomSheetHalf()
+                }
+            }
+        }
+    }
+
+    private fun collectViewModelEvent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.event.collect { event ->
+                    when(event) {
+                        is AuthEvent.GoogleSignIn -> {
+                            showToastMessage(R.string.feature_being_prepared)
+                        }
+                    }
                 }
             }
         }
