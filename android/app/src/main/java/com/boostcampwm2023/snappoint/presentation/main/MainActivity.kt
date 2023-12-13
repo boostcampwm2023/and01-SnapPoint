@@ -363,18 +363,6 @@ class MainActivity(
 
             }
         })
-
-        binding.bnv.setOnItemReselectedListener { _ ->
-            if (viewModel.uiState.value.isPreviewFragmentShowing) {
-                return@setOnItemReselectedListener
-            }
-
-            bottomSheetBehavior.state = when (bottomSheetBehavior.state) {
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> BottomSheetBehavior.STATE_EXPANDED
-                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
-                else -> BottomSheetBehavior.STATE_HALF_EXPANDED
-            }
-        }
     }
 
     private fun setBottomNavigationEvent() {
@@ -383,9 +371,29 @@ class MainActivity(
             while (true) {
                 if (navController.popBackStack().not()) break
             }
+
+            if(binding.sv.isShowing) {
+                binding.sv.hide()
+            }
             navController.navigate(menuItem.itemId)
             halfOpenBottomSheetWhenCollapsed()
             true
+        }
+
+        binding.bnv.setOnItemReselectedListener { _ ->
+            if (viewModel.uiState.value.isPreviewFragmentShowing) {
+                return@setOnItemReselectedListener
+            }
+
+            if(binding.sv.isShowing) {
+                binding.sv.hide()
+            }
+
+            bottomSheetBehavior.state = when (bottomSheetBehavior.state) {
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
+                else -> BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
         }
     }
 
