@@ -14,6 +14,8 @@ import { SummarizationService } from '../summarization/summarization.service';
 import { BlockRepository } from '@/domain/block/block.repository';
 import { HttpService } from '@nestjs/axios';
 import { FileRepository } from '@/domain/file/file.repository';
+import { RedisManager } from '@liaoliaots/nestjs-redis';
+import { ConfigService } from '@nestjs/config';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -21,6 +23,7 @@ describe('PostApiController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PostApiController],
+      imports: [],
       providers: [
         PostApiService,
         PrismaService,
@@ -31,14 +34,18 @@ describe('PostApiController', () => {
         FileService,
         TransformationService,
         RedisCacheService,
+        RedisManager,
         SummarizationService,
         BlockRepository,
         HttpService,
         FileRepository,
+        ConfigService,
       ],
     })
-      .overrideProvider(RedisCacheService)
-      .useValue(mockDeep<RedisCacheService>())
+      .overrideProvider(RedisManager)
+      .useValue(mockDeep<RedisManager>())
+      .overrideProvider(HttpService)
+      .useValue(mockDeep<HttpService>())
       .compile();
 
     controller = module.get<PostApiController>(PostApiController);
