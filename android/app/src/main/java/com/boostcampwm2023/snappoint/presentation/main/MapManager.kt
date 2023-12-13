@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.core.content.ContextCompat.getColor
 import com.boostcampwm2023.snappoint.R
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.clustering.Cluster
@@ -50,8 +52,12 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         } ?: googleMap?.moveCamera(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)))
     }
 
+    private fun isDarkMode() =
+        context.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
     override fun onMapReady(googleMap: GoogleMap) {
 
+        if (isDarkMode()) googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
         clusterManager = ClusterManager(context, googleMap)
         renderer = SnapPointClusterRenderer(context, googleMap, clusterManager, this)
         googleMap.setOnCameraIdleListener(clusterManager)
@@ -100,6 +106,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         if (selected == null) return
         val bitmap = getSnapPointBitmap(context, selected.getContent(), false)
         renderer.getMarker(selected).apply {
+            if (this == null) return
             setIcon(BitmapDescriptorFactory.fromBitmap(bitmap))
             zIndex = 0.0f
         }
@@ -143,12 +150,15 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bound, padding))
     }
 
-    suspend fun changeSelectedMarker(block: PostBlockState.IMAGE, snapPointTag: SnapPointTag) {
+    suspend fun changeSelectedMarker(block: PostBlockState, snapPointTag: SnapPointTag) {
 
         setItemUnfocused(prevSelectedMarker)
 
         val selectedBitmap = getSnapPointBitmap(context, block.content, true)
 
+        while (clusterManager.algorithm.items.find { it.getTag() == snapPointTag } == null) {
+            delay(100)
+        }
         val item = clusterManager.algorithm.items.find { it.getTag() == snapPointTag }
         while (renderer.getMarker(item) == null) { delay(100) }
         renderer.getMarker(item).apply {
@@ -197,7 +207,6 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     fun searchSnapPoints() {
         CoroutineScope(Dispatchers.IO).launch {
             val latLngBounds = withContext(Dispatchers.Main) {
-                while (googleMap?.projection == null) { delay(100) }
                 googleMap?.projection?.visibleRegion?.latLngBounds
             } ?: return@launch
 

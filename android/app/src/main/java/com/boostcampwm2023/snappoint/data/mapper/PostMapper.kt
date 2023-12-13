@@ -35,10 +35,10 @@ fun PostBlock.asPostBlockState(): PostBlockState {
                     description = this.content,
                     content = video[0].url!!,
                     position = this.asPositionState(),
-                    thumbnail144P = thumbnail[0].url144P!!,
-                    thumbnail480P = thumbnail[0].url480P!!,
-                    thumbnail720P = thumbnail[0].url720P!!,
-                    thumbnailUuid = thumbnail[0].fileUuid,
+                    thumbnail144P = if(thumbnail.isEmpty()) "" else thumbnail[0].url144P!!,
+                    thumbnail480P = if(thumbnail.isEmpty()) "" else thumbnail[0].url480P!!,
+                    thumbnail720P = if(thumbnail.isEmpty()) "" else thumbnail[0].url720P!!,
+                    thumbnailUuid = if(thumbnail.isEmpty()) "" else thumbnail[0].fileUuid,
                     fileUuid = video[0].fileUuid
                 )
             }

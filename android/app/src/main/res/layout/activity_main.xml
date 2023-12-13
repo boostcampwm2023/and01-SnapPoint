@@ -75,7 +75,8 @@
                     android:layout_gravity="bottom|center"
                     android:translationY="16dp"
                     android:minHeight="0dp"
-                    android:visibility="@{vm.uiState.isPreviewFragmentShowing || vm.uiState.isClusterPreviewShowing || vm.uiState.isSubscriptionFragmentShowing ? View.INVISIBLE : View.VISIBLE}"/>
+                    android:visibility="@{vm.uiState.isPreviewFragmentShowing || vm.uiState.isClusterPreviewShowing || vm.uiState.isSubscriptionFragmentShowing ? View.INVISIBLE : View.VISIBLE}"
+                    android:onClick="@{() -> vm.onSearchAroundButtonClicked()}"/>
 
                 <com.google.android.material.appbar.AppBarLayout
                     android:layout_width="match_parent"

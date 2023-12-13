@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
@@ -30,11 +29,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.net.URL
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
@@ -301,12 +298,10 @@ class CreatePostViewModel @Inject constructor(
             return
         }
 
-        thread {
-            if (uiState.value.uuid.isBlank()) {
-                postNewPost()
-            } else {
-                putModifiedPost()
-            }
+        if (uiState.value.uuid.isBlank()) {
+            postNewPost()
+        } else {
+            putModifiedPost()
         }
     }
 
