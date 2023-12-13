@@ -7,14 +7,14 @@
 
         <variable
             name="vm"
-            type="com.boostcampwm2023.snappoint.presentation.around.AroundViewModel" />
+            type="com.boostcampwm2023.snappoint.presentation.main.around.AroundViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.around.AroundFragment">
+        tools:context=".presentation.main.around.AroundFragment">
 
         <TextView
             android:id="@+id/tv_title_around"
@@ -35,6 +35,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             posts="@{vm.uiState.posts}"
             onPreviewButtonClick="@{vm.uiState.onPreviewButtonClicked}"
+            onViewPostButtonClick="@{vm.uiState.onViewPostButtonClicked}"
             tools:listitem="@layout/item_around_post" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

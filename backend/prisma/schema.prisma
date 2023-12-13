@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,18 +18,27 @@ model User {
   nickname   String
   createdAt  DateTime @default(now())
   modifiedAt DateTime @default(now())
-  isDeleted  Boolean  @default(false)
+  isDeleted  Boolean  @default(false)  
+}
+
+model RefreshToken {
+  id        Int   @id @default(autoincrement())
+  userUuid  String   @unique
+  token     String   
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  modifiedAt DateTime @updatedAt
 }
 
 model Post {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique @default(uuid())
   userUuid    String
-  title       String?
+  title       String
+  summary     String
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
-  isPublished Boolean  @default(false)
 }
 
 model Like {
@@ -45,17 +54,11 @@ model Block {
   type        String
   order       Int
   content     String
-  latitude    Float?
-  longitude   Float?
+  coords      Unsupported("geometry(Point, 4326)")?
+  @@index([coords], name: "coord_idx", type: Gist)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
-}
-
-model BlockFile {
-  id          Int      @id @default(autoincrement())
-  blockUuid   String
-  fileUuid    String
 }
 
 model File {
@@ -66,4 +69,8 @@ model File {
   mimeType    String
   createdAt   DateTime @default(now())
   isDeleted   Boolean  @default(false)
+  isProcessed Boolean  @default(false)
+  source      String?
+  sourceUuid  String?
+  thumbnailUuid String?
 }

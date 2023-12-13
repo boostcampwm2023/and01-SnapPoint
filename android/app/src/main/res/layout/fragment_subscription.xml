@@ -5,23 +5,40 @@
 
     <data>
 
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.main.subscription.SubscriptionViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.subscription.SubscriptionFragment">
+        tools:context=".presentation.main.subscription.SubscriptionFragment">
 
-        <!-- TODO: Update blank fragment layout -->
-
-        <Button
-            android:id="@+id/btn_create_post"
+        <TextView
+            android:id="@+id/tv_subscription_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="게시물 작성"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:text="@string/subscription_fragment_title"
+            android:textSize="22sp"
+            android:layout_marginStart="36dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_subscription_post"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_subscription_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:padding="20dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            posts="@{vm.uiState.posts}"
+            onPreviewButtonClick="@{vm.uiState.onPreviewButtonClicked}"
+            onViewPostButtonClick="@{vm.uiState.onViewPostButtonClicked}"
+            tools:listitem="@layout/item_around_post" />
+
+
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

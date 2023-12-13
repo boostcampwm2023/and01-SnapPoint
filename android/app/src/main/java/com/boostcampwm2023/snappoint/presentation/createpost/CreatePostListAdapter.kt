@@ -6,17 +6,78 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.databinding.ItemVideoBlockBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 
 class CreatePostListAdapter(
     private val blockItemEvent: BlockItemEventListener
 ) : RecyclerView.Adapter<BlockItemViewHolder>() {
 
-    private var blocks: MutableList<PostBlockState> = mutableListOf()
+    private var blocks: MutableList<PostBlockCreationState> = mutableListOf()
+
+    private val itemEvent = object : BlockItemEventListener {
+        override val onTextChange: (Int, String) -> Unit = blockItemEvent.onTextChange
+        override val onDeleteButtonClick: (Int) -> Unit = { index ->
+            blockItemEvent.onDeleteButtonClick(index)
+            deleteBlocks(index)
+        }
+        override val onEditButtonClick: (Int) -> Unit = blockItemEvent.onEditButtonClick
+        override val onCheckButtonClick: (Int) -> Unit = blockItemEvent.onCheckButtonClick
+        override val onUpButtonClick: (Int) -> Unit = { index ->
+            blockItemEvent.onUpButtonClick(index)
+            moveUpBlock(index)
+        }
+        override val onDownButtonClick: (Int) -> Unit = { index ->
+            blockItemEvent.onDownButtonClick(index)
+            moveDownBlock(index)
+        }
+        override val onAddressIconClick: (Int) -> Unit = blockItemEvent.onAddressIconClick
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+
+        return when (viewType) {
+            PostBlockCreationState.ViewType.TEXT.ordinal -> {
+                BlockItemViewHolder.TextBlockViewHolder(
+                    binding = ItemTextBlockBinding.inflate(inflater, parent, false),
+                    blockItemEvent = itemEvent
+                )
+            }
+            PostBlockCreationState.ViewType.IMAGE.ordinal -> {
+                BlockItemViewHolder.ImageBlockViewHolder(
+                    binding = ItemImageBlockBinding.inflate(inflater, parent, false),
+                    blockItemEvent = itemEvent
+                )
+            }
+            else -> {
+                BlockItemViewHolder.VideoBlockViewHolder(
+                    binding = ItemVideoBlockBinding.inflate(inflater, parent, false),
+                    blockItemEvent = itemEvent
+                )
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (blocks[position]) {
+            is PostBlockCreationState.TEXT -> PostBlockCreationState.ViewType.TEXT.ordinal
+            is PostBlockCreationState.IMAGE -> PostBlockCreationState.ViewType.IMAGE.ordinal
+            is PostBlockCreationState.VIDEO -> PostBlockCreationState.ViewType.VIDEO.ordinal
+        }
+    }
+
+    override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
+        when (holder) {
+            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockCreationState.TEXT, position)
+            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockCreationState.IMAGE, position)
+            is BlockItemViewHolder.VideoBlockViewHolder -> holder.bind(blocks[position] as PostBlockCreationState.VIDEO, position)
+        }
+    }
 
     fun getCurrentBlocks() = blocks.toList()
 
-    fun updateBlocks(newBlocks: List<PostBlockState>) {
+    fun updateBlocks(newBlocks: List<PostBlockCreationState>) {
         blocks = newBlocks.toMutableList()
     }
 
@@ -42,62 +103,8 @@ class CreatePostListAdapter(
         notifyItemRangeChanged(position, 2)
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (blocks[position]) {
-            is PostBlockState.TEXT -> ViewType.STRING.ordinal
-            is PostBlockState.IMAGE -> ViewType.IMAGE.ordinal
-            is PostBlockState.VIDEO -> ViewType.VIDEO.ordinal
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockItemViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val itemEvent = object : BlockItemEventListener {
-            override val onTextChange: (Int, String) -> Unit = blockItemEvent.onTextChange
-            override val onDeleteButtonClick: (Int) -> Unit = { index ->
-                blockItemEvent.onDeleteButtonClick(index)
-                deleteBlocks(index)
-            }
-            override val onEditButtonClick: (Int) -> Unit = blockItemEvent.onEditButtonClick
-            override val onCheckButtonClick: (Int) -> Unit = blockItemEvent.onCheckButtonClick
-            override val onUpButtonClick: (Int) -> Unit = { index ->
-                blockItemEvent.onUpButtonClick(index)
-                moveUpBlock(index)
-            }
-            override val onDownButtonClick: (Int) -> Unit = { index ->
-                blockItemEvent.onDownButtonClick(index)
-                moveDownBlock(index)
-            }
-            override val onAddressIconClick: (Int) -> Unit = blockItemEvent.onAddressIconClick
-        }
-
-        when (viewType) {
-            ViewType.IMAGE.ordinal -> {
-                return BlockItemViewHolder.ImageBlockViewHolder(
-                    binding = ItemImageBlockBinding.inflate(inflater, parent, false),
-                    blockItemEvent = itemEvent
-                )
-            }
-
-            ViewType.VIDEO.ordinal -> {
-                TODO()
-            }
-        }
-        return BlockItemViewHolder.TextBlockViewHolder(
-            binding = ItemTextBlockBinding.inflate(inflater, parent, false),
-            blockItemEvent = itemEvent
-        )
-    }
-
     override fun getItemCount(): Int {
         return blocks.size
-    }
-
-    override fun onBindViewHolder(holder: BlockItemViewHolder, position: Int) {
-        when (holder) {
-            is BlockItemViewHolder.TextBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.TEXT, position)
-            is BlockItemViewHolder.ImageBlockViewHolder -> holder.bind(blocks[position] as PostBlockState.IMAGE, position)
-        }
     }
 
     override fun onViewAttachedToWindow(holder: BlockItemViewHolder) {
@@ -109,19 +116,11 @@ class CreatePostListAdapter(
         super.onViewDetachedFromWindow(holder)
         holder.detachTextWatcherFromEditText()
     }
-
-    companion object {
-        enum class ViewType {
-            STRING,
-            IMAGE,
-            VIDEO,
-        }
-    }
 }
 
 @BindingAdapter("blocks", "blockItemEvent")
 fun RecyclerView.bindRecyclerViewAdapter(
-    blocks: List<PostBlockState>,
+    blocks: List<PostBlockCreationState>,
     blockItemEvent: BlockItemEventListener
 ) {
     if (adapter == null) adapter = CreatePostListAdapter(blockItemEvent)
@@ -148,14 +147,16 @@ fun RecyclerView.bindRecyclerViewAdapter(
                         notifyItemChanged(off)
                     }
                     when (postBlock) {
-                        is PostBlockState.IMAGE -> {
-                            if (postBlock.address != (blocks[index] as PostBlockState.IMAGE).address) {
+                        is PostBlockCreationState.IMAGE -> {
+                            if (postBlock.address != (blocks[index] as PostBlockCreationState.IMAGE).address) {
                                 notifyItemChanged(index)
                             }
                         }
 
-                        is PostBlockState.VIDEO -> {
-                            if (postBlock.address != (blocks[index] as PostBlockState.VIDEO).address) {
+                        is PostBlockCreationState.VIDEO -> {
+                            if (postBlock.address != (blocks[index] as PostBlockCreationState.VIDEO).address) {
+                                notifyItemChanged(index)
+                            }else if((postBlock.uri != (blocks[index] as PostBlockCreationState.VIDEO).uri)){
                                 notifyItemChanged(index)
                             }
                         }

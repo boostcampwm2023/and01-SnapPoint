@@ -7,8 +7,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.JavaNetCookieJar
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import java.net.CookieManager
 import javax.inject.Singleton
 
 
@@ -18,12 +21,20 @@ object RemoteModule {
 
     @Provides
     @Singleton
-    fun provideSnapPointApi(): SnapPointApi{
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .cookieJar(JavaNetCookieJar(CookieManager()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSnapPointApi(client: OkHttpClient): SnapPointApi{
         return Retrofit.Builder()
-            .baseUrl("http://175.45.195.45:3000/")
+            .baseUrl("https://snap-point.tatine.kr/")
+            .client(client)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(SnapPointApi::class.java)
     }
-
 }

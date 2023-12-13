@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_view_post"
+    app:startDestination="@id/postFragment">
+
+    <fragment
+        android:id="@+id/postFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.viewpost.post.PostFragment"
+        android:label="PostFragment" >
+        <action
+            android:id="@+id/action_postFragment_to_createPostActivity2"
+            app:destination="@id/createPostActivity2" />
+    </fragment>
+    <activity
+        android:id="@+id/createPostActivity2"
+        android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity"
+        android:label="CreatePostActivity" >
+        <argument
+            android:name="post"
+            android:defaultValue=""
+            app:argType="string" />
+    </activity>
+</navigation>

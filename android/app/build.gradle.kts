@@ -7,8 +7,11 @@ plugins {
     alias(libs.plugins.hiltAndroid)
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("kotlin-parcelize")
 
     kotlin("plugin.serialization") version "1.9.0"
+
+    alias(libs.plugins.googleServices)
 }
 
 android {
@@ -19,14 +22,23 @@ android {
         applicationId = "com.boostcampwm2023.snappoint"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("keystore.jks")
+            storePassword = System.getenv("STORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        }
+    }
 
     buildTypes {
-        release {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -40,6 +52,7 @@ android {
     }
 
     buildFeatures{
+        buildConfig = true
         dataBinding = true
     }
 
@@ -73,6 +86,8 @@ dependencies {
     //exif
     implementation(libs.androidx.exifinterface)
 
+    //okHttp
+    implementation(libs.okhttp.urlconnection)
     //retrofit
     implementation(libs.retrofit)
     //kotlinx.serialization json converter
@@ -93,8 +108,12 @@ dependencies {
 
     //maps
     implementation (libs.play.services.maps)
+    implementation (libs.android.maps.utils)
+    implementation (libs.maps.utils.ktx)
     //location
     implementation (libs.play.services.location)
+    //places
+    implementation (libs.places)
 
     //mockwebserver
     testImplementation(libs.mockwebserver)
@@ -102,4 +121,19 @@ dependencies {
 
     //kotlinx-coroutines-test
     testImplementation(libs.kotlinx.coroutines.test)
+
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+
+    //video player
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.ui)
+
+    //video upload / 편집
+    implementation(libs.media3.transformer)
+    implementation(libs.media3.common)
+    implementation(libs.media3.effect)
 }

@@ -7,22 +7,58 @@
 
     <fragment
         android:id="@+id/aroundFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.around.AroundFragment"
-        android:label="AroundFragment" />
+        android:name="com.boostcampwm2023.snappoint.presentation.main.around.AroundFragment"
+        android:label="AroundFragment" >
+        <action
+            android:id="@+id/action_aroundFragment_to_viewPostActivity"
+            app:destination="@id/viewPostActivity" />
+    </fragment>
     <fragment
         android:id="@+id/popularPostFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.popularpost.PopularPostFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.popularpost.PopularPostFragment"
         android:label="PopularPostFragment" />
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.setting.SettingFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.setting.SettingFragment"
         android:label="SettingFragment" />
     <fragment
         android:id="@+id/subscriptionFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.subscription.SubscriptionFragment"
-        android:label="SubscriptionFragment" />
+        android:name="com.boostcampwm2023.snappoint.presentation.main.subscription.SubscriptionFragment"
+        android:label="SubscriptionFragment" >
+        <action
+            android:id="@+id/action_subscriptionFragment_to_viewPostActivity"
+            app:destination="@id/viewPostActivity" />
+    </fragment>
     <fragment
         android:id="@+id/previewFragment"
-        android:name="com.boostcampwm2023.snappoint.presentation.preview.PreviewFragment"
-        android:label="PreviewFragment" />
+        android:name="com.boostcampwm2023.snappoint.presentation.main.preview.PreviewFragment"
+        android:label="PreviewFragment" >
+        <action
+            android:id="@+id/action_previewFragment_to_viewPostActivity"
+            app:destination="@id/viewPostActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/viewPostActivity"
+        android:name="com.boostcampwm2023.snappoint.presentation.viewpost.ViewPostActivity"
+        android:label="ViewPostActivity" >
+        <argument
+            android:name="uuid"
+            app:argType="string" />
+        <argument
+            android:name="isLocalPost"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </activity>
+    <activity
+        android:id="@+id/createPostActivity"
+        android:name="com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity"
+        android:label="CreatePostActivity" />
+    <fragment
+        android:id="@+id/clusterPreviewFragment"
+        android:name="com.boostcampwm2023.snappoint.presentation.main.clusterpreview.ClusterPreviewFragment"
+        android:label="ClusterListFragment" >
+        <argument
+            android:name="tags"
+            app:argType="com.boostcampwm2023.snappoint.presentation.model.SnapPointTag[]" />
+    </fragment>
 </navigation>

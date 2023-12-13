@@ -7,7 +7,7 @@
 
         <variable
             name="vm"
-            type="com.boostcampwm2023.snappoint.presentation.preview.PreviewViewModel" />
+            type="com.boostcampwm2023.snappoint.presentation.main.preview.PreviewViewModel" />
 
         <import type="android.view.View" />
     </data>
@@ -15,7 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.preview.PreviewFragment">
+        tools:context=".presentation.main.preview.PreviewFragment">
 
         <ImageView
             android:id="@+id/iv_preview_profile"
@@ -58,6 +58,7 @@
             android:layout_marginEnd="18dp"
             android:layout_marginTop="16dp"
             android:foreground="@drawable/icon_arrow_down_left"
+            android:onClick="@{()->vm.onArrowButtonClick()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

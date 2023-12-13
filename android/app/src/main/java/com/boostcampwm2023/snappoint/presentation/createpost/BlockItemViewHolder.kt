@@ -1,17 +1,27 @@
 package com.boostcampwm2023.snappoint.presentation.createpost
 
-import android.net.Uri
+import android.graphics.Bitmap
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.widget.ImageView
+import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ViewDataBinding
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.SimpleExoPlayer
+import androidx.media3.transformer.Transformer
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.boostcampwm2023.snappoint.databinding.ItemImageBlockBinding
 import com.boostcampwm2023.snappoint.databinding.ItemTextBlockBinding
-import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
+import com.boostcampwm2023.snappoint.databinding.ItemVideoBlockBinding
+import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
+import com.boostcampwm2023.snappoint.presentation.util.resizeBitmap
 import com.google.android.material.card.MaterialCardView
 
 sealed class BlockItemViewHolder(
@@ -29,7 +39,7 @@ sealed class BlockItemViewHolder(
         private val blockItemEvent: BlockItemEventListener,
     ) : BlockItemViewHolder(binding, blockItemEvent) {
 
-        fun bind(block: PostBlockState.TEXT, index: Int) {
+        fun bind(block: PostBlockCreationState.TEXT, index: Int) {
             with(binding) {
                 tilText.editText?.setText(block.content)
                 btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
@@ -65,7 +75,46 @@ sealed class BlockItemViewHolder(
         private val blockItemEvent: BlockItemEventListener,
     ) : BlockItemViewHolder(binding, blockItemEvent) {
 
-        fun bind(block: PostBlockState.IMAGE, index: Int) {
+        fun bind(block: PostBlockCreationState.IMAGE, index: Int) {
+            with(binding) {
+                tilDescription.editText?.setText(block.description)
+                tilAddress.editText?.setText(block.address)
+                btnDeleteBlock.setOnClickListener { blockItemEvent.onDeleteButtonClick(index) }
+                btnEditBlock.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onEditButtonClick(index)
+                }
+                tilAddress.setEndIconOnClickListener { blockItemEvent.onAddressIconClick(index) }
+                btnEditComplete.setOnClickListener { blockItemEvent.onCheckButtonClick(index) }
+                btnUp.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onUpButtonClick(index)
+                }
+                btnDown.setOnClickListener {
+                    itemView.rootView.clearFocus()
+                    blockItemEvent.onDownButtonClick(index)
+                }
+                editMode = block.isEditMode
+                bitmap = block.bitmap
+            }
+            textWatcher.updatePosition(index)
+        }
+
+        override fun attachTextWatcherToEditText() {
+            binding.tilDescription.editText?.addTextChangedListener(textWatcher)
+        }
+
+        override fun detachTextWatcherFromEditText() {
+            binding.tilDescription.editText?.removeTextChangedListener(textWatcher)
+        }
+    }
+
+    class VideoBlockViewHolder(
+        private val binding: ItemVideoBlockBinding,
+        private val blockItemEvent: BlockItemEventListener,
+    ) : BlockItemViewHolder(binding, blockItemEvent) {
+
+        fun bind(block: PostBlockCreationState.VIDEO, index: Int) {
             with(binding) {
                 tilDescription.editText?.setText(block.content)
                 tilAddress.editText?.setText(block.address)
@@ -84,10 +133,17 @@ sealed class BlockItemViewHolder(
                     itemView.rootView.clearFocus()
                     blockItemEvent.onDownButtonClick(index)
                 }
-                uri = block.uri
                 editMode = block.isEditMode
 
             }
+
+            val mediaItem = MediaItem.fromUri(block.uri?:block.content.toUri())
+
+            binding.pv.player = ExoPlayer.Builder(itemView.context).build().also {
+                it.setMediaItem(mediaItem)
+                it.prepare()
+            }
+
             textWatcher.updatePosition(index)
         }
 
@@ -124,9 +180,9 @@ class EditTextWatcher(private val listener: (Int, String) -> Unit) : TextWatcher
 }
 
 
-@BindingAdapter("uri")
-fun ImageView.bindUri(uri: Uri) {
-    load(uri)
+@BindingAdapter("bitmap")
+fun ImageView.bindBitmap(bitmap: Bitmap) {
+    load(resizeBitmap(bitmap, width))
 }
 
 @BindingAdapter("editMode")

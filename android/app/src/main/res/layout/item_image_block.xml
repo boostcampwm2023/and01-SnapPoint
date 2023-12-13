@@ -7,8 +7,8 @@
         <import type="android.view.View"/>
         <import type="kotlin.Unit"/>
         <variable
-            name="uri"
-            type="android.net.Uri" />
+            name="bitmap"
+            type="android.graphics.Bitmap" />
         <variable
             name="editMode"
             type="Boolean" />
@@ -26,7 +26,6 @@
             android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/til_description"
-            app:cardBackgroundColor="@color/surfaceColor"
             editMode="@{editMode}">
 
         </com.google.android.material.card.MaterialCardView>
@@ -42,7 +41,6 @@
             android:background="?attr/actionBarItemBackground"
             android:padding="16dp"
             android:layout_marginVertical="8dp"
-            app:tint="@color/errorContainer"
             android:visibility="@{editMode ? View.INVISIBLE : View.VISIBLE}"/>
 
         <ImageButton
@@ -118,8 +116,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginHorizontal="1dp"
+            android:scaleType="center"
             app:layout_constraintTop_toBottomOf="@id/btn_delete_block"
-            uri="@{uri}"/>
+            bitmap="@{bitmap}"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_address"
