@@ -280,7 +280,6 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun onCheckButtonClicked() {
-        Log.d("LOG", "CLICKED!!")
         if (isValidTitle().not()) {
             _event.tryEmit(CreatePostEvent.ShowMessage(R.string.create_post_fragment_empty_title))
             return

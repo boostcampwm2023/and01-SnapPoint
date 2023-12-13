@@ -180,9 +180,6 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     private fun initBinding() {
         with(binding) {
             vm = viewModel
-            btnCheck.setOnClickListener {
-                viewModel.onCheckButtonClicked()
-            }
         }
     }
 

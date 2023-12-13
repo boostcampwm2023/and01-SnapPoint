@@ -49,6 +49,7 @@
             android:padding="16dp"
             android:src="@drawable/icon_check"
             android:clickable="@{!vm.uiState.loading}"
+            android:onClick="@{() -> vm.onCheckButtonClicked()}"
             app:layout_constraintBottom_toBottomOf="@id/tb"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
