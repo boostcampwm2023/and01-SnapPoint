@@ -15,12 +15,13 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view_sign_up"
         android:layout_width="match_parent"
-        android:layout_height="560dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_sign_up"
             android:layout_width="match_parent"
-            android:layout_height="560dp"
+            android:layout_height="wrap_content"
             android:paddingLeft="16dp"
             android:paddingTop="16dp"
             android:paddingRight="16dp"
@@ -157,4 +158,5 @@
                 app:layout_constraintTop_toBottomOf="@+id/til_sign_up_nickname" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
 </layout>

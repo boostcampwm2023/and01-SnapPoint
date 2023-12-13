@@ -20,9 +20,9 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun updateFragmentHeight(height: Int) {
+    fun updateFragmentHeight(fragmentHeight: Int, handleHeight: Int) {
         _uiState.update {
-            it.copy(fragmentHeight = height)
+            it.copy(fragmentHeight = fragmentHeight, handleHeight = handleHeight)
         }
     }
 

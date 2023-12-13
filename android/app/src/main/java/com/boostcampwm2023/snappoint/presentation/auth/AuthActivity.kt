@@ -52,7 +52,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
         with(binding) {
             vm = viewModel
             root.post {
-                viewModel.updateFragmentHeight(root.measuredHeight)
+                viewModel.updateFragmentHeight(root.measuredHeight, dragHandleAuth.measuredHeight)
             }
 
             val behavior = BottomSheetBehavior.from(bsAuth)
@@ -96,7 +96,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
     private fun expandBottomSheetHalf() {
         with(viewModel.uiState.value) {
             if (isBottomSheetActivated) {
-                val ratio = (bottomSheetHeight / fragmentHeight.toFloat())
+                val ratio = ((bottomSheetHeight + handleHeight) / fragmentHeight.toFloat())
                 if (ratio >= 1F) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 } else if (ratio > 0F) {

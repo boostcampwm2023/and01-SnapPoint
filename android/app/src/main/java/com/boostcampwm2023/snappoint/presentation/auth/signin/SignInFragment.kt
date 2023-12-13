@@ -35,7 +35,7 @@ class SignInFragment : BaseFragment<FragmentSignInBinding>(R.layout.fragment_sig
         with(binding) {
             vm = viewModel
             root.post {
-                authViewModel.updateBottomSheetHeight(scrollViewSignIn.measuredHeight)
+                authViewModel.updateBottomSheetHeight(layoutSignIn.measuredHeight)
             }
         }
     }

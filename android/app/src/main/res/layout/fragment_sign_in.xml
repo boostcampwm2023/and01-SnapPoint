@@ -15,17 +15,17 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view_sign_in"
         android:layout_width="match_parent"
-        android:layout_height="420dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_sign_in"
             android:layout_width="match_parent"
-            android:layout_height="420dp"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            tools:context=".presentation.auth.AuthActivity">
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingTop="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 android:id="@+id/tv_sign_in_title"
@@ -106,7 +106,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/til_login_password"
                 android:onClick="@{()->vm.onSignInButtonClick()}"/>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

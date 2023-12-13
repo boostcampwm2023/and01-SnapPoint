@@ -33,7 +33,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(R.layout.fragment_sig
         with(binding) {
             vm = viewModel
             root.post {
-                authViewModel.updateBottomSheetHeight(scrollViewSignUp.measuredHeight)
+                authViewModel.updateBottomSheetHeight(layoutSignUp.measuredHeight)
             }
         }
     }
