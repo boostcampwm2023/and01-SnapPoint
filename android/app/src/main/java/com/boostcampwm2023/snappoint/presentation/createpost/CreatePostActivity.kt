@@ -22,7 +22,7 @@ import androidx.navigation.navArgs
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.ActivityCreatePostBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseActivity
-import com.boostcampwm2023.snappoint.presentation.markerpointselector.MarkerPointSelectorActivity
+import com.boostcampwm2023.snappoint.presentation.positionselector.PositionSelectorActivity
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
@@ -313,7 +313,7 @@ class CreatePostActivity : BaseActivity<ActivityCreatePostBinding>(R.layout.acti
     }
 
     private fun startMapActivityAndFindAddress(index: Int, position: PositionState) {
-        val intent = Intent(this, MarkerPointSelectorActivity::class.java)
+        val intent = Intent(this, PositionSelectorActivity::class.java)
         intent.putExtra("index", index)
         intent.putExtra("position", position.asDoubleArray())
         addressSelectionLauncher.launch(intent)

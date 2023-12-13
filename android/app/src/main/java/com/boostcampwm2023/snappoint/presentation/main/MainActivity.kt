@@ -59,7 +59,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity(
@@ -467,16 +467,17 @@ class MainActivity(
                     }
                 }
             } else {
-                // TODO - runBlocking 대체
-                val results =
-                    runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
+                lifecycleScope.launch {
+                    val results =
+                        withContext(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
 
-                if (results == null || results.size == 0) {
-                    showToastMessage(R.string.search_location_fail)
-                } else {
-                    mapManager.moveCamera(results[0].latitude, results[0].longitude)
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    sv.hide()
+                    if (results == null || results.size == 0) {
+                        showToastMessage(R.string.search_location_fail)
+                    } else {
+                        mapManager.moveCamera(results[0].latitude, results[0].longitude)
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        sv.hide()
+                    }
                 }
             }
         }

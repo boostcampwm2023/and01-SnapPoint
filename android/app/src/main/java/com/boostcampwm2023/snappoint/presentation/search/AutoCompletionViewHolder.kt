@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.main.search
+package com.boostcampwm2023.snappoint.presentation.search
 
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemSearchAutoCompleteBinding
