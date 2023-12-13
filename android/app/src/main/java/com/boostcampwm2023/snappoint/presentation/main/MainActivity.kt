@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.location.Geocoder
 import android.os.Build
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
@@ -431,6 +433,7 @@ class MainActivity(
 
             sv.editText.setOnEditorActionListener { v, _, _ ->
                 getAddressAutoCompletion(v.text.toString())
+                hideKeyboard()
                 true
             }
 
@@ -440,6 +443,11 @@ class MainActivity(
                 }
             }
         }
+    }
+
+    private fun hideKeyboard() {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun moveCameraToAddress(address: String) {
