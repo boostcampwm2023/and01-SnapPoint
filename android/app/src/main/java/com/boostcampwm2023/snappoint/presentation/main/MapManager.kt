@@ -154,7 +154,13 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
         setItemUnfocused(prevSelectedMarker)
 
-        val selectedBitmap = getSnapPointBitmap(context, block.content, true)
+        val selectedBitmap = when (block) {
+            is PostBlockState.IMAGE -> getSnapPointBitmap(context, block.url144P, true)
+
+            is PostBlockState.VIDEO -> getSnapPointBitmap(context, block.thumbnail144P, true)
+
+            else -> getSnapPointBitmap(context, block.content, true)
+        }
 
         while (clusterManager.algorithm.items.find { it.getTag() == snapPointTag } == null) {
             delay(100)

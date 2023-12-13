@@ -365,7 +365,7 @@ class MainActivity(
         })
 
         binding.bnv.setOnItemReselectedListener { _ ->
-            if (viewModel.uiState.value.isPreviewFragmentShowing) {
+            if (viewModel.uiState.value.isPreviewFragmentShowing || viewModel.uiState.value.isClusterPreviewShowing) {
                 return@setOnItemReselectedListener
             }
 

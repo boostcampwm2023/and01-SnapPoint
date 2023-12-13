@@ -63,11 +63,18 @@ fun ImageView.bindProfileImage(postBlocks: List<PostBlockState>) {
     postBlocks.forEach { block ->
         when (block) {
             is PostBlockState.IMAGE -> {
-                load(block.content) {
+                load(block.url144P) {
                     memoryCachePolicy(CachePolicy.ENABLED)
                     transformations(CircleCropTransformation())
                 }
                 return
+            }
+
+            is PostBlockState.VIDEO -> {
+                load(block.thumbnail144P) {
+                    memoryCachePolicy(CachePolicy.ENABLED)
+                    transformations(CircleCropTransformation())
+                }
             }
 
             else -> {}
