@@ -50,6 +50,7 @@
     <string name="sign_in_fragment_auto_login_fail">로그인 정보가 없거나 만료되었습니다\n다시 시도해주세요</string>
     <string name="setting_fragment_remove_all_marker">스냅 포인트 지우기</string>
     <string name="setting_fragment_sign_out">로그아웃!</string>
+    <string name="setting_fragment_sign_out_alert">로그아웃하시겠습니까?</string>
     <string name="setting_fragment_sign_out_success">로그아웃 했습니다</string>
     <string name="setting_fragment_sign_out_fail">로그아웃에 실패했습니다\n네트워크 연결을 확인하세요</string>
     <string name="get_around_posts_failed">주변 게시글 목록을 불러오는 데 실패했습니다..</string>
@@ -83,4 +84,6 @@
     <string name="fragment_being_prepared">페이지 준비중입니다.</string>
     <string name="feature_being_prepared">기능 준비중입니다.</string>
     <string name="maps_marker_activity_confirm_position">이 위치로 설정</string>
+    <string name="dialog_yes">예</string>
+    <string name="dialog_no">아니요</string>
 </resources>
