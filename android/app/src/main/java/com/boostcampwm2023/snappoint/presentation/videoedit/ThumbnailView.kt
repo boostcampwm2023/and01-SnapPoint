@@ -46,10 +46,9 @@ class ThumbnailView(
         mediaMetadataRetriever.setDataSource(context, videoUri)
         val initialBitmap = mediaMetadataRetriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
         val frameHeight = viewHeight.toInt()
-        val frameWidth = ((initialBitmap?.width?.toFloat()!! / initialBitmap?.height?.toFloat()!!) * frameHeight).toInt()
+        val frameWidth = ((initialBitmap?.width?.toFloat()!! / initialBitmap.height.toFloat()) * frameHeight).toInt()
         val numThumbs = ceil(viewWidth / frameWidth).toInt()
         val interval = videoLengthInMs.toLong() / numThumbs
-        Log.d("TAG", "getBitMap: $interval")
         for(i in 0 until numThumbs){
             var bitmap = mediaMetadataRetriever.getFrameAtTime(i * interval * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
             if(bitmap != null){
