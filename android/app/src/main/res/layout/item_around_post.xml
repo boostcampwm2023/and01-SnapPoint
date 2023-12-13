@@ -59,7 +59,7 @@
             android:id="@+id/tv_post_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{postItem.timeStamp}"
+            timeStamp="@{postItem.timeStamp}"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/btn_expand"
             app:layout_constraintStart_toStartOf="@id/tv_post_title"

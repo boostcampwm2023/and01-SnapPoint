@@ -79,4 +79,11 @@
     <string name="auth_activity_sign_in_google_button">Google로 계속하기</string>
     <string name="auth_activity_sign_in_email_button_text">이메일로 로그인</string>
     <string name="auth_activity_sign_up_button_text">회원가입</string>
+    <string name="moments_ago">방금 전</string>
+    <string name="minutes_ago">분 전</string>
+    <string name="hours_ago">시간 전</string>
+    <string name="days_ago">일 전</string>
+    <string name="weeks_ago">주 전</string>
+    <string name="months_ago">개월 전</string>
+    <string name="years_ago">년 전</string>
 </resources>
