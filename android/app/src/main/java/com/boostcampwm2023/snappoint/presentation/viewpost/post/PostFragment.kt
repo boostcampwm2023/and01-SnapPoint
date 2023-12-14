@@ -96,7 +96,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                 navigateEditPost()
             }
             R.id.post_delete -> {
-
+                deleteRemotePost()
             }
             R.id.post_report -> {
 
@@ -114,5 +114,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                 Constants.POST_BUNDLE_KEY to Json.encodeToString(viewPostViewModel.post.value)
             )
         )
+    }
+
+    private fun deleteRemotePost() {
+        viewPostViewModel.deleteRemotePost()
     }
 }

@@ -3,6 +3,7 @@ package com.boostcampwm2023.snappoint.data.mapper
 import com.boostcampwm2023.snappoint.data.remote.model.BlockType
 import com.boostcampwm2023.snappoint.data.remote.model.File
 import com.boostcampwm2023.snappoint.data.remote.model.PostBlock
+import com.boostcampwm2023.snappoint.data.remote.model.response.DeletePostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.presentation.model.PositionState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
@@ -105,4 +106,17 @@ fun List<GetPostResponse>.asPostSummaryState(): List<PostSummaryState> {
     return this.map { response ->
         response.asPostSummaryState()
     }
+}
+
+fun DeletePostResponse.asPostSummaryState(): PostSummaryState {
+    return PostSummaryState(
+        uuid = this.postUuid,
+        title = this.title,
+        author = "",
+        timeStamp = this.createdAt,
+        summary = this.summary,
+        email = email,
+        nickname = nickname,
+        postBlocks = this.blocks.map { it.asPostBlockState() }
+    )
 }
