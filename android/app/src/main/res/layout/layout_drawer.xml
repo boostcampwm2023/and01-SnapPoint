@@ -9,7 +9,8 @@
     <androidx.drawerlayout.widget.DrawerLayout
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start">
+        android:layout_gravity="start"
+        android:alpha="255">
 
         <TextView
             android:layout_width="wrap_content"
