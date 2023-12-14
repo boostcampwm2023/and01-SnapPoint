@@ -234,7 +234,10 @@ class MainActivity(
                         mapManager.changeSelectedMarker(blocks, SnapPointTag(post.uuid, blocks.uuid))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
-                            mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks)
+                            while (mapManager.clusterManager.algorithm.items.size != mapManager.clusterManager.markerCollection.markers.size) {
+                                delay(100)
+                            }
+                            mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks, post.uuid)
                         }
                     }
                 }
