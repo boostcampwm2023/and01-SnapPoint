@@ -15,30 +15,36 @@ import com.boostcampwm2023.snappoint.presentation.model.PostBlockCreationState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.util.Constants.BYTE_OF_VIDEO_PART_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.toByteArray
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.internal.wait
 import javax.inject.Inject
 import kotlin.math.min
 
 class PostRepositoryImpl @Inject constructor(
     private val snapPointApi: SnapPointApi,
-): PostRepository {
+) : PostRepository {
     override fun getImage(uri: String): Flow<ByteArray> {
 
         return flowOf(true)
-            .map{
-            byteArrayOf()
-        }
+            .map {
+                byteArrayOf()
+            }
     }
 
     override fun getImageUri(image: ByteArray): Flow<Unit> {
 
         return flowOf(true)
-            .map{
+            .map {
 
             }
     }
@@ -46,7 +52,7 @@ class PostRepositoryImpl @Inject constructor(
     override fun getVideo(uri: String): Flow<ByteArray> {
 
         return flowOf(true)
-            .map{
+            .map {
                 byteArrayOf()
             }
     }
@@ -54,12 +60,15 @@ class PostRepositoryImpl @Inject constructor(
     override fun getVideoUri(video: ByteArray): Flow<Unit> {
 
         return flowOf(true)
-            .map{
+            .map {
 
             }
     }
 
-    override fun postCreatePost(title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse> {
+    override fun postCreatePost(
+        title: String,
+        postBlocks: List<PostBlockCreationState>
+    ): Flow<CreatePostResponse> {
 
         return flowOf(true)
             .map {
@@ -69,7 +78,11 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun putModifiedPost(uuid: String, title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse> {
+    override fun putModifiedPost(
+        uuid: String,
+        title: String,
+        postBlocks: List<PostBlockCreationState>
+    ): Flow<CreatePostResponse> {
 
         return flowOf(true)
             .map {
@@ -79,29 +92,34 @@ class PostRepositoryImpl @Inject constructor(
             }
     }
 
-    private suspend fun buildCreatePostRequest(title: String, postBlockStates: List<PostBlockCreationState>): CreatePostRequest {
+    private suspend fun buildCreatePostRequest(
+        title: String,
+        postBlockStates: List<PostBlockCreationState>
+    ): CreatePostRequest {
 
         val postBlocks: List<PostBlock> = postBlockStates.map { block ->
             when (block) {
                 is PostBlockCreationState.IMAGE -> {
-                    val fileUuid = if (block.uuid.isBlank()) uploadImageAndGetUUid(block) else block.fileUuid
+                    val fileUuid =
+                        if (block.uuid.isBlank()) uploadImageAndGetUUid(block) else block.fileUuid
                     block.asPostBlock().copy(
                         files = listOf(File(fileUuid))
                     )
                 }
+
                 is PostBlockCreationState.VIDEO -> {
                     val fileUuid = if (block.uuid.isBlank()) {
                         uploadVideoAndGetUUid(block)
                     } else {
                         block.fileUuid
                     }
-                    val thumbnailUuid = if(block.thumbnailUuid.isBlank()){
+                    val thumbnailUuid = if (block.thumbnailUuid.isBlank()) {
                         uploadImageAndGetUUid(
                             PostBlockCreationState.IMAGE(
                                 bitmap = block.thumbnail
                             )
                         )
-                    }else{
+                    } else {
                         block.thumbnailUuid
                     }
                     block.asPostBlock().copy(
@@ -126,28 +144,37 @@ class PostRepositoryImpl @Inject constructor(
         val fileByteArray = file.readBytes()
 
         val byteOfFileSize = fileByteArray.size
+        val partNum = byteOfFileSize / BYTE_OF_VIDEO_PART_SIZE + 1
         val parts = mutableListOf<Part>()
+        repeat(partNum) { part ->
 
-        for(partNumber in 0 until fileByteArray.size step BYTE_OF_VIDEO_PART_SIZE){
-            val postVideoUrlResponse = snapPointApi.postVideoUrl(
-                videoUrlRequest = VideoUrlRequest(
-                    key = key,
-                    uploadId = uploadId,
-                    partNumber = parts.size + 1
+            val partNumber = part * BYTE_OF_VIDEO_PART_SIZE
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val postVideoUrlResponse = snapPointApi.postVideoUrl(
+                    videoUrlRequest = VideoUrlRequest(
+                        key = key,
+                        uploadId = uploadId,
+                        partNumber = part + 1
+                    )
                 )
-            )
-            val preSignedUrl = postVideoUrlResponse.preSignedUrl
-            val body = fileByteArray.toRequestBody(
-                contentType = videoBlock.mimeType.toMediaType(),
-                offset = partNumber,
-                byteCount = min(BYTE_OF_VIDEO_PART_SIZE, byteOfFileSize - partNumber)
-            )
-            val response = snapPointApi.putVideo(
-                url = preSignedUrl,
-                body = body
-            )
-            val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
-            parts.add(Part(parts.size + 1, eTag.trim('"')))
+                val preSignedUrl = postVideoUrlResponse.preSignedUrl
+                val body = fileByteArray.toRequestBody(
+                    contentType = videoBlock.mimeType.toMediaType(),
+                    offset = partNumber,
+                    byteCount = min(BYTE_OF_VIDEO_PART_SIZE, byteOfFileSize - partNumber)
+                )
+                val response = snapPointApi.putVideo(
+                    url = preSignedUrl,
+                    body = body
+                )
+                val eTag = response.headers()["ETag"] ?: throw Exception("서버 업로드 실패")
+                parts.add(Part(part + 1, eTag.trim('"')))
+            }
+
+        }
+        while (parts.size != partNum) {
+            delay(10)
         }
 
         val videoEndResponse = snapPointApi.postVideoEnd(
@@ -155,14 +182,15 @@ class PostRepositoryImpl @Inject constructor(
                 key = key,
                 uploadId = uploadId,
                 mimeType = videoBlock.mimeType,
-                parts = parts
+                parts = parts.sortedBy { it.partNumber }
             )
         )
         return videoEndResponse.uuid
     }
 
     private suspend fun uploadImageAndGetUUid(imageBlock: PostBlockCreationState.IMAGE): String {
-        val requestBody = imageBlock.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
+        val requestBody =
+            imageBlock.bitmap?.toByteArray()?.toRequestBody("image/webp".toMediaType())!!
         val multipartBody = MultipartBody.Part.createFormData("file", "image", requestBody)
         val uploadResult = snapPointApi.postImage(multipartBody)
         return uploadResult.uuid

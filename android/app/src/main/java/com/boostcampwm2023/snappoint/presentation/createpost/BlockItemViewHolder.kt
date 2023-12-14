@@ -137,7 +137,7 @@ sealed class BlockItemViewHolder(
 
             }
 
-            val mediaItem = MediaItem.fromUri(block.uri?:block.content.toUri())
+            val mediaItem = MediaItem.fromUri(block.uri!!)
 
             binding.pv.player = ExoPlayer.Builder(itemView.context).build().also {
                 it.setMediaItem(mediaItem)

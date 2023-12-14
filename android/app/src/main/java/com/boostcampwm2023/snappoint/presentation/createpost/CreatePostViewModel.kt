@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.R
@@ -140,11 +141,12 @@ class CreatePostViewModel @Inject constructor(
             )
         }
     }
-    fun addVideoBlock(block: PostBlockState.VIDEO) {
+    private fun addVideoBlock(block: PostBlockState.VIDEO) {
         _uiState.update {
             it.copy(
                 postBlocks = it.postBlocks + PostBlockCreationState.VIDEO(
                     content = block.description,
+                    uri = block.content.toUri(),
                     uuid = block.uuid,
                     fileUuid = block.fileUuid,
                     description = block.description,
