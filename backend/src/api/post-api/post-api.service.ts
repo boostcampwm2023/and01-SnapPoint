@@ -7,7 +7,7 @@ import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/post-api/dtos/file.dto';
-import { Block, File, Post } from '@prisma/client';
+import { Block, File, Post, User } from '@prisma/client';
 import { TransformationService } from '@/api/transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { WritePostDto } from './dtos/write-post.dto';
@@ -15,6 +15,7 @@ import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
 import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
 import { SummarizationService } from '@/api/summarization/summarization.service';
+import { UserService } from '@/domain/user/user.service';
 
 @Injectable()
 export class PostApiService {
@@ -27,16 +28,17 @@ export class PostApiService {
     private readonly fileService: FileService,
     private readonly redisService: RedisCacheService,
     private readonly summaryService: SummarizationService,
+    private readonly userService: UserService,
   ) {}
 
-  private assemblePost(post: Post, blocks: Block[], files: File[]): PostDto {
+  private assemblePost(post: Post, user: User, blocks: Block[], files: File[]): PostDto {
     const blockDtoMap = this.createBlockDtoMap(files, blocks);
-    return PostDto.of(post, blockDtoMap.get(post.uuid)!);
+    return PostDto.of(post, user, blockDtoMap.get(post.uuid)!);
   }
 
-  private assemblePosts(posts: Post[], blocks: Block[], files: File[]): PostDto[] {
+  private assemblePosts(posts: Post[], users: User[], blocks: Block[], files: File[]): PostDto[] {
     const blockDtoMap = this.createBlockDtoMap(files, blocks);
-    return posts.map((post) => PostDto.of(post, blockDtoMap.get(post.uuid)!));
+    return posts.map((post, index) => PostDto.of(post, users[index], blockDtoMap.get(post.uuid)!));
   }
 
   private createBlockDtoMap(files: File[], blocks: Block[]) {
@@ -152,12 +154,15 @@ export class PostApiService {
     const blockPostUuids = blocks.map((block) => ({ uuid: block.postUuid }));
     const posts = await this.postService.findPosts({ where: { OR: blockPostUuids } });
 
+    const userUuids = posts.map((post) => ({ uuid: post.userUuid }));
+    const users = await this.userService.findUsers({ where: { OR: userUuids } });
+
     // 3. 게시글과 연관된 모든 블록을 찾는다.
     const entireBlocks = ([] as Block[]).concat(...(await this.findEntireBlocksWithPost(posts)));
     // 4. 블록과 연관된 모든 파일을 찾는다.
     const entireFiles = ([] as File[]).concat(...(await this.findEntireFilesWithBlocks(entireBlocks)));
 
-    return this.assemblePosts(posts, entireBlocks, entireFiles);
+    return this.assemblePosts(posts, users, entireBlocks, entireFiles);
   }
 
   async findPost(uuid: string, detail: boolean = true) {
@@ -168,8 +173,14 @@ export class PostApiService {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
 
+    const user = await this.userService.findUserByUniqueInput({ uuid: post.userUuid });
+
+    if (!user) {
+      throw new NotFoundException(`Cloud not found User with UUID: ${post.userUuid}`);
+    }
+
     if (!detail) {
-      return PostDto.of(post);
+      return PostDto.of(post, user);
     }
 
     // 2. 게시글과 연관된 블록들을 찾는다.
@@ -177,7 +188,7 @@ export class PostApiService {
     // 3. 블록들과 연관된 파일들을 찾는다.
     const files = await this.fileService.findFilesBySources('block', blocks);
 
-    return this.assemblePost(post, blocks, files);
+    return this.assemblePost(post, user, blocks, files);
   }
 
   async writePost(postDto: WritePostDto, userUuid: string) {
@@ -190,6 +201,12 @@ export class PostApiService {
       const summary = await this.summaryService.summarizePost(post.title, blocks);
       const createdPost = await this.postService.createPost(userUuid, { ...post, summary });
 
+      const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
+
+      if (!user) {
+        throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
+      }
+
       const { uuid: postUuid } = createdPost;
 
       const [createdBlocks, createdFiles] = await Promise.all([
@@ -201,7 +218,7 @@ export class PostApiService {
       const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
       await this.redisService.del(deleteCacheKeys);
 
-      return this.assemblePost(createdPost, createdBlocks, createdFiles);
+      return this.assemblePost(createdPost, user, createdBlocks, createdFiles);
     });
   }
 
@@ -217,6 +234,12 @@ export class PostApiService {
 
     if (existPost.userUuid !== userUuid) {
       throw new ForbiddenException('Could not access this post. please check your permission.');
+    }
+
+    const user = await this.userService.findUserByUniqueInput({ uuid: existPost.userUuid });
+
+    if (!user) {
+      throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
     }
 
     return this.prisma.beginTransaction(async () => {
@@ -236,7 +259,7 @@ export class PostApiService {
       const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
       await this.redisService.del(deleteCacheKeys);
 
-      return this.assemblePost(updatedPost, updatedBlocks, updatedFiles);
+      return this.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
     });
   }
 }
