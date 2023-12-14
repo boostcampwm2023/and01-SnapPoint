@@ -372,7 +372,7 @@ class MainActivity(
         })
 
         binding.bnv.setOnItemReselectedListener { _ ->
-            if (viewModel.uiState.value.isPreviewFragmentShowing) {
+            if (viewModel.uiState.value.isPreviewFragmentShowing || viewModel.uiState.value.isClusterPreviewShowing) {
                 return@setOnItemReselectedListener
             }
 
@@ -398,23 +398,6 @@ class MainActivity(
             navController.navigate(menuItem.itemId)
             halfOpenBottomSheetWhenCollapsed()
             true
-        }
-
-        binding.bnv.setOnItemReselectedListener { _ ->
-            if (viewModel.uiState.value.isPreviewFragmentShowing ||
-                viewModel.uiState.value.isClusterPreviewShowing) {
-                return@setOnItemReselectedListener
-            }
-
-            if(binding.sv.isShowing) {
-                binding.sv.hide()
-            }
-
-            bottomSheetBehavior.state = when (bottomSheetBehavior.state) {
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> BottomSheetBehavior.STATE_EXPANDED
-                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
-                else -> BottomSheetBehavior.STATE_HALF_EXPANDED
-            }
         }
     }
 
