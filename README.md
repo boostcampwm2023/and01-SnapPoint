@@ -17,19 +17,19 @@
 ## 주요 기능
 |회원가입|로그인|다크모드|
 |:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a6b4a329-2a93-4ac7-9f4b-6f206e14ead4 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/b9b1688c-3383-4b1c-b78b-5dbb05e1b03f width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/d680433f-5ccc-4b88-bbfc-26d87582c61c width=250>|
+|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a6b4a329-2a93-4ac7-9f4b-6f206e14ead4 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a956f6c6-fb9c-4f2e-a55d-2f90d409ab4f width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/18110b3e-5404-4cff-8023-0329e9e344bc width=250>|
 
 |지도 표시|지도 검색|스냅포인트 표시|
 |:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/b9969a4c-ac82-4308-9c06-5855b8c0a7b7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/5bcc7d6b-75aa-47c8-8f3d-510017765268 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a01e5e8e-7338-425d-8456-e9d332551f7d width=250>|
+|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/b9969a4c-ac82-4308-9c06-5855b8c0a7b7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/5bcc7d6b-75aa-47c8-8f3d-510017765268 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/7182a9a2-7420-40a2-b707-5e7a10868700 width=250>|
 
 |내 위치로 이동|스냅포인트 클릭|경로 확인|
 |:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/beca8db1-da68-4e46-adba-e5a79e918a96 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/64d84649-82cd-42bd-a63b-8a2f186f8ffe width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/31c55e65-9305-4b22-b309-d5b88ec00cbc width=250>|
+|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/beca8db1-da68-4e46-adba-e5a79e918a96 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9ef6f719-b067-4c68-84d5-776fd70cf18c width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/22650f61-c716-4173-afc8-68493aa958f8 width=250>|
 
 |클러스터링|클러스터 클릭|게시글 보기|
 |:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/d5a1f1b5-6c7a-41b9-ac12-4264c0bdc8bc width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/2d881900-a813-4472-b339-93d7c361631b width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/ab21a0b9-5027-46c7-9503-18ee5f9772bd width=250>|
+|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/d5a1f1b5-6c7a-41b9-ac12-4264c0bdc8bc width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/2d881900-a813-4472-b339-93d7c361631b width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9bfa05a2-b9b6-4b23-a62d-42b6bd8bb950 width=250>|
 
 |이미지 블록 추가|영상 블록 추가|블록 순서 변경 및 게시글 생성|
 |:-:|:-:|:-:|
