@@ -71,7 +71,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
 
     private fun alertSignOut() {
         AlertDialog.Builder(requireContext())
-            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setIcon(R.mipmap.icon_snappoint_launcher_round)
             .setTitle(getString(R.string.setting_fragment_sign_out))
             .setMessage(getString(R.string.setting_fragment_sign_out_alert))
             .setPositiveButton(getString(R.string.dialog_yes)) { _, _ -> viewModel.signOut() }
