@@ -28,8 +28,8 @@ class PreviewAdapter : RecyclerView.Adapter<PreviewViewHolder>() {
     override fun onBindViewHolder(holder: PreviewViewHolder, position: Int) {
         mediaBlocks[position].let { postBlock ->
             when (postBlock) {
-                is PostBlockState.IMAGE -> holder.bind(Uri.parse(postBlock.content), postBlock.description)
-                is PostBlockState.VIDEO -> holder.bind(Uri.parse(postBlock.content), postBlock.description)
+                is PostBlockState.IMAGE -> holder.bind(postBlock.url480P, postBlock.description)
+                is PostBlockState.VIDEO -> holder.bind(postBlock.thumbnail480P, postBlock.description)
                 is PostBlockState.TEXT -> {}
             }
         }

@@ -11,9 +11,9 @@ class PreviewViewHolder(
     private val binding: ItemImagePreviewBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(uri: Uri, description: String) {
+    fun bind(url: String, description: String) {
         with(binding){
-            ivPreviewCarouselImage.load(uri) {
+            ivPreviewCarouselImage.load(url) {
                 memoryCachePolicy(CachePolicy.ENABLED)
                 diskCachePolicy(CachePolicy.ENABLED)
                 scale(coil.size.Scale.FILL)
