@@ -29,6 +29,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
+        initMenu()
 
         updatePostState()
         collectViewModelData()
@@ -39,6 +40,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
             vm = postViewModel
             activityVm = viewPostViewModel
         }
+    }
+
+    private fun initMenu() {
+        postViewModel.initMenu(viewPostViewModel.post.value.email)
     }
 
     private fun collectViewModelData() {

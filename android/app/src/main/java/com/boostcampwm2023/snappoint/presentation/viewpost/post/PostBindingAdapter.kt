@@ -20,6 +20,14 @@ fun MaterialToolbar.bindOnMenuItemClicked(event: (Any) -> Unit) {
     }
 }
 
+@BindingAdapter("menu")
+fun MaterialToolbar.bindMenu(isReadOnly: Boolean) {
+    this.inflateMenu(
+        if (isReadOnly) R.menu.post_app_bar_reader_menu
+        else R.menu.post_app_bar_writer_menu
+    )
+}
+
 @BindingAdapter("mark")
 fun FloatingActionButton.updateMark(isEnabled: Boolean) {
     if(isEnabled) {
