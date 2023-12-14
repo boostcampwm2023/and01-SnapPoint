@@ -6,6 +6,9 @@ import { PrismaService } from '@/common/prisma/prisma.service';
 import { FileService } from '@/domain/file/file.service';
 import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { FileRepository } from '@/domain/file/file.repository';
+import { RedisManager } from '@liaoliaots/nestjs-redis';
+import { mockDeep } from 'jest-mock-extended';
 
 // 모의 Microservice Client
 class MockMicroserviceClient {
@@ -27,10 +30,14 @@ describe('FileApiController', () => {
           useValue: new MockMicroserviceClient(), // 모의 클라이언트 사용
         },
         RedisCacheService,
+        RedisManager,
+        FileRepository,
       ],
     })
       .overrideProvider(PrismaProvider)
       .useValue(mockPrismaProvider)
+      .overrideProvider(RedisManager)
+      .useValue(mockDeep<RedisManager>())
       .compile();
 
     controller = module.get<FileApiController>(FileApiController);

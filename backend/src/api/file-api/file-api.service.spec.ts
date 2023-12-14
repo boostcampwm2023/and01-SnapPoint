@@ -6,6 +6,9 @@ import { FileService } from '@/domain/file/file.service';
 import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaService } from '@/common/prisma/prisma.service';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { RedisManager } from '@liaoliaots/nestjs-redis';
+import { FileRepository } from '@/domain/file/file.repository';
 // import { mockFileEntities } from '@/common/mocks/mock.entites.file';
 // import { FileDto } from './dto/file.dto';
 
@@ -15,12 +18,22 @@ describe('FileApiService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService, PrismaProvider, FileApiService, FileService],
+      providers: [
+        PrismaService,
+        PrismaProvider,
+        FileApiService,
+        FileService,
+        RedisCacheService,
+        RedisManager,
+        FileRepository,
+      ],
     })
       .overrideProvider(PrismaProvider)
       .useValue(mockPrismaProvider)
       .overrideProvider(FileService)
       .useValue(mockDeep<FileService>())
+      .overrideProvider(RedisManager)
+      .useValue(mockDeep<RedisManager>())
       .compile();
 
     service = module.get<FileApiService>(FileApiService);
