@@ -15,29 +15,15 @@
 |[@rbybound](https://github.com/rbybound)|[@wsb7788](https://github.com/wsb7788)|[@LJG7123](https://github.com/LJG7123)|[@takeny1998](https://github.com/takeny1998)|[@joojae02](https://github.com/joojae02)|
 
 ## 주요 기능
-|회원가입|로그인|다크모드|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a6b4a329-2a93-4ac7-9f4b-6f206e14ead4 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a956f6c6-fb9c-4f2e-a55d-2f90d409ab4f width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/18110b3e-5404-4cff-8023-0329e9e344bc width=250>|
 
-|지도 표시|지도 검색|스냅포인트 표시|
+|게시글 작성|스냅포인트 클릭|경로 확인|
 |:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/b9969a4c-ac82-4308-9c06-5855b8c0a7b7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/5bcc7d6b-75aa-47c8-8f3d-510017765268 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/7182a9a2-7420-40a2-b707-5e7a10868700 width=250>|
+|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/6d2b4a3e-eec6-4b8e-af82-4ecf702e8db7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9ef6f719-b067-4c68-84d5-776fd70cf18c width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/22650f61-c716-4173-afc8-68493aa958f8 width=250>|
 
-|내 위치로 이동|스냅포인트 클릭|경로 확인|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/beca8db1-da68-4e46-adba-e5a79e918a96 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9ef6f719-b067-4c68-84d5-776fd70cf18c width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/22650f61-c716-4173-afc8-68493aa958f8 width=250>|
+## 기술적 도전을 확인하려면?
+[Android](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Android)
 
-|클러스터링|클러스터 클릭|게시글 보기|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/d5a1f1b5-6c7a-41b9-ac12-4264c0bdc8bc width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/2d881900-a813-4472-b339-93d7c361631b width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9bfa05a2-b9b6-4b23-a62d-42b6bd8bb950 width=250>|
-
-|이미지 블록 추가|영상 블록 추가|블록 순서 변경 및 게시글 생성|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/06e44bc0-e06f-4eba-a6da-da05749cd8bc width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/c46570c5-ad2a-4c74-87cc-b7797a780bc8 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/1cd86ebd-2302-41af-bff1-5d88483ab17d width=250>|
-
-|게시글 수정 및 블록 삭제|생성한 게시글 확인|
-|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/720da7dd-4171-4fc7-b4cf-1590f08fadf5 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/fb6f0d00-ebc7-4696-9079-866d39a5b77f width=250>|
+[Backend](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Backend)
 
 ## 기술 스택 및 도구
 **Android**
@@ -64,11 +50,6 @@
 
 ## 인프라 구성도
 ![image](https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/700ff9b8-1ef7-4dd0-ab54-394774d18d7c)
-
-## 기술적 도전을 확인하려면?
-[Android](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Android)
-
-[Backend](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Backend)
 
 ## 📚문서📚
 
