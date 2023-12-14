@@ -13,8 +13,20 @@ class ClusterItemViewHolder(
 
     fun bind(item: PostBlockState, index: Int) {
         with(binding) {
-            ivImage.load(item.content) {
-                memoryCachePolicy(CachePolicy.ENABLED)
+            when (item) {
+                is PostBlockState.IMAGE -> {
+                    ivImage.load(item.url480P) {
+                        memoryCachePolicy(CachePolicy.ENABLED)
+                    }
+                }
+
+                is PostBlockState.VIDEO -> {
+                    ivImage.load(item.thumbnail480P) {
+                        memoryCachePolicy(CachePolicy.ENABLED)
+                    }
+                }
+
+                else -> {}
             }
             root.setOnClickListener {
                 onItemClicked(index)

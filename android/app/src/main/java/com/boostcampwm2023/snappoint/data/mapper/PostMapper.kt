@@ -93,7 +93,7 @@ fun GetPostResponse.asPostSummaryState(): PostSummaryState {
     return PostSummaryState(
         uuid = this.postUuid,
         title = this.title,
-        author = "",
+        author = this.nickname,
         timeStamp = this.createdAt,
         summary = this.summary,
         email = email,
@@ -112,7 +112,7 @@ fun DeletePostResponse.asPostSummaryState(): PostSummaryState {
     return PostSummaryState(
         uuid = this.postUuid,
         title = this.title,
-        author = "",
+        author = this.nickname,
         timeStamp = this.createdAt,
         summary = this.summary,
         email = email,
