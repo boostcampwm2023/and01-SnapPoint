@@ -60,7 +60,9 @@ class SnapPointClusterRenderer(
             val snapPointWithNumber = drawNumberOnSnapPoint(bitmap, cluster.size)
 
             withContext(Dispatchers.Main) {
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(snapPointWithNumber))
+                marker.runCatching {
+                    setIcon(BitmapDescriptorFactory.fromBitmap(snapPointWithNumber))
+                }
             }
         }
     }

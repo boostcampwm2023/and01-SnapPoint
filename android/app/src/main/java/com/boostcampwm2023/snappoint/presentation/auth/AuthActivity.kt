@@ -45,6 +45,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
         initBinding()
 
+        collectViewModelEvent()
         collectViewModelData()
     }
 
@@ -52,7 +53,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
         with(binding) {
             vm = viewModel
             root.post {
-                viewModel.updateFragmentHeight(root.measuredHeight)
+                viewModel.updateFragmentHeight(root.measuredHeight, dragHandleAuth.measuredHeight)
             }
 
             val behavior = BottomSheetBehavior.from(bsAuth)
@@ -83,6 +84,20 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
         }
     }
 
+    private fun collectViewModelEvent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.event.collect { event ->
+                    when(event) {
+                        is AuthEvent.GoogleSignIn -> {
+                            showToastMessage(R.string.feature_being_prepared)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun collectViewModelData() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -95,9 +110,14 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>(R.layout.activity_auth) {
 
     private fun expandBottomSheetHalf() {
         with(viewModel.uiState.value) {
-            if(isBottomSheetActivated) {
-                bottomSheetBehavior.halfExpandedRatio = bottomSheetHeight / fragmentHeight.toFloat()
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            if (isBottomSheetActivated) {
+                val ratio = ((bottomSheetHeight + handleHeight) / fragmentHeight.toFloat())
+                if (ratio >= 1F) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else if (ratio > 0F) {
+                    bottomSheetBehavior.halfExpandedRatio = ratio
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                }
             }
         }
     }

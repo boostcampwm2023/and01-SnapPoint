@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { PostApiService } from '@/api/post-api/post-api.service';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { PostDto } from '@/domain/post/dtos/post.dto';
@@ -71,5 +71,15 @@ export class PostApiController {
     return this.postApiService.modifyPost(uuid, userUuid, postDto);
   }
 
-  deletePost() {}
+  @Delete('/:uuid')
+  @ApiOperation({ summary: '게시글을 삭제하는 API', description: 'UUID에 맞는 게시글과 연관된 블록, 파일을 삭제한다.' })
+  @ApiParam({ name: 'uuid', required: true })
+  @ApiOkResponse({
+    description: '작성한 게시글의 내용 및 블록 정보를 업데이트한다.',
+    type: PostDto,
+  })
+  deletePost(@Param('uuid') uuid: string, @Req() request: any) {
+    const { uuid: userUuid } = request.user;
+    return this.postApiService.deletePost(uuid, userUuid);
+  }
 }

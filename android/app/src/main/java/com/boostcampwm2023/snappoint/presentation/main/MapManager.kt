@@ -38,7 +38,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     var googleMap: GoogleMap? = null
         private set
 
-    private lateinit var clusterManager: ClusterManager<SnapPointClusterItem>
+    lateinit var clusterManager: ClusterManager<SnapPointClusterItem>
     private lateinit var renderer: SnapPointClusterRenderer
 
     private var prevSelectedMarker: SnapPointClusterItem? = null
@@ -88,6 +88,7 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
     suspend fun removeMarkerFocus() {
         drawnRoute?.remove()
         prevSelectedIndex = -1
+        clusterManager.markerCollection.showAll()
 
         if (prevSelectedMarker != null) {
             setItemUnfocused(prevSelectedMarker)
@@ -121,13 +122,21 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
         }
     }
 
-    fun changeRoute(postBlocks: List<PostBlockState>) {
+    fun changeRoute(postBlocks: List<PostBlockState>, postUuid: String) {
         prevSelectedIndex = viewModel.markerState.value.selectedIndex
         drawnRoute?.remove()
+        clusterManager.markerCollection.hideAll()
 
         val polylineOptions = PolylineOptions().color(getColor(context, R.color.md_theme_error)).width(3.pxFloat()).pattern(listOf(
             Dash(20f), Gap(20f)
         ))
+        val markers = clusterManager.markerCollection.markers.filter { marker ->
+            renderer.getClusterItem(marker).getTag().postUuid == postUuid
+        }
+        markers.forEach {
+            println(it.position)
+            it.isVisible = true
+        }
         val positionList = postBlocks.filterNot { it is PostBlockState.TEXT }.map{ block ->
             when (block) {
                 is PostBlockState.IMAGE -> {
@@ -154,7 +163,13 @@ class MapManager(private val viewModel: MainViewModel, private val context: Cont
 
         setItemUnfocused(prevSelectedMarker)
 
-        val selectedBitmap = getSnapPointBitmap(context, block.content, true)
+        val selectedBitmap = when (block) {
+            is PostBlockState.IMAGE -> getSnapPointBitmap(context, block.url144P, true)
+
+            is PostBlockState.VIDEO -> getSnapPointBitmap(context, block.thumbnail144P, true)
+
+            else -> getSnapPointBitmap(context, block.content, true)
+        }
 
         while (clusterManager.algorithm.items.find { it.getTag() == snapPointTag } == null) {
             delay(100)

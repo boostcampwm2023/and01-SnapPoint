@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.main.search
+package com.boostcampwm2023.snappoint.presentation.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,16 +10,16 @@ import com.boostcampwm2023.snappoint.databinding.ItemSearchAutoCompleteBinding
 
 class AutoCompletionListAdapter(
     private val onAutoCompleteItemClicked: (Int) -> Unit
-) : ListAdapter<String, AutoCompletionViewHolder>(diffUtil) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompletionViewHolder {
+) : ListAdapter<String, SearchResultViewHolder>(diffUtil) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return AutoCompletionViewHolder(
+        return SearchResultViewHolder(
             binding = ItemSearchAutoCompleteBinding.inflate(inflater, parent, false),
             onAutoCompleteItemClicked = onAutoCompleteItemClicked
         )
     }
 
-    override fun onBindViewHolder(holder: AutoCompletionViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
         holder.bind(getItem(position), position)
     }
 

@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GetPostResponse(
+data class DeletePostResponse(
     @SerialName("uuid")
     val postUuid: String,
     @SerialName("title")

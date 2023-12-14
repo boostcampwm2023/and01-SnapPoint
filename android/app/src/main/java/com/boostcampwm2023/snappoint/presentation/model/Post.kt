@@ -10,6 +10,8 @@ data class PostSummaryState(
     val author: String = "",
     val timeStamp: String = "",
     val summary: String = "",
+    val email: String = "",
+    val nickname: String = "",
     val postBlocks: List<PostBlockState> = emptyList()
 )
 

@@ -32,7 +32,7 @@
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:title="게시글 보기"
                 app:titleCentered="true"
-                app:menu="@menu/post_app_bar_menu"
+                menu="@{vm.uiState.isReadOnly}"
                 onMenuItemClick="@{(id) -> vm.onMenuItemClick(id)}"
                 onNavigationClick="@{() -> vm.navigateToPrevious()}" />
 
@@ -67,14 +67,16 @@
                     android:layout_height="36dp"
                     android:layout_marginVertical="16dp"
                     app:layout_constraintStart_toStartOf="@id/tv_title"
-                    app:layout_constraintTop_toBottomOf="@id/tv_title" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_title"
+                    profile_image="@{activityVm.post.postBlocks}"/>
 
                 <TextView
                     android:id="@+id/tv_author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{activityVm.post.author}"
+                    android:text="@{activityVm.post.nickname}"
                     android:textSize="14sp"
+                    android:layout_marginStart="16dp"
                     app:layout_constraintBottom_toTopOf="@id/tv_timestamp"
                     app:layout_constraintStart_toEndOf="@id/iv_profile"
                     app:layout_constraintTop_toTopOf="@id/iv_profile"
@@ -84,7 +86,7 @@
                     android:id="@+id/tv_timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{activityVm.post.timeStamp}"
+                    timeStamp="@{activityVm.post.timeStamp}"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@id/iv_profile"
                     app:layout_constraintStart_toStartOf="@id/tv_author"

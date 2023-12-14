@@ -15,4 +15,5 @@ interface PostRepository {
     fun putModifiedPost(uuid: String, title: String, postBlocks: List<PostBlockCreationState>): Flow<CreatePostResponse>
     fun getAroundPost(leftBottom: String, rightTop: String): Flow<List<PostSummaryState>>
     fun getPost(uuid: String): Flow<PostSummaryState>
+    fun deletePost(uuid: String): Flow<PostSummaryState>
 }

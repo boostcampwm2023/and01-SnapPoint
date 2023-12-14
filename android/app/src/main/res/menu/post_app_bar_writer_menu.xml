@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/post_more"
+        android:icon="@drawable/icon_three_dots"
+        android:title="@string/post_app_bar_more"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/post_edit"
+                android:icon="@drawable/icon_edit_circle"
+                android:title="@string/post_app_bar_edit"
+                app:showAsAction="withText" />
+            <item
+                android:id="@+id/post_delete"
+                android:icon="@drawable/icon_delete"
+                android:title="@string/post_app_bar_delete"
+                app:showAsAction="withText" />
+        </menu>
+    </item>
+</menu>

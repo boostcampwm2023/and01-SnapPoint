@@ -45,4 +45,10 @@ export class BlockService {
   async upsertBlock(postUuid: string, dto: UpsertBlockDto) {
     return this.repository.upsertOne(postUuid, dto);
   }
+
+  async deleteBlocksByPost(postUuid: string) {
+    const blocks = await this.repository.findManyByPost({ postUuid });
+    this.repository.deleteManyByPost({ postUuid });
+    return blocks;
+  }
 }

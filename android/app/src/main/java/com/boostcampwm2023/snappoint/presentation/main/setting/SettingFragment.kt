@@ -1,8 +1,9 @@
 package com.boostcampwm2023.snappoint.presentation.main.setting
 
-import android.content.Intent
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,11 +13,10 @@ import androidx.navigation.fragment.findNavController
 import com.boostcampwm2023.snappoint.R
 import com.boostcampwm2023.snappoint.databinding.FragmentSettingBinding
 import com.boostcampwm2023.snappoint.presentation.base.BaseFragment
-import com.boostcampwm2023.snappoint.presentation.createpost.CreatePostActivity
 import com.boostcampwm2023.snappoint.presentation.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_setting) {
@@ -48,6 +48,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
                 viewModel.event.collect { event ->
                     when(event) {
                         is SettingEvent.SignOut -> {
+                            alertSignOut()
+                        }
+
+                        is SettingEvent.SuccessToSignOut -> {
                             showToastMessage(R.string.setting_fragment_sign_out_success)
                             activityViewModel.navigateSignIn()
                         }
@@ -63,5 +67,15 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(R.layout.fragment_s
                 }
             }
         }
+    }
+
+    private fun alertSignOut() {
+        AlertDialog.Builder(requireContext())
+            .setIcon(R.mipmap.icon_snappoint_launcher_round)
+            .setTitle(getString(R.string.setting_fragment_sign_out))
+            .setMessage(getString(R.string.setting_fragment_sign_out_alert))
+            .setPositiveButton(getString(R.string.dialog_yes)) { _, _ -> viewModel.signOut() }
+            .setNegativeButton(getString(R.string.dialog_no), null)
+            .show()
     }
 }

@@ -14,6 +14,9 @@ import { TransformationService } from '../transformation/transformation.service'
 import { WritePostDto } from './dtos/write-post.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { SummarizationService } from '../summarization/summarization.service';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from '@/domain/user/user.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
@@ -34,6 +37,9 @@ describe('PostApiService', () => {
         FileService,
         RedisCacheService,
         SummarizationService,
+        HttpService,
+        ConfigService,
+        UserService,
       ],
     })
       .overrideProvider(PrismaProvider)
@@ -46,6 +52,10 @@ describe('PostApiService', () => {
       .useValue(mockDeep<FileService>())
       .overrideProvider(RedisCacheService)
       .useValue(mockDeep<RedisCacheService>())
+      .overrideProvider(HttpService)
+      .useValue(mockDeep<HttpService>())
+      .overrideProvider(UserService)
+      .useValue(mockDeep<UserService>())
       .compile();
 
     service = module.get<PostApiService>(PostApiService);
