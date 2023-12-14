@@ -29,7 +29,6 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         super.onViewCreated(view, savedInstanceState)
 
         initBinding()
-        initMenu()
 
         updatePostState()
         collectViewModelData()
@@ -77,6 +76,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewPostViewModel.post.collect { post ->
                     postViewModel.updateLikeMarkState(post.uuid)
+                    postViewModel.initMenu(post.email)
                 }
             }
         }
