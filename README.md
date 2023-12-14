@@ -20,6 +20,9 @@
 |:-:|:-:|:-:|
 |<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/6d2b4a3e-eec6-4b8e-af82-4ecf702e8db7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9ef6f719-b067-4c68-84d5-776fd70cf18c width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/22650f61-c716-4173-afc8-68493aa958f8 width=250>|
 
+### 모든 기능을 보고 싶다면?
+- [모든 기능](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5)
+
 # 기술적 도전을 확인하려면?
 ### Android 기술적 도전
 - [Room을 사용하여 로컬 데이터베이스에 게시글 저장](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/Room%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EB%A1%9C%EC%BB%AC-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4%EC%97%90-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%A0%80%EC%9E%A5) 
