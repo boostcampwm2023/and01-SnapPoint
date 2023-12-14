@@ -25,6 +25,7 @@
 
 # 기술적 도전을 확인하려면?
 ### Android 기술적 도전
+- [영상 편집 및 인코딩](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EC%98%81%EC%83%81-%ED%8E%B8%EC%A7%91-%EB%B0%8F-%EC%9D%B8%EC%BD%94%EB%94%A9)
 - [Room을 사용하여 로컬 데이터베이스에 게시글 저장](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/Room%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EB%A1%9C%EC%BB%AC-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4%EC%97%90-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%A0%80%EC%9E%A5) 
 - [경로가 전부 보이도록 Zoom Level 조정](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B2%BD%EB%A1%9C%EA%B0%80-%EC%A0%84%EB%B6%80-%EB%B3%B4%EC%9D%B4%EB%8F%84%EB%A1%9D-Zoom-Level-%EC%A1%B0%EC%A0%95)
 - [게시글 작성 로직](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%9E%91%EC%84%B1-%EB%A1%9C%EC%A7%81)
