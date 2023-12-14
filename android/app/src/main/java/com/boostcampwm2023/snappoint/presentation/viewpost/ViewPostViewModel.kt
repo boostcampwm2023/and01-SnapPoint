@@ -7,6 +7,7 @@ import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.data.repository.UserInfoRepository
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
+import com.boostcampwm2023.snappoint.presentation.viewpost.post.PostEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -80,12 +82,10 @@ class ViewPostViewModel @Inject constructor(
 
         postRepository.deletePost(uuid)
             .catch {
-                Log.d("TAG", "deleteRemotePost: ${it.message}")
-            }
-            .onEach { post ->
-                Log.d("LOG", "DELETE: ${post}")
+                _event.emit(ViewPostEvent.FailToDeletePost)
             }
             .onCompletion {
+                _event.emit(ViewPostEvent.SuccessToDeletePost)
                 _event.emit(ViewPostEvent.FinishActivity)
             }
             .launchIn(viewModelScope)
