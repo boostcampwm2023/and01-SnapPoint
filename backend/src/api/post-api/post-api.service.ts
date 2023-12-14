@@ -88,7 +88,6 @@ export class PostApiService {
           }
           return blockByUuid[dto.postUuid];
         });
-
         return resultArray;
       },
     );
@@ -226,16 +225,7 @@ export class PostApiService {
     const decomposedPostDto = this.transform.decomposePostRequest(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
-    const existPost = await this.postService.findPost({ uuid });
-
-    if (!existPost) {
-      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
-    }
-
-    if (existPost.userUuid !== userUuid) {
-      throw new ForbiddenException('Could not access this post. please check your permission.');
-    }
-
+    const existPost = await this.accessPost(uuid, userUuid);
     const user = await this.userService.findUserByUniqueInput({ uuid: existPost.userUuid });
 
     if (!user) {
@@ -255,11 +245,46 @@ export class PostApiService {
       await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
 
       await this.redisService.del(`block:${uuid}`);
-
       const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
       await this.redisService.del(deleteCacheKeys);
 
       return this.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
     });
+  }
+
+  async deletePost(uuid: string, userUuid: string) {
+    const existPost = await this.accessPost(uuid, userUuid);
+
+    return this.prisma.beginTransaction(async () => {
+      const [deletedPost, user] = await Promise.all([
+        this.postService.deletePost({ uuid }),
+        this.userService.findUserByUniqueInput({ uuid: userUuid }),
+      ]);
+
+      if (!user) {
+        throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
+      }
+
+      const blocks = await this.blockService.deleteBlocksByPost(existPost.uuid);
+      const files = await this.fileService.deleteFilesBySources('block', blocks);
+
+      const willDeleteFileKeys = blocks.map(({ uuid }) => `file:${uuid}`);
+      await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
+
+      return this.assemblePost(deletedPost, user, blocks, files);
+    });
+  }
+
+  private async accessPost(uuid: string, userUuid: string) {
+    const existPost = await this.postService.findPost({ uuid });
+
+    if (!existPost) {
+      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
+    }
+
+    if (existPost.userUuid !== userUuid) {
+      throw new ForbiddenException('Could not access this post. please check your permission.');
+    }
+    return existPost;
   }
 }

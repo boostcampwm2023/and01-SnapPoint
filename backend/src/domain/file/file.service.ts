@@ -45,6 +45,13 @@ export class FileService {
     );
   }
 
+  async deleteFilesBySources(source: string, dtos: FindFilesBySourceDto[]) {
+    const conditions = dtos.map((dto) => ({ sourceUuid: dto.uuid }));
+    const files = await this.repository.findFiles({ where: { OR: conditions, AND: { source } } });
+    this.repository.deleteFiles({ OR: conditions });
+    return files;
+  }
+
   filterNotProcessedFiles(files: File[]) {
     return files.filter((file) => file.isProcessed === false);
   }
