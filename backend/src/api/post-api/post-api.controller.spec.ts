@@ -16,6 +16,7 @@ import { HttpService } from '@nestjs/axios';
 import { FileRepository } from '@/domain/file/file.repository';
 import { RedisManager } from '@liaoliaots/nestjs-redis';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from '@/domain/user/user.service';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -40,6 +41,7 @@ describe('PostApiController', () => {
         HttpService,
         FileRepository,
         ConfigService,
+        UserService,
       ],
     })
       .overrideProvider(RedisManager)
