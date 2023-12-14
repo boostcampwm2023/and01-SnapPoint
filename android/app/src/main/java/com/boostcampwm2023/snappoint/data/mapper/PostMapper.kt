@@ -95,19 +95,14 @@ fun GetPostResponse.asPostSummaryState(): PostSummaryState {
         author = "",
         timeStamp = this.createdAt,
         summary = this.summary,
+        email = email,
+        nickname = nickname,
         postBlocks = this.blocks.map { it.asPostBlockState() }
     )
 }
 
 fun List<GetPostResponse>.asPostSummaryState(): List<PostSummaryState> {
-    return this.map{ response ->
-        PostSummaryState(
-            uuid = response.postUuid,
-            title = response.title,
-            author = "",
-            timeStamp = response.createdAt,
-            summary = response.summary,
-            postBlocks = response.blocks.map { it.asPostBlockState() }
-        )
+    return this.map { response ->
+        response.asPostSummaryState()
     }
 }

@@ -16,6 +16,10 @@ data class GetPostResponse(
     val modifiedAt: String,
     @SerialName("summary")
     val summary: String = "",
+    @SerialName("email")
+    val email: String = "",
+    @SerialName("nickname")
+    val nickname: String = "",
     @SerialName("blocks")
     val blocks: List<PostBlock>,
 )
