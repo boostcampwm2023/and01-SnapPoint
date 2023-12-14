@@ -3,7 +3,7 @@ package com.boostcampwm2023.snappoint.presentation.search
 import androidx.recyclerview.widget.RecyclerView
 import com.boostcampwm2023.snappoint.databinding.ItemSearchAutoCompleteBinding
 
-class AutoCompletionViewHolder(
+class SearchResultViewHolder(
     private val binding: ItemSearchAutoCompleteBinding,
     private val onAutoCompleteItemClicked: (Int) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
