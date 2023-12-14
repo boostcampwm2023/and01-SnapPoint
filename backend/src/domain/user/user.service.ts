@@ -31,6 +31,23 @@ export class UserService {
     });
   }
 
+  async findUsers(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.get().user.findMany({
+      skip,
+      take,
+      cursor,
+      where: { ...where, isDeleted: false },
+      orderBy,
+    });
+  }
+
   async findOne(uuid: string): Promise<User | null> {
     return this.prisma.get().user.findUnique({
       where: {
