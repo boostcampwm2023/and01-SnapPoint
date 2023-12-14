@@ -39,6 +39,14 @@ class PostViewModel @Inject constructor(
     )
     val event: SharedFlow<PostEvent> = _event.asSharedFlow()
 
+    fun initMenu(postOwnerEmail: String) {
+        if(postOwnerEmail == userInfoRepository.getEmail()){
+            _uiState.update {
+                it.copy(isReadOnly = false)
+            }
+        }
+    }
+
     fun navigateToPrevious() {
         _event.tryEmit(PostEvent.NavigatePrev)
     }

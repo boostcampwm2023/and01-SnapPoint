@@ -41,6 +41,10 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
         }
     }
 
+    private fun initMenu() {
+        postViewModel.initMenu(viewPostViewModel.post.value.email)
+    }
+
     private fun collectViewModelData() {
         lifecycleScope.launch {
             postViewModel.event.collect { event ->
@@ -72,6 +76,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewPostViewModel.post.collect { post ->
                     postViewModel.updateLikeMarkState(post.uuid)
+                    postViewModel.initMenu(post.email)
                 }
             }
         }
@@ -91,7 +96,7 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                 navigateEditPost()
             }
             R.id.post_delete -> {
-
+                deleteRemotePost()
             }
             R.id.post_report -> {
 
@@ -109,5 +114,9 @@ class PostFragment : BaseFragment<FragmentPostBinding>(R.layout.fragment_post) {
                 Constants.POST_BUNDLE_KEY to Json.encodeToString(viewPostViewModel.post.value)
             )
         )
+    }
+
+    private fun deleteRemotePost() {
+        viewPostViewModel.deleteRemotePost()
     }
 }

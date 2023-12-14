@@ -19,6 +19,10 @@ data class CreatePostResponse(
     val modifiedAt: String,
     @SerialName("isPublished")
     val isPublished: Boolean = true,
+    @SerialName("email")
+    val email: String = "",
+    @SerialName("nickname")
+    val nickname: String = "",
     @SerialName("blocks")
     val blocks: List<PostBlock>
 )

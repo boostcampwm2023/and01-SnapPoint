@@ -30,10 +30,14 @@ class SettingViewModel @Inject constructor(
     val event: SharedFlow<SettingEvent> = _event.asSharedFlow()
 
     fun onSignOutClick() {
+        _event.tryEmit(SettingEvent.SignOut)
+    }
+
+    fun signOut() {
         signInRepository.getSignOut()
             .onEach {
                 userInfoRepository.clearUserAuthData()
-                _event.emit(SettingEvent.SignOut)
+                _event.emit(SettingEvent.SuccessToSignOut)
             }
             .catch {
                 _event.emit(SettingEvent.FailToSignOut)

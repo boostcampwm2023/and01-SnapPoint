@@ -7,6 +7,7 @@ import com.boostcampwm2023.snappoint.data.remote.model.request.VideoAbortRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.VideoEndRequest
 import com.boostcampwm2023.snappoint.data.remote.model.request.VideoUrlRequest
 import com.boostcampwm2023.snappoint.data.remote.model.response.CreatePostResponse
+import com.boostcampwm2023.snappoint.data.remote.model.response.DeletePostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.GetPostResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.VideoStartResponse
 import com.boostcampwm2023.snappoint.data.remote.model.response.ImageResponse
@@ -20,6 +21,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -109,4 +111,8 @@ interface SnapPointApi {
         @Body body: RequestBody,
     ): Response<Unit>
 
+    @DELETE("posts/{uuid}")
+    suspend fun deletePost(
+        @Path("uuid") uuid: String
+    ): DeletePostResponse
 }

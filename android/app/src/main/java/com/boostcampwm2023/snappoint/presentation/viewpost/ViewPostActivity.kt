@@ -40,6 +40,14 @@ class ViewPostActivity : BaseActivity<ActivityViewPostBinding>(R.layout.activity
         lifecycleScope.launch {
             viewModel.event.collect {
                 when (it) {
+                    ViewPostEvent.SuccessToDeletePost -> {
+                        showToastMessage(R.string.view_post_activity_success_to_delete_post)
+                    }
+
+                    ViewPostEvent.FailToDeletePost -> {
+                        showToastMessage(R.string.view_post_activity_fail_to_delete_post)
+                    }
+
                     ViewPostEvent.FinishActivity -> {
                         finish()
                     }

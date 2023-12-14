@@ -390,6 +390,11 @@ class MainActivity(
             while (true) {
                 if (navController.popBackStack().not()) break
             }
+
+            if(binding.sv.isShowing) {
+                binding.sv.hide()
+            }
+
             navController.navigate(menuItem.itemId)
             halfOpenBottomSheetWhenCollapsed()
             true
@@ -463,7 +468,7 @@ class MainActivity(
                         runOnUiThread { showToastMessage(R.string.search_location_fail) }
                     } else {
                         runOnUiThread {
-                            mapManager.moveCamera(results[0].latitude, results[0].longitude)
+                            mapManager.moveCamera(results[0].latitude, results[0].longitude, 17f)
                             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                             sv.hide()
                         }

@@ -186,4 +186,13 @@ class PostRepositoryImpl @Inject constructor(
                 response.asPostSummaryState()
             }
     }
+
+    override fun deletePost(uuid: String): Flow<PostSummaryState> {
+
+        return flowOf(true)
+            .map {
+                val response = snapPointApi.deletePost(uuid)
+                response.asPostSummaryState()
+            }
+    }
 }

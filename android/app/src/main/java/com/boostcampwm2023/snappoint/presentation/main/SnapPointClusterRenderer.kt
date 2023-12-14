@@ -1,6 +1,7 @@
 package com.boostcampwm2023.snappoint.presentation.main
 
 import android.content.Context
+import android.util.Log
 import com.boostcampwm2023.snappoint.presentation.util.Constants.MIN_CLUSTER_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.drawNumberOnSnapPoint
 import com.boostcampwm2023.snappoint.presentation.util.getSnapPointBitmap
@@ -60,7 +61,9 @@ class SnapPointClusterRenderer(
             val snapPointWithNumber = drawNumberOnSnapPoint(bitmap, cluster.size)
 
             withContext(Dispatchers.Main) {
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(snapPointWithNumber))
+                marker.runCatching {
+                    setIcon(BitmapDescriptorFactory.fromBitmap(snapPointWithNumber))
+                }
             }
         }
     }
