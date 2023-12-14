@@ -43,7 +43,7 @@ export class UserService {
       skip,
       take,
       cursor,
-      where: { ...where, isDeleted: false },
+      where,
       orderBy,
     });
   }
