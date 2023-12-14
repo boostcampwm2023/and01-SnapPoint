@@ -1,4 +1,4 @@
-package com.boostcampwm2023.snappoint.presentation.main.search
+package com.boostcampwm2023.snappoint.presentation.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

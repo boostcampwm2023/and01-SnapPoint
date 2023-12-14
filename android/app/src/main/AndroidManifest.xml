@@ -61,7 +61,7 @@
             android:name=".presentation.main.MainActivity"
             android:exported="true" />
         <activity
-            android:name=".presentation.markerpointselector.MarkerPointSelectorActivity"
+            android:name=".presentation.positionselector.PositionSelectorActivity"
             android:exported="true" />
         <activity
             android:name=".presentation.createpost.CreatePostActivity"

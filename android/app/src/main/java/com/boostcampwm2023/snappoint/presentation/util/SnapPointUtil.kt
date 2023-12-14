@@ -13,10 +13,11 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.boostcampwm2023.snappoint.R
+import com.boostcampwm2023.snappoint.presentation.util.Constants.CLUSTER_CIRCLE_SIZE
 import com.boostcampwm2023.snappoint.presentation.util.Constants.CLUSTER_TEXT_SIZE
 
 private val clusterTextSize = CLUSTER_TEXT_SIZE.pxFloat()
-private val clusterCircleRadius = (CLUSTER_TEXT_SIZE / 2 + 1).pxFloat()
+private val clusterCircleRadius = CLUSTER_CIRCLE_SIZE.pxFloat()
 
 val snapPointHeight = 100.px()
 val snapPointWidth = 85.px()
@@ -63,13 +64,14 @@ fun drawNumberOnSnapPoint(bitmap: Bitmap, number: Int) : Bitmap {
     val textPaint = Paint().apply {
         color = Color.WHITE
         textSize = clusterTextSize
+        textAlign = Paint.Align.CENTER
     }
     val circlePaint = Paint().apply {
         color = Color.RED
-        textAlign = Paint.Align.CENTER
     }
     val yPos = clusterCircleRadius - (textPaint.descent() + textPaint.ascent()) / 2
     canvas.drawCircle(clusterCircleRadius, clusterCircleRadius, clusterCircleRadius, circlePaint)
-    canvas.drawText(number.toString(), clusterCircleRadius / 2, yPos, textPaint)
+    val num = if (number > 99) "99" else number.toString()
+    canvas.drawText(num, clusterCircleRadius, yPos, textPaint)
     return result
 }

@@ -3,29 +3,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+        <variable
+            name="vm"
+            type="com.boostcampwm2023.snappoint.presentation.positionselector.PositionSelectorViewModel" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.markerpointselector.MarkerPointSelectorActivity">
+        tools:context=".presentation.positionselector.PositionSelectorActivity">
 
         <androidx.fragment.app.FragmentContainerView
 
             android:id="@+id/fcv_google_map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.google.android.material.search.SearchBar
+            android:id="@+id/sb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/activity_main_sb_hint"
+            app:menu="@menu/search_view_menu"/>
+
+        <com.google.android.material.search.SearchView
+            android:id="@+id/sv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_anchor="@id/sb">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcv_search_result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                autoCompleteTexts="@{vm.searchViewUiState.texts}"
+                onAutoCompleteItemClick="@{vm.searchViewUiState.onAutoCompleteItemClicked}"/>
+
+        </com.google.android.material.search.SearchView>
 
         <Button
             android:id="@+id/btn_confirm_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_gravity="center|bottom"
             android:layout_marginBottom="30dp"
             android:text="@string/maps_marker_activity_confirm_position" />
 
@@ -33,10 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/icon_google_marker"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_gravity="center"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

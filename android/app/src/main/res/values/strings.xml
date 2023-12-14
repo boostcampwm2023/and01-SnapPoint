@@ -82,4 +82,11 @@
     <string name="create_post_button_text">게시물 작성</string>
     <string name="fragment_being_prepared">페이지 준비중입니다.</string>
     <string name="maps_marker_activity_confirm_position">이 위치로 설정</string>
+    <string name="moments_ago">방금 전</string>
+    <string name="minutes_ago">분 전</string>
+    <string name="hours_ago">시간 전</string>
+    <string name="days_ago">일 전</string>
+    <string name="weeks_ago">주 전</string>
+    <string name="months_ago">개월 전</string>
+    <string name="years_ago">년 전</string>
 </resources>
