@@ -11,6 +11,7 @@ object Constants {
     const val POST_BUNDLE_KEY: String = "post"
     const val IS_LOCAL_POST_BUNDLE_KEY: String = "isLocalPost"
     const val CLUSTER_TEXT_SIZE = 16
+    const val CLUSTER_CIRCLE_SIZE = 11
     const val MIN_CLUSTER_SIZE = 2
     const val BYTE_OF_VIDEO_PART_SIZE = 1024 * 1024 * 5
 }

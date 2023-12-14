@@ -2,6 +2,7 @@ package com.boostcampwm2023.snappoint.presentation.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.location.Geocoder
 import android.os.Build
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
@@ -57,7 +59,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity(
@@ -90,7 +92,7 @@ class MainActivity(
 
         initMapFragment()
 
-        collectViewModelData()
+        collectViewModelData(savedInstanceState)
 
         setBottomNavigationEvent()
 
@@ -135,7 +137,7 @@ class MainActivity(
         }
     }
 
-    private fun collectViewModelData() {
+    private fun collectViewModelData(savedInstanceState: Bundle?) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
 
@@ -174,7 +176,9 @@ class MainActivity(
                             }
 
                             MainActivityEvent.CheckPermissionAndMoveCameraToUserLocation -> {
-                                checkPermissionAndMoveCameraToUserLocation(true)
+                                if (savedInstanceState == null) {
+                                    checkPermissionAndMoveCameraToUserLocation(true)
+                                }
                             }
 
                             is MainActivityEvent.HalfOpenBottomSheet -> {
@@ -230,7 +234,10 @@ class MainActivity(
                         mapManager.changeSelectedMarker(blocks, SnapPointTag(post.uuid, blocks.uuid))
 
                         if (mapManager.prevSelectedIndex != markerState.selectedIndex) {
-                            mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks)
+                            while (mapManager.clusterManager.algorithm.items.size != mapManager.clusterManager.markerCollection.markers.size) {
+                                delay(100)
+                            }
+                            mapManager.changeRoute(viewModel.getPosts()[markerState.selectedIndex].postBlocks, post.uuid)
                         }
                     }
                 }
@@ -363,6 +370,18 @@ class MainActivity(
 
             }
         })
+
+        binding.bnv.setOnItemReselectedListener { _ ->
+            if (viewModel.uiState.value.isPreviewFragmentShowing) {
+                return@setOnItemReselectedListener
+            }
+
+            bottomSheetBehavior.state = when (bottomSheetBehavior.state) {
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
+                else -> BottomSheetBehavior.STATE_HALF_EXPANDED
+            }
+        }
     }
 
     private fun setBottomNavigationEvent() {
@@ -375,6 +394,7 @@ class MainActivity(
             if(binding.sv.isShowing) {
                 binding.sv.hide()
             }
+
             navController.navigate(menuItem.itemId)
             halfOpenBottomSheetWhenCollapsed()
             true
@@ -438,6 +458,7 @@ class MainActivity(
 
             sv.editText.setOnEditorActionListener { v, _, _ ->
                 getAddressAutoCompletion(v.text.toString())
+                hideKeyboard()
                 true
             }
 
@@ -447,6 +468,11 @@ class MainActivity(
                 }
             }
         }
+    }
+
+    private fun hideKeyboard() {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun moveCameraToAddress(address: String) {
@@ -466,16 +492,17 @@ class MainActivity(
                     }
                 }
             } else {
-                // TODO - runBlocking 대체
-                val results =
-                    runBlocking(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
+                lifecycleScope.launch {
+                    val results =
+                        withContext(Dispatchers.IO) { geocoder.getFromLocationName(address, 1) }
 
-                if (results == null || results.size == 0) {
-                    showToastMessage(R.string.search_location_fail)
-                } else {
-                    mapManager.moveCamera(results[0].latitude, results[0].longitude)
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    sv.hide()
+                    if (results == null || results.size == 0) {
+                        showToastMessage(R.string.search_location_fail)
+                    } else {
+                        mapManager.moveCamera(results[0].latitude, results[0].longitude)
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        sv.hide()
+                    }
                 }
             }
         }

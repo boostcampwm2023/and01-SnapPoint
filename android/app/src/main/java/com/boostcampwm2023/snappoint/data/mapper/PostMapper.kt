@@ -19,11 +19,11 @@ fun PostBlock.asPostBlockState(): PostBlockState {
             )
         }
         else -> {
-            if(this.files!![0].mimeType!!.startsWith("image")){
+            if(files!!.size == 1 && this.files[0].mimeType!!.startsWith("image")){
                 PostBlockState.IMAGE(
                     uuid = blockUuid!!,
                     description = this.content,
-                    content = this.files[0].url720P!!,
+                    content = this.files[0].url!!,
                     url480P = this.files[0].url480P!!,
                     url144P = this.files[0].url144P!!,
                     position = this.asPositionState(),

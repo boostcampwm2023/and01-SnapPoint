@@ -88,4 +88,11 @@
     <string name="maps_marker_activity_confirm_position">이 위치로 설정</string>
     <string name="dialog_yes">예</string>
     <string name="dialog_no">아니요</string>
+    <string name="moments_ago">방금 전</string>
+    <string name="minutes_ago">분 전</string>
+    <string name="hours_ago">시간 전</string>
+    <string name="days_ago">일 전</string>
+    <string name="weeks_ago">주 전</string>
+    <string name="months_ago">개월 전</string>
+    <string name="years_ago">년 전</string>
 </resources>

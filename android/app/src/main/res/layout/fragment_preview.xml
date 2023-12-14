@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="14sp"
-            android:text="@{vm.uiState.timeStamp}"
+            timeStamp="@{vm.uiState.timeStamp}"
             app:layout_constraintStart_toStartOf="@id/tv_preview_post_title"
             app:layout_constraintTop_toBottomOf="@id/tv_preview_post_title"
             tools:text="1 Days Ago" />

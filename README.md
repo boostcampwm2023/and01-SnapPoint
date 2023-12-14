@@ -1,8 +1,8 @@
 # SnapPoint
 <img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/0ea4de60-ea9d-40e8-89ef-3c305b09665e>
 
-## 프로젝트 소개
-**지도로 확인하는 여행 기록, SnapPoint**
+# 프로젝트 소개
+### **지도로 확인하는 여행 기록, SnapPoint**
 - 내 여행을 게시글 형태로 기록할 수 있어요
 - 게시글에 추가한 미디어가 촬영된 위치를 스냅포인트 형태로 저장할 수 있어요
 - 미디어들은 경로로 이어져 지도에서 한 눈에 확인할 수 있어요
@@ -15,29 +15,26 @@
 |[@rbybound](https://github.com/rbybound)|[@wsb7788](https://github.com/wsb7788)|[@LJG7123](https://github.com/LJG7123)|[@takeny1998](https://github.com/takeny1998)|[@joojae02](https://github.com/joojae02)|
 
 ## 주요 기능
-|회원가입|로그인|다크모드|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a6b4a329-2a93-4ac7-9f4b-6f206e14ead4 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/b9b1688c-3383-4b1c-b78b-5dbb05e1b03f width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/d680433f-5ccc-4b88-bbfc-26d87582c61c width=250>|
 
-|지도 표시|지도 검색|스냅포인트 표시|
+|게시글 작성|스냅포인트 클릭|경로 확인|
 |:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/b9969a4c-ac82-4308-9c06-5855b8c0a7b7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/5bcc7d6b-75aa-47c8-8f3d-510017765268 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/a01e5e8e-7338-425d-8456-e9d332551f7d width=250>|
+|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/6d2b4a3e-eec6-4b8e-af82-4ecf702e8db7 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/9ef6f719-b067-4c68-84d5-776fd70cf18c width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/22650f61-c716-4173-afc8-68493aa958f8 width=250>|
 
-|내 위치로 이동|스냅포인트 클릭|경로 확인|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/beca8db1-da68-4e46-adba-e5a79e918a96 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/64d84649-82cd-42bd-a63b-8a2f186f8ffe width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/31c55e65-9305-4b22-b309-d5b88ec00cbc width=250>|
+### 모든 기능을 보고 싶다면?
+- [모든 기능](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5)
 
-|클러스터링|클러스터 클릭|게시글 보기|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/d5a1f1b5-6c7a-41b9-ac12-4264c0bdc8bc width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/2d881900-a813-4472-b339-93d7c361631b width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/ab21a0b9-5027-46c7-9503-18ee5f9772bd width=250>|
+# 기술적 도전을 확인하려면?
+### Android 기술적 도전
+- [Room을 사용하여 로컬 데이터베이스에 게시글 저장](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/Room%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EB%A1%9C%EC%BB%AC-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4%EC%97%90-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%A0%80%EC%9E%A5) 
+- [경로가 전부 보이도록 Zoom Level 조정](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B2%BD%EB%A1%9C%EA%B0%80-%EC%A0%84%EB%B6%80-%EB%B3%B4%EC%9D%B4%EB%8F%84%EB%A1%9D-Zoom-Level-%EC%A1%B0%EC%A0%95)
+- [게시글 작성 로직](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%9E%91%EC%84%B1-%EB%A1%9C%EC%A7%81)
+- [이미지 최적화](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%B5%9C%EC%A0%81%ED%99%94)
+- [마커 최적화](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EB%A7%88%EC%BB%A4-%EC%B5%9C%EC%A0%81%ED%99%94)
 
-|이미지 블록 추가|영상 블록 추가|블록 순서 변경 및 게시글 생성|
-|:-:|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/06e44bc0-e06f-4eba-a6da-da05749cd8bc width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/c46570c5-ad2a-4c74-87cc-b7797a780bc8 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/1cd86ebd-2302-41af-bff1-5d88483ab17d width=250>|
-
-|게시글 수정 및 블록 삭제|생성한 게시글 확인|
-|:-:|:-:|
-|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/720da7dd-4171-4fc7-b4cf-1590f08fadf5 width=250>|<img src=https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/fb6f0d00-ebc7-4696-9079-866d39a5b77f width=250>|
+### Backend 기술적 도전
+- [DDD Layered Architecture](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/DDD-Layered-Architecture)
+- [메세지 큐 기반 Adaptive Streaming](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EB%A9%94%EC%84%B8%EC%A7%80-%ED%81%90-%EA%B8%B0%EB%B0%98-Adaptive-Streaming)
+- [Redis를 이용한 Caching](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/Redis%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-Caching)
 
 ## 기술 스택 및 도구
 **Android**
@@ -65,12 +62,7 @@
 ## 인프라 구성도
 ![image](https://github.com/boostcampwm2023/and01-SnapPoint/assets/85796984/700ff9b8-1ef7-4dd0-ab54-394774d18d7c)
 
-## 기술적 도전을 확인하려면?
-[Android](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Android)
-
-[Backend](https://github.com/boostcampwm2023/and01-SnapPoint/wiki/%EA%B8%B0%EC%88%A0%EC%A0%81-%EB%8F%84%EC%A0%84-%E2%80%90-Backend)
-
-## 📚문서📚
+# 📚문서📚
 
 - [그라운드 룰](https://www.notion.so/2c85275c12b349f9ac7697372e4ac41b?pvs=21)
 - [코딩 컨벤션](https://www.notion.so/8b37933773b64129b06838743837f975?pvs=21)

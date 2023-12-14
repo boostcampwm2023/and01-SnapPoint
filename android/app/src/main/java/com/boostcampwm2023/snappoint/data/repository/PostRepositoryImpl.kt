@@ -1,5 +1,6 @@
 package com.boostcampwm2023.snappoint.data.repository
 
+import android.util.Log
 import com.boostcampwm2023.snappoint.data.mapper.asPostBlock
 import com.boostcampwm2023.snappoint.data.mapper.asPostSummaryState
 import com.boostcampwm2023.snappoint.data.remote.SnapPointApi
@@ -172,6 +173,7 @@ class PostRepositoryImpl @Inject constructor(
         return flowOf(true)
             .map {
                 val response = snapPointApi.getAroundPost(leftBottom, rightTop)
+                Log.d("TAG", "getAroundPost: $response")
                 response.asPostSummaryState()
             }
     }

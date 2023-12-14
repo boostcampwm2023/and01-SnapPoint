@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.boostcampwm2023.snappoint.data.repository.PostRepository
 import com.boostcampwm2023.snappoint.data.repository.RoomRepository
 import com.boostcampwm2023.snappoint.data.repository.UserInfoRepository
-import com.boostcampwm2023.snappoint.presentation.main.search.SearchViewUiState
+import com.boostcampwm2023.snappoint.presentation.search.SearchViewUiState
 import com.boostcampwm2023.snappoint.presentation.model.PostBlockState
 import com.boostcampwm2023.snappoint.presentation.model.PostSummaryState
 import com.boostcampwm2023.snappoint.presentation.model.SnapPointTag
