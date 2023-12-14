@@ -225,8 +225,7 @@ export class PostApiService {
     const decomposedPostDto = this.transform.decomposePostRequest(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
-    await this.accessPost(uuid, userUuid);
-
+    const existPost = await this.accessPost(uuid, userUuid);
     const user = await this.userService.findUserByUniqueInput({ uuid: existPost.userUuid });
 
     if (!user) {
@@ -257,14 +256,22 @@ export class PostApiService {
     const existPost = await this.accessPost(uuid, userUuid);
 
     return this.prisma.beginTransaction(async () => {
-      await this.postService.deletePost({ uuid });
+      const [deletedPost, user] = await Promise.all([
+        this.postService.deletePost({ uuid }),
+        this.userService.findUserByUniqueInput({ uuid: userUuid }),
+      ]);
+
+      if (!user) {
+        throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
+      }
+
       const blocks = await this.blockService.deleteBlocksByPost(existPost.uuid);
       const files = await this.fileService.deleteFilesBySources('block', blocks);
 
       const willDeleteFileKeys = blocks.map(({ uuid }) => `file:${uuid}`);
       await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
 
-      return this.assemblePost(existPost, blocks, files);
+      return this.assemblePost(deletedPost, user, blocks, files);
     });
   }
 
