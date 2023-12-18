@@ -1,0 +1,1 @@
+export const TRANSACTIONAL_KEY = Symbol('TRANSACTIONAL');
