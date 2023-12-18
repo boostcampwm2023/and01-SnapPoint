@@ -1,21 +1,24 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Prisma, RefreshToken, User } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteRefreshTokenDto } from './dto/delete-refresh-token.dto';
+import { Repository } from '@/common/interfaces/repository.interface';
+import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Injectable()
-export class RefreshTokenService {
+export class RefreshTokenService extends Repository {
   constructor(
-    readonly prisma: PrismaProvider,
+    readonly prisma: PrismaService,
     readonly jwtService: JwtService,
     readonly configService: ConfigService,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
-    return this.prisma.get().refreshToken.create({
+    return this.prisma.refreshToken.create({
       data: {
         userUuid: createRefreshTokenDto.userUuid,
         token: createRefreshTokenDto.token,
@@ -25,7 +28,7 @@ export class RefreshTokenService {
   }
 
   async update(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
-    const refreshToken = await this.prisma.get().refreshToken.findUnique({
+    const refreshToken = await this.prisma.refreshToken.findUnique({
       where: {
         userUuid: createRefreshTokenDto.userUuid,
       },
@@ -35,7 +38,7 @@ export class RefreshTokenService {
       throw new NotFoundException('해당 유저의 리프레시 토큰이 존재하지 않습니다.');
     }
 
-    return this.prisma.get().refreshToken.update({
+    return this.prisma.refreshToken.update({
       where: {
         userUuid: createRefreshTokenDto.userUuid,
       },
@@ -47,7 +50,7 @@ export class RefreshTokenService {
   }
 
   async delete(deleteRefreshTokenDto: DeleteRefreshTokenDto) {
-    return this.prisma.get().refreshToken.delete({
+    return this.prisma.refreshToken.delete({
       where: {
         userUuid: deleteRefreshTokenDto.userUuid,
       },
@@ -55,7 +58,7 @@ export class RefreshTokenService {
   }
 
   async findRefreshTokenByUnique(where: Prisma.RefreshTokenWhereUniqueInput): Promise<RefreshToken | null> {
-    return this.prisma.get().refreshToken.findUnique({
+    return this.prisma.refreshToken.findUnique({
       where,
     });
   }

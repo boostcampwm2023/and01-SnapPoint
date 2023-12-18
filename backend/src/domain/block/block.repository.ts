@@ -1,4 +1,3 @@
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Block } from '@/domain/block/entites/block.entity';
 import { FindBlocksByPostDto } from './dtos/find-blocks-by-post.dto';
 import { FindBlocksByAreaDto } from './dtos/find-blocks-by-area.dto';
@@ -9,10 +8,14 @@ import { FindBlocksByIdDto } from './dtos/find-blocks-by-id.dto';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Sql } from '@prisma/client/runtime/library';
+import { PrismaService } from '@/common/prisma/prisma.service';
+import { Repository } from '@/common/interfaces/repository.interface';
 
 @Injectable()
-export class BlockRepository {
-  constructor(private readonly prisma: PrismaProvider) {}
+export class BlockRepository extends Repository {
+  constructor(private readonly prisma: PrismaService) {
+    super();
+  }
 
   async createMany(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
     const values = dtos.map((dto) => {
@@ -21,7 +24,7 @@ export class BlockRepository {
       return Prisma.sql`(${uuid}, ${postUuid}, ${content}, ${type}, ${order}, ${coords ? Prisma.raw(coords) : null})`;
     });
 
-    return this.prisma.get()
+    return this.prisma
       .$queryRaw`INSERT INTO "Block" ("uuid", "postUuid", "content", "type", "order", "coords") VALUES ${Prisma.join(
       values,
     )}`;
@@ -30,7 +33,7 @@ export class BlockRepository {
   async findManyByIds(dtos: FindBlocksByIdDto[]): Promise<Block[]> {
     const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"uuid" = ${dto.uuid}`);
 
-    const blocks: Block[] = await this.prisma.get().$queryRaw`
+    const blocks: Block[] = await this.prisma.$queryRaw`
       SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
                 "createdAt", "modifiedAt", "isDeleted",
                 ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
@@ -45,7 +48,7 @@ export class BlockRepository {
   async findManyByPost(dto: FindBlocksByPostDto): Promise<Block[]> {
     const { postUuid } = dto;
 
-    return this.prisma.get().$queryRaw`
+    return this.prisma.$queryRaw`
       SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
               "createdAt", "modifiedAt", "isDeleted",
               ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
@@ -58,7 +61,7 @@ export class BlockRepository {
   async findManyByPosts(dtos: FindBlocksByPostDto[]): Promise<Block[]> {
     const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"postUuid" = ${dto.postUuid}`);
 
-    return this.prisma.get().$queryRaw`
+    return this.prisma.$queryRaw`
       SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
                 "createdAt", "modifiedAt", "isDeleted",
                 ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
@@ -72,7 +75,7 @@ export class BlockRepository {
     const { latitudeMin: latMin, longitudeMin: lonMin, latitudeMax: latMax, longitudeMax: lonMax } = dto;
 
     // TODO: 여유를 줄 수 있는 방법을 찾아본다.
-    return this.prisma.get().$queryRaw`
+    return this.prisma.$queryRaw`
       SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
                 "createdAt", "modifiedAt", "isDeleted",
                 ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
@@ -99,13 +102,13 @@ export class BlockRepository {
         "isDeleted" = ${isDeleted}
     `;
 
-    return this.prisma.get().$queryRaw(query);
+    return this.prisma.$queryRaw(query);
   }
 
   async deleteManyByPost(dto: DeleteBlocksByPostDto): Promise<number> {
     const { postUuid } = dto;
 
-    const { count } = await this.prisma.get().block.updateMany({
+    const { count } = await this.prisma.block.updateMany({
       data: { isDeleted: true },
       where: { postUuid },
     });
