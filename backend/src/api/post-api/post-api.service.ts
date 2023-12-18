@@ -1,5 +1,4 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
@@ -16,11 +15,11 @@ import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto
 import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
 import { SummarizationService } from '@/api/summarization/summarization.service';
 import { UserService } from '@/domain/user/user.service';
+import { Transactional } from '@/common/transaction/transaction.decorator';
 
 @Injectable()
 export class PostApiService {
   constructor(
-    private readonly prisma: PrismaProvider,
     private readonly validation: ValidationService,
     private readonly transform: TransformationService,
     private readonly postService: PostService,
@@ -190,37 +189,40 @@ export class PostApiService {
     return this.assemblePost(post, user, blocks, files);
   }
 
+  @Transactional()
   async writePost(postDto: WritePostDto, userUuid: string) {
     const decomposedPostDto = this.transform.decomposePostRequest(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
-    await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
+    await Promise.all([
+      this.validation.validateBlocks(blocks, files),
+      // this.validation.validateFiles(files, userUuid)
+    ]);
 
-    return this.prisma.beginTransaction(async () => {
-      const summary = await this.summaryService.summarizePost(post.title, blocks);
-      const createdPost = await this.postService.createPost(userUuid, { ...post, summary });
+    const summary = await this.summaryService.summarizePost(post.title, blocks);
+    const createdPost = await this.postService.createPost(userUuid, { ...post, summary });
 
-      const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
+    const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
 
-      if (!user) {
-        throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
-      }
+    if (!user) {
+      throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
+    }
 
-      const { uuid: postUuid } = createdPost;
+    const { uuid: postUuid } = createdPost;
 
-      const [createdBlocks, createdFiles] = await Promise.all([
-        this.blockService.createBlocks(postUuid, blocks),
-        this.fileService.attachFiles(files),
-      ]);
+    const [createdBlocks, createdFiles] = await Promise.all([
+      this.blockService.createBlocks(postUuid, blocks),
+      this.fileService.attachFiles(files),
+    ]);
 
-      await this.redisService.del(`block:${postUuid}`);
-      const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
-      await this.redisService.del(deleteCacheKeys);
+    await this.redisService.del(`block:${postUuid}`);
+    const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
+    await this.redisService.del(deleteCacheKeys);
 
-      return this.assemblePost(createdPost, user, createdBlocks, createdFiles);
-    });
+    return this.assemblePost(createdPost, user, createdBlocks, createdFiles);
   }
 
+  @Transactional()
   async modifyPost(uuid: string, userUuid: string, postDto: WritePostDto) {
     const decomposedPostDto = this.transform.decomposePostRequest(postDto);
     const { post, blocks, files } = decomposedPostDto;
@@ -232,47 +234,44 @@ export class PostApiService {
       throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
     }
 
-    return this.prisma.beginTransaction(async () => {
-      const [updatedBlocks, updatedFiles] = await Promise.all([
-        this.blockService.modifyBlocks(uuid, blocks),
-        this.fileService.modifyFiles(files),
-      ]);
+    const [updatedBlocks, updatedFiles] = await Promise.all([
+      this.blockService.modifyBlocks(uuid, blocks),
+      this.fileService.modifyFiles(files),
+    ]);
 
-      const summary = await this.summaryService.summarizePost(post.title, blocks);
+    const summary = await this.summaryService.summarizePost(post.title, blocks);
 
-      const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary } });
+    const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary } });
 
-      await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
+    await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
 
-      await this.redisService.del(`block:${uuid}`);
-      const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
-      await this.redisService.del(deleteCacheKeys);
+    await this.redisService.del(`block:${uuid}`);
+    const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
+    await this.redisService.del(deleteCacheKeys);
 
-      return this.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
-    });
+    return this.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
   }
 
+  @Transactional()
   async deletePost(uuid: string, userUuid: string) {
     const existPost = await this.accessPost(uuid, userUuid);
 
-    return this.prisma.beginTransaction(async () => {
-      const [deletedPost, user] = await Promise.all([
-        this.postService.deletePost({ uuid }),
-        this.userService.findUserByUniqueInput({ uuid: userUuid }),
-      ]);
+    const [deletedPost, user] = await Promise.all([
+      this.postService.deletePost({ uuid }),
+      this.userService.findUserByUniqueInput({ uuid: userUuid }),
+    ]);
 
-      if (!user) {
-        throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
-      }
+    if (!user) {
+      throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
+    }
 
-      const blocks = await this.blockService.deleteBlocksByPost(existPost.uuid);
-      const files = await this.fileService.deleteFilesBySources('block', blocks);
+    const blocks = await this.blockService.deleteBlocksByPost(existPost.uuid);
+    const files = await this.fileService.deleteFilesBySources('block', blocks);
 
-      const willDeleteFileKeys = blocks.map(({ uuid }) => `file:${uuid}`);
-      await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
+    const willDeleteFileKeys = blocks.map(({ uuid }) => `file:${uuid}`);
+    await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
 
-      return this.assemblePost(deletedPost, user, blocks, files);
-    });
+    return this.assemblePost(deletedPost, user, blocks, files);
   }
 
   private async accessPost(uuid: string, userUuid: string) {
