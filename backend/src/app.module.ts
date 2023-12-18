@@ -1,23 +1,24 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { BlockModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
 import { FileModule } from './domain/file/file.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { PrismaService } from './common/prisma/prisma.service';
-import { PrismaProvider } from './common/prisma/prisma.provider';
 import { UserModule } from './domain/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from './domain/refresh-token/refresh-token.service';
 import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE, DiscoveryModule } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ApiModule } from './api/api.module';
 import { validationPipe } from './common/pipes/validation.pipe';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { HealthModule } from './common/health/health.module';
+import { TransactionManager } from './common/transaction/transaction.manager';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -45,11 +46,11 @@ import { HealthModule } from './common/health/health.module';
     ApiModule,
     RedisCacheModule,
     HealthModule,
+    DiscoveryModule,
   ],
   controllers: [],
   providers: [
     PrismaService,
-    PrismaProvider,
     RefreshTokenService,
     {
       provide: APP_GUARD,
@@ -59,6 +60,8 @@ import { HealthModule } from './common/health/health.module';
       provide: APP_PIPE,
       useValue: validationPipe,
     },
+    TransactionManager,
   ],
+  exports: [PrismaService],
 })
 export class AppModule {}

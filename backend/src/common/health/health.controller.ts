@@ -7,9 +7,9 @@ import {
   MicroserviceHealthIndicator,
 } from '@nestjs/terminus';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '@/common/prisma/prisma.service';
 
 @Controller('health')
 export class HealthController {
@@ -17,7 +17,7 @@ export class HealthController {
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
     private prisma: PrismaHealthIndicator,
-    private prismaProvider: PrismaProvider,
+    private prismaService: PrismaService,
     private microService: MicroserviceHealthIndicator,
     private configService: ConfigService,
   ) {}
@@ -28,7 +28,7 @@ export class HealthController {
   check() {
     return this.health.check([
       () => this.http.pingCheck('HTTP', 'https://docs.nestjs.com'),
-      () => this.prisma.pingCheck('DATABASE', this.prismaProvider.get()),
+      () => this.prisma.pingCheck('DATABASE', this.prismaService),
       () =>
         this.microService.pingCheck('DATA_MICROSERVICE', {
           transport: Transport.RMQ,
