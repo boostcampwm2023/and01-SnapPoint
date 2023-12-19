@@ -32,6 +32,7 @@ export class TransactionManager implements OnModuleInit {
   private getStaticInstances(): any[] {
     return this.discoverService
       .getProviders()
+      .filter((wrapper) => wrapper.isDependencyTreeStatic())
       .filter((wrapper) => wrapper.instance)
       .map((wrapper) => wrapper.instance);
   }
