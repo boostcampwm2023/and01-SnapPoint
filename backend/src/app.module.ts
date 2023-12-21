@@ -2,21 +2,19 @@ import { Global, Module } from '@nestjs/common';
 import { BlockModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
 import { FileModule } from './domain/file/file.module';
-import { PrismaModule } from './common/prisma/prisma.module';
-import { PrismaService } from './common/prisma/prisma.service';
 import { UserModule } from './domain/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from './domain/refresh-token/refresh-token.service';
 import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD, APP_PIPE, DiscoveryModule } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ApiModule } from './api/api.module';
 import { validationPipe } from './common/pipes/validation.pipe';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { HealthModule } from './common/health/health.module';
-import { TransactionManager } from './common/transaction/transaction.manager';
+import { TransactionModule } from './common/transaction/transaction.module';
 
 @Global()
 @Module({
@@ -36,21 +34,21 @@ import { TransactionManager } from './common/transaction/transaction.manager';
       }),
       inject: [ConfigService],
     }),
+    TransactionModule.forRoot({
+      isGlobal: true,
+    }),
     BlockModule,
     PostModule,
     UserModule,
     FileModule,
-    PrismaModule,
     JwtModule,
     RefreshTokenModule,
     ApiModule,
     RedisCacheModule,
     HealthModule,
-    DiscoveryModule,
   ],
   controllers: [],
   providers: [
-    PrismaService,
     RefreshTokenService,
     {
       provide: APP_GUARD,
@@ -60,8 +58,6 @@ import { TransactionManager } from './common/transaction/transaction.manager';
       provide: APP_PIPE,
       useValue: validationPipe,
     },
-    TransactionManager,
   ],
-  exports: [PrismaService],
 })
 export class AppModule {}

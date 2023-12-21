@@ -3,14 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma, User } from '@prisma/client';
-import { Repository } from '@/common/interfaces/repository.interface';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 @Injectable()
-export class UserService extends Repository {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class UserService {
+  constructor(private readonly prisma: TxPrismaService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);

@@ -4,18 +4,15 @@ import { Prisma, RefreshToken, User } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteRefreshTokenDto } from './dto/delete-refresh-token.dto';
-import { Repository } from '@/common/interfaces/repository.interface';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 @Injectable()
-export class RefreshTokenService extends Repository {
+export class RefreshTokenService {
   constructor(
-    readonly prisma: PrismaService,
+    readonly prisma: TxPrismaService,
     readonly jwtService: JwtService,
     readonly configService: ConfigService,
-  ) {
-    super();
-  }
+  ) {}
 
   async create(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
     return this.prisma.refreshToken.create({

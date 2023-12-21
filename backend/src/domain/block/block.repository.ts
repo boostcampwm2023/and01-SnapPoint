@@ -8,14 +8,11 @@ import { FindBlocksByIdDto } from './dtos/find-blocks-by-id.dto';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Sql } from '@prisma/client/runtime/library';
-import { PrismaService } from '@/common/prisma/prisma.service';
-import { Repository } from '@/common/interfaces/repository.interface';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 @Injectable()
-export class BlockRepository extends Repository {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class BlockRepository {
+  constructor(private readonly prisma: TxPrismaService) {}
 
   async createMany(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
     const values = dtos.map((dto) => {

@@ -1,22 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { Repository } from '@/common/interfaces/repository.interface';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 @Injectable()
-export class PostService extends Repository {
-  constructor(private readonly prisma: PrismaService) {
-    super();
-  }
+export class PostService {
+  constructor(private readonly prisma: TxPrismaService) {}
 
   async createPost(userUuid: string, dto: CreatePostDto) {
     return this.prisma.post.create({ data: { ...dto, userUuid } });
   }
 
   async findPost(postWhereUniqueInput: Prisma.PostWhereUniqueInput): Promise<Post | null> {
-    Logger.debug(`${this.prisma}`);
-
     return this.prisma.post.findUnique({
       where: { ...postWhereUniqueInput, isDeleted: false },
     });
