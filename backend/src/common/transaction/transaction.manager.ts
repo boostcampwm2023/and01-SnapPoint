@@ -1,20 +1,18 @@
-import { Repository } from '../interfaces/repository.interface';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
-import { PrismaService } from '../prisma/prisma.service';
-import { AsyncLocalStorage } from 'async_hooks';
-import { TRANSACTIONAL_KEY } from './transacion.key';
-import { Prisma } from '@prisma/client';
+import { TRANSACTIONAL } from './transaction.key';
+import { TransactionStorage } from './transaction.storage';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class TransactionManager implements OnModuleInit {
-  private readonly asyncLocalStorage = new AsyncLocalStorage<{ txClient: Prisma.TransactionClient }>();
+  private readonly prisma = new PrismaClient();
 
   constructor(
+    @Inject('TRANSACTION_STORAGE') private readonly asyncLocalStorage: TransactionStorage,
     private readonly discoverService: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,
     private readonly reflector: Reflector,
-    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -22,7 +20,6 @@ export class TransactionManager implements OnModuleInit {
    */
   onModuleInit() {
     this.wrapDecorators();
-    this.wrapRepository();
   }
 
   /**
@@ -46,9 +43,15 @@ export class TransactionManager implements OnModuleInit {
   private wrapMethods(method: any, instance: any) {
     const { prisma, asyncLocalStorage } = this;
 
+    // Wrapping the original method with transaction logic.
     return async function (...args: any[]) {
-      // Wrapping the original method with transaction logic.
-      return await prisma.$transaction(async (txClient) =>
+      const store = asyncLocalStorage.getStore();
+
+      if (store) {
+        return method.apply(instance, args);
+      }
+
+      return prisma.$transaction(async (txClient) =>
         asyncLocalStorage.run({ txClient }, () => method.apply(instance, args)),
       );
     };
@@ -67,33 +70,10 @@ export class TransactionManager implements OnModuleInit {
       methodNames.forEach((name) => {
         const method = instance[name];
         // Wrap only if the method is annotated with @Transactional.
-        if (this.reflector.get(TRANSACTIONAL_KEY, method)) {
+        if (this.reflector.get(TRANSACTIONAL, method)) {
           instance[name] = this.wrapMethods(method, instance);
         }
       });
     });
-  }
-
-  /**
-   * Wraps repositories to use the transactional client from AsyncLocalStorage.
-   */
-  wrapRepository() {
-    const { asyncLocalStorage } = this;
-    const instances = this.getStaticInstances();
-
-    instances
-      .filter((instance) => instance instanceof Repository)
-      .forEach((instance) => {
-        const prevClient = instance.prisma;
-
-        // Defining a getter to provide the transactional client.
-        Object.defineProperty(instance, 'prisma', {
-          configurable: false,
-          get() {
-            const store = asyncLocalStorage.getStore();
-            return store ? store.txClient : prevClient;
-          },
-        });
-      });
   }
 }
