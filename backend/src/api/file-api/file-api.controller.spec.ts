@@ -1,14 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FileApiController } from './file-api.controller';
 import { FileApiService } from './file-api.service';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
-import { PrismaService } from '@/common/prisma/prisma.service';
 import { FileService } from '@/domain/file/file.service';
-import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { FileRepository } from '@/domain/file/file.repository';
 import { RedisManager } from '@liaoliaots/nestjs-redis';
 import { mockDeep } from 'jest-mock-extended';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 // 모의 Microservice Client
 class MockMicroserviceClient {
@@ -21,8 +19,6 @@ describe('FileApiController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FileApiController],
       providers: [
-        PrismaService,
-        PrismaProvider,
         FileApiService,
         FileService,
         {
@@ -32,10 +28,11 @@ describe('FileApiController', () => {
         RedisCacheService,
         RedisManager,
         FileRepository,
+        TxPrismaService,
       ],
     })
-      .overrideProvider(PrismaProvider)
-      .useValue(mockPrismaProvider)
+      .overrideProvider(TxPrismaService)
+      .useValue(mockDeep<TxPrismaService>())
       .overrideProvider(RedisManager)
       .useValue(mockDeep<RedisManager>())
       .compile();

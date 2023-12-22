@@ -14,6 +14,7 @@ import { SummarizationService } from '../summarization/summarization.service';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
@@ -35,6 +36,7 @@ describe('PostApiService', () => {
         HttpService,
         ConfigService,
         UserService,
+        TxPrismaService,
       ],
     })
       .overrideProvider(PostService)
@@ -49,6 +51,8 @@ describe('PostApiService', () => {
       .useValue(mockDeep<HttpService>())
       .overrideProvider(UserService)
       .useValue(mockDeep<UserService>())
+      .overrideProvider(TxPrismaService)
+      .useValue(mockDeep<TxPrismaService>())
       .compile();
 
     service = module.get<PostApiService>(PostApiService);
