@@ -7,8 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshToken, User } from '@prisma/client';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 describe('AuthSerivce', () => {
   let service: AuthService;
@@ -17,15 +16,7 @@ describe('AuthSerivce', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        UserService,
-        ConfigService,
-        JwtService,
-        RefreshTokenService,
-        PrismaProvider,
-        PrismaService,
-      ],
+      providers: [AuthService, UserService, ConfigService, JwtService, RefreshTokenService, TxPrismaService],
     })
       .overrideProvider(JwtService)
       .useValue(mockDeep<JwtService>())
@@ -33,6 +24,8 @@ describe('AuthSerivce', () => {
       .useValue(mockDeep<RefreshTokenService>())
       .overrideProvider(UserService)
       .useValue(mockDeep<UserService>())
+      .overrideProvider(TxPrismaService)
+      .useValue(mockDeep<TxPrismaService>())
       .compile();
 
     service = module.get<AuthService>(AuthService);

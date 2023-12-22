@@ -1,26 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
-import { DeepMockProxy } from 'jest-mock-extended';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '@/common/prisma/prisma.service';
-import { MockPrismaProvider, mockPrismaProvider } from '@/common/mocks/mock.prisma';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 describe('UserService', () => {
   let userService: UserService;
-  let prisma: DeepMockProxy<MockPrismaProvider>;
+  let prisma: DeepMockProxy<TxPrismaService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService, PrismaService, PrismaProvider],
+      providers: [UserService, TxPrismaService],
     })
-      .overrideProvider(PrismaProvider)
-      .useValue(mockPrismaProvider)
+      .overrideProvider(TxPrismaService)
+      .useValue(mockDeep<TxPrismaService>())
       .compile();
 
     userService = module.get<UserService>(UserService);
-    prisma = module.get(PrismaProvider);
+    prisma = module.get(TxPrismaService);
   });
 
   afterEach(() => {
@@ -48,8 +46,8 @@ describe('UserService', () => {
     it('정상 입력인 경우 새로운 유저를 생성한다.', async () => {
       jest.spyOn(bcrypt, 'hash').mockImplementation(() => Promise.resolve(hashedPassword));
 
-      prisma.get().user.findUnique.mockResolvedValueOnce(null);
-      prisma.get().user.create.mockResolvedValueOnce(userMock);
+      prisma.user.findUnique.mockResolvedValueOnce(null);
+      prisma.user.create.mockResolvedValueOnce(userMock);
 
       const result = await userService.create(createUserDto);
 

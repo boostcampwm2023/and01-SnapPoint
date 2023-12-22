@@ -1,13 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostApiService } from './post-api.service';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { ValidationService } from '../validation/validation.service';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
-import { PrismaService } from '@/common/prisma/prisma.service';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
-import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
@@ -17,6 +14,7 @@ import { SummarizationService } from '../summarization/summarization.service';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
@@ -28,8 +26,6 @@ describe('PostApiService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PostApiService,
-        PrismaService,
-        PrismaProvider,
         ValidationService,
         TransformationService,
         PostService,
@@ -40,10 +36,9 @@ describe('PostApiService', () => {
         HttpService,
         ConfigService,
         UserService,
+        TxPrismaService,
       ],
     })
-      .overrideProvider(PrismaProvider)
-      .useValue(mockPrismaProvider)
       .overrideProvider(PostService)
       .useValue(mockDeep<PostService>())
       .overrideProvider(BlockService)
@@ -56,6 +51,8 @@ describe('PostApiService', () => {
       .useValue(mockDeep<HttpService>())
       .overrideProvider(UserService)
       .useValue(mockDeep<UserService>())
+      .overrideProvider(TxPrismaService)
+      .useValue(mockDeep<TxPrismaService>())
       .compile();
 
     service = module.get<PostApiService>(PostApiService);

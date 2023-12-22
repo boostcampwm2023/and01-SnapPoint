@@ -1,18 +1,18 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import * as bcrypt from 'bcrypt';
 import { Prisma, User } from '@prisma/client';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaProvider) {}
+  constructor(private readonly prisma: TxPrismaService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    return this.prisma.get().user.create({
+    return this.prisma.user.create({
       data: {
         email: createUserDto.email,
         password: hashedPassword,
@@ -22,11 +22,11 @@ export class UserService {
   }
 
   findAll(): Promise<User[]> {
-    return this.prisma.get().user.findMany();
+    return this.prisma.user.findMany();
   }
 
   async findUserByUniqueInput(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
-    return this.prisma.get().user.findUnique({
+    return this.prisma.user.findUnique({
       where,
     });
   }
@@ -39,7 +39,7 @@ export class UserService {
     orderBy?: Prisma.UserOrderByWithRelationInput;
   }): Promise<User[]> {
     const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.get().user.findMany({
+    return this.prisma.user.findMany({
       skip,
       take,
       cursor,
@@ -49,7 +49,7 @@ export class UserService {
   }
 
   async findOne(uuid: string): Promise<User | null> {
-    return this.prisma.get().user.findUnique({
+    return this.prisma.user.findUnique({
       where: {
         uuid: uuid,
       },
@@ -57,7 +57,7 @@ export class UserService {
   }
 
   async update(uuid: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.prisma.get().user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         uuid: uuid,
       },
@@ -69,7 +69,7 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
 
-    return this.prisma.get().user.update({
+    return this.prisma.user.update({
       where: {
         uuid: uuid,
       },
@@ -81,7 +81,7 @@ export class UserService {
   }
 
   async remove(uuid: string) {
-    const user = await this.prisma.get().user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         uuid: uuid,
       },
@@ -91,7 +91,7 @@ export class UserService {
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
     }
 
-    return this.prisma.get().user.update({
+    return this.prisma.user.update({
       where: {
         uuid: uuid,
       },

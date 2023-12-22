@@ -1,37 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RefreshTokenService } from './refresh-token.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
-import { PrismaClient, RefreshToken } from '@prisma/client';
+import { RefreshToken } from '@prisma/client';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 jest.mock('@nestjs/jwt');
 jest.mock('@nestjs/config');
 
 describe('RefreshTokenService', () => {
   let service: RefreshTokenService;
-  let prisma: DeepMockProxy<PrismaClient>;
+  let prisma: DeepMockProxy<TxPrismaService>;
 
   beforeEach(async () => {
-    prisma = mockDeep<PrismaClient>();
-
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RefreshTokenService,
-        {
-          provide: PrismaProvider,
-          useValue: {
-            get: () => prisma,
-          },
-        },
-        JwtService,
-        ConfigService,
-      ],
-    }).compile();
+      providers: [RefreshTokenService, JwtService, ConfigService, TxPrismaService],
+    })
+      .overrideProvider(TxPrismaService)
+      .useValue(mockDeep<TxPrismaService>())
+      .compile();
 
     service = module.get<RefreshTokenService>(RefreshTokenService);
+    prisma = module.get(TxPrismaService);
   });
 
   describe('리프레쉬 토큰 생성', () => {

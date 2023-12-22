@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { FileApiController } from '@/api/file-api/file-api.controller';
 import { FileApiService } from '@/api/file-api/file-api.service';
 import { PostApiController } from '@/api/post-api/post-api.controller';
-import { PrismaService } from '@/common/prisma/prisma.service';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PostApiService } from '@/api/post-api/post-api.service';
 import { ValidationService } from './validation/validation.service';
 import { PostService } from '@/domain/post/post.service';
@@ -62,8 +60,6 @@ import { SummarizationService } from './summarization/summarization.service';
   ],
   controllers: [FileApiController, PostApiController, AuthController],
   providers: [
-    PrismaService,
-    PrismaProvider,
     FileApiService,
     PostApiService,
     ValidationService,

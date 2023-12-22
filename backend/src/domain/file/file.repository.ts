@@ -1,21 +1,21 @@
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 import { Injectable } from '@nestjs/common';
 import { File, Prisma } from '@prisma/client';
 
 @Injectable()
 export class FileRepository {
-  constructor(private readonly prisma: PrismaProvider) {}
+  constructor(private readonly prisma: TxPrismaService) {}
 
   async createFile(data: Prisma.FileCreateInput) {
-    return this.prisma.get().file.create({ data });
+    return this.prisma.file.create({ data });
   }
 
   async createFiles(data: Prisma.FileCreateManyInput) {
-    return this.prisma.get().file.createMany({ data });
+    return this.prisma.file.createMany({ data });
   }
 
   async findFile(fileWhereUniqueInput: Prisma.FileWhereUniqueInput): Promise<File | null> {
-    return this.prisma.get().file.findUnique({
+    return this.prisma.file.findUnique({
       where: { ...fileWhereUniqueInput, isDeleted: false },
     });
   }
@@ -28,7 +28,7 @@ export class FileRepository {
     orderBy?: Prisma.FileOrderByWithRelationInput;
   }): Promise<File[]> {
     const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.get().file.findMany({
+    return this.prisma.file.findMany({
       skip,
       take,
       cursor,
@@ -39,21 +39,21 @@ export class FileRepository {
 
   async updateFile(params: { where: Prisma.FileWhereUniqueInput; data: Prisma.FileUpdateInput }) {
     const { data, where } = params;
-    return this.prisma.get().file.update({
+    return this.prisma.file.update({
       data,
       where,
     });
   }
 
   async deleteFile(where: Prisma.FileWhereUniqueInput): Promise<File> {
-    return this.prisma.get().file.update({
+    return this.prisma.file.update({
       data: { isDeleted: true },
       where,
     });
   }
 
   async deleteFiles(where: Prisma.FileWhereInput) {
-    return this.prisma.get().file.updateMany({
+    return this.prisma.file.updateMany({
       data: { isDeleted: true },
       where,
     });

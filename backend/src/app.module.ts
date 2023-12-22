@@ -1,10 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { BlockModule } from './domain/block/block.module';
 import { PostModule } from './domain/post/post.module';
 import { FileModule } from './domain/file/file.module';
-import { PrismaModule } from './common/prisma/prisma.module';
-import { PrismaService } from './common/prisma/prisma.service';
-import { PrismaProvider } from './common/prisma/prisma.provider';
 import { UserModule } from './domain/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RefreshTokenService } from './domain/refresh-token/refresh-token.service';
@@ -17,7 +14,9 @@ import { validationPipe } from './common/pipes/validation.pipe';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { HealthModule } from './common/health/health.module';
+import { TransactionModule } from './common/transaction/transaction.module';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,11 +34,13 @@ import { HealthModule } from './common/health/health.module';
       }),
       inject: [ConfigService],
     }),
+    TransactionModule.forRoot({
+      isGlobal: true,
+    }),
     BlockModule,
     PostModule,
     UserModule,
     FileModule,
-    PrismaModule,
     JwtModule,
     RefreshTokenModule,
     ApiModule,
@@ -48,8 +49,6 @@ import { HealthModule } from './common/health/health.module';
   ],
   controllers: [],
   providers: [
-    PrismaService,
-    PrismaProvider,
     RefreshTokenService,
     {
       provide: APP_GUARD,
