@@ -9,7 +9,7 @@ import {
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '@/common/prisma/prisma.service';
+import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
 
 @Controller('health')
 export class HealthController {
@@ -17,7 +17,7 @@ export class HealthController {
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
     private prisma: PrismaHealthIndicator,
-    private prismaService: PrismaService,
+    private prismaService: TxPrismaService,
     private microService: MicroserviceHealthIndicator,
     private configService: ConfigService,
   ) {}

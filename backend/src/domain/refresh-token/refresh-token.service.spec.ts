@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RefreshTokenService } from './refresh-token.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { PrismaClient, RefreshToken } from '@prisma/client';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -18,17 +17,7 @@ describe('RefreshTokenService', () => {
     prisma = mockDeep<PrismaClient>();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RefreshTokenService,
-        {
-          provide: PrismaProvider,
-          useValue: {
-            get: () => prisma,
-          },
-        },
-        JwtService,
-        ConfigService,
-      ],
+      providers: [RefreshTokenService, JwtService, ConfigService],
     }).compile();
 
     service = module.get<RefreshTokenService>(RefreshTokenService);

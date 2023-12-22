@@ -1,13 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostApiService } from './post-api.service';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import { ValidationService } from '../validation/validation.service';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
-import { PrismaService } from '@/common/prisma/prisma.service';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
-import { mockPrismaProvider } from '@/common/mocks/mock.prisma';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
@@ -28,8 +25,6 @@ describe('PostApiService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PostApiService,
-        PrismaService,
-        PrismaProvider,
         ValidationService,
         TransformationService,
         PostService,
@@ -42,8 +37,6 @@ describe('PostApiService', () => {
         UserService,
       ],
     })
-      .overrideProvider(PrismaProvider)
-      .useValue(mockPrismaProvider)
       .overrideProvider(PostService)
       .useValue(mockDeep<PostService>())
       .overrideProvider(BlockService)

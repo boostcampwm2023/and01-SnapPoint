@@ -2,10 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { DeepMockProxy } from 'jest-mock-extended';
-import { PrismaProvider } from '@/common/prisma/prisma.provider';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '@/common/prisma/prisma.service';
-import { MockPrismaProvider, mockPrismaProvider } from '@/common/mocks/mock.prisma';
+import { MockPrismaProvider } from '@/common/mocks/mock.prisma';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -13,14 +11,10 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService, PrismaService, PrismaProvider],
-    })
-      .overrideProvider(PrismaProvider)
-      .useValue(mockPrismaProvider)
-      .compile();
+      providers: [UserService],
+    }).compile();
 
     userService = module.get<UserService>(UserService);
-    prisma = module.get(PrismaProvider);
   });
 
   afterEach(() => {
