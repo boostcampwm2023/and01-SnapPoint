@@ -30,8 +30,8 @@ export class TransactionManager implements OnModuleInit {
     return this.discoverService
       .getProviders()
       .filter((wrapper) => wrapper.isDependencyTreeStatic())
-      .filter((wrapper) => wrapper.instance)
-      .map((wrapper) => wrapper.instance);
+      .filter(({ instance }) => instance && Object.getPrototypeOf(instance))
+      .map(({ instance }) => instance);
   }
 
   /**
