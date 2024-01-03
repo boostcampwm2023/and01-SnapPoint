@@ -5,7 +5,7 @@ import { mockDeep } from 'jest-mock-extended';
 import { BadRequestException } from '@nestjs/common';
 import { ValidateFileDto } from './dtos/validate-file.dto';
 import { ValidateBlockDto } from './dtos/validate-block.dto';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 describe('ValidationService', () => {
   let service: ValidationService;
@@ -15,10 +15,15 @@ describe('ValidationService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ValidationService, FileService, TxPrismaService],
+      providers: [
+        ValidationService,
+        FileService,
+        {
+          provide: PRISMA_SERVICE,
+          useValue: mockDeep<PrismaService>(),
+        },
+      ],
     })
-      .overrideProvider(TxPrismaService)
-      .useValue(mockDeep<TxPrismaService>())
       .overrideProvider(FileService)
       .useValue(mockDeep<FileService>())
       .compile();
