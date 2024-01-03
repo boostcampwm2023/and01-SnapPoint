@@ -1,3 +1,0 @@
-export const TRANSACTIONAL = Symbol('TRANSACTIONAL');
-
-export const TRANSACTION_STORAGE = Symbol('TRANSACTION_STORAGE');
