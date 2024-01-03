@@ -1,15 +1,15 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
 import { Prisma, RefreshToken, User } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteRefreshTokenDto } from './dto/delete-refresh-token.dto';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 @Injectable()
 export class RefreshTokenService {
   constructor(
-    readonly prisma: TxPrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
     readonly jwtService: JwtService,
     readonly configService: ConfigService,
   ) {}

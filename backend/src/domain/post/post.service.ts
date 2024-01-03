@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prisma: TxPrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async createPost(userUuid: string, dto: CreatePostDto) {
     return this.prisma.post.create({ data: { ...dto, userUuid } });
