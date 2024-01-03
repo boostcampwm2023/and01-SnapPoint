@@ -14,7 +14,8 @@ import { validationPipe } from './common/pipes/validation.pipe';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { HealthModule } from './common/health/health.module';
-import { TransactionModule } from './common/transaction/transaction.module';
+import { TransactionModule, txExtension } from '@takeny1998/nestjs-prisma-transactional';
+import { PRISMA_SERVICE, PrismaService } from './common/databases/prisma.service';
 
 @Global()
 @Module({
@@ -34,9 +35,7 @@ import { TransactionModule } from './common/transaction/transaction.module';
       }),
       inject: [ConfigService],
     }),
-    TransactionModule.forRoot({
-      isGlobal: true,
-    }),
+    TransactionModule,
     BlockModule,
     PostModule,
     UserModule,
@@ -58,6 +57,11 @@ import { TransactionModule } from './common/transaction/transaction.module';
       provide: APP_PIPE,
       useValue: validationPipe,
     },
+    {
+      provide: PRISMA_SERVICE,
+      useValue: new PrismaService().$extends(txExtension),
+    },
   ],
+  exports: [PRISMA_SERVICE],
 })
 export class AppModule {}
