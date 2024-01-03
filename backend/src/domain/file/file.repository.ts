@@ -1,10 +1,10 @@
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
-import { Injectable } from '@nestjs/common';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
+import { Inject, Injectable } from '@nestjs/common';
 import { File, Prisma } from '@prisma/client';
 
 @Injectable()
 export class FileRepository {
-  constructor(private readonly prisma: TxPrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async createFile(data: Prisma.FileCreateInput) {
     return this.prisma.file.create({ data });

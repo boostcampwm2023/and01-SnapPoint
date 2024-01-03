@@ -3,22 +3,25 @@ import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import * as bcrypt from 'bcrypt';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PrismaService, PRISMA_SERVICE } from '@/common/databases/prisma.service';
 
 describe('UserService', () => {
   let userService: UserService;
-  let prisma: DeepMockProxy<TxPrismaService>;
+  let prisma: DeepMockProxy<PrismaService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService, TxPrismaService],
-    })
-      .overrideProvider(TxPrismaService)
-      .useValue(mockDeep<TxPrismaService>())
-      .compile();
+      providers: [
+        UserService,
+        {
+          provide: PRISMA_SERVICE,
+          useValue: mockDeep<PrismaService>(),
+        },
+      ],
+    }).compile();
 
     userService = module.get<UserService>(UserService);
-    prisma = module.get(TxPrismaService);
+    prisma = module.get(PRISMA_SERVICE);
   });
 
   afterEach(() => {

@@ -6,7 +6,8 @@ import { FileService } from '@/domain/file/file.service';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { RedisManager } from '@liaoliaots/nestjs-redis';
 import { FileRepository } from '@/domain/file/file.repository';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
+
 // import { mockFileEntities } from '@/common/mocks/mock.entites.file';
 // import { FileDto } from './dto/file.dto';
 
@@ -16,16 +17,22 @@ describe('FileApiService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FileApiService, FileService, RedisCacheService, RedisManager, FileRepository, TxPrismaService],
+      providers: [
+        FileApiService,
+        FileService,
+        RedisCacheService,
+        RedisManager,
+        FileRepository,
+        {
+          provide: PRISMA_SERVICE,
+          useValue: mockDeep<PrismaService>(),
+        },
+      ],
     })
-      .overrideProvider(TxPrismaService)
-      .useValue(mockDeep<TxPrismaService>())
       .overrideProvider(FileService)
       .useValue(mockDeep<FileService>())
       .overrideProvider(RedisManager)
       .useValue(mockDeep<RedisManager>())
-      .overrideProvider(TxPrismaService)
-      .useValue(mockDeep<TxPrismaService>())
       .compile();
 
     service = module.get<FileApiService>(FileApiService);

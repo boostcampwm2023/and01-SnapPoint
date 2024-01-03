@@ -6,7 +6,7 @@ import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { FileRepository } from '@/domain/file/file.repository';
 import { RedisManager } from '@liaoliaots/nestjs-redis';
 import { mockDeep } from 'jest-mock-extended';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 // 모의 Microservice Client
 class MockMicroserviceClient {
@@ -28,11 +28,12 @@ describe('FileApiController', () => {
         RedisCacheService,
         RedisManager,
         FileRepository,
-        TxPrismaService,
+        {
+          provide: PRISMA_SERVICE,
+          useValue: mockDeep<PrismaService>(),
+        },
       ],
     })
-      .overrideProvider(TxPrismaService)
-      .useValue(mockDeep<TxPrismaService>())
       .overrideProvider(RedisManager)
       .useValue(mockDeep<RedisManager>())
       .compile();

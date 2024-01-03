@@ -15,7 +15,7 @@ import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto
 import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
 import { SummarizationService } from '@/api/summarization/summarization.service';
 import { UserService } from '@/domain/user/user.service';
-import { Transactional } from '@/common/transaction/transaction.decorator';
+import { Transactional } from '@takeny1998/nestjs-prisma-transactional';
 
 @Injectable()
 export class PostApiService {
@@ -194,10 +194,7 @@ export class PostApiService {
     const decomposedPostDto = this.transform.decomposePostRequest(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
-    await Promise.all([
-      this.validation.validateBlocks(blocks, files),
-      // this.validation.validateFiles(files, userUuid)
-    ]);
+    await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
 
     const summary = await this.summaryService.summarizePost(post.title, blocks);
     const createdPost = await this.postService.createPost(userUuid, { ...post, summary });
