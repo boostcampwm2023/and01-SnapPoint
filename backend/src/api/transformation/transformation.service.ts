@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { FindNearbyPostQuery } from '../post-api/dtos/find-nearby-post.query.dto';
 import { randomUUID } from 'crypto';
 import { plainToInstance } from 'class-transformer';
-import { DecomposedPostDto } from '../post-api/dtos/decomposed-post.dto';
-import { ModifyPostDto } from '../post-api/dtos/post/modify-post.dto';
 import { AttachFileDto } from '../post-api/dtos/file/attach-file.dto';
 import { DecomposedBlockDto } from './dtos/decomposed-block.dto';
 import { DecomposedPostDataDto } from './dtos/decomposed-post-data.dto';
 import { DecomposedFileDto } from './dtos/decomposed-file.dto';
+import { DecomposedPostDto } from './dtos/decomposed-post.dto';
 import { WritePostDto } from '../post-api/dtos/post/write-post.dto';
+import { ModifyPostDto } from '../post-api/dtos/post/modify-post.dto';
 
 @Injectable()
 export class TransformationService {
@@ -78,31 +78,28 @@ export class TransformationService {
    * @param postUuid 게시글의 UUID
    * @returns 분할된 게시글, 블록, 파일 데이터의 집합
    */
-  decomposePostData(postDto: WritePostDto | ModifyPostDto, postUuid?: string): DecomposedPostDataDto {
+  decomposePostData(postDataDto: WritePostDto | ModifyPostDto, postUuid?: string): DecomposedPostDataDto {
     const blockDtos: DecomposedBlockDto[] = [];
     const fileDtos: DecomposedFileDto[] = [];
 
-    const { title, blocks } = postDto;
+    const { title, blocks } = postDataDto;
+    const postDto = plainToInstance(DecomposedPostDto, { uuid: postUuid ?? randomUUID(), title });
 
     blocks.forEach((block, order) => {
       const { content, type, latitude, longitude, files } = block;
 
       // 블록의 UUID가 없으면 임시로 생성한다.
-      const blockUuid = block['uuid'] ?? randomUUID();
+      const uuid = block['uuid'] ?? randomUUID();
 
+      // 파일이 있는 경우 파일 DTO를 해석하고 추가한다.
       if (files) {
-        fileDtos.push(...this.decomposeAttachFiles(files, blockUuid));
+        fileDtos.push(...this.decomposeAttachFiles(files, uuid));
       }
 
-      blockDtos.push(
-        plainToInstance(DecomposedBlockDto, { uuid: blockUuid, postUuid, content, type, latitude, longitude, order }),
-      );
+      const blockDto = { uuid, content, type, latitude, longitude, order, postUuid: postDto.uuid };
+      blockDtos.push(plainToInstance(DecomposedBlockDto, blockDto));
     });
 
-    return plainToInstance(DecomposedPostDataDto, {
-      post: plainToInstance(DecomposedPostDto, { uuid: postUuid ?? randomUUID(), title }),
-      blocks: blockDtos,
-      files: fileDtos,
-    });
+    return plainToInstance(DecomposedPostDataDto, { post: postDto, blocks: blockDtos, files: fileDtos });
   }
 }
