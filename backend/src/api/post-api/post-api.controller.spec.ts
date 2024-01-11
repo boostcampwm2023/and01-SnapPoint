@@ -15,7 +15,7 @@ import { FileRepository } from '@/domain/file/file.repository';
 import { RedisManager } from '@liaoliaots/nestjs-redis';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -39,11 +39,12 @@ describe('PostApiController', () => {
         FileRepository,
         ConfigService,
         UserService,
-        TxPrismaService,
+        {
+          provide: PRISMA_SERVICE,
+          useValue: mockDeep<PrismaService>(),
+        },
       ],
     })
-      .overrideProvider(TxPrismaService)
-      .useValue(mockDeep<TxPrismaService>())
       .overrideProvider(RedisManager)
       .useValue(mockDeep<RedisManager>())
       .overrideProvider(HttpService)

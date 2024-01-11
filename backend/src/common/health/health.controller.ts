@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import {
   HealthCheckService,
   HttpHealthIndicator,
@@ -9,7 +9,7 @@ import {
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '../databases/prisma.service';
 
 @Controller('health')
 export class HealthController {
@@ -17,7 +17,7 @@ export class HealthController {
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
     private prisma: PrismaHealthIndicator,
-    private prismaService: TxPrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prismaService: PrismaService,
     private microService: MicroserviceHealthIndicator,
     private configService: ConfigService,
   ) {}

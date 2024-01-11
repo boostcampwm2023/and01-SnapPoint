@@ -5,14 +5,14 @@ import { CreateBlockDto } from './dtos/create-block.dto';
 import { DeleteBlocksByPostDto } from './dtos/delete-blocks-by-post.dto';
 import { UpsertBlockDto } from './dtos/upsert-block.dto';
 import { FindBlocksByIdDto } from './dtos/find-blocks-by-id.dto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Sql } from '@prisma/client/runtime/library';
-import { TxPrismaService } from '@/common/transaction/tx-prisma.service';
+import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 @Injectable()
 export class BlockRepository {
-  constructor(private readonly prisma: TxPrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async createMany(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
     const values = dtos.map((dto) => {
