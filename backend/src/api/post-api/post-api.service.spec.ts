@@ -1,3 +1,4 @@
+import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostApiService } from './post-api.service';
 import { ValidationService } from '../validation/validation.service';
@@ -8,7 +9,6 @@ import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
-import { WritePostDto } from './dtos/write-post.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { SummarizationService } from '../summarization/summarization.service';
 import { HttpService } from '@nestjs/axios';
@@ -19,7 +19,7 @@ import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service
 describe('PostApiService', () => {
   let service: PostApiService;
   let postService: DeepMockProxy<PostService>;
-  let postDto: WritePostDto;
+  let postDto: ModifyPostDto;
   let postEntity: Post;
 
   beforeEach(async () => {
