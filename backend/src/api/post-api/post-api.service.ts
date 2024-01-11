@@ -9,13 +9,14 @@ import { FileDto } from '@/api/post-api/dtos/file.dto';
 import { Block, File, Post, User } from '@prisma/client';
 import { TransformationService } from '@/api/transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
-import { WritePostDto } from './dtos/write-post.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
 import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
 import { SummarizationService } from '@/api/summarization/summarization.service';
 import { UserService } from '@/domain/user/user.service';
 import { Transactional } from '@takeny1998/nestjs-prisma-transactional';
+import { WritePostDto } from './dtos/post/write-post.dto';
+import { ModifyPostDto } from './dtos/post/modify-post.dto';
 
 @Injectable()
 export class PostApiService {
@@ -191,7 +192,7 @@ export class PostApiService {
 
   @Transactional()
   async writePost(postDto: WritePostDto, userUuid: string) {
-    const decomposedPostDto = this.transform.decomposePostRequest(postDto);
+    const decomposedPostDto = this.transform.decomposePostData(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
     await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
@@ -220,8 +221,8 @@ export class PostApiService {
   }
 
   @Transactional()
-  async modifyPost(uuid: string, userUuid: string, postDto: WritePostDto) {
-    const decomposedPostDto = this.transform.decomposePostRequest(postDto);
+  async modifyPost(uuid: string, userUuid: string, postDto: ModifyPostDto) {
+    const decomposedPostDto = this.transform.decomposePostData(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
     const existPost = await this.accessPost(uuid, userUuid);
