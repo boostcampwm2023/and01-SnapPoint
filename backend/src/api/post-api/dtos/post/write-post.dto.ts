@@ -1,7 +1,7 @@
 import { ArrayNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { WriteBlockDto } from './write-block.dto';
+import { WriteBlockDto } from '../block/write-block.dto';
 
 export class WritePostDto {
   @ApiProperty({ description: '게시글의 제목을 나타냅니다.' })

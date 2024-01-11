@@ -1,8 +1,8 @@
 import { FileService } from '@/domain/file/file.service';
 import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
-import { WriteBlockFileDto } from '@/api/post-api/dtos/write-block-files.dto';
 import { ValidateFileDto } from '@/api/validation/dtos/validate-file.dto';
 import { ValidateBlockDto } from '@/api/validation/dtos/validate-block.dto';
+import { AttachFileDto } from '../post-api/dtos/file/attach-file.dto';
 
 @Injectable()
 export class ValidationService {
@@ -34,10 +34,9 @@ export class ValidationService {
   }
 
   async validateBlocks(blockDtos: ValidateBlockDto[], blockFileDtos: ValidateFileDto[]) {
-    const sourceFileMap = new Map<string, WriteBlockFileDto[]>();
+    const sourceFileMap = new Map<string, AttachFileDto[]>();
 
     // 블록이 다른 포스트에 있지 않은지 판별한다.
-
     blockFileDtos.forEach((blockFile) => {
       const { sourceUuid } = blockFile;
       if (!sourceFileMap.has(sourceUuid)) {

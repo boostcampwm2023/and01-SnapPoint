@@ -11,8 +11,9 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
-import { WritePostDto } from './dtos/write-post.dto';
 import { ReadPostQuery } from './dtos/read-post.query.dto';
+import { ModifyPostDto } from './dtos/post/modify-post.dto';
+import { WritePostDto } from './dtos/post/write-post.dto';
 
 @Controller('posts')
 export class PostApiController {
@@ -66,7 +67,7 @@ export class PostApiController {
     description: '작성한 게시글의 내용 및 블록 정보를 업데이트한다.',
     type: PostDto,
   })
-  modifyPost(@Param('uuid') uuid: string, @Body() postDto: WritePostDto, @Req() request: any) {
+  modifyPost(@Param('uuid') uuid: string, @Body() postDto: ModifyPostDto, @Req() request: any) {
     const { uuid: userUuid } = request.user;
     return this.postApiService.modifyPost(uuid, userUuid, postDto);
   }
