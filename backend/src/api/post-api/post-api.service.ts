@@ -192,28 +192,32 @@ export class PostApiService {
 
   @Transactional()
   async writePost(postDto: WritePostDto, userUuid: string) {
+    // 계층적인 게시글 데이터를 게시글, 블록, 파일로 분할한다.
     const decomposedPostDto = this.transform.decomposePostData(postDto);
     const { post, blocks, files } = decomposedPostDto;
 
+    // 게시글의 블록, 파일을 각각 검사한다.
     await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
 
-    const summary = await this.summaryService.summarizePost(post.title, blocks);
-    const createdPost = await this.postService.createPost(userUuid, { ...post, summary });
-
     const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
-
     if (!user) {
       throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
     }
 
-    const { uuid: postUuid } = createdPost;
+    // 게시글 블록의 내용을 요약한 후 생성하는 Promise
+    const createPostPromise = this.summaryService
+      .summarizePost(post.title, blocks)
+      .then((summary: string) => this.postService.createPost(userUuid, { ...post, summary }));
 
-    const [createdBlocks, createdFiles] = await Promise.all([
-      this.blockService.createBlocks(postUuid, blocks),
+    // 게시글, 블록, 파일 생성을 비동기 병렬 처리한다.
+    const [createdPost, createdBlocks, createdFiles] = await Promise.all([
+      createPostPromise,
+      this.blockService.createBlocks(post.uuid, blocks),
       this.fileService.attachFiles(files),
     ]);
 
-    await this.redisService.del(`block:${postUuid}`);
+    // Redis 캐시 정보를 삭제한다.
+    await this.redisService.del(`block:${post.uuid}`);
     const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
     await this.redisService.del(deleteCacheKeys);
 
