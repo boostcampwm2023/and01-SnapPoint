@@ -31,6 +31,16 @@ async function bootstrap() {
     },
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [configService.getOrThrow<string>('RMQ_HOST')],
+      queue: configService.getOrThrow<string>('RMQ_SUMMARY_QUEUE'),
+      noAck: false,
+      queueOptions: { durable: true },
+    },
+  });
+
   await app.startAllMicroservices();
   await app.listen(3000);
 }

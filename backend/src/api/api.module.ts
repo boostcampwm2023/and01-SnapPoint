@@ -20,6 +20,7 @@ import { BlockModule } from '@/domain/block/block.module';
 import { HttpModule } from '@nestjs/axios';
 import { FileModule } from '@/domain/file/file.module';
 import { SummarizationService } from './summarization/summarization.service';
+import { SummarizationController } from './summarization/summarizationi.controller';
 
 @Module({
   imports: [
@@ -32,6 +33,24 @@ import { SummarizationService } from './summarization/summarization.service';
           options: {
             urls: [configService.getOrThrow<string>('RMQ_HOST')],
             queue: configService.getOrThrow<string>('RMQ_MEDIA_QUEUE'),
+            queueOptions: {
+              durable: true,
+            },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+
+    ClientsModule.registerAsync([
+      {
+        name: 'SUMMARY_SERVICE',
+        imports: [ConfigModule],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RMQ_HOST')],
+            queue: configService.getOrThrow<string>('RMQ_SUMMARY_QUEUE'),
             queueOptions: {
               durable: true,
             },
@@ -58,7 +77,7 @@ import { SummarizationService } from './summarization/summarization.service';
     HttpModule,
     FileModule,
   ],
-  controllers: [FileApiController, PostApiController, AuthController],
+  controllers: [FileApiController, PostApiController, AuthController, SummarizationController],
   providers: [
     FileApiService,
     PostApiService,

@@ -1,4 +1,10 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
@@ -12,11 +18,12 @@ import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
 import { FindFilesBySourceDto } from '@/domain/file/dtos/find-files-by-source.dto';
-import { SummarizationService } from '@/api/summarization/summarization.service';
 import { UserService } from '@/domain/user/user.service';
 import { Transactional } from '@takeny1998/nestjs-prisma-transactional';
 import { WritePostDto } from './dtos/post/write-post.dto';
 import { ModifyPostDto } from './dtos/post/modify-post.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { SummaryPostDto } from '../summarization/dtos/summary-post.dto';
 
 @Injectable()
 export class PostApiService {
@@ -27,7 +34,7 @@ export class PostApiService {
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
     private readonly redisService: RedisCacheService,
-    private readonly summaryService: SummarizationService,
+    @Inject('SUMMARY_SERVICE') private readonly summaryService: ClientProxy,
     private readonly userService: UserService,
   ) {}
 
@@ -204,14 +211,9 @@ export class PostApiService {
       throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
     }
 
-    // 게시글 블록의 내용을 요약한 후 생성하는 Promise
-    const createPostPromise = this.summaryService
-      .summarizePost(post.title, blocks)
-      .then((summary: string) => this.postService.createPost(userUuid, { ...post, summary }));
-
     // 게시글, 블록, 파일 생성을 비동기 병렬 처리한다.
     const [createdPost, createdBlocks, createdFiles] = await Promise.all([
-      createPostPromise,
+      this.postService.createPost(userUuid, { ...post, summary: '' }),
       this.blockService.createBlocks(post.uuid, blocks),
       this.fileService.attachFiles(files),
     ]);
@@ -220,6 +222,8 @@ export class PostApiService {
     await this.redisService.del(`block:${post.uuid}`);
     const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
     await this.redisService.del(deleteCacheKeys);
+
+    this.summaryService.emit<SummaryPostDto>({ cmd: 'summary.post' }, { post: createdPost, blocks: createdBlocks });
 
     return this.assemblePost(createdPost, user, createdBlocks, createdFiles);
   }
@@ -241,15 +245,16 @@ export class PostApiService {
       this.fileService.modifyFiles(files),
     ]);
 
-    const summary = await this.summaryService.summarizePost(post.title, blocks);
-
-    const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary } });
+    const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary: '' } });
 
     await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
 
     await this.redisService.del(`block:${uuid}`);
     const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
     await this.redisService.del(deleteCacheKeys);
+
+    // 게시글 내용을 요약한다.
+    this.summaryService.emit<SummaryPostDto>({ cmd: 'summary.post' }, { post: updatedPost, blocks: updatedBlocks });
 
     return this.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
   }
