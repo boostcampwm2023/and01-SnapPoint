@@ -16,6 +16,7 @@ import { RedisManager } from '@liaoliaots/nestjs-redis';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
 import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
+import { ClientProxy } from '@nestjs/microservices';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -42,6 +43,10 @@ describe('PostApiController', () => {
         {
           provide: PRISMA_SERVICE,
           useValue: mockDeep<PrismaService>(),
+        },
+        {
+          provide: 'SUMMARY_SERVICE',
+          useValue: mockDeep<ClientProxy>(),
         },
       ],
     })

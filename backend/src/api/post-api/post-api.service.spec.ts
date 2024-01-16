@@ -1,3 +1,4 @@
+import { ClientProxy } from '@nestjs/microservices';
 import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostApiService } from './post-api.service';
@@ -39,6 +40,10 @@ describe('PostApiService', () => {
         {
           provide: PRISMA_SERVICE,
           useValue: mockDeep<PrismaService>(),
+        },
+        {
+          provide: 'SUMMARY_SERVICE',
+          useValue: mockDeep<ClientProxy>(),
         },
       ],
     })
