@@ -153,6 +153,9 @@ export class PostApiService {
   async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
+    // 올바른 위치인지 게시글을 검증한다.
+    this.validation.validateLookupArea(findNearbyPostDto);
+
     // 1. 현 위치 주변의 블록을 찾는다.
     const blocks = await this.blockService.findBlocksByArea(findNearbyPostDto);
 
