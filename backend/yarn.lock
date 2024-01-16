@@ -970,10 +970,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@takeny1998/nestjs-prisma-transactional@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@takeny1998/nestjs-prisma-transactional/-/nestjs-prisma-transactional-1.0.1.tgz#adb4bbb9edcbd1a65be82c879cdb1e382a4a21ee"
-  integrity sha512-Lsqwp+P1ifInN5YCGdj+fiHOUIa80d7TvqIP7fDhqdpjDi8sUbCfXTIFDju4AgSSMFSzOoWTJGkZvy+dvAAmaA==
+"@takeny1998/nestjs-prisma-transactional@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@takeny1998/nestjs-prisma-transactional/-/nestjs-prisma-transactional-1.0.3.tgz#00cdfffa78d33389b71142dcc74ba03121b400bf"
+  integrity sha512-4TnH8VlTubv6bvvvG/NQRoqTvbRP//mTMhJjBkpARhA/QEl6UJbjMDEB+21yXFrMxtBDI44cq+MA1QqwCotomg==
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
