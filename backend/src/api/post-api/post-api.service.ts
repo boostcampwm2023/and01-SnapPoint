@@ -216,7 +216,7 @@ export class PostApiService {
 
     // 게시글, 블록, 파일 생성을 비동기 병렬 처리한다.
     const [createdPost, createdBlocks, createdFiles] = await Promise.all([
-      this.postService.createPost(userUuid, { ...post, summary: '' }),
+      this.postService.createPost(userUuid, post),
       this.blockService.createBlocks(post.uuid, blocks),
       this.fileService.attachFiles(files),
     ]);
