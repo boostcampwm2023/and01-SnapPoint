@@ -233,7 +233,7 @@ export class PostApiService {
 
   @Transactional()
   async modifyPost(uuid: string, userUuid: string, postDto: ModifyPostDto) {
-    const decomposedPostDto = this.transform.decomposePostData(postDto);
+    const decomposedPostDto = this.transform.decomposePostData(postDto, uuid);
     const { post, blocks, files } = decomposedPostDto;
 
     const existPost = await this.accessPost(uuid, userUuid);
