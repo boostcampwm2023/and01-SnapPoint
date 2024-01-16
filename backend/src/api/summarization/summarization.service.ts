@@ -1,6 +1,6 @@
 import { PostService } from './../../domain/post/post.service';
 import { HttpService } from '@nestjs/axios';
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom, map } from 'rxjs';
 import { SummaryPostDto } from './dtos/summary-post.dto';
@@ -32,24 +32,33 @@ export class SummarizationService {
       });
     }
 
-    const summary$ = this.summarizeContent(title, content);
-
-    // 요약이 되지 않을 경우 (NULL) 첫 번째 텍스트 블록 내용을 저장한다.
-    if (summary$ === null) {
-      return this.postService.updatePost({
+    try {
+      const { summary } = await this.summarizeContent(title, content);
+      this.postService.updatePost({
         where: { uuid },
-        data: { summary: this.getFirstTextBlockContent(blocks) },
+        data: { summary },
       });
-    }
+    } catch (httpError) {
+      const { error } = httpError;
 
-    const { summary } = await firstValueFrom(summary$);
-    return this.postService.updatePost({
-      where: { uuid },
-      data: { summary },
-    });
+      // 회복 불가능한 오류인 경우, 첫 텍스트 블록 내용을 저장한다.
+      switch (error.errorCode) {
+        case 'E001': // 빈 문자열 or blank 문자
+        case 'E002': // UTF-8 인코딩 에러
+        case 'E003': // 문장이 기준치보다 초과 했을 경우
+        case 'E100': // 유효한 문장이 부족할 경우
+          this.postService.updatePost({
+            where: { uuid },
+            data: { summary: this.getFirstTextBlockContent(blocks) },
+          });
+          break;
+        default:
+          throw httpError;
+      }
+    }
   }
 
-  private summarizeContent(title: string, content: string) {
+  private async summarizeContent(title: string, content: string) {
     const data = {
       document: { title, content },
       option: { language: 'ko', model: 'general', tone: 3, summaryCount: 1 },
@@ -62,17 +71,11 @@ export class SummarizationService {
       },
     };
 
-    try {
-      const summary$ = this.httpService
-        .post<{ summary: string }>(this.summaryApiUrl, data, config)
-        .pipe(map((res) => res.data));
+    const summary$ = this.httpService
+      .post<{ summary: string }>(this.summaryApiUrl, data, config)
+      .pipe(map((res) => res.data));
 
-      return summary$;
-    } catch (error) {
-      // API 연결 오류일 경우 NULL을 반환한다.
-      if (error instanceof HttpException) return null;
-      throw error;
-    }
+    return firstValueFrom(summary$);
   }
 
   private prepareContent(blocks: { content: string; type: string }[]): string {
