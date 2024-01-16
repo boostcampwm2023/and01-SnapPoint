@@ -44,31 +44,31 @@ describe('ValidationService', () => {
     };
   });
 
-  // describe('validateFile()', () => {
-  //   it('업로드된 파일이 없을 경우 BadRequestException을 발생시킨다', async () => {
-  //     fileService.findFiles.mockResolvedValue([]);
-  //     await expect(service.validateFiles([mockFileDto], 'mock-user-uuid')).rejects.toThrow(BadRequestException);
-  //   });
+  describe('validateLookupArea()', () => {
+    it('두 지점의 최소 거리가 10km 이하인 경우 예외를 발생하지 않는다.', () => {
+      const mockNearbyPostDto = {
+        latitudeMin: 36.651,
+        latitudeMax: 36.667,
+        longitudeMin: 127.512,
+        longitudeMax: 127.535,
+      };
 
-  //   it('자신이 업로드하지 않은 파일일 경우 ForbiddenException을 발생시킨다', async () => {
-  //     fileService.findFiles.mockResolvedValue([
-  //       {
-  //         id: 1,
-  //         uuid: 'mock-file-uuid-1',
-  //         userUuid: 'mock-user-uuid',
-  //         mimeType: 'image/jpeg',
-  //         url: 'https://mock.storage.com/mock-file-uuid-1',
-  //         createdAt: new Date('2023-11-23T15:02:10.626Z'),
-  //         isDeleted: false,
-  //         source: null,
-  //         sourceUuid: null,
-  //         isProcessed: false,
-  //       },
-  //     ]);
+      expect(() => service.validateLookupArea(mockNearbyPostDto)).not.toThrow();
+    });
 
-  //     await expect(service.validateFiles([mockFileDto], 'not-exist-user-uuid')).rejects.toThrow(ForbiddenException);
-  //   });
-  // });
+    it('영역(두 지점)의 최소 거리가 10km 초과인 경우, BadRequestException을 발생시킨다.', () => {
+      const mockNearbyPostDto = {
+        latitudeMin: 36.614,
+        latitudeMax: 36.667,
+        longitudeMin: 127.424,
+        longitudeMax: 127.535,
+      };
+
+      expect(() => service.validateLookupArea(mockNearbyPostDto)).toThrow(
+        new BadRequestException(`The lookup areas is too large (10km Limit)`),
+      );
+    });
+  });
 
   describe('validateBlocks()', () => {
     it('텍스트 타입에 위도 및 경도 값이 포함된 경우 BadRequestException을 발생시킨다', async () => {
