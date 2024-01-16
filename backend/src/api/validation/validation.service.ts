@@ -28,7 +28,7 @@ export class ValidationService {
   }
 
   /**
-   * 조회할 영역이 적합한 영역(10km)인지 검사해 반환한다.
+   * 조회할 영역이 적합한 영역인지 검사해 반환한다.
    * @param dto
    */
   validateLookupArea(dto: FindNearbyPostDto) {
@@ -36,8 +36,8 @@ export class ValidationService {
 
     const dist = this.calDistance(latitudeMin, longitudeMin, latitudeMax, longitudeMax);
 
-    if (dist > 10.0) {
-      throw new BadRequestException(`The lookup areas is too large (10km Limit)`);
+    if (dist > 20.0) {
+      throw new BadRequestException(`The lookup areas is too large`);
     }
   }
 
