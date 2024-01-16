@@ -8,7 +8,6 @@ import { ValidationService } from '../validation/validation.service';
 import { TransformationService } from '../transformation/transformation.service';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
 import { mockDeep } from 'jest-mock-extended';
-import { SummarizationService } from '../summarization/summarization.service';
 import { BlockRepository } from '@/domain/block/block.repository';
 import { HttpService } from '@nestjs/axios';
 import { FileRepository } from '@/domain/file/file.repository';
@@ -34,7 +33,6 @@ describe('PostApiController', () => {
         TransformationService,
         RedisCacheService,
         RedisManager,
-        SummarizationService,
         BlockRepository,
         HttpService,
         FileRepository,

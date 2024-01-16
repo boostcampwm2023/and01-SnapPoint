@@ -11,7 +11,6 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
-import { SummarizationService } from '../summarization/summarization.service';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
@@ -33,7 +32,6 @@ describe('PostApiService', () => {
         BlockService,
         FileService,
         RedisCacheService,
-        SummarizationService,
         HttpService,
         ConfigService,
         UserService,
