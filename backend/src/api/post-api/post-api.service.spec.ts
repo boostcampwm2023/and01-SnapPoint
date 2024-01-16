@@ -1,3 +1,4 @@
+import { ClientProxy } from '@nestjs/microservices';
 import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostApiService } from './post-api.service';
@@ -10,7 +11,6 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { TransformationService } from '../transformation/transformation.service';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
-import { SummarizationService } from '../summarization/summarization.service';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
@@ -32,13 +32,16 @@ describe('PostApiService', () => {
         BlockService,
         FileService,
         RedisCacheService,
-        SummarizationService,
         HttpService,
         ConfigService,
         UserService,
         {
           provide: PRISMA_SERVICE,
           useValue: mockDeep<PrismaService>(),
+        },
+        {
+          provide: 'SUMMARY_SERVICE',
+          useValue: mockDeep<ClientProxy>(),
         },
       ],
     })
