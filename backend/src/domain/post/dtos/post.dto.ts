@@ -16,7 +16,7 @@ export class PostDto {
   readonly modifiedAt: Date;
 
   @ApiProperty({ description: '게시글의 요약 정보입니다.' })
-  readonly summary: string;
+  readonly summary?: string;
 
   @ApiProperty({ description: '게시글의 작성자의 이메일 정보입니다.' })
   readonly email: string;
@@ -33,7 +33,7 @@ export class PostDto {
       title: post.title,
       createdAt: post.createdAt,
       modifiedAt: post.modifiedAt,
-      summary: post.summary,
+      summary: post.summary ?? undefined,
       email: user.email,
       nickname: user.nickname,
       blocks: blockDtos,
