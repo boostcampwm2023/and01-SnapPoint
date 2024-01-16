@@ -203,7 +203,10 @@ export class PostApiService {
     const { post, blocks, files } = decomposedPostDto;
 
     // 게시글의 블록, 파일을 각각 검사한다.
-    await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
+    await Promise.all([
+      this.validation.validateCreateBlocks(blocks, files),
+      // this.validation.validateFiles(files, userUuid)
+    ]);
 
     const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
     if (!user) {
@@ -237,19 +240,19 @@ export class PostApiService {
       this.validation.validatePost({ uuid, userUuid }),
     ]);
 
+    await this.validation.validateModifyBlocks(uuid, blocks, files);
+
     if (!user) {
       throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
     }
 
-    const [updatedBlocks, updatedFiles] = await Promise.all([
+    const [updatedPost, updatedBlocks, updatedFiles] = await Promise.all([
+      this.postService.updatePost({ where: { uuid }, data: post }),
       this.blockService.modifyBlocks(uuid, blocks),
       this.fileService.modifyFiles(files),
     ]);
 
-    const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary: '' } });
-
-    await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
-
+    await this.redisService.del(`file:${uuid}`);
     await this.redisService.del(`block:${uuid}`);
     const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
     await this.redisService.del(deleteCacheKeys);
@@ -271,13 +274,13 @@ export class PostApiService {
       throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
     }
 
-    const blocks = await this.blockService.deleteBlocksByPost(existPost.uuid);
-    const files = await this.fileService.deleteFilesBySources('block', blocks);
+    const deletedPost = await this.postService.deletePost({ uuid });
+    const deletedBlocks = await this.blockService.deleteBlocksByPost(uuid);
+    const deletedFiles = await this.fileService.deleteFilesBySources('block', deletedBlocks);
 
-    const willDeleteFileKeys = blocks.map(({ uuid }) => `file:${uuid}`);
+    const willDeleteFileKeys = deletedBlocks.map(({ uuid }) => `file:${uuid}`);
     await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
 
-    return this.assemblePost(deletedPost, user, blocks, files);
-  }
+    return this.assemblePost(deletedPost, user, deletedBlocks, deletedFiles);
   }
 }

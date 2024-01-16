@@ -3,6 +3,8 @@ export class ValidateBlockDto {
 
   type: string;
 
+  postUuid: string;
+
   latitude?: number;
 
   longitude?: number;

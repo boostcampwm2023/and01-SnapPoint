@@ -19,6 +19,7 @@ import { Block } from '@prisma/client';
 export class ValidationService {
   constructor(
     private readonly postService: PostService,
+    private readonly blockService: BlockService,
     private readonly fileService: FileService,
     private readonly utils: UtilityService,
   ) {}
@@ -62,39 +63,39 @@ export class ValidationService {
     });
   }
 
-  async validateBlocks(blockDtos: ValidateBlockDto[], blockFileDtos: ValidateFileDto[]) {
-    const sourceFileMap = new Map<string, AttachFileDto[]>();
-
-    // 블록이 다른 포스트에 있지 않은지 판별한다.
-    blockFileDtos.forEach((blockFile) => {
-      const { sourceUuid } = blockFile;
-      if (!sourceFileMap.has(sourceUuid)) {
-        sourceFileMap.set(sourceUuid, []);
-      }
-      const fileDtos = sourceFileMap.get(sourceUuid);
-      if (fileDtos) {
-        fileDtos.push(blockFile);
-      }
-    });
+  async validateCreateBlocks(blockDtos: ValidateBlockDto[], fileDtos: ValidateFileDto[]) {
+    const sourceFileMap = this.utils.toMapFromArray<string, ValidateFileDto>(fileDtos, (fileDto) => fileDto.sourceUuid);
 
     blockDtos.forEach((blockDto) => {
-      const { uuid, type, latitude, longitude } = blockDto;
-      const sourceFiles = sourceFileMap.get(uuid);
+      const sourceFiles = sourceFileMap.get(blockDto.uuid);
+      this.validateBlock(blockDto, sourceFiles);
+    });
+  }
 
-      if (type === 'text' && (latitude !== undefined || longitude !== undefined)) {
-        throw new BadRequestException('Latitude and longitude should not be provided for text type');
+  async validateModifyBlocks(postUuid: string, blockDtos: ValidateBlockDto[], fileDtos: ValidateFileDto[]) {
+    const sourceFileMap = this.utils.toMapFromArray<string, ValidateFileDto>(fileDtos, ({ sourceUuid }) => sourceUuid);
+
+    const existBlocks = await this.blockService.findBlocksByIdList(blockDtos);
+    const existBlockMap = this.utils.toUniqueMapFromArray<string, Block>(existBlocks, ({ uuid }) => uuid);
+
+    blockDtos.forEach((block) => {
+      const sourceFiles = sourceFileMap.get(block.uuid);
+      this.validateBlock(block, sourceFiles);
+
+      // 이미 존재하는 블록의 유효성을 검사한다.
+      const existBlock = existBlockMap.get(block.uuid);
+      if (!existBlock) return;
+
+      // 다른 게시글의 블록에 접근하지 않았는지 검증한다.
+      if (existBlock.postUuid !== postUuid) {
+        throw new BadRequestException(
+          `블록 ${existBlock.uuid}는 다른 게시글 ${existBlock.postUuid}에 첨부되어 있습니다.`,
+        );
       }
 
-      if (type === 'media' && (latitude === undefined || longitude === undefined)) {
-        throw new BadRequestException('Latitude and longitude should be provided for media type');
-      }
-
-      if (type === 'text' && sourceFiles) {
-        throw new BadRequestException('File block must not have media file');
-      }
-
-      if (type === 'media' && (!sourceFiles || sourceFiles.length === 0)) {
-        throw new BadRequestException('Media Block must have at least one files');
+      // 블록의 종류를 바꾸지 않았는지 검증한다.
+      if (existBlock.type !== block.type) {
+        throw new BadRequestException(`블록 ${existBlock.uuid}의 타입을 변경할 수 없습니다.`);
       }
     });
   }
