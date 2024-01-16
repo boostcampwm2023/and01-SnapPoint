@@ -1,6 +1,6 @@
 import { FileDto } from '@/api/post-api/dtos/file.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Block } from '../entites/block.entity';
+import { Block } from '@prisma/client';
 
 export class BlockDto {
   @ApiProperty({ description: '블록의 고유 식별자입니다.' })
@@ -26,19 +26,11 @@ export class BlockDto {
   readonly files?: FileDto[];
 
   static of(block: Block, files?: FileDto[]): BlockDto {
-    if (block.type === 'text') {
-      return {
-        uuid: block.uuid,
-        content: block.content,
-        type: block.type,
-      };
-    }
-
     return {
       uuid: block.uuid,
       content: block.content,
-      latitude: block.latitude,
-      longitude: block.longitude,
+      latitude: block.latitude ?? undefined,
+      longitude: block.longitude ?? undefined,
       type: block.type,
       files: files,
     };

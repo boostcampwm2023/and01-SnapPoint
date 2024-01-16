@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBlockDto } from '@/domain/block/dtos/create-block.dto';
-import { Block } from '@/domain/block/entites/block.entity';
 import { UpsertBlockDto } from '@/domain/block/dtos/upsert-block.dto';
 import { BlockRepository } from '@/domain/block/block.repository';
 import { FindBlocksByAreaDto } from '@/domain/block/dtos/find-blocks-by-area.dto';
 import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
+import { Block } from '@prisma/client';
 
 @Injectable()
 export class BlockService {
   constructor(private readonly repository: BlockRepository) {}
 
   async createBlocks(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
-    await this.repository.createMany(postUuid, dtos);
-    return this.repository.findManyByIds(dtos);
+    const data = dtos.map((dto) => ({ ...dto, postUuid }));
+    return this.repository.createMany({ data });
   }
 
   async findBlocksByArea(dto: FindBlocksByAreaDto): Promise<Block[]> {
@@ -20,35 +20,30 @@ export class BlockService {
   }
 
   async findBlocksByPost(dto: FindBlocksByPostDto): Promise<Block[]> {
-    return this.repository.findManyByPosts([dto]);
+    const { postUuid } = dto;
+
+    return this.repository.findMany({
+      where: { postUuid },
+    });
   }
 
   async findBlocksByPosts(dtos: FindBlocksByPostDto[]): Promise<Block[]> {
-    return this.repository.findManyByPosts(dtos);
+    return this.repository.findMany({
+      where: { AND: [{ OR: dtos }] },
+    });
   }
 
   async modifyBlocks(postUuid: string, dtos: UpsertBlockDto[]): Promise<Block[]> {
-    await this.repository.deleteManyByPost({ postUuid });
+    await this.repository.deleteMany({ where: { postUuid } });
 
-    await Promise.all(
-      dtos.map((dto) =>
-        this.repository.upsertOne(postUuid, {
-          ...dto,
-          isDeleted: false,
-        }),
-      ),
-    );
-
-    return this.repository.findManyByIds(dtos);
-  }
-
-  async upsertBlock(postUuid: string, dto: UpsertBlockDto) {
-    return this.repository.upsertOne(postUuid, dto);
+    const data = dtos.map((dto) => ({ ...dto, postUuid }));
+    return this.repository.upsertMany({ data });
   }
 
   async deleteBlocksByPost(postUuid: string) {
-    const blocks = await this.repository.findManyByPost({ postUuid });
-    this.repository.deleteManyByPost({ postUuid });
+    // TODO: DeletePost App 서비스 리팩토링 후, Delete는 Count만 반환하게 변경한다.
+    const blocks = await this.repository.findMany({ where: { postUuid } });
+    await this.repository.deleteMany({ where: { postUuid } });
     return blocks;
   }
 }

@@ -1,113 +1,62 @@
-import { Block } from '@/domain/block/entites/block.entity';
-import { FindBlocksByPostDto } from './dtos/find-blocks-by-post.dto';
 import { FindBlocksByAreaDto } from './dtos/find-blocks-by-area.dto';
-import { CreateBlockDto } from './dtos/create-block.dto';
-import { DeleteBlocksByPostDto } from './dtos/delete-blocks-by-post.dto';
-import { UpsertBlockDto } from './dtos/upsert-block.dto';
-import { FindBlocksByIdDto } from './dtos/find-blocks-by-id.dto';
 import { Inject, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { Sql } from '@prisma/client/runtime/library';
+import { Block, Prisma } from '@prisma/client';
 import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 
 @Injectable()
 export class BlockRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
-  async createMany(postUuid: string, dtos: CreateBlockDto[]): Promise<Block[]> {
-    const values = dtos.map((dto) => {
-      const { uuid, content, type, order, latitude, longitude } = dto;
-      const coords = type === 'media' ? `ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)` : null;
-      return Prisma.sql`(${uuid}, ${postUuid}, ${content}, ${type}, ${order}, ${coords ? Prisma.raw(coords) : null})`;
-    });
-
-    return this.prisma
-      .$queryRaw`INSERT INTO "Block" ("uuid", "postUuid", "content", "type", "order", "coords") VALUES ${Prisma.join(
-      values,
-    )}`;
+  async createMany(params: { data: Prisma.BlockCreateInput[] }): Promise<Block[]> {
+    const { data } = params;
+    const createPromises = data.map((block) => this.prisma.block.create({ data: block }));
+    return Promise.all(createPromises);
   }
 
-  async findManyByIds(dtos: FindBlocksByIdDto[]): Promise<Block[]> {
-    const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"uuid" = ${dto.uuid}`);
+  async findMany(params: {
+    cursor?: Prisma.BlockWhereUniqueInput;
+    where?: Prisma.BlockWhereInput;
+    orderBy?: Prisma.BlockOrderByWithRelationInput;
+  }) {
+    const { cursor, where, orderBy } = params;
 
-    const blocks: Block[] = await this.prisma.$queryRaw`
-      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
-                "createdAt", "modifiedAt", "isDeleted",
-                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM      "Block"
-      WHERE     ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
-      ORDER BY  "order" 
-    `;
-
-    return blocks;
-  }
-
-  async findManyByPost(dto: FindBlocksByPostDto): Promise<Block[]> {
-    const { postUuid } = dto;
-
-    return this.prisma.$queryRaw`
-      SELECT  "id", "uuid", "postUuid", "type", "order", "content", 
-              "createdAt", "modifiedAt", "isDeleted",
-              ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM    "Block"
-      WHERE   "postUuid" = ${postUuid} AND "isDeleted" = 'false'
-      ORDER BY  "order" 
-    `;
-  }
-
-  async findManyByPosts(dtos: FindBlocksByPostDto[]): Promise<Block[]> {
-    const conditions: Sql[] = dtos.map((dto) => Prisma.sql`"postUuid" = ${dto.postUuid}`);
-
-    return this.prisma.$queryRaw`
-      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
-                "createdAt", "modifiedAt", "isDeleted",
-                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM      "Block"
-      WHERE     ${Prisma.join(conditions, 'OR')} AND "isDeleted" = 'false'
-      ORDER BY  "order" 
-    `;
+    return this.prisma.block.findMany({ cursor, where: { ...where, isDeleted: false }, orderBy });
   }
 
   async findManyByArea(dto: FindBlocksByAreaDto): Promise<Block[]> {
     const { latitudeMin: latMin, longitudeMin: lonMin, latitudeMax: latMax, longitudeMax: lonMax } = dto;
 
-    // TODO: 여유를 줄 수 있는 방법을 찾아본다.
+    // isDeleted 추가
     return this.prisma.$queryRaw`
-      SELECT    "id", "uuid", "postUuid", "type", "order", "content", 
-                "createdAt", "modifiedAt", "isDeleted",
-                ST_X("coords") AS "longitude", ST_Y("coords") As "latitude"
-      FROM      "Block"
-      WHERE     "isDeleted" = 'false' and "type" = 'media' AND "coords" IS NOT NULL
-                AND ST_Intersects(coords, ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326))
-      ORDER BY  ST_Distance(coords, ST_Centroid(ST_MakeEnvelope(${lonMin}, ${latMin}, ${lonMax}, ${latMax}, 4326)));
-    `;
+      SELECT *,
+            SQRT(POW(latitude - ((${latMin} + ${latMax}) / 2), 2) + POW(longitude - ((${lonMin} + ${lonMax}) / 2), 2)) as Distance
+      FROM block
+      WHERE (latitude BETWEEN ${latMin} and ${latMax}) and (longitude BETWEEN ${lonMin} and ${lonMax})
+      ORDER BY Distance
+      LIMIT 30
+  `;
   }
 
-  async upsertOne(postUuid: string, dto: UpsertBlockDto) {
-    const { uuid, content, type, order, latitude, longitude, isDeleted } = dto;
+  async upsertMany(params: { data: Prisma.BlockCreateInput[] }): Promise<Block[]> {
+    const { data } = params;
 
-    const coords = type === 'media' ? `ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)` : null;
+    const upsertPromises = data.map((block) =>
+      this.prisma.block.upsert({
+        where: { uuid: block.uuid, isDeleted: false },
+        update: block,
+        create: block,
+      }),
+    );
 
-    const query = Prisma.sql`
-      INSERT INTO "Block" ("uuid", "postUuid", "content", "type", "order", "coords")
-      VALUES (${uuid}, ${postUuid}, ${content}, ${type}, ${order}, ${coords ? Prisma.raw(coords) : null})
-      ON CONFLICT ("uuid")
-      DO UPDATE SET
-        "content" = ${content},
-        "order" = ${order},
-        "coords" = ${coords ? Prisma.raw(coords) : null},
-        "isDeleted" = ${isDeleted}
-    `;
-
-    return this.prisma.$queryRaw(query);
+    return Promise.all(upsertPromises);
   }
 
-  async deleteManyByPost(dto: DeleteBlocksByPostDto): Promise<number> {
-    const { postUuid } = dto;
+  async deleteMany(params: { where: Prisma.BlockWhereInput }): Promise<number> {
+    const { where } = params;
 
     const { count } = await this.prisma.block.updateMany({
       data: { isDeleted: true },
-      where: { postUuid },
+      where: where,
     });
     return count;
   }
