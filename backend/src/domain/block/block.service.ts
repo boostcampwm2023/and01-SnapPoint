@@ -5,6 +5,7 @@ import { BlockRepository } from '@/domain/block/block.repository';
 import { FindBlocksByAreaDto } from '@/domain/block/dtos/find-blocks-by-area.dto';
 import { FindBlocksByPostDto } from '@/domain/block/dtos/find-blocks-by-post.dto';
 import { Block } from '@prisma/client';
+import { FindBlocksDto } from './dtos/find-blocks.dto';
 
 @Injectable()
 export class BlockService {
@@ -17,6 +18,10 @@ export class BlockService {
 
   async findBlocksByArea(dto: FindBlocksByAreaDto): Promise<Block[]> {
     return this.repository.findManyByArea(dto);
+  }
+
+  async findBlocksByIdList(dto: FindBlocksDto[]): Promise<Block[]> {
+    return this.repository.findMany({ where: { OR: dto } });
   }
 
   async findBlocksByPost(dto: FindBlocksByPostDto): Promise<Block[]> {
