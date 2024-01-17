@@ -56,7 +56,6 @@ model Block {
   content     String
   latitude    Float?
   longitude   Float?
-  @@unique([latitude, longitude])
   @@index([latitude, longitude])
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
