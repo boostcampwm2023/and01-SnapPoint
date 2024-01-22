@@ -1,6 +1,7 @@
+import { UserPayload } from '@/common/guards/user-payload.interface';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Post, User } from '@prisma/client';
+import { Post } from '@prisma/client';
 
 export class PostDto {
   @ApiProperty({ description: '게시글을 나타내는 고유한 식별자입니다.' })
@@ -27,7 +28,7 @@ export class PostDto {
   @ApiProperty({ type: BlockDto, isArray: true, required: false })
   readonly blocks?: BlockDto[];
 
-  static of(post: Post, user: User, blockDtos?: BlockDto[]): PostDto {
+  static of(post: Post, user: UserPayload, blockDtos?: BlockDto[]): PostDto {
     return {
       uuid: post.uuid,
       title: post.title,

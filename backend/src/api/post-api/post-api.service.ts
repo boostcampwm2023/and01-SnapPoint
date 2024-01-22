@@ -6,7 +6,7 @@ import { ValidationService } from '@/api/validation/validation.service';
 import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
 import { FileDto } from '@/api/post-api/dtos/file.dto';
-import { Block, File, Post, User } from '@prisma/client';
+import { Block, File, Post } from '@prisma/client';
 import { TransformationService } from '@/api/transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { RedisCacheService } from '@/common/redis/redis-cache.service';
@@ -19,6 +19,7 @@ import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { SummaryPostDto } from '../summarization/dtos/summary-post.dto';
 import { UtilityService } from '@/common/utility/utility.service';
+import { UserPayload } from '@/common/guards/user-payload.interface';
 
 @Injectable()
 export class PostApiService {
@@ -34,12 +35,12 @@ export class PostApiService {
     private readonly utils: UtilityService,
   ) {}
 
-  private assemblePost(post: Post, user: User, blocks: Block[], files: File[]): PostDto {
+  private assemblePost(post: Post, user: UserPayload, blocks: Block[], files: File[]): PostDto {
     const blockDtoMap = this.createBlockDtoMap(files, blocks);
     return PostDto.of(post, user, blockDtoMap.get(post.uuid)!);
   }
 
-  private assemblePosts(posts: Post[], users: User[], blocks: Block[], files: File[]): PostDto[] {
+  private assemblePosts(posts: Post[], users: UserPayload[], blocks: Block[], files: File[]): PostDto[] {
     const blockDtoMap = this.createBlockDtoMap(files, blocks);
     return posts.map((post, index) => PostDto.of(post, users[index], blockDtoMap.get(post.uuid)!));
   }
@@ -197,7 +198,7 @@ export class PostApiService {
   }
 
   @Transactional()
-  async writePost(postDto: WritePostDto, userUuid: string) {
+  async writePost(postDto: WritePostDto, user: UserPayload) {
     // 계층적인 게시글 데이터를 게시글, 블록, 파일로 분할한다.
     const decomposedPostDto = this.transform.decomposePostData(postDto);
     const { post, blocks, files } = decomposedPostDto;
@@ -205,17 +206,12 @@ export class PostApiService {
     // 게시글의 블록, 파일을 각각 검사한다.
     await Promise.all([
       this.validation.validateCreateBlocks(blocks, files),
-      // this.validation.validateFiles(files, userUuid)
+      this.validation.validateFiles(files, user.uuid),
     ]);
-
-    const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
-    if (!user) {
-      throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
-    }
 
     // 게시글, 블록, 파일 생성을 비동기 병렬 처리한다.
     const [createdPost, createdBlocks, createdFiles] = await Promise.all([
-      this.postService.createPost(userUuid, post),
+      this.postService.createPost(user.uuid, post),
       this.blockService.createBlocks(post.uuid, blocks),
       this.fileService.attachFiles(files),
     ]);
@@ -231,20 +227,13 @@ export class PostApiService {
   }
 
   @Transactional()
-  async modifyPost(uuid: string, userUuid: string, postDto: ModifyPostDto) {
+  async modifyPost(uuid: string, postDto: ModifyPostDto, user: UserPayload) {
     const decomposedPostDto = this.transform.decomposePostData(postDto, uuid);
     const { post, blocks, files } = decomposedPostDto;
 
-    const [user] = await Promise.all([
-      this.userService.findUserByUniqueInput({ uuid: userUuid }),
-      this.validation.validatePost({ uuid, userUuid }),
-    ]);
+    await this.validation.validatePost({ uuid, userUuid: user.uuid });
 
     await this.validation.validateModifyBlocks(uuid, blocks, files);
-
-    if (!user) {
-      throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
-    }
 
     const [updatedPost, updatedBlocks, updatedFiles] = await Promise.all([
       this.postService.updatePost({ where: { uuid }, data: post }),
@@ -264,15 +253,8 @@ export class PostApiService {
   }
 
   @Transactional()
-  async deletePost(uuid: string, userUuid: string) {
-    const [user] = await Promise.all([
-      this.userService.findUserByUniqueInput({ uuid: userUuid }),
-      this.validation.validatePost({ uuid, userUuid }),
-    ]);
-
-    if (!user) {
-      throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
-    }
+  async deletePost(uuid: string, user: UserPayload) {
+    await this.validation.validatePost({ uuid, userUuid: user.uuid });
 
     const deletedPost = await this.postService.deletePost({ uuid });
     const deletedBlocks = await this.blockService.deleteBlocksByPost(uuid);
