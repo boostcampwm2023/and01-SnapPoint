@@ -61,9 +61,9 @@ export class RefreshTokenService {
   }
 
   async generateAccessToken(user: User): Promise<string> {
-    const payload = {
-      uuid: user.uuid,
-    };
+    const { uuid, email, nickname } = user;
+    const payload = { uuid, email, nickname };
+
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
       expiresIn: this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRATION_TIME'),
@@ -71,9 +71,9 @@ export class RefreshTokenService {
   }
 
   async generateRefreshToken(user: User): Promise<string> {
-    const payload = {
-      uuid: user.uuid,
-    };
+    const { uuid, email, nickname } = user;
+    const payload = { uuid, email, nickname };
+
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME'),
