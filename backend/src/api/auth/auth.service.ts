@@ -52,22 +52,13 @@ export class AuthService {
     }
   }
 
-  async logout(refreshToken: string) {
+  async signOut(refreshToken: string) {
     const decodedRefreshToken = await this.jwtService.verifyAsync(refreshToken, {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
     });
 
     const { uuid: userUuid } = decodedRefreshToken;
 
-    await this.refreshTokenService.delete({ userUuid });
-  }
-
-  async setCurrentRefreshToken(refreshToken: string, userUuid: string) {
-    const createdRefreshToken = await this.refreshTokenService.save({
-      userUuid: userUuid,
-      token: refreshToken,
-    });
-
-    return createdRefreshToken;
+    await this.refreshTokenService.deleteRefreshToken({ userUuid });
   }
 }
