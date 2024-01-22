@@ -27,7 +27,7 @@ export class RefreshTokenService {
     );
   }
 
-  async delete(deleteRefreshTokenDto: DeleteRefreshTokenDto) {
+  async deleteRefreshToken(deleteRefreshTokenDto: DeleteRefreshTokenDto) {
     const { userUuid } = deleteRefreshTokenDto;
 
     return this.redisService.del(`token:${userUuid}`);
@@ -43,7 +43,7 @@ export class RefreshTokenService {
     const { uuid, email, nickname } = generateAccessTokenDto;
     const payload = { uuid, email, nickname };
 
-    return await this.jwtService.signAsync(payload, {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
       expiresIn: this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRATION_TIME'),
     });
@@ -53,7 +53,7 @@ export class RefreshTokenService {
     const { uuid } = generateRefreshTokenDto;
     const payload = { uuid };
 
-    return await this.jwtService.signAsync(payload, {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME'),
     });

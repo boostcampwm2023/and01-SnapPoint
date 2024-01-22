@@ -38,9 +38,16 @@ export class AuthService {
     }
 
     await this.verifyPassword(loginAuthDto.password, user.password);
-    const accessToken = await this.refreshTokenService.generateAccessToken(user);
-    const refreshToken = await this.refreshTokenService.generateRefreshToken(user);
-    await this.setCurrentRefreshToken(refreshToken, user.uuid);
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.refreshTokenService.generateAccessToken(user),
+      this.refreshTokenService.generateRefreshToken(user),
+    ]);
+
+    await this.refreshTokenService.save({
+      userUuid: user.uuid,
+      token: refreshToken,
+    });
 
     return LoginDto.of(accessToken, refreshToken);
   }
