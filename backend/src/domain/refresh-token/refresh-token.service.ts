@@ -1,67 +1,46 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateRefreshTokenDto } from './dto/create-refresh-token.dto';
-import { Prisma, RefreshToken, User } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { SaveRefreshTokenDto } from './dto/save-refresh-token.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { DeleteRefreshTokenDto } from './dto/delete-refresh-token.dto';
-import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
+import { RedisCacheService } from '@/common/redis/redis-cache.service';
+import { FindRefreshTokenDto } from './dto/find-refresh-token.dto';
+import { GenerateAccessTokenDto } from './dto/generate-access-token.dto';
+import { GenerateRefreshTokenDto } from './dto/generate-refresh-token.dto';
 
 @Injectable()
 export class RefreshTokenService {
   constructor(
-    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
     readonly jwtService: JwtService,
     readonly configService: ConfigService,
+    private readonly redisService: RedisCacheService,
   ) {}
 
-  async create(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
-    return this.prisma.refreshToken.create({
-      data: {
-        userUuid: createRefreshTokenDto.userUuid,
-        token: createRefreshTokenDto.token,
-        expiresAt: createRefreshTokenDto.expiresAt,
-      },
-    });
-  }
+  async save(createRefreshTokenDto: SaveRefreshTokenDto) {
+    const { userUuid, token } = createRefreshTokenDto;
 
-  async update(createRefreshTokenDto: CreateRefreshTokenDto): Promise<RefreshToken> {
-    const refreshToken = await this.prisma.refreshToken.findUnique({
-      where: {
-        userUuid: createRefreshTokenDto.userUuid,
-      },
-    });
-
-    if (!refreshToken) {
-      throw new NotFoundException('해당 유저의 리프레시 토큰이 존재하지 않습니다.');
-    }
-
-    return this.prisma.refreshToken.update({
-      where: {
-        userUuid: createRefreshTokenDto.userUuid,
-      },
-      data: {
-        token: createRefreshTokenDto.token,
-        expiresAt: createRefreshTokenDto.expiresAt,
-      },
-    });
+    return this.redisService.set(
+      `token:${userUuid}`,
+      token,
+      this.configService.getOrThrow<number>('JWT_REFRESH_EXPIRATION_TIME'),
+      (v) => v,
+    );
   }
 
   async delete(deleteRefreshTokenDto: DeleteRefreshTokenDto) {
-    return this.prisma.refreshToken.delete({
-      where: {
-        userUuid: deleteRefreshTokenDto.userUuid,
-      },
-    });
+    const { userUuid } = deleteRefreshTokenDto;
+
+    return this.redisService.del(`token:${userUuid}`);
   }
 
-  async findRefreshTokenByUnique(where: Prisma.RefreshTokenWhereUniqueInput): Promise<RefreshToken | null> {
-    return this.prisma.refreshToken.findUnique({
-      where,
-    });
+  async findRefreshToken(findRefreshTokenDto: FindRefreshTokenDto) {
+    const { userUuid } = findRefreshTokenDto;
+
+    return this.redisService.get(`token:${userUuid}`, async (v) => v);
   }
 
-  async generateAccessToken(user: User): Promise<string> {
-    const { uuid, email, nickname } = user;
+  async generateAccessToken(generateAccessTokenDto: GenerateAccessTokenDto): Promise<string> {
+    const { uuid, email, nickname } = generateAccessTokenDto;
     const payload = { uuid, email, nickname };
 
     return await this.jwtService.signAsync(payload, {
@@ -70,26 +49,13 @@ export class RefreshTokenService {
     });
   }
 
-  async generateRefreshToken(user: User): Promise<string> {
-    const { uuid, email, nickname } = user;
-    const payload = { uuid, email, nickname };
+  async generateRefreshToken(generateRefreshTokenDto: GenerateRefreshTokenDto): Promise<string> {
+    const { uuid } = generateRefreshTokenDto;
+    const payload = { uuid };
 
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME'),
     });
-  }
-
-  async getCurrentRefreshTokenExp(): Promise<Date> {
-    const currentDate = new Date();
-
-    const expireTime = this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME');
-
-    if (!expireTime) {
-      throw new InternalServerErrorException();
-    }
-
-    const currentRefreshTokenExp = new Date(currentDate.getTime() + parseInt(expireTime));
-    return currentRefreshTokenExp;
   }
 }

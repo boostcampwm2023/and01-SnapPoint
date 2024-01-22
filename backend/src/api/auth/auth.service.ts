@@ -57,34 +57,17 @@ export class AuthService {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
     });
 
-    const user = await this.userService.findUserByUniqueInput({ uuid: decodedRefreshToken.uuid });
+    const { uuid: userUuid } = decodedRefreshToken;
 
-    if (!user) {
-      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
-    }
-
-    await this.refreshTokenService.delete({ userUuid: user.uuid });
+    await this.refreshTokenService.delete({ userUuid });
   }
 
   async setCurrentRefreshToken(refreshToken: string, userUuid: string) {
-    const isRefreshToken = await this.refreshTokenService.findRefreshTokenByUnique({ userUuid: userUuid });
-
-    if (!isRefreshToken) {
-      const createdRefreshToken = await this.refreshTokenService.create({
-        userUuid: userUuid,
-        token: refreshToken,
-        expiresAt: await this.refreshTokenService.getCurrentRefreshTokenExp(),
-      });
-
-      return createdRefreshToken;
-    }
-
-    const updatedRefreshToken = this.refreshTokenService.update({
+    const createdRefreshToken = await this.refreshTokenService.save({
       userUuid: userUuid,
       token: refreshToken,
-      expiresAt: await this.refreshTokenService.getCurrentRefreshTokenExp(),
     });
 
-    return updatedRefreshToken;
+    return createdRefreshToken;
   }
 }

@@ -92,15 +92,15 @@ export class JwtAuthGuard implements CanActivate {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
     });
 
-    const refreshTokenEntity = await this.refreshTokenService.findRefreshTokenByUnique({
+    const existToken = await this.refreshTokenService.findRefreshToken({
       userUuid: decodedRefreshToken.uuid,
     });
 
-    if (!refreshTokenEntity) {
+    if (!existToken) {
       throw new NotFoundException('리프레시 토큰이 존재하지 않습니다.');
     }
 
-    const user = await this.userService.findUserByUniqueInput({ uuid: refreshTokenEntity.userUuid });
+    const user = await this.userService.findOne(decodedRefreshToken.uuid);
 
     if (!user) {
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
