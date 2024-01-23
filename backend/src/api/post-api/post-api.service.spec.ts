@@ -15,12 +15,19 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
 import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
+import { UtilityService } from '@/common/utility/utility.service';
 
 describe('PostApiService', () => {
   let service: PostApiService;
   let postService: DeepMockProxy<PostService>;
   let postDto: ModifyPostDto;
   let postEntity: Post;
+
+  const mockUserPayload = () => ({
+    uuid: 'mock-user-uuid',
+    email: 'mock@example.com',
+    nickname: 'mock-user',
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,6 +42,7 @@ describe('PostApiService', () => {
         HttpService,
         ConfigService,
         UserService,
+        UtilityService,
         {
           provide: PRISMA_SERVICE,
           useValue: mockDeep<PrismaService>(),
@@ -57,6 +65,10 @@ describe('PostApiService', () => {
       .useValue(mockDeep<HttpService>())
       .overrideProvider(UserService)
       .useValue(mockDeep<UserService>())
+      .overrideProvider(ValidationService)
+      .useValue(mockDeep<ValidationService>())
+      .overrideProvider(UtilityService)
+      .useValue(mockDeep<UtilityService>())
       .compile();
 
     service = module.get<PostApiService>(PostApiService);
@@ -88,19 +100,19 @@ describe('PostApiService', () => {
   describe('readPost()', () => {
     it('게시글을 찾지 못한 경우 NotFoundExcpetion을 발생한다.', () => {
       postService.findPost.mockResolvedValue(null);
-      expect(service.modifyPost('not-exist-uuid', 'mock-user-uuid', postDto)).rejects.toThrow(NotFoundException);
+      expect(service.modifyPost('not-exist-uuid', postDto, mockUserPayload())).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('modifyPost()', () => {
     it('게시글을 찾지 못한 경우 NotFoundExcpetion을 발생한다.', () => {
       postService.findPost.mockResolvedValue(null);
-      expect(service.modifyPost('not-exist-uuid', 'mock-user-uuid', postDto)).rejects.toThrow(NotFoundException);
+      expect(service.modifyPost('not-exist-uuid', postDto, mockUserPayload())).rejects.toThrow(NotFoundException);
     });
 
     it('자신의 게시글이 아닐 경우 ForbiddenExcpetion을 발생한다.', () => {
       postService.findPost.mockResolvedValue(postEntity);
-      expect(service.modifyPost('mock-post-uuid', 'not-exist-uuid', postDto)).rejects.toThrow(ForbiddenException);
+      expect(service.modifyPost('mock-post-uuid', postDto, mockUserPayload())).rejects.toThrow(ForbiddenException);
     });
   });
 });
