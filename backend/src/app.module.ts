@@ -4,8 +4,7 @@ import { PostModule } from './domain/post/post.module';
 import { FileModule } from './domain/file/file.module';
 import { UserModule } from './domain/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RefreshTokenService } from './domain/refresh-token/refresh-token.service';
-import { RefreshTokenModule } from './domain/refresh-token/refresh-token.module';
+import { TokenModule } from './domain/token/token.module';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -42,14 +41,13 @@ import { UtilityModule } from './common/utility/utility.module';
     UserModule,
     FileModule,
     JwtModule,
-    RefreshTokenModule,
+    TokenModule,
     ApiModule,
     RedisCacheModule,
     HealthModule,
     UtilityModule,
   ],
   providers: [
-    RefreshTokenService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

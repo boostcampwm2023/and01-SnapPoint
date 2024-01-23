@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { RefreshTokenService } from './refresh-token.service';
+import { TokenService } from './token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RedisCacheModule } from '@/common/redis/redis-cache.module';
 
 @Module({
-  providers: [RefreshTokenService, ConfigService],
+  providers: [TokenService, ConfigService],
   imports: [
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
@@ -18,6 +18,6 @@ import { RedisCacheModule } from '@/common/redis/redis-cache.module';
     }),
     RedisCacheModule,
   ],
-  exports: [RefreshTokenService],
+  exports: [TokenService],
 })
-export class RefreshTokenModule {}
+export class TokenModule {}

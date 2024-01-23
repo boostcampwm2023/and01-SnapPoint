@@ -3,7 +3,7 @@ import { UserService } from '@/domain/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
+import { TokenService } from '@/domain/token/token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -15,7 +15,7 @@ export class AuthService {
     readonly userService: UserService,
     readonly jwtService: JwtService,
     readonly configService: ConfigService,
-    readonly refreshTokenService: RefreshTokenService,
+    readonly tokenService: TokenService,
   ) {}
 
   async signup(createAuthDto: CreateAuthDto) {
@@ -40,11 +40,11 @@ export class AuthService {
     await this.verifyPassword(loginAuthDto.password, user.password);
 
     const [accessToken, refreshToken] = await Promise.all([
-      this.refreshTokenService.generateAccessToken(user),
-      this.refreshTokenService.generateRefreshToken(user),
+      this.tokenService.generateAccessToken(user),
+      this.tokenService.generateRefreshToken(user),
     ]);
 
-    await this.refreshTokenService.save({
+    await this.tokenService.saveRefreshToken({
       userUuid: user.uuid,
       token: refreshToken,
     });
@@ -66,6 +66,6 @@ export class AuthService {
 
     const { uuid: userUuid } = decodedRefreshToken;
 
-    await this.refreshTokenService.deleteRefreshToken({ userUuid });
+    await this.tokenService.deleteRefreshToken({ userUuid });
   }
 }

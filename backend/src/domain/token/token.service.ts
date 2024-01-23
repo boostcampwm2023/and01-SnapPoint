@@ -9,14 +9,14 @@ import { GenerateAccessTokenDto } from './dto/generate-access-token.dto';
 import { GenerateRefreshTokenDto } from './dto/generate-refresh-token.dto';
 
 @Injectable()
-export class RefreshTokenService {
+export class TokenService {
   constructor(
     readonly jwtService: JwtService,
     readonly configService: ConfigService,
     private readonly redisService: RedisCacheService,
   ) {}
 
-  async save(createRefreshTokenDto: SaveRefreshTokenDto) {
+  async saveRefreshToken(createRefreshTokenDto: SaveRefreshTokenDto) {
     const { userUuid, token } = createRefreshTokenDto;
 
     return this.redisService.set(
