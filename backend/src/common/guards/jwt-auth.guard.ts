@@ -1,4 +1,4 @@
-import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
+import { TokenService } from '@/domain/token/token.service';
 import { UserService } from '@/domain/user/user.service';
 import {
   BadRequestException,
@@ -19,7 +19,7 @@ export class JwtAuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private configService: ConfigService,
-    private refreshTokenService: RefreshTokenService,
+    private refreshTokenService: TokenService,
     private userService: UserService,
   ) {}
 
@@ -100,7 +100,7 @@ export class JwtAuthGuard implements CanActivate {
       throw new NotFoundException('리프레시 토큰이 존재하지 않습니다.');
     }
 
-    const user = await this.userService.findOne(decodedRefreshToken.uuid);
+    const user = await this.userService.findUserById({ uuid: decodedRefreshToken.uuid });
 
     if (!user) {
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');

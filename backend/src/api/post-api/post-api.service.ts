@@ -161,7 +161,7 @@ export class PostApiService {
     const posts = await this.postService.findPosts({ where: { OR: blockPostUuids } });
 
     const userUuids = posts.map((post) => ({ uuid: post.userUuid }));
-    const users = await this.userService.findUsers({ where: { OR: userUuids } });
+    const users = await this.userService.findUsersByIds(userUuids);
 
     // 3. 게시글과 연관된 모든 블록을 찾는다.
     const entireBlocks = ([] as Block[]).concat(...(await this.findEntireBlocksWithPost(posts)));
@@ -179,7 +179,7 @@ export class PostApiService {
       throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
     }
 
-    const user = await this.userService.findUserByUniqueInput({ uuid: post.userUuid });
+    const user = await this.userService.findUserById({ uuid: post.userUuid });
 
     if (!user) {
       throw new NotFoundException(`Cloud not found User with UUID: ${post.userUuid}`);

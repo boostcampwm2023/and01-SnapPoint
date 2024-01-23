@@ -1,13 +1,12 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '@/domain/user/user.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenService } from '@/domain/token/token.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { SignUpDto } from './dto/signup.dto';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,26 +17,33 @@ export class AuthService {
     readonly tokenService: TokenService,
   ) {}
 
-  async signup(createAuthDto: CreateAuthDto) {
-    const user = await this.userService.findUserByUniqueInput({ email: createAuthDto.email });
+  async signUp(createAuthDto: CreateAuthDto) {
+    const { email } = createAuthDto;
+    const user = await this.userService.findUserByEmail({ email });
 
     if (user) {
       throw new ConflictException('이미 존재하는 이메일입니다.');
     }
 
-    const newUser = await this.userService.create(createAuthDto);
+    const newUser = await this.userService.createUser(createAuthDto);
 
     return SignUpDto.of(newUser);
   }
 
   async validateUser(loginAuthDto: LoginAuthDto) {
-    const user = await this.userService.findUserByUniqueInput({ email: loginAuthDto.email });
+    const { email, password } = loginAuthDto;
+
+    const user = await this.userService.findUserByEmail({ email });
 
     if (!user) {
       throw new NotFoundException('해당 유저가 존재하지 않습니다.');
     }
 
-    await this.verifyPassword(loginAuthDto.password, user.password);
+    const isValidPassword = await this.userService.verifyPassword({ password, hashedPassword: user.password });
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException('아이디 또는 비밀번호가 다릅니다.');
+    }
 
     const [accessToken, refreshToken] = await Promise.all([
       this.tokenService.generateAccessToken(user),
@@ -50,13 +56,6 @@ export class AuthService {
     });
 
     return LoginDto.of(accessToken, refreshToken);
-  }
-
-  async verifyPassword(plainText: string, hash: string) {
-    const isPasswordMatching = await bcrypt.compare(plainText, hash);
-    if (!isPasswordMatching) {
-      throw new BadRequestException('잘못된 비밀번호입니다.');
-    }
   }
 
   async signOut(refreshToken: string) {

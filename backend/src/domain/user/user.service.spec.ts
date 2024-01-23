@@ -52,7 +52,7 @@ describe('UserService', () => {
       prisma.user.findUnique.mockResolvedValueOnce(null);
       prisma.user.create.mockResolvedValueOnce(userMock);
 
-      const result = await userService.create(createUserDto);
+      const result = await userService.createUser(createUserDto);
 
       expect(result).toEqual(userMock);
     });
