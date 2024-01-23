@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, IsStrongPassword, MinLength } from 'class-validator';
 
-export class CreateAuthDto {
+export class SignUpDto {
   @IsEmail()
   @ApiProperty({ description: '유저의 이메일' })
   readonly email: string;

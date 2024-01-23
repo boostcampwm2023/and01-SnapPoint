@@ -3,9 +3,9 @@ import { UserService } from '@/domain/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenService } from '@/domain/token/token.service';
-import { LoginAuthDto } from './dto/login-auth.dto';
-import { LoginDto } from './dto/login.dto';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { TokenDto } from './dto/token';
+import { SignUpDto } from './dto/sign-up.dto';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -17,26 +17,26 @@ export class AuthService {
     readonly tokenService: TokenService,
   ) {}
 
-  async signUp(createAuthDto: CreateAuthDto) {
-    const { email } = createAuthDto;
+  async signUp(SignUpDto: SignUpDto) {
+    const { email } = SignUpDto;
     const user = await this.userService.findUserByEmail({ email });
 
     if (user) {
       throw new ConflictException('이미 존재하는 이메일입니다.');
     }
 
-    const newUser = await this.userService.createUser(createAuthDto);
+    const newUser = await this.userService.createUser(SignUpDto);
 
-    return SignUpDto.of(newUser);
+    return UserDto.of(newUser);
   }
 
-  async validateUser(loginAuthDto: LoginAuthDto) {
-    const { email, password } = loginAuthDto;
+  async signIn(SignInDto: SignInDto) {
+    const { email, password } = SignInDto;
 
     const user = await this.userService.findUserByEmail({ email });
 
     if (!user) {
-      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
+      throw new UnauthorizedException('아이디 또는 비밀번호가 다릅니다.');
     }
 
     const isValidPassword = await this.userService.verifyPassword({ password, hashedPassword: user.password });
@@ -55,7 +55,7 @@ export class AuthService {
       token: refreshToken,
     });
 
-    return LoginDto.of(accessToken, refreshToken);
+    return TokenDto.of(accessToken, refreshToken);
   }
 
   async signOut(refreshToken: string) {
