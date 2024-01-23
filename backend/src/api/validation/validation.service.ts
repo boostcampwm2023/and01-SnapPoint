@@ -3,10 +3,43 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable 
 import { ValidateFileDto } from '@/api/validation/dtos/validate-file.dto';
 import { ValidateBlockDto } from '@/api/validation/dtos/validate-block.dto';
 import { AttachFileDto } from '../post-api/dtos/file/attach-file.dto';
+import { FindNearbyPostDto } from '../post-api/dtos/find-nearby-post.dto';
 
 @Injectable()
 export class ValidationService {
   constructor(private readonly fileService: FileService) {}
+
+  /**
+   * 두 지점의 거리를 계산하고, KM 단위로 반환한다.
+   * @param latMin 위도의 최솟값
+   * @param lonMin 경도의 최솟값
+   * @param latMax 위도의 최댓값
+   * @param lonMax 경도의 최댓값
+   * @returns 두 지점의 거리 (KM 단위)
+   */
+  private calDistance(latMin: number, lonMin: number, latMax: number, lonMax: number) {
+    const R = 6371000; // 지구 반지름 (미터 단위)
+    const rad = Math.PI / 180; // 도를 라디안으로 변환
+
+    const x = (lonMax * rad - lonMin * rad) * Math.cos((latMin * rad + latMax * rad) / 2);
+    const y = latMax * rad - latMin * rad;
+
+    return (Math.sqrt(x * x + y * y) * R) / 1000;
+  }
+
+  /**
+   * 조회할 영역이 적합한 영역인지 검사해 반환한다.
+   * @param dto
+   */
+  validateLookupArea(dto: FindNearbyPostDto) {
+    const { latitudeMin, latitudeMax, longitudeMin, longitudeMax } = dto;
+
+    const dist = this.calDistance(latitudeMin, longitudeMin, latitudeMax, longitudeMax);
+
+    if (dist > 20.0) {
+      throw new BadRequestException(`The lookup areas is too large`);
+    }
+  }
 
   async validateFiles(fileDtos: ValidateFileDto[], userUuid: string) {
     const fileWhereInputs = fileDtos.map((fileDto) => ({ uuid: fileDto.uuid }));

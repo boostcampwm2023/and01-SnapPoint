@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -35,7 +35,7 @@ model Post {
   uuid        String   @unique @default(uuid())
   userUuid    String
   title       String
-  summary     String
+  summary     String?
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)
@@ -54,8 +54,9 @@ model Block {
   type        String
   order       Int
   content     String
-  coords      Unsupported("geometry(Point, 4326)")?
-  @@index([coords], name: "coord_idx", type: Gist)
+  latitude    Float?
+  longitude   Float?
+  @@index([latitude, longitude])
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
   isDeleted   Boolean  @default(false)

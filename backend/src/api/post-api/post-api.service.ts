@@ -153,6 +153,9 @@ export class PostApiService {
   async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
+    // 올바른 위치인지 게시글을 검증한다.
+    this.validation.validateLookupArea(findNearbyPostDto);
+
     // 1. 현 위치 주변의 블록을 찾는다.
     const blocks = await this.blockService.findBlocksByArea(findNearbyPostDto);
 
@@ -213,7 +216,7 @@ export class PostApiService {
 
     // 게시글, 블록, 파일 생성을 비동기 병렬 처리한다.
     const [createdPost, createdBlocks, createdFiles] = await Promise.all([
-      this.postService.createPost(userUuid, { ...post, summary: '' }),
+      this.postService.createPost(userUuid, post),
       this.blockService.createBlocks(post.uuid, blocks),
       this.fileService.attachFiles(files),
     ]);
@@ -230,7 +233,7 @@ export class PostApiService {
 
   @Transactional()
   async modifyPost(uuid: string, userUuid: string, postDto: ModifyPostDto) {
-    const decomposedPostDto = this.transform.decomposePostData(postDto);
+    const decomposedPostDto = this.transform.decomposePostData(postDto, uuid);
     const { post, blocks, files } = decomposedPostDto;
 
     const existPost = await this.accessPost(uuid, userUuid);
