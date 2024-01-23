@@ -31,17 +31,6 @@ export class TransformationService {
     };
   }
 
-  toMapFromArray<T, K, V>(items: T[], extractKeyFn: (item: T) => K, transformFn: (item: T) => V): Map<K, V[]> {
-    const map = new Map<K, V[]>();
-    items.forEach((item) => {
-      const key = extractKeyFn(item);
-      const collection = map.get(key) || [];
-      collection.push(transformFn(item));
-      map.set(key, collection);
-    });
-    return map;
-  }
-
   /**
    * 게시글 파일의 썸네일 유무에 따라 분할해 반환한다.
    * @param files 게시글의 파일 데이터들

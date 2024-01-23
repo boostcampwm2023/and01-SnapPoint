@@ -1,10 +1,4 @@
-import {
-  ForbiddenException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
@@ -24,6 +18,7 @@ import { WritePostDto } from './dtos/post/write-post.dto';
 import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { SummaryPostDto } from '../summarization/dtos/summary-post.dto';
+import { UtilityService } from '@/common/utility/utility.service';
 
 @Injectable()
 export class PostApiService {
@@ -36,6 +31,7 @@ export class PostApiService {
     private readonly redisService: RedisCacheService,
     @Inject('SUMMARY_SERVICE') private readonly summaryService: ClientProxy,
     private readonly userService: UserService,
+    private readonly utils: UtilityService,
   ) {}
 
   private assemblePost(post: Post, user: User, blocks: Block[], files: File[]): PostDto {
@@ -49,13 +45,13 @@ export class PostApiService {
   }
 
   private createBlockDtoMap(files: File[], blocks: Block[]) {
-    const fileDtoMap = this.transform.toMapFromArray<File, string, FileDto>(
+    const fileDtoMap = this.utils.toTransMapFromArray<File, string, FileDto>(
       files,
       (file: File) => file.sourceUuid!,
       (file: File) => FileDto.of(file),
     );
 
-    const blockDtoMap = this.transform.toMapFromArray<Block, string, BlockDto>(
+    const blockDtoMap = this.utils.toTransMapFromArray<Block, string, BlockDto>(
       blocks,
       (block: Block) => block.postUuid,
       (block: Block) => BlockDto.of(block, fileDtoMap.get(block.uuid)),
@@ -207,7 +203,10 @@ export class PostApiService {
     const { post, blocks, files } = decomposedPostDto;
 
     // 게시글의 블록, 파일을 각각 검사한다.
-    await Promise.all([this.validation.validateBlocks(blocks, files), this.validation.validateFiles(files, userUuid)]);
+    await Promise.all([
+      this.validation.validateCreateBlocks(blocks, files),
+      // this.validation.validateFiles(files, userUuid)
+    ]);
 
     const user = await this.userService.findUserByUniqueInput({ uuid: userUuid });
     if (!user) {
@@ -236,22 +235,24 @@ export class PostApiService {
     const decomposedPostDto = this.transform.decomposePostData(postDto, uuid);
     const { post, blocks, files } = decomposedPostDto;
 
-    const existPost = await this.accessPost(uuid, userUuid);
-    const user = await this.userService.findUserByUniqueInput({ uuid: existPost.userUuid });
+    const [user] = await Promise.all([
+      this.userService.findUserByUniqueInput({ uuid: userUuid }),
+      this.validation.validatePost({ uuid, userUuid }),
+    ]);
+
+    await this.validation.validateModifyBlocks(uuid, blocks, files);
 
     if (!user) {
-      throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
+      throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
     }
 
-    const [updatedBlocks, updatedFiles] = await Promise.all([
+    const [updatedPost, updatedBlocks, updatedFiles] = await Promise.all([
+      this.postService.updatePost({ where: { uuid }, data: post }),
       this.blockService.modifyBlocks(uuid, blocks),
       this.fileService.modifyFiles(files),
     ]);
 
-    const updatedPost = await this.postService.updatePost({ where: { uuid }, data: { ...post, summary: '' } });
-
-    await this.validation.validateBlocks(blocks, files), this.redisService.del(`file:${uuid}`);
-
+    await this.redisService.del(`file:${uuid}`);
     await this.redisService.del(`block:${uuid}`);
     const deleteCacheKeys = blocks.map((block) => `file:${block.uuid}`);
     await this.redisService.del(deleteCacheKeys);
@@ -264,36 +265,22 @@ export class PostApiService {
 
   @Transactional()
   async deletePost(uuid: string, userUuid: string) {
-    const existPost = await this.accessPost(uuid, userUuid);
-
-    const [deletedPost, user] = await Promise.all([
-      this.postService.deletePost({ uuid }),
+    const [user] = await Promise.all([
       this.userService.findUserByUniqueInput({ uuid: userUuid }),
+      this.validation.validatePost({ uuid, userUuid }),
     ]);
 
     if (!user) {
-      throw new NotFoundException(`Cloud not found User with UUID: ${existPost.userUuid}`);
+      throw new NotFoundException(`Cloud not found User with UUID: ${userUuid}`);
     }
 
-    const blocks = await this.blockService.deleteBlocksByPost(existPost.uuid);
-    const files = await this.fileService.deleteFilesBySources('block', blocks);
+    const deletedPost = await this.postService.deletePost({ uuid });
+    const deletedBlocks = await this.blockService.deleteBlocksByPost(uuid);
+    const deletedFiles = await this.fileService.deleteFilesBySources('block', deletedBlocks);
 
-    const willDeleteFileKeys = blocks.map(({ uuid }) => `file:${uuid}`);
+    const willDeleteFileKeys = deletedBlocks.map(({ uuid }) => `file:${uuid}`);
     await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
 
-    return this.assemblePost(deletedPost, user, blocks, files);
-  }
-
-  private async accessPost(uuid: string, userUuid: string) {
-    const existPost = await this.postService.findPost({ uuid });
-
-    if (!existPost) {
-      throw new NotFoundException(`Cloud not found post with UUID: ${uuid}`);
-    }
-
-    if (existPost.userUuid !== userUuid) {
-      throw new ForbiddenException('Could not access this post. please check your permission.');
-    }
-    return existPost;
+    return this.assemblePost(deletedPost, user, deletedBlocks, deletedFiles);
   }
 }

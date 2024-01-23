@@ -21,6 +21,7 @@ import { HttpModule } from '@nestjs/axios';
 import { FileModule } from '@/domain/file/file.module';
 import { SummarizationService } from './summarization/summarization.service';
 import { SummarizationController } from './summarization/summarizationi.controller';
+import { UtilityModule } from '@/common/utility/utility.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { SummarizationController } from './summarization/summarizationi.controll
     BlockModule,
     HttpModule,
     FileModule,
+    UtilityModule,
   ],
   controllers: [FileApiController, PostApiController, AuthController, SummarizationController],
   providers: [

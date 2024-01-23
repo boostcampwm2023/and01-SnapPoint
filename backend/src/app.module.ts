@@ -16,6 +16,7 @@ import { RedisCacheModule } from './common/redis/redis-cache.module';
 import { HealthModule } from './common/health/health.module';
 import { TransactionModule, txExtension } from '@takeny1998/nestjs-prisma-transactional';
 import { PRISMA_SERVICE, PrismaService } from './common/databases/prisma.service';
+import { UtilityModule } from './common/utility/utility.module';
 
 @Global()
 @Module({
@@ -45,8 +46,8 @@ import { PRISMA_SERVICE, PrismaService } from './common/databases/prisma.service
     ApiModule,
     RedisCacheModule,
     HealthModule,
+    UtilityModule,
   ],
-  controllers: [],
   providers: [
     RefreshTokenService,
     {
