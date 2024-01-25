@@ -116,7 +116,7 @@ export class ValidationService {
     return post;
   }
 
-  private validateBlock(blockDto: ValidateBlockDto, sourceFiles?: ValidateFileDto[]) {
+  validateBlock(blockDto: ValidateBlockDto, sourceFiles?: ValidateFileDto[]) {
     const { type, latitude, longitude } = blockDto;
 
     if (type === 'text' && (latitude !== undefined || longitude !== undefined)) {

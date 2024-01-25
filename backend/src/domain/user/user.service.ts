@@ -1,103 +1,83 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma, User } from '@prisma/client';
 import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
+import { FindUserByIdDto } from './dto/find-user-by-id.dto';
+import { findUserByEmailDto } from './dto/find-user-by-email.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
+import { VerifyPasswordDto } from './dto/verify-password.dto';
 
 @Injectable()
 export class UserService {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const { email, password, nickname } = createUserDto;
+
+    const hashedPassword = await this.hashPassword(password);
 
     return this.prisma.user.create({
-      data: {
-        email: createUserDto.email,
-        password: hashedPassword,
-        nickname: createUserDto.nickname,
-      },
+      data: { email, nickname, password: hashedPassword },
     });
   }
 
-  findAll(): Promise<User[]> {
-    return this.prisma.user.findMany();
-  }
+  async findUserByEmail(findUserByEmailDto: findUserByEmailDto) {
+    const { email } = findUserByEmailDto;
 
-  async findUserByUniqueInput(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
     return this.prisma.user.findUnique({
-      where,
+      where: { email, isDeleted: false },
     });
   }
 
-  async findUsers(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+  async findUserById(findUserByIdDto: FindUserByIdDto) {
+    const { uuid } = findUserByIdDto;
+
+    return this.prisma.user.findUnique({
+      where: { uuid, isDeleted: false },
+    });
+  }
+
+  async findUsersByIds(findUserByIdDtos: FindUserByIdDto[]) {
+    const conditions = findUserByIdDtos.map(({ uuid }) => uuid);
+
     return this.prisma.user.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
+      where: { uuid: { in: conditions }, isDeleted: false },
     });
   }
 
-  async findOne(uuid: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
-      where: {
-        uuid: uuid,
-      },
-    });
-  }
+  async updateUser(uuid: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const { nickname, password } = updateUserDto;
 
-  async update(uuid: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        uuid: uuid,
-      },
-    });
+    const updateData: Prisma.UserUpdateInput = { nickname };
 
-    if (!user) {
-      throw new BadRequestException();
-    }
-
-    const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
-
-    return this.prisma.user.update({
-      where: {
-        uuid: uuid,
-      },
-      data: {
-        password: hashedPassword,
-        nickname: updateUserDto.nickname,
-      },
-    });
-  }
-
-  async remove(uuid: string) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        uuid: uuid,
-      },
-    });
-
-    if (!user) {
-      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
+    if (password) {
+      updateData.password = await this.hashPassword(password);
     }
 
     return this.prisma.user.update({
-      where: {
-        uuid: uuid,
-      },
-      data: {
-        isDeleted: true,
-      },
+      where: { uuid },
+      data: updateData,
     });
+  }
+
+  async deleteUser(deleteUserDto: DeleteUserDto) {
+    const { uuid } = deleteUserDto;
+
+    return this.prisma.user.update({
+      where: { uuid },
+      data: { isDeleted: true },
+    });
+  }
+
+  async verifyPassword(verifyPasswordDto: VerifyPasswordDto) {
+    const { password, hashedPassword } = verifyPasswordDto;
+
+    return bcrypt.compare(password, hashedPassword);
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
   }
 }

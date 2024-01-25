@@ -1,11 +1,11 @@
 import { Controller, Post, Body, Res, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { LoginAuthDto } from './dto/login-auth.dto';
+import { SignInDto } from './dto/sign-in.dto';
 import { Response } from 'express';
 import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NoAuth } from '@/common/decorator/no-auth.decorator';
 import { Cookies } from '@/common/decorator/cookie.decorator';
+import { SignUpDto } from './dto/sign-up.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -20,8 +20,8 @@ export class AuthController {
   })
   @ApiOkResponse({ description: '성공적으로 유저 생성이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 유저를 생성할 수 없습니다.' })
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.signup(createAuthDto);
+  create(@Body() signUpDto: SignUpDto) {
+    return this.authService.signUp(signUpDto);
   }
 
   @Post('sign-in')
@@ -32,8 +32,8 @@ export class AuthController {
   })
   @ApiOkResponse({ description: '성공적으로 유저 로그인이 완료되었습니다.' })
   @ApiNotFoundResponse({ description: '해당 유저 로그인을 할 수 없습니다.' })
-  async login(@Body() loginAuthDto: LoginAuthDto, @Res({ passthrough: true }) res: Response) {
-    const loginDto = await this.authService.validateUser(loginAuthDto);
+  async signIn(@Body() signInDto: SignInDto, @Res({ passthrough: true }) res: Response) {
+    const loginDto = await this.authService.signIn(signInDto);
 
     res.setHeader('Authorization', 'Bearer ' + [loginDto.accessToken, loginDto.refreshToken]);
     res.cookie('access_token', loginDto.accessToken, {
@@ -52,8 +52,8 @@ export class AuthController {
     description: '로그아웃에 성공하면 201번을 반환한다.',
   })
   @ApiOkResponse({ description: '성공적으로 로그아웃이 완료되었습니다.' })
-  async logout(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
-    await this.authService.logout(refreshToken);
+  async signOut(@Cookies('refresh_token') refreshToken: string, @Res({ passthrough: true }) res: Response) {
+    await this.authService.signOut(refreshToken);
     res.cookie('access_token', '', {
       httpOnly: true,
       maxAge: 0,

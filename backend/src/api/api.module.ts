@@ -10,7 +10,6 @@ import { AuthController } from '@/api/auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '@/common/strategies/auth.jwt.strategy';
-import { RefreshTokenService } from '@/domain/refresh-token/refresh-token.service';
 import { UserService } from '@/domain/user/user.service';
 import { AuthService } from './auth/auth.service';
 import { RedisCacheModule } from '@/common/redis/redis-cache.module';
@@ -22,6 +21,7 @@ import { FileModule } from '@/domain/file/file.module';
 import { SummarizationService } from './summarization/summarization.service';
 import { SummarizationController } from './summarization/summarizationi.controller';
 import { UtilityModule } from '@/common/utility/utility.module';
+import { TokenModule } from '@/domain/token/token.module';
 
 @Module({
   imports: [
@@ -78,6 +78,7 @@ import { UtilityModule } from '@/common/utility/utility.module';
     HttpModule,
     FileModule,
     UtilityModule,
+    TokenModule,
   ],
   controllers: [FileApiController, PostApiController, AuthController, SummarizationController],
   providers: [
@@ -90,7 +91,6 @@ import { UtilityModule } from '@/common/utility/utility.module';
     AuthService,
     UserService,
     JwtStrategy,
-    RefreshTokenService,
     SummarizationService,
   ],
 })

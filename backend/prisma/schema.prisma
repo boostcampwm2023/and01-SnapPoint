@@ -21,15 +21,6 @@ model User {
   isDeleted  Boolean  @default(false)  
 }
 
-model RefreshToken {
-  id        Int   @id @default(autoincrement())
-  userUuid  String   @unique
-  token     String   
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-}
-
 model Post {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique @default(uuid())

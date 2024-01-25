@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from '@/domain/user/user.service';
 import { PRISMA_SERVICE, PrismaService } from '@/common/databases/prisma.service';
 import { ClientProxy } from '@nestjs/microservices';
+import { UtilityModule } from '@/common/utility/utility.module';
 
 describe('PostApiController', () => {
   let controller: PostApiController;
@@ -23,7 +24,7 @@ describe('PostApiController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PostApiController],
-      imports: [],
+      imports: [UtilityModule],
       providers: [
         PostApiService,
         ValidationService,

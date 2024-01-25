@@ -14,6 +14,7 @@ import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
 import { ReadPostQuery } from './dtos/read-post.query.dto';
 import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { WritePostDto } from './dtos/post/write-post.dto';
+import { AuthRequest } from '@/common/guards/auth-request.interface';
 
 @Controller('posts')
 export class PostApiController {
@@ -55,9 +56,8 @@ export class PostApiController {
     type: PostDto,
   })
   @ApiNotFoundResponse({ description: '업로드한 파일 정보를 찾을 수 없습니다.' })
-  writePost(@Body() postDto: WritePostDto, @Req() request: any) {
-    const { uuid: userUuid } = request.user;
-    return this.postApiService.writePost(postDto, userUuid);
+  writePost(@Body() postDto: WritePostDto, @Req() request: AuthRequest) {
+    return this.postApiService.writePost(postDto, request.user);
   }
 
   @Put('/:uuid')
@@ -67,9 +67,8 @@ export class PostApiController {
     description: '작성한 게시글의 내용 및 블록 정보를 업데이트한다.',
     type: PostDto,
   })
-  modifyPost(@Param('uuid') uuid: string, @Body() postDto: ModifyPostDto, @Req() request: any) {
-    const { uuid: userUuid } = request.user;
-    return this.postApiService.modifyPost(uuid, userUuid, postDto);
+  modifyPost(@Param('uuid') uuid: string, @Body() postDto: ModifyPostDto, @Req() request: AuthRequest) {
+    return this.postApiService.modifyPost(uuid, postDto, request.user);
   }
 
   @Delete('/:uuid')
@@ -79,8 +78,7 @@ export class PostApiController {
     description: '작성한 게시글의 내용 및 블록 정보를 업데이트한다.',
     type: PostDto,
   })
-  deletePost(@Param('uuid') uuid: string, @Req() request: any) {
-    const { uuid: userUuid } = request.user;
-    return this.postApiService.deletePost(uuid, userUuid);
+  deletePost(@Param('uuid') uuid: string, @Req() request: AuthRequest) {
+    return this.postApiService.deletePost(uuid, request.user);
   }
 }
