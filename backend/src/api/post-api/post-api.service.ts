@@ -3,9 +3,7 @@ import { PostService } from '@/domain/post/post.service';
 import { BlockService } from '@/domain/block/block.service';
 import { FileService } from '@/domain/file/file.service';
 import { ValidationService } from '@/api/validation/validation.service';
-import { BlockDto } from '@/domain/block/dtos/block.dto';
 import { PostDto } from '@/domain/post/dtos/post.dto';
-import { FileDto } from '@/api/post-api/dtos/file.dto';
 import { Block, File, Post } from '@prisma/client';
 import { TransformationService } from '@/api/transformation/transformation.service';
 import { FindNearbyPostQuery } from './dtos/find-nearby-post.query.dto';
@@ -18,48 +16,20 @@ import { WritePostDto } from './dtos/post/write-post.dto';
 import { ModifyPostDto } from './dtos/post/modify-post.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { SummaryPostDto } from '../summarization/dtos/summary-post.dto';
-import { UtilityService } from '@/common/utility/utility.service';
 import { UserPayload } from '@/common/guards/user-payload.interface';
 
 @Injectable()
 export class PostApiService {
   constructor(
-    private readonly validation: ValidationService,
-    private readonly transform: TransformationService,
     private readonly postService: PostService,
     private readonly blockService: BlockService,
     private readonly fileService: FileService,
+    private readonly userService: UserService,
+    private readonly validation: ValidationService,
+    private readonly transform: TransformationService,
     private readonly redisService: RedisCacheService,
     @Inject('SUMMARY_SERVICE') private readonly summaryService: ClientProxy,
-    private readonly userService: UserService,
-    private readonly utils: UtilityService,
   ) {}
-
-  private assemblePost(post: Post, user: UserPayload, blocks: Block[], files: File[]): PostDto {
-    const blockDtoMap = this.createBlockDtoMap(files, blocks);
-    return PostDto.of(post, user, blockDtoMap.get(post.uuid)!);
-  }
-
-  private assemblePosts(posts: Post[], users: UserPayload[], blocks: Block[], files: File[]): PostDto[] {
-    const blockDtoMap = this.createBlockDtoMap(files, blocks);
-    return posts.map((post, index) => PostDto.of(post, users[index], blockDtoMap.get(post.uuid)!));
-  }
-
-  private createBlockDtoMap(files: File[], blocks: Block[]) {
-    const fileDtoMap = this.utils.toTransMapFromArray<File, string, FileDto>(
-      files,
-      (file: File) => file.sourceUuid!,
-      (file: File) => FileDto.of(file),
-    );
-
-    const blockDtoMap = this.utils.toTransMapFromArray<Block, string, BlockDto>(
-      blocks,
-      (block: Block) => block.postUuid,
-      (block: Block) => BlockDto.of(block, fileDtoMap.get(block.uuid)),
-    );
-
-    return blockDtoMap;
-  }
 
   async findEntireBlocksWithPost(posts: Post[]): Promise<Block[][]> {
     const keys = posts.map((post) => `block:${post.uuid}`);
@@ -147,7 +117,7 @@ export class PostApiService {
     return entireFiles;
   }
 
-  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery): Promise<PostDto[]> {
+  async findNearbyPost(findNearbyPostQuery: FindNearbyPostQuery) {
     const findNearbyPostDto = this.transform.toNearbyPostDtoFromQuery(findNearbyPostQuery);
 
     // 올바른 위치인지 게시글을 검증한다.
@@ -168,7 +138,7 @@ export class PostApiService {
     // 4. 블록과 연관된 모든 파일을 찾는다.
     const entireFiles = ([] as File[]).concat(...(await this.findEntireFilesWithBlocks(entireBlocks)));
 
-    return this.assemblePosts(posts, users, entireBlocks, entireFiles);
+    return this.transform.assemblePosts(posts, users, entireBlocks, entireFiles);
   }
 
   async findPost(uuid: string, detail: boolean = true) {
@@ -194,7 +164,7 @@ export class PostApiService {
     // 3. 블록들과 연관된 파일들을 찾는다.
     const files = await this.fileService.findFilesBySources('block', blocks);
 
-    return this.assemblePost(post, user, blocks, files);
+    return this.transform.assemblePost(post, user, blocks, files);
   }
 
   @Transactional()
@@ -223,7 +193,7 @@ export class PostApiService {
 
     this.summaryService.emit<SummaryPostDto>({ cmd: 'summary.post' }, { post: createdPost, blocks: createdBlocks });
 
-    return this.assemblePost(createdPost, user, createdBlocks, createdFiles);
+    return this.transform.assemblePost(createdPost, user, createdBlocks, createdFiles);
   }
 
   @Transactional()
@@ -249,7 +219,7 @@ export class PostApiService {
     // 게시글 내용을 요약한다.
     this.summaryService.emit<SummaryPostDto>({ cmd: 'summary.post' }, { post: updatedPost, blocks: updatedBlocks });
 
-    return this.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
+    return this.transform.assemblePost(updatedPost, user, updatedBlocks, updatedFiles);
   }
 
   @Transactional()
@@ -263,6 +233,6 @@ export class PostApiService {
     const willDeleteFileKeys = deletedBlocks.map(({ uuid }) => `file:${uuid}`);
     await Promise.all([this.redisService.del(`block:${uuid}`), this.redisService.del(willDeleteFileKeys)]);
 
-    return this.assemblePost(deletedPost, user, deletedBlocks, deletedFiles);
+    return this.transform.assemblePost(deletedPost, user, deletedBlocks, deletedFiles);
   }
 }
